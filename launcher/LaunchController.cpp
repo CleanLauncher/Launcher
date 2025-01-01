@@ -35,6 +35,9 @@
  */
 
 #include "LaunchController.h"
+
+#include <meta/BaseEntity.h>
+
 #include "Application.h"
 #include "launch/steps/PrintServers.h"
 #include "minecraft/auth/AccountData.h"
@@ -94,8 +97,7 @@ void LaunchController::decideAccount()
     if (!accounts->anyAccountIsValid()) {
         // Tell the user they need to log in at least one account in order to play.
         auto reply = CustomMessageBox::selectable(m_parentWidget, tr("No Accounts"),
-                                                  tr("In order to play Minecraft, you must have at least one Microsoft "
-                                                     "account which owns Minecraft logged in. "
+                                                  tr("In order to play Minecraft, you must have at least one account added. "
                                                      "Would you like to open the account manager to add an account now?"),
                                                   QMessageBox::Information, QMessageBox::Yes | QMessageBox::No)
                          ->exec();
@@ -303,7 +305,7 @@ void LaunchController::login()
 
     m_session = std::make_shared<AuthSession>();
     m_session->launchMode = m_actualLaunchMode;
-    m_accountToUse->fillSession(m_session);
+    m_accountToUse->fillSession(m_session, m_instance->settings()->get("ElyPatchPreference").toInt());
 
     if (m_accountToUse->accountType() != AccountType::Offline) {
         if (m_actualLaunchMode == LaunchMode::Normal && !m_accountToUse->hasProfile()) {
@@ -395,7 +397,17 @@ void LaunchController::launchInstance()
         online_mode = "online";
 
         // Prepend Server Status
-        QStringList servers = { "login.microsoftonline.com", "session.minecraft.net", "textures.minecraft.net", "api.mojang.com" };
+        QStringList servers;
+        if (m_session->wantsElyPatch) {
+            servers = { "ely.by", "account.ely.by", "skinsystem.ely.by" };
+        } else {
+            servers = { "login.microsoftonline.com", "session.minecraft.net", "textures.minecraft.net", "api.mojang.com" };
+        }
+
+        const auto s = APPLICATION->settings();
+        const QString metaOverride = s->get("MetaURLOverride").toString();
+        const QUrl metaUrl = !metaOverride.isEmpty() ? QUrl(metaOverride) : QUrl(BuildConfig.META_URL);
+        servers.prepend(metaUrl.host(QUrl::FullyEncoded));
 
         m_launcher->prependStep(makeShared<PrintServers>(m_launcher, servers));
     } else {

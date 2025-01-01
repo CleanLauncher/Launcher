@@ -587,6 +587,10 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
             migrated = handleDataMigration(
                 dataPath, FS::PathCombine(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "../../multimc"), "MultiMC",
                 "multimc.cfg");
+        if (!migrated)
+            migrated = handleDataMigration(
+                dataPath, FS::PathCombine(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "../../PrismLauncher"),
+                "Prism Launcher", "prismlauncher.cfg");
     }
 
     {
@@ -637,7 +641,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     // Initialize application settings
     {
         // Provide a fallback for migration from PolyMC
-        m_settings.reset(new INISettingsObject({ BuildConfig.LAUNCHER_CONFIGFILE, "polymc.cfg", "multimc.cfg" }, this));
+        m_settings.reset(
+            new INISettingsObject({ BuildConfig.LAUNCHER_CONFIGFILE, "prismlauncher.cfg", "polymc.cfg", "multimc.cfg" }, this));
 
         // Theming
         m_settings->registerSetting("IconTheme", QString());
@@ -753,6 +758,9 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
         // Legacy settings
         m_settings->registerSetting("OnlineFixes", false);
+
+        // Ely settings
+        m_settings->registerSetting("ElyPatchPreference", 1);
 
         // Native library workarounds
         m_settings->registerSetting("UseNativeOpenAL", false);
@@ -876,6 +884,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
         // Custom Microsoft Authentication Client ID
         m_settings->registerSetting("MSAClientIDOverride", "");
+        // Custom Ely.by Accounts OAuth ID
+        m_settings->registerSetting("ElyClientIDOverride", "");
 
         // Custom Flame API Key
         {
@@ -1022,6 +1032,19 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
     // now we have network, download translation updates
     m_translations->downloadIndex();
+
+    // now we have network, fix meta URL
+    // don't mind this SHIT code it's temporary anyway
+    if (m_settings->get("MetaURLOverride").toString().contains("elyprismlauncher.github.io")) {
+        auto [request, response] = Net::Download::makeByteArray(QUrl("https://api.github.com/repos/ElyPrismLauncher/elyprismlauncher.github.io"));
+        request->setNetwork(m_network.get());
+        connect(request.get(), &Task::finished, this, [this, request, response] {
+            if (request->replyStatusCode() == 404 || response->contains("\"status\": \"404\"")) {
+                m_settings->set("MetaURLOverride", "https://pineconemc.github.io/meta/v1");
+            }
+        });
+        request->start();
+    }
 
     // FIXME: what to do with these?
     m_profilers.insert("jprofiler", std::shared_ptr<BaseProfilerFactory>(new JProfilerFactory()));
@@ -1878,6 +1901,16 @@ QString Application::getMSAClientID()
     }
 
     return BuildConfig.MSA_CLIENT_ID;
+}
+
+QString Application::getElyClientID()
+{
+    QString clientIDOverride = m_settings->get("ElyClientIDOverride").toString();
+    if (!clientIDOverride.isEmpty()) {
+        return clientIDOverride;
+    }
+
+    return BuildConfig.ELY_CLIENT_ID;
 }
 
 QString Application::getFlameAPIKey()

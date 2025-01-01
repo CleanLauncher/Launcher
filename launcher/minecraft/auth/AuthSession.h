@@ -25,6 +25,8 @@ struct AuthSession {
     QString user_type;
     // the actual launch mode for this session
     LaunchMode launchMode;
+    // settings & account type allow for Ely.by patch?
+    bool wantsElyPatch = false;
 };
 
 using AuthSessionPtr = std::shared_ptr<AuthSession>;
