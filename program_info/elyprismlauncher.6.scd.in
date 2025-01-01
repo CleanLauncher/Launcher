@@ -13,10 +13,10 @@
 
 # DESCRIPTION
 
-Prism Launcher is a custom launcher for Minecraft that allows you to easily manage
-multiple installations of Minecraft at once. It also allows you to easily
-install and remove mods by simply dragging and dropping.
-Here are the current features of Prism Launcher.
+PineconeMC is a fork of Prism Launcher, a custom launcher for Minecraft that allows you to easily manage
+multiple installations of Minecraft at once, with integrated support for Ely.by accounts & skin system.
+
+PineconeMC is not endorsed by Prism Launcher or Ely.by.
 
 # OPTIONS
 

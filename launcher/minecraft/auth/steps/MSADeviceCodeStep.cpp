@@ -59,14 +59,13 @@ void MSADeviceCodeStep::perform()
 {
     QUrlQuery data;
     data.addQueryItem("client_id", m_clientId);
-    data.addQueryItem("scope", "XboxLive.SignIn XboxLive.offline_access");
+    data.addQueryItem("scope", m_scopes);
     auto payload = data.query(QUrl::FullyEncoded).toUtf8();
-    QUrl url("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode");
     auto headers = QList<Net::HeaderPair>{
         { "Content-Type", "application/x-www-form-urlencoded" },
         { "Accept", "application/json" },
     };
-    auto [request, response] = Net::Upload::makeByteArray(url, payload);
+    auto [request, response] = Net::Upload::makeByteArray(m_deviceCodeUrl, payload);
     m_request = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
@@ -177,12 +176,11 @@ void MSADeviceCodeStep::authenticateUser()
     data.addQueryItem("grant_type", "urn:ietf:params:oauth:grant-type:device_code");
     data.addQueryItem("device_code", m_device_code);
     auto payload = data.query(QUrl::FullyEncoded).toUtf8();
-    QUrl url("https://login.microsoftonline.com/consumers/oauth2/v2.0/token");
     auto headers = QList<Net::HeaderPair>{
         { "Content-Type", "application/x-www-form-urlencoded" },
         { "Accept", "application/json" },
     };
-    auto [request, response] = Net::Upload::makeByteArray(url, payload);
+    auto [request, response] = Net::Upload::makeByteArray(m_tokenUrl, payload);
     m_request = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
 

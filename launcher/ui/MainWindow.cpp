@@ -952,7 +952,7 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 // format of url curseforge://install?addonId=IDHERE&fileId=IDHERE
                 // format of url binaryname://install?platform=curseforge&addonId=IDHERE&fileId=IDHERE
                 QUrlQuery query(url);
-                
+
                 // check if this is a binaryname:// url
                 if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) {
                     // check this is an curseforge platform request

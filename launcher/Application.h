@@ -164,6 +164,7 @@ class Application : public QApplication {
     QString getJarPath(QString jarFile);
 
     QString getMSAClientID();
+    QString getElyClientID();
     QString getFlameAPIKey();
     QString getModrinthAPIToken();
     QString getUserAgent();

@@ -67,10 +67,10 @@ MinecraftAccountPtr MinecraftAccount::loadFromJsonV3(const QJsonObject& json)
     return nullptr;
 }
 
-MinecraftAccountPtr MinecraftAccount::createBlankMSA()
+MinecraftAccountPtr MinecraftAccount::createBlank(const AccountType type)
 {
     MinecraftAccountPtr account(new MinecraftAccount());
-    account->data.type = AccountType::MSA;
+    account->data.type = type;
     return account;
 }
 
@@ -163,7 +163,7 @@ void MinecraftAccount::authFailed(QString reason)
             // NOTE: this doesn't do much. There was an error of some sort.
         } break;
         case AccountTaskState::STATE_FAILED_HARD: {
-            if (accountType() == AccountType::MSA) {
+            if (accountType() == AccountType::MSA || accountType() == AccountType::Ely) {
                 data.msaToken.token = QString();
                 data.msaToken.refresh_token = QString();
                 data.msaToken.validity = Validity::None;
@@ -193,10 +193,23 @@ void MinecraftAccount::authFailed(QString reason)
 
 QString MinecraftAccount::displayName() const
 {
+    const auto typeFriendlyString = [](const AccountType type) {
+        switch (type) {
+            case AccountType::MSA:
+                return QStringLiteral("MSA");
+            case AccountType::Ely:
+                return QStringLiteral("Ely.by");
+            case AccountType::Offline:
+                return QStringLiteral("Offline");
+        }
+        Q_ASSERT_X(false, "MinecraftAccount::displayName", "No type friendly string mapping for current account type");
+        return QString();
+    };
+    const QString nameWithType = QString("%1 [%2]").arg(profileName(), typeFriendlyString(data.type));
     if (const QList validStates{ AccountState::Unchecked, AccountState::Working, AccountState::Offline, AccountState::Online }; !validStates.contains(accountState())) {
-        return QString("⚠ %1").arg(profileName());
+        return QString("⚠ %1").arg(nameWithType);
     }
-    return profileName();
+    return nameWithType;
 }
 
 bool MinecraftAccount::isActive() const
@@ -239,7 +252,7 @@ bool MinecraftAccount::shouldRefresh() const
     return false;
 }
 
-void MinecraftAccount::fillSession(AuthSessionPtr session)
+void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreference)
 {
     // volatile auth token
     session->access_token = data.accessToken();
@@ -255,6 +268,20 @@ void MinecraftAccount::fillSession(AuthSessionPtr session)
         session->session = "token:" + data.accessToken() + ":" + data.profileId();
     } else {
         session->session = "-";
+    }
+    switch (elyPatchPreference) {
+        case 0: { // Always
+            session->wantsElyPatch = true;
+        } break;
+        case 1: { // When using Ely and Offline accounts
+            session->wantsElyPatch = data.type == AccountType::Ely || data.type == AccountType::Offline;
+        } break;
+        case 2: { // When using Ely accounts
+            session->wantsElyPatch = data.type == AccountType::Ely;
+        } break;
+        default: { // Never/unknown
+            session->wantsElyPatch = false;
+        }
     }
 }
 
