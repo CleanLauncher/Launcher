@@ -398,6 +398,7 @@ if(UNIX AND APPLE)
 
     # Add the icon
     install(FILES ${Launcher_Branding_ICNS} DESTINATION ${RESOURCES_DEST_DIR} RENAME ${Launcher_Name}.icns)
+    install(FILES ${Launcher_Branding_macos_ASSETSCAR} DESTINATION ${RESOURCES_DEST_DIR} )
 
 elseif(UNIX)
     include(KDEInstallDirs)
