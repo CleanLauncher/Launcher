@@ -44,6 +44,7 @@
 #include "FileSystem.h"
 #include "JavaCommon.h"
 #include "java/JavaInstallList.h"
+#include "java/JavaPerformance.h"
 #include "java/JavaUtils.h"
 #include "settings/Setting.h"
 #include "SysInfo.h"
@@ -104,8 +105,16 @@ JavaSettingsWidget::JavaSettingsWidget(BaseInstance* instance, QWidget* parent)
     connect(m_ui->maxMemSpinBox, &QSpinBox::valueChanged, this, &JavaSettingsWidget::updateThresholds);
     connect(m_ui->minMemSpinBox, &QSpinBox::valueChanged, this, &JavaSettingsWidget::updateThresholds);
 
+    connect(m_ui->javaInstallationGroupBox, &QGroupBox::toggled, this, &JavaSettingsWidget::updateLauncherArgs);
+    connect(m_ui->javaPathTextBox, &QLineEdit::textChanged, this, &JavaSettingsWidget::updateLauncherArgs);
+    connect(m_ui->optimizedArgsCheckBox, &QCheckBox::toggled, this, &JavaSettingsWidget::updateLauncherArgs);
+    connect(m_ui->noPresetRadioButton, &QRadioButton::toggled, this, &JavaSettingsWidget::updateLauncherArgs);
+    connect(m_ui->g1gcPresetRadioButton, &QRadioButton::toggled, this, &JavaSettingsWidget::updateLauncherArgs);
+    connect(m_ui->zgcPresetRadioButton, &QRadioButton::toggled, this, &JavaSettingsWidget::updateLauncherArgs);
+
     loadSettings();
     updateThresholds();
+    updateLauncherArgs();
 }
 
 JavaSettingsWidget::~JavaSettingsWidget()
@@ -129,7 +138,7 @@ void JavaSettingsWidget::loadSettings()
     m_ui->skipCompatibilityCheckBox->setChecked(settings->get("IgnoreJavaCompatibility").toBool());
 
     m_ui->javaArgumentsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideJavaArgs").toBool());
-    m_ui->jvmArgsTextBox->setPlainText(settings->get("JvmArgs").toString());
+    m_ui->userArgsTextBox->setPlainText(settings->get("JvmArgs").toString());
 
     if (m_instance == nullptr) {
         m_ui->skipWizardCheckBox->setChecked(settings->get("IgnoreJavaWizard").toBool());
@@ -153,7 +162,17 @@ void JavaSettingsWidget::loadSettings()
 
     // Java arguments
     m_ui->javaArgumentsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideJavaArgs").toBool());
-    m_ui->jvmArgsTextBox->setPlainText(settings->get("JvmArgs").toString());
+    m_ui->userArgsTextBox->setPlainText(settings->get("JvmArgs").toString());
+
+    m_ui->optimizedArgsCheckBox->setChecked(settings->get("UseOptimizedJvmArgs").toBool());
+    auto preset = settings->get("GarbageCollectorPreset").toString();
+    if (preset == "G1GC") {
+        m_ui->g1gcPresetRadioButton->toggle();
+    } else if (preset == "ZGC") {
+        m_ui->zgcPresetRadioButton->toggle();
+    } else {
+        m_ui->noPresetRadioButton->toggle();
+    }
 }
 
 void JavaSettingsWidget::saveSettings()
@@ -217,9 +236,19 @@ void JavaSettingsWidget::saveSettings()
         settings->set("OverrideJavaArgs", javaArgs);
 
     if (javaArgs) {
-        settings->set("JvmArgs", m_ui->jvmArgsTextBox->toPlainText().replace("\n", " "));
+        settings->set("JvmArgs", m_ui->userArgsTextBox->toPlainText().replace("\n", " "));
+        settings->set("UseOptimizedJvmArgs", m_ui->optimizedArgsCheckBox->isChecked());
+        QString preset = "None";
+        if (m_ui->g1gcPresetRadioButton->isChecked()) {
+            preset = "G1GC";
+        } else if (m_ui->zgcPresetRadioButton->isChecked()) {
+            preset = "ZGC";
+        }
+        settings->set("GarbageCollectorPreset", preset);
     } else {
         settings->reset("JvmArgs");
+        settings->reset("UseOptimizedJvmArgs");
+        settings->reset("GarbageCollectorPreset");
     }
 }
 
@@ -248,7 +277,7 @@ void JavaSettingsWidget::onJavaTest()
     QString jvmArgs;
 
     if (m_instance == nullptr || m_ui->javaArgumentsGroupBox->isChecked())
-        jvmArgs = m_ui->jvmArgsTextBox->toPlainText().replace("\n", " ");
+        jvmArgs = m_ui->userArgsTextBox->toPlainText().replace("\n", " ");
     else
         jvmArgs = APPLICATION->settings()->get("JvmArgs").toString();
 
@@ -304,4 +333,30 @@ void JavaSettingsWidget::updateThresholds()
     } else {
         m_ui->labelMaxMemNotice->hide();
     }
+}
+
+void JavaSettingsWidget::updateLauncherArgs()
+{
+    QString javaPath = APPLICATION->settings()->get("JavaPath").toString();
+    if (m_instance == nullptr || m_ui->javaInstallationGroupBox->isChecked()) {
+        javaPath = m_ui->javaPathTextBox->text();
+    }
+    m_versionChecker.reset(new JavaChecker(javaPath, "", 0, 0, 0, 0));
+    connect(m_versionChecker.get(), &JavaChecker::checkFinished, this, [this](const JavaChecker::Result& result) {
+        if (result.validity != JavaChecker::Result::Validity::Valid) {
+            m_ui->launcherArgsTextBox->setText(tr("Java path invalid"));
+            return;
+        }
+
+        auto preset = JavaPerformance::GarbageCollectorPreset::None;
+        if (m_ui->g1gcPresetRadioButton->isChecked()) {
+            preset = JavaPerformance::GarbageCollectorPreset::G1GC;
+        } else if (m_ui->zgcPresetRadioButton->isChecked()) {
+            preset = JavaPerformance::GarbageCollectorPreset::ZGC;
+        }
+
+        m_ui->launcherArgsTextBox->setText(
+            JavaPerformance::getCompletePerformanceArgs(result.javaVersion, m_ui->optimizedArgsCheckBox->isChecked(), preset).join(" "));
+    });
+    m_versionChecker->start();
 }

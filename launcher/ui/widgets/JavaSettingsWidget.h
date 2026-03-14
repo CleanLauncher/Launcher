@@ -60,9 +60,11 @@ class JavaSettingsWidget : public QWidget {
     void onJavaAutodetect();
     void onJavaTest();
     void updateThresholds();
+    void updateLauncherArgs();
 
    private:
     BaseInstance* m_instance;
     Ui::JavaSettingsWidget* m_ui;
     unique_qobject_ptr<JavaCommon::TestCheck> m_checker;
+    JavaChecker::Ptr m_versionChecker;
 };
