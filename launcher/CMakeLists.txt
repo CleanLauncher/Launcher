@@ -436,6 +436,8 @@ set(JAVA_SOURCES
     java/JavaUtils.cpp
     java/JavaVersion.h
     java/JavaVersion.cpp
+    java/JavaPerformance.cpp
+    java/JavaPerformance.h
 
     java/JavaMetadata.h
     java/JavaMetadata.cpp
