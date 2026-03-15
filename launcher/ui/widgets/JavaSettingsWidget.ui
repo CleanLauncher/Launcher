@@ -364,13 +364,24 @@
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="8" column="1">
-       <widget class="QPlainTextEdit" name="userArgsTextBox"/>
+      <item row="7" column="1">
+       <widget class="QLabel" name="argsNoticeLabel">
+        <property name="text">
+         <string notr="true">Java Arguments Notice</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="1">
        <widget class="QRadioButton" name="noPresetRadioButton">
         <property name="text">
          <string>None</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QRadioButton" name="g1gcPresetRadioButton">
+        <property name="text">
+         <string>G1GC</string>
         </property>
        </widget>
       </item>
@@ -384,17 +395,20 @@
         </property>
        </widget>
       </item>
+      <item row="9" column="1">
+       <widget class="QPlainTextEdit" name="userArgsTextBox"/>
+      </item>
+      <item row="4" column="1">
+       <widget class="QRadioButton" name="zgcPresetRadioButton">
+        <property name="text">
+         <string>ZGC</string>
+        </property>
+       </widget>
+      </item>
       <item row="5" column="1">
        <widget class="QLabel" name="optimizedArgsLabel">
         <property name="text">
          <string>Java Arguments chosen by launcher:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QLabel" name="customArgsLabel">
-        <property name="text">
-         <string>Custom Java Arguments:</string>
         </property>
        </widget>
       </item>
@@ -405,17 +419,10 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QRadioButton" name="g1gcPresetRadioButton">
+      <item row="8" column="1">
+       <widget class="QLabel" name="customArgsLabel">
         <property name="text">
-         <string>G1GC</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QRadioButton" name="zgcPresetRadioButton">
-        <property name="text">
-         <string>ZGC (requires Java 17+)</string>
+         <string>Custom Java Arguments:</string>
         </property>
        </widget>
       </item>

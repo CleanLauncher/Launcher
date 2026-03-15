@@ -31,5 +31,5 @@ namespace JavaPerformance {
 
     QStringList getMojangOptimizationArgs(const JavaVersion& version, GarbageCollectorPreset preset);
     QStringList getGarbageCollectorArgs(const JavaVersion& version, GarbageCollectorPreset preset);
-    QStringList getCompletePerformanceArgs(const JavaVersion& version, bool useOptimized, GarbageCollectorPreset preset);
+    QStringList getCompletePerformanceArgs(const JavaVersion& version, bool useOptimized, GarbageCollectorPreset preset, QString* warning = nullptr);
 }
