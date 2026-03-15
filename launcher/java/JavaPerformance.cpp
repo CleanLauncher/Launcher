@@ -19,6 +19,7 @@
 #include "JavaPerformance.h"
 
 #include <QDebug>
+#include <QObject>
 
 QStringList JavaPerformance::getMojangOptimizationArgs(const JavaVersion& version, const GarbageCollectorPreset preset)
 {
@@ -40,10 +41,7 @@ QStringList JavaPerformance::getMojangOptimizationArgs(const JavaVersion& versio
     // -XX:+UseStringDeduplication
     // Since Java 8 for G1GC
     // Since Java 18 for ZGC
-    if ((version.major() >= 8 && preset == GarbageCollectorPreset::G1GC)
-        // There is 1 GC that didn't get support for string deduplication in Java 18: Shenandoah GC
-        // Because of this, we cannot assume this argument is 100% guaranteed to be compatible with user arguments
-        || (version.major() >= 18 && preset != GarbageCollectorPreset::None)) {
+    if ((version.major() >= 8 && preset == GarbageCollectorPreset::G1GC) || version.major() >= 18) {
         args << "-XX:+UseStringDeduplication";
     }
 
@@ -72,11 +70,14 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
     return {};
 }
 
-QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion& version, const bool useOptimized, GarbageCollectorPreset preset)
+QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion& version, const bool useOptimized, GarbageCollectorPreset preset, QString* warning)
 {
     // ZGC was declared as production ready in Java 15, but did not receive support for macOS/aarch64 until Java 17
     if (preset == GarbageCollectorPreset::ZGC && version.major() < 17) {
         preset = GarbageCollectorPreset::G1GC;
+        if (warning) {
+            *warning = QObject::tr("ZGC requires Java 17 or higher, using G1GC");
+        }
     }
 
     if (!useOptimized) {

@@ -355,8 +355,17 @@ void JavaSettingsWidget::updateLauncherArgs()
             preset = JavaPerformance::GarbageCollectorPreset::ZGC;
         }
 
+        QString warning;
         m_ui->launcherArgsTextBox->setText(
-            JavaPerformance::getCompletePerformanceArgs(result.javaVersion, m_ui->optimizedArgsCheckBox->isChecked(), preset).join(" "));
+            JavaPerformance::getCompletePerformanceArgs(result.javaVersion, m_ui->optimizedArgsCheckBox->isChecked(), preset, &warning)
+                .join(" "));
+        if (!warning.isEmpty()) {
+            const auto warningColour(QStringLiteral("<span style='color:#f5c211'>%1</span>"));
+            m_ui->argsNoticeLabel->setText(warningColour.arg(warning));
+            m_ui->argsNoticeLabel->show();
+        } else {
+            m_ui->argsNoticeLabel->hide();
+        }
     });
     m_versionChecker->start();
 }
