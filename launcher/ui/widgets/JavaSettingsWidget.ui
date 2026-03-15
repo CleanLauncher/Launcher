@@ -377,10 +377,10 @@
       <item row="0" column="1">
        <widget class="QCheckBox" name="optimizedArgsCheckBox">
         <property name="toolTip">
-         <string>Adds arguments that generally improve game performance. Some arguments may not be available depending on Java version</string>
+         <string>Some arguments may not be available depending on Java version</string>
         </property>
         <property name="text">
-         <string>Use optimized JVM arguments</string>
+         <string>Use Mojang optimized defaults</string>
         </property>
        </widget>
       </item>
@@ -415,7 +415,7 @@
       <item row="4" column="1">
        <widget class="QRadioButton" name="zgcPresetRadioButton">
         <property name="text">
-         <string>ZGC (if supported, requires Java 17+)</string>
+         <string>ZGC (requires Java 17+)</string>
         </property>
        </widget>
       </item>
