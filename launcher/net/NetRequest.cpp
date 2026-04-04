@@ -119,6 +119,8 @@ void NetRequest::executeTask()
     request.setTransferTimeout();
 #endif
 
+    request.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
+
     m_last_progress_time = m_clock.now();
     m_last_progress_bytes = 0;
 
