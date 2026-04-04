@@ -42,6 +42,7 @@ void PineconeNetworkCheck::launchRequest(const QUrl& url, Result ifSuccess)
 {
     QNetworkRequest request(url);
     request.setTransferTimeout(std::chrono::seconds(3));
+    request.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
     auto* reply = m_network->head(request);
     m_pendingRequests++;
 
