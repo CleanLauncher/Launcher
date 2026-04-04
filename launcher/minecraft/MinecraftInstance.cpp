@@ -641,7 +641,7 @@ QStringList MinecraftInstance::javaArguments()
     if (presetString == "ZGC") {
         preset = JavaPerformance::GarbageCollectorPreset::ZGC;
     }
-    args.append(JavaPerformance::getCompletePerformanceArgs(javaVersion, m_settings->get("UseOptimizedJavaPreset").toBool(), preset));
+    args.append(JavaPerformance::getCompletePerformanceArgs(javaVersion, m_settings->get("UseOptimizedJvmArgs").toBool(), preset));
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
