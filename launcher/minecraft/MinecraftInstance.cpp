@@ -98,6 +98,8 @@
 #include <QStandardPaths>
 #include <QWindow>
 
+#include "java/JavaPerformance.h"
+
 #ifdef Q_OS_LINUX
 #include "LibraryUtils.h"
 #endif
@@ -189,8 +191,10 @@ void MinecraftInstance::loadSpecificSettings()
 
     if (auto global_settings = globalSettings()) {
         m_settings->registerOverride(global_settings->getSetting("JavaPath"), locationOverride);
-        m_settings->registerOverride(global_settings->getSetting("JvmArgs"), argsOverride);
         m_settings->registerOverride(global_settings->getSetting("IgnoreJavaCompatibility"), locationOverride);
+        m_settings->registerOverride(global_settings->getSetting("JvmArgs"), argsOverride);
+        m_settings->registerOverride(global_settings->getSetting("UseOptimizedJvmArgs"), argsOverride);
+        m_settings->registerOverride(global_settings->getSetting("GarbageCollectorPreset"), argsOverride);
 
         // special!
         m_settings->registerPassthrough(global_settings->getSetting("JavaSignature"), locationOverride);
@@ -628,6 +632,16 @@ QStringList MinecraftInstance::javaArguments()
             args << QString("-XX:PermSize=%1m").arg(permgen);
         }
     }
+
+    const auto presetString = m_settings->get("GarbageCollectorPreset");
+    auto preset = JavaPerformance::GarbageCollectorPreset::None;
+    if (presetString == "G1GC") {
+        preset = JavaPerformance::GarbageCollectorPreset::G1GC;
+    }
+    if (presetString == "ZGC") {
+        preset = JavaPerformance::GarbageCollectorPreset::ZGC;
+    }
+    args.append(JavaPerformance::getCompletePerformanceArgs(javaVersion, m_settings->get("UseOptimizedJavaPreset").toBool(), preset));
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
         // allow reflective access to java.net - required by the skin fix
