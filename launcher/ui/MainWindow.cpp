@@ -286,6 +286,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         connect(newsLabel, &QAbstractButton::clicked, this, &MainWindow::newsButtonClicked);
         connect(m_newsChecker.get(), &NewsChecker::newsLoaded, this, &MainWindow::updateNewsLabel);
+        connect(APPLICATION, &Application::shouldReloadNews, m_newsChecker.get(), &NewsChecker::reloadNews);
         updateNewsLabel();
     }
 
@@ -406,7 +407,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // load the news
     {
-        m_newsChecker->reloadNews();
+        //m_newsChecker->reloadNews();
         updateNewsLabel();
     }
 

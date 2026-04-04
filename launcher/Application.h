@@ -51,6 +51,7 @@
 
 #include "minecraft/auth/MinecraftAccount.h"
 
+class PineconeNetworkCheck;
 class LaunchController;
 class LocalPeer;
 class InstanceWindow;
@@ -210,6 +211,8 @@ class Application : public QApplication {
 
     void oauthReplyRecieved(QVariantMap);
 
+    void shouldReloadNews(QString newUrl);
+
 #ifdef Q_OS_MACOS
     void clickedOnDock();
 #endif
@@ -302,6 +305,8 @@ class Application : public QApplication {
     LocalPeer* m_peerInstance = nullptr;
 
     SetupWizard* m_setupWizard = nullptr;
+
+    std::unique_ptr<PineconeNetworkCheck> m_pineconeNetworkCheck;
 
    public:
     QString m_detectedGLFWPath;
