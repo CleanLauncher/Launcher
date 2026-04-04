@@ -76,12 +76,8 @@ bool PineconeNetworkCheck::handleUrlOverride(const QString& overrideName, const 
     if (currentOverride == newOverride) {
         return false;
     }
-    if (!currentOverride.isEmpty()) {
-        for (const auto& url : urlMap.values()) {
-            if (currentOverride != url) {
-                return false;
-            }
-        }
+    if (!currentOverride.isEmpty() && !urlMap.values().contains(currentOverride)) {
+        return false;
     }
 
     settings->set(overrideName, newOverride);
