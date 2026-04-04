@@ -397,7 +397,7 @@ void LaunchController::launchInstance()
         online_mode = "online";
 
         // Prepend Server Status
-        const QStringList servers;
+        QStringList servers;
         if (m_session->wantsElyPatch) {
             servers = { "ely.by", "account.ely.by", "skinsystem.ely.by" };
         } else {

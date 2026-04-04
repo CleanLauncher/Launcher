@@ -124,6 +124,7 @@
 #include <DesktopServices.h>
 #include <FileSystem.h>
 #include <LocalPeer.h>
+#include <PineconeNetworkCheck.h>
 
 #include <stdlib.h>
 #include "SysInfo.h"
@@ -1036,18 +1037,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     // now we have network, download translation updates
     m_translations->downloadIndex();
 
-    // now we have network, fix meta URL
-    // don't mind this SHIT code it's temporary anyway
-    if (m_settings->get("MetaURLOverride").toString().contains("elyprismlauncher.github.io")) {
-        auto [request, response] = Net::Download::makeByteArray(QUrl("https://api.github.com/repos/ElyPrismLauncher/elyprismlauncher.github.io"));
-        request->setNetwork(m_network.get());
-        connect(request.get(), &Task::finished, this, [this, request, response] {
-            if (request->replyStatusCode() == 404 || response->contains("\"status\": \"404\"")) {
-                m_settings->set("MetaURLOverride", "https://pineconemc.github.io/meta/v1");
-            }
-        });
-        request->start();
-    }
+    m_pineconeNetworkCheck = std::make_unique<PineconeNetworkCheck>(m_network.get());
+    connect(m_pineconeNetworkCheck.get(), &PineconeNetworkCheck::shouldReloadNews, this, &Application::shouldReloadNews);
 
     // FIXME: what to do with these?
     m_profilers.insert("jprofiler", std::shared_ptr<BaseProfilerFactory>(new JProfilerFactory()));

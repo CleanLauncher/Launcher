@@ -54,7 +54,7 @@ class NewsChecker : public QObject {
      * Reloads the news from the website's RSS feed.
      * If the news is already loading, this does nothing.
      */
-    void Q_SLOT reloadNews();
+    void Q_SLOT reloadNews(const QString& newUrl = {});
 
    signals:
     /*!
