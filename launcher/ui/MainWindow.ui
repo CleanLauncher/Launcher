@@ -321,6 +321,14 @@
     <enum>QAction::MenuRole::PreferencesRole</enum>
    </property>
   </action>
+  <action name="actionManageSkins">
+   <property name="icon">
+    <iconset theme="settings"/>
+   </property>
+   <property name="text">
+    <string>Manage &amp;Skins...</string>
+   </property>
+  </action>
   <action name="actionManageAccounts">
    <property name="icon">
     <iconset theme="accounts"/>
@@ -519,7 +527,7 @@
     <string>Close the current window</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::QuitRole</enum>
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
   <action name="actionViewInstanceFolder">
