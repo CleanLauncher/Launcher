@@ -24,14 +24,14 @@ body:
     - macOS
     - Linux
     - Other
-- type: textarea
+- type: input
   attributes:
     label: Version of PineconeMC
     description: The version of PineconeMC used in the bug report.
     placeholder: PineconeMC 10.0.6
   validations:
     required: true
-- type: textarea
+- type: input
   attributes:
     label: Version of Qt
     description: The version of Qt used in the bug report. You can find it in Help -> About PineconeMC -> About Qt.
