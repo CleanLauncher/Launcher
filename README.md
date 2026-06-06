@@ -1,3 +1,8 @@
+> [!CAUTION]
+> **There's now malicious links in the wild that disguise themselves as this project.**
+>
+> Make sure that you download PineconeMC from `elyprismlauncher.github.io` and/or `pineconemc.ru`.
+
 <p align="center">
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="/program_info/ru.pineconemc.launcher.logo-darkmode.svg">
