@@ -583,9 +583,9 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
             dataPath, FS::PathCombine(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "../../PolyMC"), "PolyMC",
             "polymc.cfg");
         if (!migrated) {
-            migrated = handleDataMigration(dataPath,
-                                FS::PathCombine(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "../../multimc"),
-                                "MultiMC", "multimc.cfg");
+            migrated = handleDataMigration(
+                dataPath, FS::PathCombine(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "../../multimc"), "MultiMC",
+                "multimc.cfg");
         }
         if (!migrated) {
             handleDataMigration(dataPath,
