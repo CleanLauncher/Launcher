@@ -109,7 +109,9 @@ runs:
                 QT_ARCH="win64_msvc2022_64"
                 aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
                   -O "$GITHUB_WORKSPACE/qt" \
-                  -m qtimageformats qtnetworkauth
+                  -m qtimageformats qtnetworkauth || \
+                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
+                  -O "$GITHUB_WORKSPACE/qt"
                 ;;
               *)     QT_ARCH="win64_msvc2022_64" ;;
             esac
@@ -118,7 +120,9 @@ runs:
 
         aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
           -O "$GITHUB_WORKSPACE/qt" \
-          -m qtimageformats qtnetworkauth
+          -m qtimageformats qtnetworkauth || \
+        aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
+          -O "$GITHUB_WORKSPACE/qt"
 
         QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
         if [ ! -d "$QT_ROOT" ]; then
