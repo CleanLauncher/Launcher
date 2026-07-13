@@ -21,7 +21,6 @@
 let
   date =
     let
-      # YYYYMMDD
       date' = lib.substring 0 8 self.lastModifiedDate;
       year = lib.substring 0 4 date';
       month = lib.substring 4 2 date';
@@ -36,7 +35,6 @@ let
     else
       "unknown";
 
-  # Remove once https://github.com/NixOS/nixpkgs/pull/518987 lands
   extra-cmake-modules = kdePackages.extra-cmake-modules.overrideAttrs (prevAttrs: {
     meta = prevAttrs.meta // {
       platforms = lib.platforms.all;
@@ -89,16 +87,13 @@ stdenv.mkDerivation {
   ++ lib.optional stdenv.hostPlatform.isLinux gamemode;
 
   cmakeFlags = [
-    # downstream branding
     (lib.cmakeFeature "Launcher_BUILD_PLATFORM" "nixpkgs")
   ]
   ++ lib.optionals (msaClientID != null) [
     (lib.cmakeFeature "Launcher_MSA_CLIENT_ID" (toString msaClientID))
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    # we wrap our binary manually
     (lib.cmakeFeature "INSTALL_BUNDLE" "nodeps")
-    # disable built-in updater
     (lib.cmakeFeature "MACOSX_SPARKLE_UPDATE_FEED_URL" "''")
     (lib.cmakeFeature "CMAKE_INSTALL_PREFIX" "${placeholder "out"}/Applications/")
   ];

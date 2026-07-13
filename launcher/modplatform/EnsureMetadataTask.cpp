@@ -59,8 +59,7 @@ Hashing::Hasher::Ptr EnsureMetadataTask::createNewHash(Resource* resource)
 
 QString EnsureMetadataTask::getExistingHash(Resource* resource)
 {
-    // Check for already computed hashes
-    // (linear on the number of mods vs. linear on the size of the mod's JAR)
+
     auto it = m_resources.keyValueBegin();
     while (it != m_resources.keyValueEnd()) {
         if ((*it).second == resource)
@@ -68,18 +67,16 @@ QString EnsureMetadataTask::getExistingHash(Resource* resource)
         it++;
     }
 
-    // We already have the hash computed
     if (it != m_resources.keyValueEnd()) {
         return (*it).first;
     }
 
-    // No existing hash
     return {};
 }
 
 bool EnsureMetadataTask::abort()
 {
-    // Prevent sending signals to a dead object
+
     disconnect(this, 0, 0, 0);
 
     if (m_currentTask)
@@ -98,14 +95,12 @@ void EnsureMetadataTask::executeTask()
             continue;
         }
 
-        // They already have the right metadata :o
         if (resource->status() != ResourceStatus::NoMetadata && resource->metadata() && resource->metadata()->provider == m_provider) {
             qDebug() << "Resource" << resource->name() << "already has metadata!";
             emitReady(resource);
             continue;
         }
 
-        // Folders don't have metadata
         if (resource->type() == ResourceType::FOLDER) {
             emitReady(resource);
         }
@@ -209,15 +204,12 @@ void EnsureMetadataTask::emitFail(Resource* resource, QString key, RemoveFromLis
     }
 }
 
-// Modrinth
-
 Task::Ptr EnsureMetadataTask::modrinthVersionsTask()
 {
     auto hash_type = ModPlatform::ProviderCapabilities::hashType(ModPlatform::ResourceProvider::MODRINTH).first();
 
     auto [ver_task, response] = modrinth_api.currentVersions(m_resources.keys(), hash_type);
 
-    // Prevents unfortunate timings when aborting the task
     if (!ver_task)
         return Task::Ptr{ nullptr };
 
@@ -277,7 +269,6 @@ Task::Ptr EnsureMetadataTask::modrinthProjectsTask()
         std::tie(proj_task, response) = modrinth_api.getProjects(addonIds.keys());
     }
 
-    // Prevents unfortunate timings when aborting the task
     if (!proj_task)
         return Task::Ptr{ nullptr };
 
@@ -314,7 +305,6 @@ Task::Ptr EnsureMetadataTask::modrinthProjectsTask()
                 qDebug() << e.cause();
                 qDebug() << doc;
 
-                // Skip this entry, since it has problems
                 continue;
             }
 
@@ -337,7 +327,6 @@ Task::Ptr EnsureMetadataTask::modrinthProjectsTask()
     return proj_task;
 }
 
-// Flame
 Task::Ptr EnsureMetadataTask::flameVersionsTask()
 {
     QList<uint> fingerprints;
@@ -425,7 +414,6 @@ Task::Ptr EnsureMetadataTask::flameProjectsTask()
         std::tie(proj_task, response) = flame_api.getProjects(addonIds.keys());
     }
 
-    // Prevents unfortunate timings when aborting the task
     if (!proj_task)
         return Task::Ptr{ nullptr };
 
@@ -479,7 +467,7 @@ Task::Ptr EnsureMetadataTask::flameProjectsTask()
 void EnsureMetadataTask::updateMetadata(ModPlatform::IndexedPack& pack, ModPlatform::IndexedVersion& ver, Resource* resource)
 {
     try {
-        // Prevent file name mismatch
+
         ver.fileName = resource->fileinfo().fileName();
         if (ver.fileName.endsWith(".disabled"))
             ver.fileName.chop(9);

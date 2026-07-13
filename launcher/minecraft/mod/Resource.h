@@ -46,20 +46,29 @@
 class BaseInstance;
 
 enum class ResourceType : std::uint8_t {
-    UNKNOWN,     //!< Indicates an unspecified resource type.
-    ZIPFILE,     //!< The resource is a zip file containing the resource's class files.
-    SINGLEFILE,  //!< The resource is a single file (not a zip file).
-    FOLDER,      //!< The resource is in a folder on the filesystem.
-    LITEMOD,     //!< The resource is a litemod
+    UNKNOWN,
+
+    ZIPFILE,
+
+    SINGLEFILE,
+
+    FOLDER,
+
+    LITEMOD,
+
 };
 
 QDebug operator<<(QDebug debug, ResourceType type);
 
 enum class ResourceStatus : std::uint8_t {
-    Installed,     // Both JAR and Metadata are present
-    NotInstalled,  // Only the Metadata is present
-    NoMetadata,    // Only the JAR is present
-    Unknown,       // Default status
+    Installed,
+
+    NotInstalled,
+
+    NoMetadata,
+
+    Unknown,
+
 };
 
 QDebug operator<<(QDebug debug, ResourceStatus status);
@@ -83,11 +92,6 @@ enum class SortType : std::uint8_t {
 
 enum class EnableAction : std::uint8_t { ENABLE, DISABLE, TOGGLE };
 
-/** General class for managed resources. It mirrors a file in disk, with some more info
- *  for display and house-keeping purposes.
- *
- *  Subclass it to add additional data / behavior, such as Mods or Resource packs.
- */
 class Resource : public QObject {
     Q_OBJECT
     Q_DISABLE_COPY(Resource)
@@ -125,30 +129,14 @@ class Resource : public QObject {
     void setMetadata(std::shared_ptr<Metadata::ModStruct>&& metadata);
     void setMetadata(const Metadata::ModStruct& metadata) { setMetadata(std::make_shared<Metadata::ModStruct>(metadata)); }
 
-    /**
-     * Returns compatibility issues with the resource and the instance.
-     * This is initially empty, and may be updated when calling updateIssues.
-     */
     QStringList issues() const;
     void updateIssues(const BaseInstance* inst);
     bool hasIssues() const { return !m_issues.empty(); }
 
-    /** Compares two Resources, for sorting purposes, considering a ascending order, returning:
-     *  > 0: 'this' comes after 'other'
-     *  = 0: 'this' is equal to 'other'
-     *  < 0: 'this' comes before 'other'
-     */
     virtual int compare(const Resource& other, SortType type = SortType::Name) const;
 
-    /** Returns whether the given filter should filter out 'this' (false),
-     *  or if such filter includes the Resource (true).
-     */
     virtual bool applyFilter(QRegularExpression filter) const;
 
-    /** Changes the enabled property, according to 'action'.
-     *
-     *  Returns whether a change was applied to the Resource's properties.
-     */
     bool enable(EnableAction action);
 
     auto shouldResolve() const -> bool { return !m_is_resolving && !m_is_resolved; }
@@ -162,49 +150,36 @@ class Resource : public QObject {
         m_resolution_ticket = resolutionTicket;
     }
 
-    // Delete all files of this resource.
     auto destroy(const QDir& indexDir, bool preserveMetadata = false, bool attemptTrash = true) -> bool;
-    // Delete the metadata only.
+
     auto destroyMetadata(const QDir& indexDir) -> void;
 
     auto isSymLink() const -> bool { return m_file_info.isSymLink(); }
 
-    /**
-     * @brief Take a instance path, checks if the file pointed to by the resource is a symlink or under a symlink in that instance
-     *
-     * @param instPath path to an instance directory
-     * @return true
-     * @return false
-     */
     bool isSymLinkUnder(const QString& instPath) const;
 
     bool isMoreThanOneHardLink() const;
 
    protected:
-    /* The file corresponding to this resource. */
+
     QFileInfo m_file_info;
-    /* The cached date when this file was last changed. */
+
     QDateTime m_changed_date_time;
 
-    /* Internal ID for internal purposes. Properties such as human-readability should not be assumed. */
     QString m_internal_id;
-    /* Name as reported via the file name. In the absence of a better name, this is shown to the user. */
+
     QString m_name;
 
-    /* The type of file we're dealing with. */
     ResourceType m_type = ResourceType::UNKNOWN;
 
-    /* Installation status of the resource. */
     ResourceStatus m_status = ResourceStatus::Unknown;
 
     std::shared_ptr<Metadata::ModStruct> m_metadata = nullptr;
 
-    /* Whether the resource is enabled (e.g. shows up in the game) or not. */
     bool m_enabled = true;
 
     QList<const char*> m_issues;
 
-    /* Used to keep trach of pending / concluded actions on the resource. */
     bool m_is_resolving = false;
     bool m_is_resolved = false;
     int m_resolution_ticket = 0;

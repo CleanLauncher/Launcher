@@ -227,7 +227,8 @@ void ModFilterWidget::prepareBasicFilter()
     m_filter->openSource = false;
     if (m_instance) {
         m_filter->hideInstalled = false;
-        m_filter->side = ModPlatform::Side::NoSide;  // or "both"
+        m_filter->side = ModPlatform::Side::NoSide;
+
         ModPlatform::ModLoaderTypes loaders;
         if (m_instance->settings()->get("OverrideModDownloadLoaders").toBool()) {
             for (auto loader : Json::toStringList(m_instance->settings()->get("ModDownloadLoaders").toString())) {

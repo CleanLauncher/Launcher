@@ -70,9 +70,6 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Used to launch old versions which support applets.
- */
 final class LegacyLauncher extends AbstractLauncher {
     private final String user, session;
     private final String title;
@@ -117,8 +114,6 @@ final class LegacyLauncher extends AbstractLauncher {
             }
         }
 
-        // find and invoke the main method, this time without size parameters - in all
-        // versions that support applets, these are ignored
         MethodHandle method = ReflectionUtils.findMainMethod(main);
         method.invokeExact(gameArgs.toArray(new String[0]));
     }
@@ -131,7 +126,7 @@ final class LegacyLauncher extends AbstractLauncher {
     }
 
     private static Field findMinecraftGameDirField(Class<?> clazz) {
-        // search for private static File
+
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getType() != File.class)
                 continue;

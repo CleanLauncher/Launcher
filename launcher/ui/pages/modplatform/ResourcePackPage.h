@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -32,9 +32,8 @@ class ResourcePackResourcePage : public ResourcePage {
         return page;
     }
 
-    //: The plural version of 'resource pack'
     inline QString resourcesString() const override { return tr("resource packs"); }
-    //: The singular version of 'resource packs'
+
     inline QString resourceString() const override { return tr("resource pack"); }
 
     bool supportsFiltering() const override { return false; };
@@ -50,4 +49,4 @@ class ResourcePackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}  // namespace ResourceDownload
+}

@@ -28,11 +28,6 @@ bool FlameCheckUpdate::abort()
     return result;
 }
 
-/* Check for update:
- * - Get latest version available
- * - Compare hash of the latest version with the current hash
- * - If equal, no updates, else, there's updates, so add to the list
- * */
 void FlameCheckUpdate::executeTask()
 {
     setStatus(tr("Preparing resources for CurseForge..."));
@@ -71,7 +66,6 @@ void FlameCheckUpdate::getLatestVersionCallback(Resource* resource, QByteArray* 
         return;
     }
 
-    // Fake pack with the necessary info to pass to the download task :)
     auto pack = std::make_shared<ModPlatform::IndexedPack>();
     pack->name = resource->name();
     pack->slug = resource->metadata()->slug;
@@ -196,7 +190,8 @@ void FlameCheckUpdate::collectBlockedMods()
         }
     });
 
-    connect(projTask.get(), &Task::finished, this, &FlameCheckUpdate::emitSucceeded);  // do not care much about error
+    connect(projTask.get(), &Task::finished, this, &FlameCheckUpdate::emitSucceeded);
+
     connect(projTask.get(), &Task::progress, this, &FlameCheckUpdate::setProgress);
     connect(projTask.get(), &Task::stepProgress, this, &FlameCheckUpdate::propagateStepProgress);
     connect(projTask.get(), &Task::details, this, &FlameCheckUpdate::setDetails);

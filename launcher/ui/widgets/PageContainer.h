@@ -64,14 +64,9 @@ class PageContainer : public QWidget, public BasePageContainer {
 
     void useSidebarStyle(bool sidebar);
 
-    /*
-     * Save any unsaved state and prepare to be closed.
-     * @return true if everything can be saved, false if there is something that requires attention
-     */
     bool prepareToClose();
     bool saveAll();
 
-    /* request close - used by individual pages */
     bool requestClose() override
     {
         if (m_container) {
@@ -100,7 +95,7 @@ class PageContainer : public QWidget, public BasePageContainer {
     void help();
 
    signals:
-    /** Emitted when the currently selected page is changed */
+
     void selectedPageChanged(BasePage* previous, BasePage* selected);
 
    private slots:

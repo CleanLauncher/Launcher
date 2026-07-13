@@ -96,7 +96,6 @@ struct AccountData {
     QJsonObject saveState() const;
     bool resumeStateFromV3(QJsonObject data);
 
-    //! Yggdrasil access token, as passed to the game.
     QString accessToken() const;
 
     QString profileId() const;
@@ -116,7 +115,6 @@ struct AccountData {
     MinecraftEntitlement minecraftEntitlement;
     Validity validity_ = Validity::None;
 
-    // runtime only information (not saved with the account)
     QString internalId;
     QString errorString;
     QNetworkReply::NetworkError networkError = QNetworkReply::NoError;

@@ -79,7 +79,6 @@ void ProxyPage::applySettings()
 {
     auto s = APPLICATION->settings();
 
-    // Proxy
     QString proxyType = "None";
     if (ui->proxyDefaultBtn->isChecked())
         proxyType = "Default";
@@ -102,7 +101,7 @@ void ProxyPage::applySettings()
 void ProxyPage::loadSettings()
 {
     auto s = APPLICATION->settings();
-    // Proxy
+
     QString proxyType = s->get("ProxyType").toString();
     if (proxyType == "Default")
         ui->proxyDefaultBtn->setChecked(true);

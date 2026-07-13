@@ -64,10 +64,8 @@ import java.util.List;
 public abstract class AbstractLauncher implements Launcher {
     private static final int DEFAULT_WINDOW_WIDTH = 854, DEFAULT_WINDOW_HEIGHT = 480;
 
-    // parameters, separated from ParamBucket
     protected final List<String> gameArgs;
 
-    // secondary parameters
     protected final int width, height;
     protected final boolean maximize;
     protected final String serverAddress, serverPort, worldName;

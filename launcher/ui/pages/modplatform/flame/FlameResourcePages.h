@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -71,7 +71,7 @@ static inline QString metaEntryBase()
 {
     return "FlameMods";
 }
-}  // namespace Flame
+}
 
 class FlameModPage : public ModPage {
     Q_OBJECT
@@ -205,4 +205,4 @@ class FlameDataPackPage : public DataPackResourcePage {
     void openUrl(const QUrl& url) override;
 };
 
-}  // namespace ResourceDownload
+}

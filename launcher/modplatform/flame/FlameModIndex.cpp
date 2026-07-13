@@ -90,12 +90,13 @@ void FlameMod::loadIndexedPackVersions(ModPlatform::IndexedPack& pack, QJsonArra
         if (!file.addonId.isValid())
             file.addonId = pack.addonId;
 
-        if (file.fileId.isValid())  // Heuristic to check if the returned value is valid
+        if (file.fileId.isValid())
+
             unsortedVersions.append(file);
     }
 
     auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-        // dates are in RFC 3339 format
+
         return a.date > b.date;
     };
     std::sort(unsortedVersions.begin(), unsortedVersions.end(), orderSortPredicate);
@@ -178,22 +179,28 @@ auto FlameMod::loadIndexedPackVersion(QJsonObject& obj, bool load_changelog) -> 
         ModPlatform::Dependency dependency;
         dependency.addonId = Json::requireInteger(dep, "modId");
         switch (Json::requireInteger(dep, "relationType")) {
-            case 1:  // EmbeddedLibrary
+            case 1:
+
                 dependency.type = ModPlatform::DependencyType::EMBEDDED;
                 break;
-            case 2:  // OptionalDependency
+            case 2:
+
                 dependency.type = ModPlatform::DependencyType::OPTIONAL;
                 break;
-            case 3:  // RequiredDependency
+            case 3:
+
                 dependency.type = ModPlatform::DependencyType::REQUIRED;
                 break;
-            case 4:  // Tool
+            case 4:
+
                 dependency.type = ModPlatform::DependencyType::TOOL;
                 break;
-            case 5:  // Incompatible
+            case 5:
+
                 dependency.type = ModPlatform::DependencyType::INCOMPATIBLE;
                 break;
-            case 6:  // Include
+            case 6:
+
                 dependency.type = ModPlatform::DependencyType::INCLUDE;
                 break;
             default:

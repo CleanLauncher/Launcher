@@ -68,7 +68,7 @@ void LanguagePage::applySettings()
 
 void LanguagePage::loadSettings()
 {
-    // NIL
+
 }
 
 void LanguagePage::retranslate()

@@ -45,19 +45,26 @@ struct RegReplace {
 
 static const QVector<RegReplace> anonymizeRules = {
     RegReplace(QRegularExpression("C:\\\\Users\\\\([^\\\\]+)\\\\", QRegularExpression::CaseInsensitiveOption),
-               "C:\\Users\\********\\"),  // windows
+               "C:\\Users\\********\\"),
+
     RegReplace(QRegularExpression("C:\\/Users\\/([^\\/]+)\\/", QRegularExpression::CaseInsensitiveOption),
-               "C:/Users/********/"),  // windows with forward slashes
+               "C:/Users/********/"),
+
     RegReplace(QRegularExpression("(?<!\\\\w)\\/home\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption),
-               "/home/********/"),  // linux
+               "/home/********/"),
+
     RegReplace(QRegularExpression("(?<!\\\\w)\\/Users\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption),
-               "/Users/********/"),  // macos
+               "/Users/********/"),
+
     RegReplace(QRegularExpression("\\(Session ID is [^\\)]+\\)", QRegularExpression::CaseInsensitiveOption),
-               "(Session ID is <SESSION_TOKEN>)"),  // SESSION_TOKEN
+               "(Session ID is <SESSION_TOKEN>)"),
+
     RegReplace(QRegularExpression("new refresh token: \"[^\"]+\"", QRegularExpression::CaseInsensitiveOption),
-               "new refresh token: \"<TOKEN>\""),  // refresh token
+               "new refresh token: \"<TOKEN>\""),
+
     RegReplace(QRegularExpression("\"device_code\" :  \"[^\"]+\"", QRegularExpression::CaseInsensitiveOption),
-               "\"device_code\" :  \"<DEVICE_CODE>\""),  // device code
+               "\"device_code\" :  \"<DEVICE_CODE>\""),
+
 };
 
 void anonymizeLog(QString& log)

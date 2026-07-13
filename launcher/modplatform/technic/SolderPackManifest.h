@@ -46,4 +46,4 @@ struct PackBuild {
 
 void loadPackBuild(PackBuild& v, QJsonObject& obj);
 
-}  // namespace TechnicSolder
+}

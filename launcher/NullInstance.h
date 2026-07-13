@@ -72,6 +72,6 @@ class NullInstance : public BaseInstance {
     QString modsRoot() const override { return QString(); }
     void updateRuntimeContext() override
     {
-        // NOOP
+
     }
 };

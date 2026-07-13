@@ -62,13 +62,11 @@ class ModpackListModel : public QAbstractListModel {
 
     auto debugName() const -> QString;
 
-    /* Retrieve information from the model at a given index with the given role */
     auto data(const QModelIndex& index, int role) const -> QVariant override;
     bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
     inline void setActiveJob(NetJob::Ptr ptr) { m_jobPtr = ptr; }
 
-    /* Ask the API for more information */
     void fetchMore(const QModelIndex& parent) override;
     void refresh();
     void searchWithTerm(const QString& term, int sort, std::shared_ptr<ModFilterWidget::Filter> filter, bool filterChanged);
@@ -123,4 +121,4 @@ class ModpackListModel : public QAbstractListModel {
 
     int m_modpacks_per_page = 20;
 };
-}  // namespace Modrinth
+}

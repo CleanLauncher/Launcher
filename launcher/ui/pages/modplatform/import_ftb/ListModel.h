@@ -67,4 +67,4 @@ class ListModel : public QAbstractListModel {
     ModpackList m_modpacks;
     const QString m_instances_path;
 };
-}  // namespace FTBImportAPP
+}

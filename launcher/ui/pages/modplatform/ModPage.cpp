@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -67,7 +67,6 @@ void ModPage::setFilterWidget(std::unique_ptr<ModFilterWidget>& widget)
     }
 
     auto* old = m_ui->splitter->replaceWidget(0, widget.get());
-    // because we replaced the widget we also need to delete it
 
     delete old;
 
@@ -78,8 +77,6 @@ void ModPage::setFilterWidget(std::unique_ptr<ModFilterWidget>& widget)
     connect(m_filter_widget.get(), &ModFilterWidget::filterChanged, this, &ModPage::triggerSearch);
     prepareProviderCategories();
 }
-
-/******** Callbacks to events in the UI (set up in the derived classes) ********/
 
 void ModPage::filterMods()
 {
@@ -109,8 +106,6 @@ QMap<QString, QString> ModPage::urlHandlers() const
     return map;
 }
 
-/******** Make changes to the UI ********/
-
 void ModPage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
                                 ModPlatform::IndexedVersion& version,
                                 ResourceFolderModel* baseModel,
@@ -120,4 +115,4 @@ void ModPage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);
 }
 
-}  // namespace ResourceDownload
+}

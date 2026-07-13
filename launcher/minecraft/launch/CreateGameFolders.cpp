@@ -15,7 +15,6 @@ void CreateGameFolders::executeTask()
         return;
     }
 
-    // HACK: this is a workaround for MCL-3732 - 'server-resource-packs' folder is created.
     if (!FS::ensureFolderPathExists(FS::PathCombine(instance->gameRoot(), "server-resource-packs"))) {
         emit logLine("Couldn't create the 'server-resource-packs' folder", MessageLevel::Error);
     }

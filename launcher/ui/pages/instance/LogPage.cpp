@@ -106,7 +106,7 @@ QModelIndex LogFormatProxyModel::find(const QModelIndex& start, const QString& v
                 if (idx.isValid())
                     return idx;
             }
-            // prepare for the next iteration
+
             from = rowCount() - 1;
             to = start.row();
         }
@@ -120,7 +120,7 @@ QModelIndex LogFormatProxyModel::find(const QModelIndex& start, const QString& v
                 if (idx.isValid())
                     return idx;
             }
-            // prepare for the next iteration
+
             from = 0;
             to = start.row();
         }
@@ -134,7 +134,6 @@ LogPage::LogPage(BaseInstance* instance, QWidget* parent) : QWidget(parent), ui(
 
     m_proxy = new LogFormatProxyModel(this);
 
-    // set up fonts in the log proxy
     {
         QString fontFamily = APPLICATION->settings()->get("ConsoleFont").toString();
         bool conversionOk = false;
@@ -147,7 +146,6 @@ LogPage::LogPage(BaseInstance* instance, QWidget* parent) : QWidget(parent), ui(
 
     ui->text->setModel(m_proxy);
 
-    // set up instance and launch process recognition
     {
         auto launchTask = m_instance->getLaunchTask();
         if (launchTask) {
@@ -240,7 +238,6 @@ void LogPage::on_btnPaste_clicked()
     if (!m_model)
         return;
 
-    // FIXME: turn this into a proper task and move the upload logic out of GuiUtil!
     m_model->append(MessageLevel::Launcher,
                     QString("Log upload triggered at: %1").arg(QDateTime::currentDateTime().toString(Qt::RFC2822Date)));
     auto url = GuiUtil::uploadPaste(tr("Minecraft Log"), m_model->toPlainText(), this);
@@ -316,7 +313,7 @@ void LogPage::findPreviousActivated()
 
 void LogPage::findActivated()
 {
-    // focus the search bar if it doesn't have focus
+
     if (!ui->searchBar->hasFocus()) {
         ui->searchBar->setFocus();
         ui->searchBar->selectAll();

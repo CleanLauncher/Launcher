@@ -16,7 +16,7 @@ LegacyFMLLibrariesTask::LegacyFMLLibrariesTask(MinecraftInstance* inst)
 }
 void LegacyFMLLibrariesTask::executeTask()
 {
-    // Get the mod list
+
     MinecraftInstance* inst = (MinecraftInstance*)m_inst;
     auto components = inst->getPackProfile();
     auto profile = components->getProfile();
@@ -35,14 +35,12 @@ void LegacyFMLLibrariesTask::executeTask()
 
     auto& libList = fmlLibsMapping[version];
 
-    // determine if we need some libs for FML or forge
     setStatus(tr("Checking for FML libraries..."));
     if (!components->getComponent("net.minecraftforge")) {
         emitSucceeded();
         return;
     }
 
-    // now check the lib folder inside the instance for files.
     for (auto& lib : libList) {
         QFileInfo libInfo(FS::PathCombine(inst->libDir(), lib.filename));
         if (libInfo.exists())
@@ -50,13 +48,11 @@ void LegacyFMLLibrariesTask::executeTask()
         fmlLibsToProcess.append(lib);
     }
 
-    // if everything is in place, there's nothing to do here...
     if (fmlLibsToProcess.isEmpty()) {
         emitSucceeded();
         return;
     }
 
-    // download missing libs to our place
     setStatus(tr("Downloading FML libraries..."));
     NetJob::Ptr dljob{ new NetJob("FML libraries", APPLICATION->network()) };
     auto metacache = APPLICATION->metacache();

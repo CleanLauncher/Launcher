@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -43,16 +43,13 @@ QString processComponent(const QJsonValue& value, bool strikethrough = false, bo
 
 bool processPackPNG(const DataPack* pack, QByteArray&& raw_data);
 
-/// processes ONLY the pack.png (rest of the pack may be invalid)
 bool processPackPNG(const DataPack* pack);
 
-/** Checks whether a file is valid as a data pack or not. */
 bool validate(QFileInfo file);
 
-/** Checks whether a file is valid as a resource pack or not. */
 bool validateResourcePack(QFileInfo file);
 
-}  // namespace DataPackUtils
+}
 
 class LocalDataPackParseTask : public Task {
     Q_OBJECT

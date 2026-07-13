@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ShaderPackPage.h"
@@ -16,8 +16,6 @@
 namespace ResourceDownload {
 
 ShaderPackResourcePage::ShaderPackResourcePage(ShaderPackDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance) {}
-
-/******** Callbacks to events in the UI (set up in the derived classes) ********/
 
 void ShaderPackResourcePage::triggerSearch()
 {
@@ -50,4 +48,4 @@ void ShaderPackResourcePage::addResourceToPage(ModPlatform::IndexedPack::Ptr pac
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);
 }
 
-}  // namespace ResourceDownload
+}

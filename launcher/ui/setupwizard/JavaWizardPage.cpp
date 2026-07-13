@@ -62,9 +62,9 @@ bool JavaWizardPage::validatePage()
         }
         case JavaWizardWidget::ValidationStatus::AllOK: {
             settings->set("JavaPath", m_java_widget->javaPath());
-        } /* fallthrough */
+        }
         case JavaWizardWidget::ValidationStatus::JavaBad: {
-            // Memory
+
             auto s = APPLICATION->settings();
             s->set("MinMemAlloc", m_java_widget->minHeapSize());
             s->set("MaxMemAlloc", m_java_widget->maxHeapSize());

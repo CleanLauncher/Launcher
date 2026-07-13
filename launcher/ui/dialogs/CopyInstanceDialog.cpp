@@ -169,7 +169,6 @@ void CopyInstanceDialog::checkAllCheckboxes(const bool& b)
     ui->copyScreenshotsCheckbox->setChecked(b);
 }
 
-// Check the "Select all" checkbox if all options are already selected:
 void CopyInstanceDialog::updateSelectAllCheckbox()
 {
     ui->selectAllCheckbox->blockSignals(true);

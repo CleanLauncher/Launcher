@@ -64,56 +64,38 @@ class Task;
 class LaunchTask;
 class BaseInstance;
 
-/// Shortcut saving target representations
 enum class ShortcutTarget { Desktop, Applications, Other };
 
-/// Shortcut data representation
 struct ShortcutData {
     QString name;
     QString filePath;
     ShortcutTarget target = ShortcutTarget::Other;
 };
 
-/// Console settings
 int getConsoleMaxLines(SettingsObject* settings);
 bool shouldStopOnConsoleOverflow(SettingsObject* settings);
 
-/*!
- * \brief Base class for instances.
- * This class implements many functions that are common between instances and
- * provides a standard interface for all instances.
- *
- * To create a new instance type, create a new class inheriting from this class
- * and implement the pure virtual functions.
- */
 class BaseInstance : public QObject {
     Q_OBJECT
    protected:
-    /// no-touchy!
+
     BaseInstance(SettingsObject* globalSettings, std::unique_ptr<SettingsObject> settings, const QString& rootDir);
 
-   public: /* types */
+   public:
     enum class Status {
         Present,
-        Gone  // either nuked or invalidated
+        Gone
+
     };
 
    public:
-    /// virtual destructor to make sure the destruction is COMPLETE
+
     virtual ~BaseInstance();
 
     virtual void saveNow() = 0;
 
-    /***
-     * the instance has been invalidated - it is no longer tracked by the launcher for some reason,
-     * but it has not necessarily been deleted.
-     *
-     * Happens when the instance folder changes to some other location, or the instance is removed by external means.
-     */
     void invalidate();
 
-    /// The instance's ID. The ID SHALL be determined by LAUNCHER internally. The ID IS guaranteed to
-    /// be unique.
     virtual QString id() const;
 
     void setMinecraftRunning(bool running);
@@ -123,30 +105,23 @@ class BaseInstance : public QObject {
     int64_t lastTimePlayed() const;
     void resetTimePlayed();
 
-    /// get the type of this instance
     QString instanceType() const;
 
-    /// Path to the instance's root directory.
     QString instanceRoot() const;
 
-    /// Path to the instance's game root directory.
     virtual QString gameRoot() const { return instanceRoot(); }
 
-    /// Path to the instance's mods directory.
     virtual QString modsRoot() const = 0;
 
     QString name() const;
     void setName(QString val);
 
-    /// Sync name and rename instance dir accordingly; returns true if successful
     bool syncInstanceDirName(const QString& newRoot) const;
 
-    /// Register a created shortcut
     void registerShortcut(const ShortcutData& data);
     QList<ShortcutData> shortcuts() const;
     void setShortcuts(const QList<ShortcutData>& shortcuts);
 
-    /// Value used for instance window titles
     QString windowTitle() const;
 
     QString iconKey() const;
@@ -170,59 +145,31 @@ class BaseInstance : public QObject {
 
     virtual QStringList extraArguments();
 
-    /// Traits. Normally inside the version, depends on instance implementation.
     virtual QSet<QString> traits() const = 0;
 
-    /**
-     * Gets the time that the instance was last launched.
-     * Stored in milliseconds since epoch.
-     */
     qint64 lastLaunch() const;
-    /// Sets the last launched time to 'val' milliseconds since epoch
+
     void setLastLaunch(qint64 val = QDateTime::currentMSecsSinceEpoch());
 
-    /*!
-     * \brief Gets this instance's settings object.
-     * This settings object stores instance-specific settings.
-     *
-     * Note that this method is not const.
-     * It may call loadSpecificSettings() to ensure those are loaded.
-     *
-     * \return A pointer to this instance's settings object.
-     */
     virtual SettingsObject* settings();
 
-    /*!
-     * \brief Loads settings specific to an instance type if they're not already loaded.
-     */
     virtual void loadSpecificSettings() = 0;
 
-    /// returns a valid update task
     virtual QList<Task::Ptr> createUpdateTask() = 0;
 
-    /// returns a valid launcher (task container)
     virtual LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) = 0;
 
-    /// returns the current launch task (if any)
     LaunchTask* getLaunchTask();
 
-    /*!
-     * Create envrironment variables for running the instance
-     */
     virtual QProcessEnvironment createEnvironment() = 0;
     virtual QProcessEnvironment createLaunchEnvironment() = 0;
 
-    /*!
-     * Returns the root folder to use for looking up log files
-     */
     virtual QStringList getLogFileSearchPaths() = 0;
 
     virtual QString getStatusbarDescription() = 0;
 
-    /// FIXME: this really should be elsewhere...
     virtual QString instanceConfigFolder() const = 0;
 
-    /// get variables this instance exports
     virtual QMap<QString, QString> getVariables() = 0;
 
     virtual QString typeName() const = 0;
@@ -265,9 +212,6 @@ class BaseInstance : public QObject {
 
     bool reloadSettings();
 
-    /**
-     * 'print' a verbose description of the instance into a QStringList
-     */
     virtual QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) = 0;
 
     Status currentStatus() const;
@@ -289,9 +233,7 @@ class BaseInstance : public QObject {
     void setSpecificSettingsLoaded(bool loaded) { m_specific_settings_loaded = loaded; }
 
    signals:
-    /*!
-     * \brief Signal emitted when properties relevant to the instance view change
-     */
+
     void propertiesChanged(BaseInstance* inst);
 
     void launchTaskChanged(LaunchTask*);
@@ -305,16 +247,16 @@ class BaseInstance : public QObject {
    protected slots:
     void iconUpdated(QString key);
 
-   protected: /* data */
+   protected:
     QString m_rootDir;
     std::unique_ptr<SettingsObject> m_settings;
-    // InstanceFlags m_flags;
+
     bool m_isRunning = false;
     std::unique_ptr<LaunchTask> m_launchProcess;
     QDateTime m_timeStarted;
     RuntimeContext m_runtimeContext;
 
-   private: /* data */
+   private:
     Status m_status = Status::Present;
     bool m_crashed = false;
     bool m_hasUpdate = false;
@@ -325,5 +267,3 @@ class BaseInstance : public QObject {
 };
 
 Q_DECLARE_METATYPE(shared_qobject_ptr<BaseInstance>)
-// Q_DECLARE_METATYPE(BaseInstance::InstanceFlag)
-// Q_DECLARE_OPERATORS_FOR_FLAGS(BaseInstance::InstanceFlags)

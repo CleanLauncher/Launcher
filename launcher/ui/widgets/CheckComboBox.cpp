@@ -189,7 +189,6 @@ void CheckComboBox::paintEvent(QPaintEvent*)
     QStylePainter painter(this);
     painter.setPen(palette().color(QPalette::Text));
 
-    // draw the combobox frame, focusrect and selected etc.
     QStyleOptionComboBox opt;
     initStyleOption(&opt);
     QStringList items = checkedItems();
@@ -199,7 +198,6 @@ void CheckComboBox::paintEvent(QPaintEvent*)
         opt.currentText = items.join(separator());
     painter.drawComplexControl(QStyle::CC_ComboBox, opt);
 
-    // draw the icon and text
     painter.drawControl(QStyle::CE_ComboBoxLabel, opt);
 }
 

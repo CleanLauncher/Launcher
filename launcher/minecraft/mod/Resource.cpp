@@ -39,7 +39,7 @@ std::tuple<QString, qint64> calculateFileSize(const QFileInfo& file)
     }
     return { StringUtils::humanReadableFileSize(file.size(), true), file.size() };
 }
-}  // namespace
+}
 
 void Resource::parseFile()
 {
@@ -94,7 +94,7 @@ void removeThePrefix(QString& string)
     string.remove(s_regex);
     string = string.trimmed();
 }
-}  // namespace
+}
 
 auto Resource::provider() const -> QString
 {
@@ -152,7 +152,7 @@ void Resource::updateIssues(const BaseInstance* inst)
     QString mcVersion = profile->getComponentVersion("net.minecraft");
 
     if (!m_metadata->mcVersions.empty() && !m_metadata->mcVersions.contains(mcVersion)) {
-        // delay translation until issues() is called
+
         m_issues.append(QT_TR_NOOP("Not marked as compatible with the instance's game version."));
     }
 }
@@ -173,7 +173,6 @@ int Resource::compare(const Resource& other, SortType type) const
             QString thisName{ name() };
             QString otherName{ other.name() };
 
-            // TODO do we need this? it could result in 0 being returned
             removeThePrefix(thisName);
             removeThePrefix(otherName);
 
@@ -260,8 +259,7 @@ bool Resource::enable(EnableAction action)
     }
 
     if (enable) {
-        // m_enabled is false, but there's no '.disabled' suffix.
-        // TODO: Report error?
+
         if (!path.endsWith(".disabled")) {
             return false;
         }

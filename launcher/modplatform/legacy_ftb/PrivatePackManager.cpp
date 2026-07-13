@@ -68,4 +68,4 @@ void PrivatePackManager::save() const
     }
 }
 
-}  // namespace LegacyFTB
+}

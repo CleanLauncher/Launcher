@@ -84,13 +84,7 @@ VersionProxyModel::VersionProxyModel(QObject* parent) : QAbstractProxyModel(pare
     connect(filterModel, &QAbstractItemModel::rowsInserted, this, &VersionProxyModel::sourceRowsInserted);
     connect(filterModel, &QAbstractItemModel::rowsAboutToBeRemoved, this, &VersionProxyModel::sourceRowsAboutToBeRemoved);
     connect(filterModel, &QAbstractItemModel::rowsRemoved, this, &VersionProxyModel::sourceRowsRemoved);
-    // FIXME: implement when needed
-    /*
-    connect(replacing, &QAbstractItemModel::rowsAboutToBeMoved, this, &VersionProxyModel::sourceRowsAboutToBeMoved);
-    connect(replacing, &QAbstractItemModel::rowsMoved, this, &VersionProxyModel::sourceRowsMoved);
-    connect(replacing, &QAbstractItemModel::layoutAboutToBeChanged, this, &VersionProxyModel::sourceLayoutAboutToBeChanged);
-    connect(replacing, &QAbstractItemModel::layoutChanged, this, &VersionProxyModel::sourceLayoutChanged);
-    */
+
     connect(filterModel, &QAbstractItemModel::modelAboutToBeReset, this, &VersionProxyModel::sourceAboutToBeReset);
     connect(filterModel, &QAbstractItemModel::modelReset, this, &VersionProxyModel::sourceReset);
 
@@ -109,7 +103,8 @@ QVariant VersionProxyModel::headerData(int section, Qt::Orientation orientation,
             case Name:
                 return tr("Version");
             case ParentVersion:
-                return tr("Minecraft");  // FIXME: this should come from metadata
+                return tr("Minecraft");
+
             case Branch:
                 return tr("Branch");
             case Type:
@@ -130,7 +125,8 @@ QVariant VersionProxyModel::headerData(int section, Qt::Orientation orientation,
             case Name:
                 return tr("The name of the version.");
             case ParentVersion:
-                return tr("Minecraft version");  // FIXME: this should come from metadata
+                return tr("Minecraft version");
+
             case Branch:
                 return tr("The version's branch");
             case Type:
@@ -256,7 +252,7 @@ QModelIndex VersionProxyModel::mapToSource(const QModelIndex& proxyIndex) const
 
 QModelIndex VersionProxyModel::index(int row, int column, const QModelIndex& parent) const
 {
-    // no trees here... shoo
+
     if (parent.isValid()) {
         return QModelIndex();
     }
@@ -285,7 +281,6 @@ void VersionProxyModel::sourceDataChanged(const QModelIndex& source_top_left, co
     if (source_top_left.parent() != source_bottom_right.parent())
         return;
 
-    // whole row is getting changed
     auto topLeft = createIndex(source_top_left.row(), 0);
     auto bottomRight = createIndex(source_bottom_right.row(), columnCount() - 1);
     emit dataChanged(topLeft, bottomRight);
@@ -306,12 +301,7 @@ void VersionProxyModel::setSourceModel(QAbstractItemModel* replacingRaw)
     if (roles.contains(BaseVersionList::VersionRole)) {
         m_columns.push_back(Name);
     }
-    /*
-    if(roles.contains(BaseVersionList::ParentVersionRole))
-    {
-        m_columns.push_back(ParentVersion);
-    }
-    */
+
     if (roles.contains(BaseVersionList::CPUArchitectureRole)) {
         m_columns.push_back(CPUArchitecture);
     }

@@ -17,7 +17,6 @@ public final class SystemProperties {
         if (launcherVersion != null)
             System.setProperty("minecraft.launcher.version", launcherVersion);
 
-        // set useful properties for mods
         if (name != null)
             System.setProperty("org.launcher.instance.name", name);
         if (iconId != null)
@@ -29,7 +28,6 @@ public final class SystemProperties {
         if (windowDimensions != null)
             System.setProperty("org.launcher.window.dimensions", windowDimensions);
 
-        // set multimc properties for compatibility
         if (name != null)
             System.setProperty("multimc.instance.title", name);
         if (iconId != null)

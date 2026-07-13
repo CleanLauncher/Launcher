@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "FlameResourceModels.h"
@@ -28,7 +28,6 @@ ResourceAPI::SearchArgs FlameTexturePackModel::createSearchArguments()
     auto profile = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
     QString instance_minecraft_version = profile->getComponentVersion("net.minecraft");
 
-    // Bypass the texture pack logic, because we can't do multiple versions in the API query
     args.versions = { instance_minecraft_version };
 
     return args;
@@ -38,7 +37,6 @@ ResourceAPI::VersionSearchArgs FlameTexturePackModel::createVersionsArguments(co
 {
     auto args = TexturePackResourceModel::createVersionsArguments(entry);
 
-    // Bypass the texture pack logic, because we can't do multiple versions in the API query
     args.mcVersions = {};
 
     return args;
@@ -49,4 +47,4 @@ bool FlameTexturePackModel::optedOut(const ModPlatform::IndexedVersion& ver) con
     return isOptedOut(ver);
 }
 
-}  // namespace ResourceDownload
+}

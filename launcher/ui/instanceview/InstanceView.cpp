@@ -117,15 +117,14 @@ void InstanceView::rowsRemoved()
 void InstanceView::currentChanged(const QModelIndex& current, const QModelIndex& previous)
 {
     QAbstractItemView::currentChanged(current, previous);
-    // TODO: for accessibility support, implement+register a factory, steal QAccessibleTable from Qt and return an instance of it for
-    // InstanceView.
+
 #ifndef QT_NO_ACCESSIBILITY
     if (QAccessible::isActive() && current.isValid()) {
         QAccessibleEvent event(this, QAccessible::Focus);
         event.setChild(current.row());
         QAccessible::updateAccessibility(&event);
     }
-#endif /* !QT_NO_ACCESSIBILITY */
+#endif
 }
 
 class LocaleString : public QString {
@@ -146,7 +145,7 @@ void InstanceView::updateScrollbar()
         verticalScrollBar()->setRange(0, 0);
     } else {
         int totalHeight = 0;
-        // top margin
+
         totalHeight += m_categoryMargin;
         int itemScroll = 0;
         for (auto category : m_groups) {
@@ -156,7 +155,7 @@ void InstanceView::updateScrollbar()
                 itemScroll = category->contentHeight() / category->numRows();
             }
         }
-        // do not divide by zero
+
         if (itemScroll == 0)
             itemScroll = 64;
 
@@ -291,11 +290,10 @@ void InstanceView::mousePressEvent(QMouseEvent* event)
 
     if (index.isValid() && (index.flags() & Qt::ItemIsEnabled)) {
         if (index != currentIndex()) {
-            // FIXME: better!
+
             m_currentCursorColumn = -1;
         }
-        // we disable scrollTo for mouse press so the item doesn't change position
-        // when the user is interacting with it (ie. clicking on it)
+
         bool autoScroll = hasAutoScroll();
         setAutoScroll(false);
         selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
@@ -304,10 +302,9 @@ void InstanceView::mousePressEvent(QMouseEvent* event)
         QRect rect(visualPos, visualPos);
         setSelection(rect, QItemSelectionModel::ClearAndSelect);
 
-        // signal handlers may change the model
         emit pressed(index);
     } else {
-        // Forces a finalize() even if mouse is pressed, but not on a item
+
         selectionModel()->select(QModelIndex(), QItemSelectionModel::Select);
     }
 }
@@ -352,7 +349,6 @@ void InstanceView::mouseMoveEvent(QMouseEvent* event)
         setSelection(QRect(visualPos, visualPos), QItemSelectionModel::ClearAndSelect);
         QModelIndex index = indexAt(visualPos);
 
-        // set at the end because it might scroll the view
         if (index.isValid() && (index != selectionModel()->currentIndex()) && (index.flags() & Qt::ItemIsEnabled)) {
             selectionModel()->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
         }
@@ -424,7 +420,7 @@ void InstanceView::mouseDoubleClickEvent(QMouseEvent* event)
         mousePressEvent(&me);
         return;
     }
-    // signal handlers may change the model
+
     QPersistentModelIndex persistent = index;
     emit doubleClicked(persistent);
 
@@ -449,7 +445,6 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         painter.save();
         QString emptyString = tr("Welcome!") + "\n" + tr("Click \"Add Instance\" to get started.");
 
-        // calculate the rect for the overlay
         painter.setRenderHint(QPainter::Antialiasing, true);
         QFont font("sans", 20);
         font.setBold(true);
@@ -470,7 +465,6 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         auto wrapRect = textRect;
         wrapRect.adjust(-10, -10, 10, 10);
 
-        // check if we are allowed to draw in our area
         if (!event->rect().intersects(wrapRect)) {
             return;
         }
@@ -522,9 +516,6 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         itemDelegate()->paint(&painter, option, index);
     }
 
-    /*
-     * Drop indicators for manual reordering...
-     */
 #if 0
     if (!m_lastDragPosition.isNull())
     {
@@ -631,12 +622,10 @@ void InstanceView::dropEvent(QDropEvent* event)
         return;
     }
 
-    // check if the action is supported
     if (!mimedata) {
         return;
     }
 
-    // files dropped from outside?
     if (mimedata->hasUrls()) {
         auto urls = mimedata->urls();
         event->accept();
@@ -666,7 +655,7 @@ void InstanceView::startDrag(Qt::DropActions supportedActions)
     if (this->defaultDropAction() != Qt::IgnoreAction && (supportedActions & this->defaultDropAction())) {
         defaultDropAction = this->defaultDropAction();
     }
-    /*auto action = */
+
     drag->exec(supportedActions, defaultDropAction);
 }
 
@@ -693,7 +682,6 @@ QRect InstanceView::geometryRect(const QModelIndex& index) const
     const VisualGroup* cat = category(index);
     QPair<int, int> pos = cat->positionOf(index);
     int x = pos.first;
-    // int y = pos.second;
 
     QStyleOptionViewItem option;
     initViewItemOption(&option);
@@ -796,7 +784,8 @@ QRegion InstanceView::visualRegionForSelection(const QItemSelection& selection) 
             int end_column = range.right();
             for (int column = start_column; column <= end_column; ++column) {
                 QModelIndex index = model()->index(row, column, rootIndex());
-                region += visualRect(index);  // OK
+                region += visualRect(index);
+
             }
         }
     }
@@ -820,7 +809,7 @@ QModelIndex InstanceView::moveCursor(QAbstractItemView::CursorAction cursorActio
     if (m_currentCursorColumn < 0) {
         m_currentCursorColumn = column;
     }
-    // Handle different movement actions.
+
     switch (cursorAction) {
         case MoveUp: {
             if (row == 0) {
@@ -934,7 +923,7 @@ QModelIndex InstanceView::moveCursor(QAbstractItemView::CursorAction cursorActio
             return cat->rows[row][last];
         }
         default:
-            // For unsupported cursor actions, return the current index.
+
             break;
     }
     return current;

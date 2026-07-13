@@ -90,7 +90,6 @@ void CheckJava::executeTask()
     hash.addData(m_javaPath.toUtf8());
     m_javaSignature = hash.result().toHex();
 
-    // if timestamps are not the same, or something is missing, check!
     if (m_javaSignature != storedSignature || storedVersion.size() == 0 || storedArchitecture.size() == 0 ||
         storedRealArchitecture.size() == 0 || storedVendor.size() == 0) {
         m_JavaChecker.reset(new JavaChecker(realJavaPath, "", 0, 0, 0, 0));
@@ -113,7 +112,7 @@ void CheckJava::checkJavaFinished(const JavaChecker::Result& result)
 {
     switch (result.validity) {
         case JavaChecker::Result::Validity::Errored: {
-            // Error message displayed if java can't start
+
             emit logLine(QString("Could not start java:"), MessageLevel::Error);
             emit logLines(result.errorLog.split('\n'), MessageLevel::Error);
             emit logLine(QString("\nCheck your Java settings."), MessageLevel::Launcher);

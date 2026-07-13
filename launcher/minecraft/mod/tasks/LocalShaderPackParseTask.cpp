@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -45,15 +45,18 @@ bool processFolder(ShaderPack& pack, ProcessingLevel level)
 
     QFileInfo shaders_dir_info(FS::PathCombine(pack.fileinfo().filePath(), "shaders"));
     if (!shaders_dir_info.exists() || !shaders_dir_info.isDir()) {
-        return false;  // assets dir does not exists or isn't valid
+        return false;
+
     }
     pack.setPackFormat(ShaderPackFormat::VALID);
 
     if (level == ProcessingLevel::BasicInfoOnly) {
-        return true;  // only need basic info already checked
+        return true;
+
     }
 
-    return true;  // all tests passed
+    return true;
+
 }
 
 bool processZIP(ShaderPack& pack, ProcessingLevel level)
@@ -62,21 +65,12 @@ bool processZIP(ShaderPack& pack, ProcessingLevel level)
 
     MMCZip::ArchiveReader zip(pack.fileinfo().filePath());
     if (!zip.collectFiles(false))
-        return false;  // can't open zip file
+        return false;
 
     if (!zip.exists("/shaders")) {
-        // assets dir does not exists at zip root, but shader packs
-        // will sometimes be a zip file containing a folder with the
-        // actual contents in it. This happens
-        // e.g. when the shader pack is downloaded as code
-        // from Github. so other than "/shaders", we
-        // could also check for a "shaders" folder one level deep.
 
         QStringList files = zip.getFiles();
 
-        // the assumption here is that there is just one
-        // folder with the "shader" subfolder. In case
-        // there are multiple, the first one is picked.
         bool isShaderPresent = false;
         for (QString f : files) {
             if (f.contains("/shaders/", Qt::CaseInsensitive)) {
@@ -86,13 +80,14 @@ bool processZIP(ShaderPack& pack, ProcessingLevel level)
         }
 
         if (!isShaderPresent)
-            // assets dir does not exist.
+
             return false;
     }
     pack.setPackFormat(ShaderPackFormat::VALID);
 
     if (level == ProcessingLevel::BasicInfoOnly) {
-        return true;  // only need basic info already checked
+        return true;
+
     }
 
     return true;
@@ -104,7 +99,7 @@ bool validate(QFileInfo file)
     return ShaderPackUtils::process(sp, ProcessingLevel::BasicInfoOnly) && sp.valid();
 }
 
-}  // namespace ShaderPackUtils
+}
 
 LocalShaderPackParseTask::LocalShaderPackParseTask(int token, ShaderPack& sp) : Task(false), m_token(token), m_shader_pack(sp) {}
 

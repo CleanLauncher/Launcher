@@ -39,10 +39,6 @@
 #include <QStringDecoder>
 #include "MessageLevel.h"
 
-/*
- * This is a basic process.
- * It has line-based logging support and hides some of the nasty bits.
- */
 class LoggedProcess : public QProcess {
     Q_OBJECT
    public:
@@ -62,9 +58,7 @@ class LoggedProcess : public QProcess {
     void stateChanged(LoggedProcess::State state);
 
    public slots:
-    /**
-     * @brief kill the process - equivalent to kill -9
-     */
+
     void kill();
 
    private slots:

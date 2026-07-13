@@ -40,7 +40,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -166,7 +166,6 @@ void ListModel::performPaginatedSearch()
 {
     static const FlameAPI api;
 
-    // activate search by id only for numerical values because all CurseForge ids are numerical
     static const QRegularExpression s_projectIdExpr("^\\#[0-9]+$");
     if (m_searchState != ResetRequested && s_projectIdExpr.match(m_currentSearchTerm).hasMatch()) {
         auto projectId = m_currentSearchTerm.mid(1);
@@ -247,7 +246,6 @@ void Flame::ListModel::searchRequestFinished(QList<ModPlatform::IndexedPack::Ptr
         m_searchState = CanPossiblyFetchMore;
     }
 
-    // When you have a Qt build with assertions turned on, proceeding here will abort the application
     if (newList.size() == 0)
         return;
 
@@ -281,4 +279,4 @@ void Flame::ListModel::searchRequestFailed(QString reason)
     }
 }
 
-}  // namespace Flame
+}

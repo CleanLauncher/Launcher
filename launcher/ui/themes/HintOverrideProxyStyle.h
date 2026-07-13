@@ -21,7 +21,6 @@
 #include <QProxyStyle>
 #include <iostream>
 
-/// Used to override platform-specific behaviours which the launcher does work well with.
 class HintOverrideProxyStyle : public QProxyStyle {
     Q_OBJECT
    public:

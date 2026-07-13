@@ -64,10 +64,10 @@ class VersionList : public BaseVersionList, public BaseEntity {
 
     QList<Version::Ptr> versions() const { return m_versions; }
 
-    // this blocks until the version list is loaded
     void waitToLoad();
 
-   public:  // for usage only by parsers
+   public:
+
     void setName(const QString& name);
     void setVersions(const QList<Version::Ptr>& versions);
     void merge(const VersionList::Ptr& other);
@@ -96,5 +96,6 @@ class VersionList : public BaseVersionList, public BaseEntity {
 
     void setupAddedVersion(int row, const Version::Ptr& version);
 };
-}  // namespace Meta
+}
+
 Q_DECLARE_METATYPE(Meta::VersionList::Ptr)

@@ -125,10 +125,10 @@ bool parseOldFileFormat(QIODevice& device, QSettings::SettingsMap& map)
     QStringList lines = in.readAll().split('\n');
     for (int i = 0; i < lines.count(); i++) {
         QString& lineRaw = lines[i];
-        // Ignore comments.
+
         int commentIndex = 0;
         QString line = lineRaw;
-        // Search for comments until no more escaped # are available
+
         while ((commentIndex = line.indexOf('#', commentIndex + 1)) != -1) {
             if (commentIndex > 0 && line.at(commentIndex - 1) == '\\') {
                 continue;

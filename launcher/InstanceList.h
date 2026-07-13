@@ -86,14 +86,12 @@ class InstanceList : public QAbstractListModel {
 
     enum AdditionalRoles {
         GroupRole = Qt::UserRole,
-        InstancePointerRole = 0x34B1CB48,  ///< Return pointer to real instance
-        InstanceIDRole = 0x34B1CB49        ///< Return id if the instance
+        InstancePointerRole = 0x34B1CB48,
+
+        InstanceIDRole = 0x34B1CB49
+
     };
-    /*!
-     * \brief Error codes returned by functions in the InstanceList class.
-     * NoError Indicates that no error occurred.
-     * UnknownError indicates that an unspecified error occurred.
-     */
+
     enum InstListError { NoError = 0, UnknownError };
 
     BaseInstance* at(int i) const { return m_instances.at(i).get(); }
@@ -103,9 +101,8 @@ class InstanceList : public QAbstractListModel {
     InstListError loadList();
     void saveNow();
 
-    /* O(n) */
     BaseInstance* getInstanceById(QString id) const;
-    /* O(n) */
+
     BaseInstance* getInstanceByManagedName(const QString& managed_name) const;
     QModelIndex getInstanceIndexById(const QString& id) const;
     QStringList getGroups();
@@ -121,27 +118,12 @@ class InstanceList : public QAbstractListModel {
     bool undoTrashInstance();
     void deleteInstance(const InstanceId& id);
 
-    // Wrap an instance creation task in some more task machinery and make it ready to be used
     Task* wrapInstanceTask(InstanceTask* task);
 
-    /**
-     * Create a new empty staging area for instance creation and @return a path/key top commit it later.
-     * Used by instance manipulation tasks.
-     */
     QString getStagedInstancePath();
 
-    /**
-     * Commit the staging area given by @keyPath to the provider - used when creation succeeds.
-     * Used by instance manipulation tasks.
-     * should_override is used when another similar instance already exists, and we want to override it
-     * - for instance, when updating it.
-     */
     bool commitStagedInstance(const QString& keyPath, const InstanceName& instanceName, QString groupName, const InstanceTask&);
 
-    /**
-     * Destroy a previously created staging area given by @keyPath - used when creation fails.
-     * Used by instance manipulation tasks.
-     */
     bool destroyStagingPath(const QString& keyPath);
 
     int getTotalPlayTime();
@@ -193,13 +175,13 @@ class InstanceList : public QAbstractListModel {
     int totalPlayTime = 0;
     bool m_dirty = false;
     std::vector<std::unique_ptr<BaseInstance>> m_instances;
-    // id -> refs
+
     QMap<QString, int> m_groupNameCache;
 
     SettingsObject* m_globalSettings;
     QString m_instDir;
     QFileSystemWatcher* m_watcher;
-    // FIXME: this is so inefficient that looking at it is almost painful.
+
     QSet<QString> m_collapsedGroups;
     QMap<InstanceId, GroupId> m_instanceGroupIndex;
     QSet<InstanceId> instanceSet;

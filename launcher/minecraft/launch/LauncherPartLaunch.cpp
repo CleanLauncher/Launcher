@@ -101,7 +101,6 @@ void LauncherPartLaunch::executeTask()
 
     m_process.setProcessEnvironment(instance->createLaunchEnvironment());
 
-    // make detachable - this will keep the process running even if the object is destroyed
     m_process.setDetachable(true);
 
     auto classPath = instance->getClassPath();
@@ -163,7 +162,7 @@ void LauncherPartLaunch::on_state(LoggedProcess::State state)
 {
     switch (state) {
         case LoggedProcess::FailedToStart: {
-            //: Error message displayed if instace can't start
+
             const char* reason = QT_TR_NOOP("Could not launch Minecraft: %1");
             emit logLine(QString(reason).arg(m_process.errorString()), MessageLevel::Fatal);
             emitFailed(tr(reason).arg(m_process.errorString()));
@@ -183,22 +182,20 @@ void LauncherPartLaunch::on_state(LoggedProcess::State state)
 
             m_parent->setPid(-1);
             m_parent->instance()->setMinecraftRunning(false);
-            // if the exit code wasn't 0, report this as a crash
+
             auto exitCode = m_process.exitCode();
             if (exitCode != 0) {
                 emitFailed(tr("Game crashed."));
                 return;
             }
-            // FIXME: make this work again
-            //  m_postlaunchprocess.processEnvironment().insert("INST_EXITCODE", QString(exitCode));
-            //  run post-exit
+
             emitSucceeded();
             break;
         }
         case LoggedProcess::Running:
             emit logLine(QString("Minecraft process ID: %1\n\n").arg(m_process.processId()), MessageLevel::Launcher);
             m_parent->setPid(m_process.processId());
-            // send the launch script to the launcher part
+
             m_process.write(m_launchScript.toUtf8());
 
             mayProceed = true;

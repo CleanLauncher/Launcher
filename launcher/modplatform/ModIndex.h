@@ -63,18 +63,18 @@ enum class Side : std::uint8_t { NoSide = 0, ClientSide = 1U << 0U, ServerSide =
 namespace SideUtils {
 QString toString(Side side);
 Side fromString(QString side);
-}  // namespace SideUtils
+}
 
 namespace DependencyTypeUtils {
 QString toString(DependencyType type);
 DependencyType fromString(const QString& str);
-}  // namespace DependencyTypeUtils
+}
 
 namespace ProviderCapabilities {
 const char* name(ResourceProvider);
 QString readableName(ResourceProvider);
 QStringList hashType(ResourceProvider);
-}  // namespace ProviderCapabilities
+}
 
 struct ModpackAuthor {
     QString name;
@@ -125,9 +125,8 @@ struct IndexedVersion {
     bool is_preferred = true;
     QString changelog;
     QList<Dependency> dependencies;
-    Side side = Side::NoSide;  // this is for flame API
+    Side side = Side::NoSide;
 
-    // For internal use, not provided by APIs
     bool is_currently_selected = false;
 
     QString getVersionDisplayString() const
@@ -178,11 +177,9 @@ struct IndexedPack {
     bool versionsLoaded = false;
     QList<IndexedVersion> versions;
 
-    // Don't load by default, since some modplatform don't have that info
     bool extraDataLoaded = true;
     ExtraPackData extraData;
 
-    // For internal use, not provided by APIs
     bool isVersionSelected(int index) const
     {
         if (!versionsLoaded) {
@@ -235,7 +232,7 @@ struct Category {
     QString id;
 };
 
-}  // namespace ModPlatform
+}
 
 Q_DECLARE_METATYPE(ModPlatform::IndexedPack)
 Q_DECLARE_METATYPE(ModPlatform::IndexedPack::Ptr)

@@ -79,8 +79,7 @@ class ScreenshotsFSModel : public QFileSystemModel {
                          const QModelIndex& parent) const override
     {
         const QUrl root = QUrl::fromLocalFile(rootPath());
-        // this disables reordering items inside the model
-        // by rejecting drops if the file is already inside the folder
+
         if (data->hasUrls()) {
             for (auto& url : data->urls()) {
                 if (root.isParentOf(url)) {
@@ -149,8 +148,6 @@ class ThumbnailRunnable : public QRunnable {
     ThumbnailingResult m_resultEmitter;
 };
 
-// this is about as elegant and well written as a bag of bricks with scribbles done by insane
-// asylum patients.
 class FilterModel : public QIdentityProxyModel {
     Q_OBJECT
    public:
@@ -205,8 +202,7 @@ class FilterModel : public QIdentityProxyModel {
         if (role != Qt::EditRole) {
             return false;
         }
-        // FIXME: this is a workaround for a bug in QFileSystemModel, where it doesn't
-        // sort after renames
+
         {
             static_cast<QFileSystemModel*>(model)->setNameFilterDisables(true);
             static_cast<QFileSystemModel*>(model)->setNameFilterDisables(false);
@@ -223,12 +219,12 @@ class FilterModel : public QIdentityProxyModel {
         m_thumbnailingPool.start(runnable);
     }
    private slots:
-    void thumbnailReady(const QString& /*path*/) { emit layoutChanged(); }
+    void thumbnailReady(const QString& ) { emit layoutChanged(); }
     void thumbnailFailed(const QString& path) { m_failed.insert(path); }
     void fileChanged(const QString& filepath)
     {
         m_thumbnailCache->setStale(filepath);
-        // reinsert the path...
+
         watcher.removePath(filepath);
         if (QFile::exists(filepath)) {
             watcher.addPath(filepath);
@@ -270,8 +266,7 @@ ScreenshotsPage::ScreenshotsPage(QString path, QWidget* parent)
     m_model->setReadOnly(false);
     m_model->setNameFilters({ "*.png" });
     m_model->setNameFilterDisables(false);
-    // Sorts by modified date instead of creation date because that column is not available and would require subclassing, this should work
-    // considering screenshots aren't modified after creation.
+
     constexpr int file_modified_column_index = 3;
     m_model->sort(file_modified_column_index, Qt::DescendingOrder);
 
@@ -283,7 +278,7 @@ ScreenshotsPage::ScreenshotsPage(QString path, QWidget* parent)
     ui->listView->setIconSize(QSize(128, 128));
     ui->listView->setGridSize(QSize(192, 160));
     ui->listView->setSpacing(9);
-    // ui->listView->setUniformItemSizes(true);
+
     ui->listView->setLayoutMode(QListView::Batched);
     ui->listView->setViewMode(QListView::IconMode);
     ui->listView->setResizeMode(QListView::Adjust);
@@ -361,7 +356,7 @@ void ScreenshotsPage::onItemActivated(QModelIndex index) const
     DesktopServices::openPath(info);
 }
 
-void ScreenshotsPage::onCurrentSelectionChanged(const QItemSelection& /*selected*/) const
+void ScreenshotsPage::onCurrentSelectionChanged(const QItemSelection& ) const
 {
     const auto selected = ui->listView->selectionModel()->selectedIndexes();
 
@@ -510,7 +505,6 @@ void ScreenshotsPage::on_actionCopy_Image_triggered() const
         return;
     }
 
-    // You can only copy one image to the clipboard. In the case of multiple selected files, only the first one gets copied.
     const auto item = selection.first();
     const auto info = m_model->fileInfo(item);
     const QImage image(info.absoluteFilePath());
@@ -522,7 +516,7 @@ void ScreenshotsPage::on_actionCopy_File_s_triggered() const
 {
     auto selection = ui->listView->selectionModel()->selectedIndexes();
     if (selection.size() < 1) {
-        // Don't do anything so we don't empty the users clipboard
+
         return;
     }
 
@@ -577,7 +571,7 @@ void ScreenshotsPage::on_actionRename_triggered() const
         return;
     }
     ui->listView->edit(selection.first());
-    // TODO: mass renaming
+
 }
 
 void ScreenshotsPage::openedImpl()
@@ -592,7 +586,8 @@ void ScreenshotsPage::openedImpl()
             ui->listView->setModel(m_filterModel.get());
             connect(ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
                     &ScreenshotsPage::onCurrentSelectionChanged);
-            onCurrentSelectionChanged(ui->listView->selectionModel()->selection());  // set initial button enable states
+            onCurrentSelectionChanged(ui->listView->selectionModel()->selection());
+
             ui->listView->setRootIndex(m_filterModel->mapFromSource(idx));
         } else {
             ui->listView->setModel(nullptr);

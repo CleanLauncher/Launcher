@@ -41,21 +41,14 @@
 #include <QStyleOption>
 #include <QVBoxLayout>
 
-/*
- *
- *  Tool Button with a label on it, instead of the normal text rendering
- *
- */
-
 LabeledToolButton::LabeledToolButton(QWidget* parent) : QToolButton(parent), m_label(new QLabel(this))
 {
-    // QToolButton::setText(" ");
+
     m_label->setWordWrap(true);
     m_label->setMouseTracking(false);
     m_label->setAlignment(Qt::AlignCenter);
     m_label->setTextInteractionFlags(Qt::NoTextInteraction);
-    // somehow, this makes word wrap work in the QLabel. yay.
-    // m_label->setMinimumWidth(100);
+
 }
 
 QString LabeledToolButton::text() const
@@ -74,16 +67,9 @@ void LabeledToolButton::setIcon(QIcon icon)
     resetIcon();
 }
 
-/*!
-    \reimp
-*/
 QSize LabeledToolButton::sizeHint() const
 {
-    /*
-    Q_D(const QToolButton);
-    if (d->sizeHint.isValid())
-        return d->sizeHint;
-    */
+
     ensurePolished();
 
     int w = 0, h = 0;
@@ -93,7 +79,8 @@ QSize LabeledToolButton::sizeHint() const
     w = sz.width();
     h = sz.height();
 
-    opt.rect.setSize(QSize(w, h));  // PM_MenuButtonIndicator depends on the height
+    opt.rect.setSize(QSize(w, h));
+
     if (popupMode() == MenuButtonPopup)
         w += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
 
@@ -115,7 +102,7 @@ void LabeledToolButton::resetIcon()
     float w = iconSz.width();
     float h = iconSz.height();
     float ar = w / h;
-    // FIXME: hardcoded max size of 160x80
+
     int newW = 80 * ar;
     if (newW > 160)
         newW = 160;

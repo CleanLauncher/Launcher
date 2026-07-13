@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Basic start script for running the launcher with the libs packaged with it.
 
 function printerror {
     printf "$1"
@@ -13,21 +12,17 @@ if [[ $EUID -eq 0 ]]; then
     exit 1
 fi
 
-
 LAUNCHER_NAME=@Launcher_APP_BINARY_NAME@
 LAUNCHER_ENVNAME=@Launcher_ENVName@
 LAUNCHER_DIR="$(dirname "$(readlink -f "$0")")"
 echo "Launcher Dir: ${LAUNCHER_DIR}"
 
-# Makes the launcher use portals for file picking
 export QT_QPA_PLATFORMTHEME=xdgdesktopportal
 
-# disable OpenGL and Vulkan launcher features on sharun until https://github.com/VHSgunzo/sharun/issues/35
 if [[ -f "${LAUNCHER_DIR}/sharun" ]]; then
     export ${LAUNCHER_ENVNAME}_DISABLE_GLVULKAN=1
 fi
 
-# Just to be sure...
 chmod +x "${LAUNCHER_DIR}/bin/${LAUNCHER_NAME}"
 
 ARGS=("${LAUNCHER_DIR}/${LAUNCHER_NAME}" "${LAUNCHER_DIR}/bin/${LAUNCHER_NAME}")
@@ -38,5 +33,4 @@ fi
 
 ARGS+=("$@")
 
-# Run the launcher
 exec -a "${ARGS[@]}"

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Sefa Eyeoglu <contact@scrumplex.net>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "DataMigrationTask.h"
@@ -22,10 +22,9 @@ void DataMigrationTask::executeTask()
 {
     setStatus(tr("Scanning files..."));
 
-    // 1. Scan
-    // Check how many files we gotta copy
     m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] {
-        return m_copy(true);  // dry run to collect amount of files
+        return m_copy(true);
+
     });
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::finished, this, &DataMigrationTask::dryRunFinished);
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::canceled, this, &DataMigrationTask::dryRunAborted);
@@ -42,19 +41,18 @@ void DataMigrationTask::dryRunFinished()
         return;
     }
 
-    // 2. Copy
-    // Actually copy all files now.
     m_toCopy = m_copy.totalCopied();
     connect(&m_copy, &FS::copy::fileCopied, [&, this](const QString& relativeName) {
         QString shortenedName = relativeName;
-        // shorten the filename to hopefully fit into one line
+
         if (shortenedName.length() > 50)
             shortenedName = relativeName.left(20) + "…" + relativeName.right(29);
         setProgress(m_copy.totalCopied(), m_toCopy);
         setStatus(tr("Copying %1…").arg(shortenedName));
     });
     m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] {
-        return m_copy(false);  // actually copy now
+        return m_copy(false);
+
     });
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::finished, this, &DataMigrationTask::copyFinished);
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::canceled, this, &DataMigrationTask::copyAborted);

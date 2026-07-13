@@ -76,8 +76,7 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
         case VersionIdRole:
             return version->version();
         case ParentVersionRole: {
-            // FIXME: HACK: this should be generic and be replaced by something else. Anything that is a hard 'equals' dep is a 'parent
-            // uid'.
+
             auto& reqs = version->requiredSet();
             auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Require& req) { return req.uid == "net.minecraft"; });
             if (iter != reqs.end()) {
@@ -107,8 +106,7 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
             }
             return major;
         }
-        // FIXME: this should be determined in whatever view/proxy is used...
-        // case LatestRole: return version == getLatestStable();
+
         default:
             return QVariant();
     }
@@ -180,7 +178,6 @@ void VersionList::setVersions(const QList<Version::Ptr>& versions)
         setupAddedVersion(i, m_versions.at(i));
     }
 
-    // FIXME: this is dumb, we have 'recommended' as part of the metadata already...
     auto recommendedIt =
         std::find_if(m_versions.constBegin(), m_versions.constEnd(), [](const Version::Ptr& ptr) { return ptr->type() == "release"; });
     m_recommended = recommendedIt == m_versions.constEnd() ? nullptr : *recommendedIt;
@@ -202,7 +199,6 @@ void VersionList::clearExternalRecommends()
     m_externalRecommendsVersions.clear();
 }
 
-// FIXME: this is dumb, we have 'recommended' as part of the metadata already...
 static const Meta::Version::Ptr& getBetterVersion(const Meta::Version::Ptr& a, const Meta::Version::Ptr& b)
 {
     if (!a)
@@ -210,10 +206,10 @@ static const Meta::Version::Ptr& getBetterVersion(const Meta::Version::Ptr& a, c
     if (!b)
         return a;
     if (a->type() == b->type()) {
-        // newer of same type wins
+
         return (a->rawTime() > b->rawTime() ? a : b);
     }
-    // 'release' type wins
+
     return (a->type() == "release" ? a : b);
 }
 
@@ -236,20 +232,19 @@ void VersionList::merge(const VersionList::Ptr& other)
         m_sha256 = other->m_sha256;
     }
 
-    // TODO: do not reset the whole model. maybe?
     beginResetModel();
     if (other->m_versions.isEmpty()) {
         qWarning() << "Empty list loaded ...";
     }
     for (auto version : other->m_versions) {
-        // we already have the version. merge the contents
+
         if (m_lookup.contains(version->version())) {
             auto existing = m_lookup.value(version->version());
             existing->mergeFromList(version);
             version = existing;
         } else {
             m_lookup.insert(version->version(), version);
-            // connect it.
+
             setupAddedVersion(m_versions.size(), version);
             m_versions.append(version);
         }
@@ -317,4 +312,4 @@ Version::Ptr VersionList::getLatestForParent(const QString& uid, const QString& 
     return latestCompat;
 }
 
-}  // namespace Meta
+}

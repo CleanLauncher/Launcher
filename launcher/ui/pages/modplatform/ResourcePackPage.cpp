@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ResourcePackPage.h"
@@ -15,8 +15,6 @@ namespace ResourceDownload {
 
 ResourcePackResourcePage::ResourcePackResourcePage(ResourceDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance)
 {}
-
-/******** Callbacks to events in the UI (set up in the derived classes) ********/
 
 void ResourcePackResourcePage::triggerSearch()
 {
@@ -41,4 +39,4 @@ QMap<QString, QString> ResourcePackResourcePage::urlHandlers() const
     return map;
 }
 
-}  // namespace ResourceDownload
+}

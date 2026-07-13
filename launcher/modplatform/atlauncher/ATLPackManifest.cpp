@@ -53,7 +53,7 @@ static ATLauncher::DownloadType parseDownloadType(QString rawType)
 
 static ATLauncher::ModType parseModType(QString rawType)
 {
-    // See https://wiki.atlauncher.com/mod_types
+
     if (rawType == QString("root")) {
         return ATLauncher::ModType::Root;
     } else if (rawType == QString("forge")) {
@@ -106,12 +106,10 @@ static void loadVersionLoader(ATLauncher::VersionLoader& p, QJsonObject& obj)
     p.latest = metadata["latest"].toBool();
     p.recommended = metadata["recommended"].toBool();
 
-    // Minecraft Forge
     if (p.type == "forge" || p.type == "neoforge") {
         p.version = metadata["version"].toString("");
     }
 
-    // Fabric Loader
     if (p.type == "fabric") {
         p.version = metadata["loader"].toString("");
     }
@@ -149,10 +147,6 @@ static void loadVersionMod(ATLauncher::VersionMod& p, QJsonObject& obj)
     p.type_raw = Json::requireString(obj, "type");
     p.type = parseModType(p.type_raw);
 
-    // This contributes to the Minecraft Forge detection, where we rely on mod.type being "Forge"
-    // when the mod represents Forge. As there is little difference between "Jar" and "Forge, some
-    // packs regretfully use "Jar". This will correct the type to "Forge" in these cases (as best
-    // it can).
     if (p.name == QString("Minecraft Forge") && p.type == ATLauncher::ModType::Jar) {
         p.type_raw = "forge";
         p.type = ATLauncher::ModType::Forge;
@@ -188,7 +182,6 @@ static void loadVersionMod(ATLauncher::VersionMod& p, QJsonObject& obj)
 
     p.client = obj["client"].toBool();
 
-    // computed
     p.effectively_hidden = p.hidden || p.library;
 }
 

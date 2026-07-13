@@ -58,7 +58,7 @@
 
 APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 {
-    // This is here so you can reorder the entries in the combobox without messing stuff up
+
     int comboBoxEntries[] = { PasteUpload::PasteType::Mclogs, PasteUpload::PasteType::NullPointer, PasteUpload::PasteType::PasteGG,
                               PasteUpload::PasteType::Hastebin };
 
@@ -74,9 +74,9 @@ APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 
     void (QComboBox::*currentIndexChangedSignal)(int)(&QComboBox::currentIndexChanged);
     connect(ui->pasteTypeComboBox, currentIndexChangedSignal, this, &APIPage::updateBaseURLPlaceholder);
-    // This function needs to be called even when the ComboBox's index is still in its default state.
+
     updateBaseURLPlaceholder(ui->pasteTypeComboBox->currentIndex());
-    // NOTE: this allows http://, but we replace that with https later anyway
+
     ui->metaURL->setValidator(new QRegularExpressionValidator(s_validUrlRegExp, ui->metaURL));
     ui->resourceURL->setValidator(new QRegularExpressionValidator(s_validUrlRegExp, ui->resourceURL));
     ui->baseURLEntry->setValidator(new QRegularExpressionValidator(s_validUrlRegExp, ui->baseURLEntry));

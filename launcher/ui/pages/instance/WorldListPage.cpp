@@ -76,7 +76,7 @@ class WorldListProxyModel : public QSortFilterProxyModel {
             WorldList* worlds = qobject_cast<WorldList*>(sourceModel());
             auto iconFile = worlds->data(sourceIndex, WorldList::IconFileRole).toString();
             if (iconFile.isNull()) {
-                // NOTE: Minecraft uses the same placeholder for servers AND worlds
+
                 return QIcon::fromTheme("unknown_server");
             }
             return QIcon(iconFile);
@@ -356,7 +356,7 @@ void WorldListPage::mceditState(LoggedProcess::State state)
         case LoggedProcess::Aborted: {
             failed = true;
         }
-        /* fallthrough */
+
         case LoggedProcess::Running:
         case LoggedProcess::Finished: {
             m_mceditStarting = false;

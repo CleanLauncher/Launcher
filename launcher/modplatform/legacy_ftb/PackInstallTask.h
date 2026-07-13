@@ -21,7 +21,7 @@ class PackInstallTask : public InstanceTask {
     bool abort() override;
 
    protected:
-    //! Entry point for tasks.
+
     virtual void executeTask() override;
 
    private:
@@ -34,7 +34,7 @@ class PackInstallTask : public InstanceTask {
     void onUnzipFinished();
     void onUnzipCanceled();
 
-   private: /* data */
+   private:
     QNetworkAccessManager* m_network;
     bool abortable = false;
     QFuture<std::optional<QStringList>> m_extractFuture;
@@ -46,4 +46,4 @@ class PackInstallTask : public InstanceTask {
     QString m_version;
 };
 
-}  // namespace LegacyFTB
+}

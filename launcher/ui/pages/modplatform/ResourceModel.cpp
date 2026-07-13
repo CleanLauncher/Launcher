@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ResourceModel.h"
@@ -54,7 +54,7 @@ auto ResourceModel::data(const QModelIndex& index, int role) const -> QVariant
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -79,7 +79,7 @@ auto ResourceModel::data(const QModelIndex& index, int role) const -> QVariant
             v.setValue(pack);
             return v;
         }
-            // Custom data
+
         case UserDataTypes::TITLE:
             return pack->name;
         case UserDataTypes::DESCRIPTION:
@@ -219,7 +219,7 @@ void ResourceModel::loadEntry(const QModelIndex& entry)
         ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
         auto addonId = pack->addonId;
-        // Use default if no callbacks are set
+
         if (!callbacks.on_succeed) {
             callbacks.on_succeed = [this, entry, addonId](auto& doc) {
                 if (!s_running_models.constFind(this).value()) {
@@ -304,7 +304,8 @@ void ResourceModel::clearData()
 
 void ResourceModel::runSearchJob(Task::Ptr ptr)
 {
-    m_current_search_job.reset(ptr);  // clean up first
+    m_current_search_job.reset(ptr);
+
     m_current_search_job->start();
 }
 void ResourceModel::runInfoJob(Task::Ptr ptr)
@@ -324,7 +325,8 @@ std::optional<ResourceAPI::SortingMethod> ResourceModel::getCurrentSortingMethod
 {
     std::optional<ResourceAPI::SortingMethod> sort{};
 
-    {  // Find sorting method by ID
+    {
+
         auto sortingMethods = getSortingMethods();
         auto method = std::find_if(sortingMethods.constBegin(), sortingMethods.constEnd(),
                                    [this](const auto& e) { return m_current_sort_index == e.index; });
@@ -384,8 +386,6 @@ std::optional<QIcon> ResourceModel::getIcon(QModelIndex& index, const QUrl& url)
     return {};
 }
 
-/* Default callbacks */
-
 void ResourceModel::searchRequestSucceeded(QList<ModPlatform::IndexedPack::Ptr>& newList)
 {
     QList<ModPlatform::IndexedPack::Ptr> filteredNewList;
@@ -413,7 +413,6 @@ void ResourceModel::searchRequestSucceeded(QList<ModPlatform::IndexedPack::Ptr>&
         m_search_state = SearchState::CanFetchMore;
     }
 
-    // When you have a Qt build with assertions turned on, proceeding here will abort the application
     if (filteredNewList.size() == 0) {
         return;
     }
@@ -436,14 +435,14 @@ void ResourceModel::searchRequestFailed([[maybe_unused]] QString reason, int net
 {
     switch (networkErrorCode) {
         default:
-            // Network error
+
             QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load mods."));
             break;
         case 404:
-            // 404 Not Found, some APIs return this when nothing is found, no need to bother the user
+
             break;
         case 409:
-            // 409 Gone, notify user to update
+
             QMessageBox::critical(nullptr, tr("Error"),
                                   QString("%1").arg(tr("API version too old!\nPlease update %1!").arg(BuildConfig.LAUNCHER_DISPLAYNAME)));
             break;
@@ -465,7 +464,6 @@ void ResourceModel::searchRequestAborted()
         qCritical() << "Search task in" << debugName() << "aborted by an unknown reason!";
     }
 
-    // Retry fetching
     clearData();
 
     m_next_search_offset = 0;
@@ -476,7 +474,6 @@ void ResourceModel::versionRequestSucceeded(QVector<ModPlatform::IndexedVersion>
 {
     auto currentPack = data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
 
-    // Check if the index is still valid for this resource or not
     if (pack != currentPack->addonId) {
         return;
     }
@@ -484,7 +481,6 @@ void ResourceModel::versionRequestSucceeded(QVector<ModPlatform::IndexedVersion>
     currentPack->versions = doc;
     currentPack->versionsLoaded = true;
 
-    // Cache info :^)
     QVariant newPack;
     newPack.setValue(currentPack);
     if (!setData(index, newPack, Qt::UserRole)) {
@@ -499,12 +495,10 @@ void ResourceModel::infoRequestSucceeded(ModPlatform::IndexedPack::Ptr pack, con
 {
     auto currentPack = data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
 
-    // Check if the index is still valid for this resource or not
     if (pack->addonId != currentPack->addonId) {
         return;
     }
 
-    // Cache info :^)
     QVariant newPack;
     newPack.setValue(pack);
     if (!setData(index, newPack, Qt::UserRole)) {
@@ -540,7 +534,8 @@ void ResourceModel::removePack(const QString& rem)
     }
 #endif
     auto pack = std::ranges::find_if(m_packs, [&rem](const ModPlatform::IndexedPack::Ptr& i) { return rem == i->name; });
-    if (pack == m_packs.end()) {  // ignore it if is not in the current search
+    if (pack == m_packs.end()) {
+
         return;
     }
     if (!pack->get()->versionsLoaded) {
@@ -555,4 +550,4 @@ bool ResourceModel::checkVersionFilters(const ModPlatform::IndexedVersion& v)
 {
     return (!optedOut(v));
 }
-}  // namespace ResourceDownload
+}

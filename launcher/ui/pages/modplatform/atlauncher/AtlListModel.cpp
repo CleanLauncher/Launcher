@@ -50,7 +50,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack.description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack.description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -77,7 +77,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
             return pack.name;
         case Qt::SizeHintRole:
             return QSize(0, 58);
-        // Custom data
+
         case UserDataTypes::TITLE:
             return pack.name;
         case UserDataTypes::DESCRIPTION:
@@ -110,7 +110,7 @@ void ListModel::request()
 
 void ListModel::requestFinished(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
+
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 
@@ -138,13 +138,12 @@ void ListModel::requestFinished(QByteArray* responsePtr)
             return;
         }
 
-        // ignore packs without a published version
         if (pack.versions.length() == 0)
             continue;
-        // only display public packs (for now)
+
         if (pack.type != ATLauncher::PackType::Public)
             continue;
-        // ignore "system" packs (Vanilla, Vanilla with Forge, etc)
+
         if (pack.system)
             continue;
 
@@ -218,4 +217,4 @@ void ListModel::requestLogo(QString file, QString url)
     m_loadingLogos.append(file);
 }
 
-}  // namespace Atl
+}

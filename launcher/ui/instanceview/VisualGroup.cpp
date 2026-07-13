@@ -121,14 +121,13 @@ VisualGroup::HitResults VisualGroup::hitScan(const QPoint& pos) const
     int body_start = y_start + headerHeight();
     int body_end = body_start + contentHeight();
     int y = pos.y();
-    // int x = pos.x();
+
     if (y < y_start) {
         results = VisualGroup::NoHit;
     } else if (y < body_start) {
         results = VisualGroup::HeaderHit;
         int collapseSize = headerHeight() - 4;
 
-        // the icon
         QRect iconRect = QRect(view->m_leftMargin + 2, 2 + y_start, view->width() - 4, collapseSize);
         if (iconRect.contains(pos)) {
             results |= VisualGroup::CheckboxHit;
@@ -156,13 +155,11 @@ void VisualGroup::drawHeader(QPainter* painter, const QStyleOptionViewItem& opti
     painter->setPen(pen);
     painter->setRenderHint(QPainter::Antialiasing);
 
-    // sizes and offsets, to keep things consistent below
     const int arrowOffsetLeft = fontMetrics.height() / 2 + 7;
     const int textOffsetLeft = arrowOffsetLeft * 2;
     const int centerHeight = optRect.top() + fontMetrics.height() / 2;
     const QString& textToDraw = text.isEmpty() ? QObject::tr("Ungrouped") : text;
 
-    // BEGIN: arrow
     {
         constexpr int arrowSize = 6;
         QPolygon arrowPolygon;
@@ -178,9 +175,7 @@ void VisualGroup::drawHeader(QPainter* painter, const QStyleOptionViewItem& opti
             painter->drawPolyline(arrowPolygon);
         }
     }
-    // END: arrow
 
-    // BEGIN: text
     {
         QRect textRect(optRect);
         textRect.setTop(textRect.top());
@@ -190,24 +185,22 @@ void VisualGroup::drawHeader(QPainter* painter, const QStyleOptionViewItem& opti
 
         painter->drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, textToDraw);
     }
-    // END: text
 
-    // BEGIN: horizontal line
     {
         penColor.setAlphaF(0.05f);
         pen.setColor(penColor);
         painter->setPen(pen);
-        // startPoint is left + arrow + text + space
+
         const int startPoint =
             optRect.left() + fontMetrics.height() + fontMetrics.size(Qt::AlignLeft | Qt::AlignVCenter, textToDraw).width() + 20;
         painter->setRenderHint(QPainter::Antialiasing, false);
         QPolygon polygon;
-        // for some reason the height (yPos) doesn't look centered, so we are adding 1 to the center height
+
         const int lineHeight = centerHeight + 1;
         polygon << QPoint(startPoint, lineHeight) << QPoint(optRect.right() - 3, lineHeight);
         painter->drawPolyline(polygon);
     }
-    // END: horizontal line
+
 }
 
 int VisualGroup::totalHeight() const
@@ -221,16 +214,10 @@ int VisualGroup::headerHeight()
     font.setBold(true);
     QFontMetrics fontMetrics(font);
 
-    const int height = fontMetrics.height() + 1 /* 1 pixel-width gradient */
-                       + 11 /* top and bottom separation */;
+    const int height = fontMetrics.height() + 1
+                       + 11 ;
     return height;
-    /*
-    int raw = view->viewport()->fontMetrics().height() + 4;
-    // add english. maybe. depends on font height.
-    if (raw % 2 == 0)
-        raw++;
-    return std::min(raw, 25);
-    */
+
 }
 
 int VisualGroup::contentHeight() const

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -95,7 +95,7 @@ GitHubRelease SelectReleaseDialog::getRelease(QTreeWidgetItem* item)
     return release;
 }
 
-void SelectReleaseDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* /*previous*/)
+void SelectReleaseDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* )
 {
     GitHubRelease release = getRelease(current);
     QString body = markdownToHTML(release.body.toUtf8());
@@ -166,7 +166,7 @@ GitHubReleaseAsset SelectReleaseAssetDialog::getAsset(QTreeWidgetItem* item)
     return selected_asset;
 }
 
-void SelectReleaseAssetDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* /*previous*/)
+void SelectReleaseAssetDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* )
 {
     GitHubReleaseAsset asset = getAsset(current);
     m_selectedAsset = asset;

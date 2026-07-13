@@ -3,23 +3,19 @@
 #include <QString>
 #include <compare>
 
-/**
- * @brief the MessageLevel Enum
- * defines what level a log message is
- */
 struct MessageLevel {
     enum class Enum {
-        Unknown,  /**< No idea what this is or where it came from */
-        StdOut,   /**< Undetermined stderr messages */
-        StdErr,   /**< Undetermined stdout messages */
-        Launcher, /**< Launcher Messages */
-        Trace,    /**< Trace Messages */
-        Debug,    /**< Debug Messages */
-        Info,     /**< Info Messages */
-        Message,  /**< Standard Messages */
-        Warning,  /**< Warnings */
-        Error,    /**< Errors */
-        Fatal,    /**< Fatal Errors */
+        Unknown,
+        StdOut,
+        StdErr,
+        Launcher,
+        Trace,
+        Debug,
+        Info,
+        Message,
+        Warning,
+        Error,
+        Fatal,
     };
     using enum Enum;
     constexpr MessageLevel(Enum e = Unknown) : m_type(e) {}
@@ -32,10 +28,8 @@ struct MessageLevel {
     explicit operator int() const { return static_cast<int>(m_type); }
     explicit operator MessageLevel::Enum() { return m_type; }
 
-    /* Get message level from a line. Line is modified if it was successful. */
     static MessageLevel takeFromLine(QString& line);
 
-    /* Get message level from a line from the launcher log. Line is modified if it was successful. */
     static MessageLevel takeFromLauncherLine(QString& line);
 
    private:

@@ -25,7 +25,6 @@ class ShaderPackFolderModel : public ResourceFolderModel {
 
     Task* createPreUpdateTask() override;
 
-    // avoid watching twice
     virtual bool startWatching() override { return ResourceFolderModel::startWatching({ m_dir.absolutePath() }); }
     virtual bool stopWatching() override { return ResourceFolderModel::stopWatching({ m_dir.absolutePath() }); }
 

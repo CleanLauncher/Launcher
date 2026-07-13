@@ -71,7 +71,7 @@ static bool isBinaryJson(const QByteArray& data)
 QJsonDocument requireDocument(const QByteArray& data, const QString& what)
 {
     if (isBinaryJson(data)) {
-        // FIXME: Is this needed?
+
         throw JsonException(what + ": Invalid JSON. Binary JSON unsupported");
     } else {
         QJsonParseError error;
@@ -169,7 +169,7 @@ template <>
 QByteArray requireIsType<QByteArray>(const QJsonValue& value, const QString& what)
 {
     const QString string = value.toString(what);
-    // ensure that the string can be safely cast to Latin1
+
     if (string != QString::fromLatin1(string.toLatin1())) {
         throw JsonException(what + " is not encodable as Latin1");
     }
@@ -251,7 +251,7 @@ template <>
 QDir requireIsType<QDir>(const QJsonValue& value, const QString& what)
 {
     const QString string = requireIsType<QString>(value, what);
-    // FIXME: does not handle invalid characters!
+
     return QDir::current().absoluteFilePath(string);
 }
 
@@ -260,7 +260,8 @@ QUuid requireIsType<QUuid>(const QJsonValue& value, const QString& what)
 {
     const QString string = requireIsType<QString>(value, what);
     const QUuid uuid = QUuid(string);
-    if (uuid.toString() != string)  // converts back => valid
+    if (uuid.toString() != string)
+
     {
         throw JsonException(what + " is not a valid UUID");
     }
@@ -338,4 +339,4 @@ QString fromMap(const QVariantMap& map)
     return QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
 }
 
-}  // namespace Json
+}

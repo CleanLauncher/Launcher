@@ -91,8 +91,6 @@ NewInstanceDialog::NewInstanceDialog(const QString& initialGroup,
     ui->groupBox->setCurrentIndex(index);
     ui->groupBox->lineEdit()->setPlaceholderText(tr("No group"));
 
-    // NOTE: m_buttons must be initialized before PageContainer, because it indirectly accesses m_buttons through setSuggestedPack! Do not
-    // move this below.
     m_buttons = new QDialogButtonBox(QDialogButtonBox::Help | QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
 
     m_container = new PageContainer(this, {}, this);
@@ -106,8 +104,6 @@ NewInstanceDialog::NewInstanceDialog(const QString& initialGroup,
         m_buttons->button(QDialogButtonBox::Ok)->setEnabled(creationTask && !instName().isEmpty());
     });
 
-    // Bonk Qt over its stupid head and make sure it understands which button is the default one...
-    // See: https://stackoverflow.com/questions/24556831/qbuttonbox-set-default-button
     auto OkButton = m_buttons->button(QDialogButtonBox::Ok);
     OkButton->setDefault(true);
     OkButton->setAutoDefault(true);
@@ -150,7 +146,6 @@ void NewInstanceDialog::reject()
 {
     APPLICATION->settings()->set("NewInstanceGeometry", QString::fromUtf8(saveGeometry().toBase64()));
 
-    // This is just so that the pages get the close() call and can react to it, if needed.
     m_container->prepareToClose();
 
     QDialog::reject();
@@ -161,7 +156,6 @@ void NewInstanceDialog::accept()
     APPLICATION->settings()->set("NewInstanceGeometry", QString::fromUtf8(saveGeometry().toBase64()));
     importIconNow();
 
-    // This is just so that the pages get the close() call and can react to it, if needed.
     m_container->prepareToClose();
 
     QDialog::accept();
@@ -235,7 +229,6 @@ void NewInstanceDialog::setSuggestedIconFromFile(const QString& path, const QStr
     importIconPath = path;
     importIconName = name;
 
-    // Hmm, for some reason they can be to small
     ui->iconButton->setIcon(QIcon(path));
 }
 
@@ -296,7 +289,8 @@ QString NewInstanceDialog::iconKey() const
 
 void NewInstanceDialog::on_iconButton_clicked()
 {
-    importIconNow();  // so the user can switch back
+    importIconNow();
+
     IconPickerDialog dlg(this);
     dlg.execWithSelection(InstIconKey);
 

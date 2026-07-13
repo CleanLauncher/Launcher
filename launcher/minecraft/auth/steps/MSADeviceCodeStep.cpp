@@ -42,7 +42,6 @@
 #include "Json.h"
 #include "net/RawHeaderProxy.h"
 
-// https://learn.microsoft.com/en-us/entra/identity-platform/v2-oauth2-device-code
 MSADeviceCodeStep::MSADeviceCodeStep(AccountData* data) : AuthStep(data)
 {
     m_clientId = APPLICATION->getMSAClientID();
@@ -228,29 +227,20 @@ AuthenticationResponse parseAuthenticationResponse(const QByteArray& data)
 void MSADeviceCodeStep::authenticationFinished(QByteArray* response)
 {
     if (m_request->error() == QNetworkReply::TimeoutError) {
-        // rfc8628#section-3.5
-        // "On encountering a connection timeout, clients MUST unilaterally
-        // reduce their polling frequency before retrying.  The use of an
-        // exponential backoff algorithm to achieve this, such as doubling the
-        // polling interval on each such connection timeout, is RECOMMENDED."
+
         interval *= 2;
         startPoolTimer();
         return;
     }
     auto rsp = parseAuthenticationResponse(*response);
     if (rsp.error == "slow_down") {
-        // rfc8628#section-3.5
-        // "A variant of 'authorization_pending', the authorization request is
-        // still pending and polling should continue, but the interval MUST
-        // be increased by 5 seconds for this and all subsequent requests."
+
         interval += 5;
         startPoolTimer();
         return;
     }
     if (rsp.error == "authorization_pending") {
-        // keep trying - rfc8628#section-3.5
-        // "The authorization request is still pending as the end user hasn't
-        // yet completed the user-interaction steps (Section 3.3)."
+
         startPoolTimer();
         return;
     }
@@ -261,7 +251,8 @@ void MSADeviceCodeStep::authenticationFinished(QByteArray* response)
         return;
     }
     if (!m_request->wasSuccessful() || m_request->error() != QNetworkReply::NoError) {
-        startPoolTimer();  // it failed so just try again without increasing the interval
+        startPoolTimer();
+
         return;
     }
 

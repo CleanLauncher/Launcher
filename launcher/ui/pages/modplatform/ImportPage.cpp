@@ -107,12 +107,11 @@ void ImportPage::updateState()
         QString input = ui->modpackEdit->text().trimmed();
         auto url = QUrl::fromUserInput(input);
         if (url.isLocalFile()) {
-            // FIXME: actually do some validation of what's inside here... this is fake AF
+
             QFileInfo fi(input);
 
-            // Allow non-latin people to use ZIP files!
             bool isZip = QMimeDatabase().mimeTypeForUrl(url).suffixes().contains("zip");
-            // mrpack is a modrinth pack
+
             bool isMRPack = fi.suffix() == "mrpack";
 
             if (fi.exists() && (isZip || isMRPack)) {
@@ -122,8 +121,7 @@ void ImportPage::updateState()
                 dialog->setSuggestedIcon("default");
             }
         } else if (url.scheme() == "curseforge") {
-            // need to find the download link for the modpack
-            // format of url curseforge://install?addonId=IDHERE&fileId=IDHERE
+
             QUrlQuery query(url);
             if (query.allQueryItemValues("addonId").isEmpty() || query.allQueryItemValues("fileId").isEmpty()) {
                 qDebug() << "Invalid curseforge link:" << url;
@@ -141,11 +139,10 @@ void ImportPage::updateState()
                 qDebug() << "Returned CFURL Json:\n" << array->toStdString().c_str();
                 auto doc = Json::requireDocument(*array);
                 auto data = doc.object()["data"].toObject();
-                // No way to find out if it's a mod or a modpack before here
-                // And also we need to check if it ends with .zip, instead of any better way
+
                 auto fileName = data["fileName"].toString();
                 if (fileName.endsWith(".zip")) {
-                    // Have to use ensureString then use QUrl to get proper url encoding
+
                     auto dl_url = QUrl(data["downloadUrl"].toString(""));
                     if (!dl_url.isValid()) {
                         CustomMessageBox::selectable(
@@ -180,7 +177,7 @@ void ImportPage::updateState()
                 input.append("/file");
                 url = QUrl::fromUserInput(input);
             }
-            // hook, line and sinker.
+
             QFileInfo fi(url.fileName());
             auto extra_info = QMap(m_extra_info);
             dialog->setSuggestedPack(fi.completeBaseName(), new InstanceImportTask(url, this, std::move(extra_info)));
@@ -208,7 +205,7 @@ void ImportPage::on_modpackBtn_clicked()
     const QMimeType zip = QMimeDatabase().mimeTypeForName("application/zip");
     auto filter = tr("Supported files") + QString(" (%1 *.mrpack)").arg(zip.globPatterns().join(" "));
     filter += ";;" + zip.filterString();
-    //: Option for filtering for *.mrpack files when importing
+
     filter += ";;" + tr("Modrinth pack") + " (*.mrpack)";
     const QUrl url = QFileDialog::getOpenFileUrl(this, tr("Choose modpack"), modpackUrl(), filter);
     if (url.isValid()) {

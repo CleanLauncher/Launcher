@@ -19,11 +19,6 @@ static const QRegularExpression s_newlineRegex("\r\n|\n|\r");
 
 namespace ModUtils {
 
-// NEW format
-// https://github.com/MinecraftForge/FML/wiki/FML-mod-information-file/c8d8f1929aff9979e322af79a59ce81f3e02db6a
-
-// OLD format:
-// https://github.com/MinecraftForge/FML/wiki/FML-mod-information-file/5bf6a2d05145ec79387acc0d45c958642fb049fc
 ModDetails ReadMCModInfo(QByteArray contents)
 {
     auto getInfoFromArray = [](QJsonArray arr) -> ModDetails {
@@ -34,14 +29,14 @@ ModDetails ReadMCModInfo(QByteArray contents)
         auto firstObj = arr.at(0).toObject();
         details.mod_id = firstObj.value("modid").toString();
         auto name = firstObj.value("name").toString();
-        // NOTE: ignore stupid example mods copies where the author didn't even bother to change the name
+
         if (name != "Example Mod") {
             details.name = name;
         }
         details.version = firstObj.value("version").toString();
         auto homeurl = firstObj.value("url").toString().trimmed();
         if (!homeurl.isEmpty()) {
-            // fix up url.
+
             if (!homeurl.startsWith("http://") && !homeurl.startsWith("https://") && !homeurl.startsWith("ftp://")) {
                 homeurl.prepend("http://");
             }
@@ -50,7 +45,7 @@ ModDetails ReadMCModInfo(QByteArray contents)
         details.description = firstObj.value("description").toString();
         QJsonArray authors = firstObj.value("authorList").toArray();
         if (authors.size() == 0) {
-            // FIXME: what is the format of this? is there any?
+
             authors = firstObj.value("authors").toArray();
         }
 
@@ -95,7 +90,7 @@ ModDetails ReadMCModInfo(QByteArray contents)
     };
     QJsonParseError jsonError;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(contents, &jsonError);
-    // this is the very old format that had just the array
+
     if (jsonDoc.isArray()) {
         return getInfoFromArray(jsonDoc.array());
     } else if (jsonDoc.isObject()) {
@@ -106,7 +101,6 @@ ModDetails ReadMCModInfo(QByteArray contents)
 
         int version = val.toInt(-1);
 
-        // Some mods set the number with "", so it's a String instead
         if (version < 0)
             version = val.toString("").toInt();
 
@@ -127,7 +121,6 @@ ModDetails ReadMCModInfo(QByteArray contents)
     return {};
 }
 
-// https://github.com/MinecraftForge/Documentation/blob/5ab4ba6cf9abc0ac4c0abd96ad187461aefd72af/docs/gettingstarted/structuring.md
 ModDetails ReadMCModTOML(QByteArray contents)
 {
     ModDetails details;
@@ -147,14 +140,12 @@ ModDetails ReadMCModTOML(QByteArray contents)
     tomlData = result.table();
 #endif
 
-    // array defined by [[mods]]
     auto tomlModsArr = tomlData["mods"].as_array();
     if (!tomlModsArr) {
         qWarning() << "Corrupted mods.toml? Couldn't find [[mods]] array!";
         return {};
     }
 
-    // we only really care about the first element, since multiple mods in one file is not supported by us at the moment
     auto tomlModsTable0 = tomlModsArr->get(0);
     if (!tomlModsTable0) {
         qWarning() << "Corrupted mods.toml? [[mods]] didn't have an element at index 0!";
@@ -166,7 +157,6 @@ ModDetails ReadMCModTOML(QByteArray contents)
         return {};
     }
 
-    // mandatory properties - always in [[mods]]
     if (auto modIdDatum = (*modsTable)["modId"].as_string()) {
         details.mod_id = QString::fromStdString(modIdDatum->get());
     }
@@ -180,7 +170,6 @@ ModDetails ReadMCModTOML(QByteArray contents)
         details.description = QString::fromStdString(descriptionDatum->get());
     }
 
-    // optional properties - can be in the root table or [[mods]]
     QString authors = "";
     if (auto authorsDatum = tomlData["authors"].as_string()) {
         authors = QString::fromStdString(authorsDatum->get());
@@ -197,7 +186,7 @@ ModDetails ReadMCModTOML(QByteArray contents)
     } else if (auto homeurlDatumMods = (*modsTable)["displayURL"].as_string()) {
         homeurl = QString::fromStdString(homeurlDatumMods->get());
     }
-    // fix up url.
+
     if (!homeurl.isEmpty() && !homeurl.startsWith("http://") && !homeurl.startsWith("https://") && !homeurl.startsWith("ftp://")) {
         homeurl.prepend("http://");
     }
@@ -276,7 +265,6 @@ ModDetails ReadMCModTOML(QByteArray contents)
     return details;
 }
 
-// https://fabricmc.net/wiki/documentation:fabric_mod_json
 ModDetails ReadFabricModInfo(QByteArray contents)
 {
     QJsonParseError jsonError;
@@ -338,7 +326,7 @@ ModDetails ReadFabricModInfo(QByteArray contents)
             auto icon = object.value("icon");
             if (icon.isObject()) {
                 auto obj = icon.toObject();
-                // take the largest icon
+
                 int largest = 0;
                 for (auto key : obj.keys()) {
                     auto size = key.split('x').first().toInt();
@@ -349,8 +337,8 @@ ModDetails ReadFabricModInfo(QByteArray contents)
                 if (largest > 0) {
                     auto key = QString::number(largest) + "x" + QString::number(largest);
                     details.icon_file = obj.value(key).toString();
-                } else {  // parsing the sizes failed
-                    // take the first
+                } else {
+
                     if (auto it = obj.begin(); it != obj.end()) {
                         details.icon_file = it->toString();
                     }
@@ -375,7 +363,6 @@ ModDetails ReadFabricModInfo(QByteArray contents)
     return details;
 }
 
-// https://github.com/QuiltMC/rfcs/blob/master/specification/0002-quilt.mod.json.md
 ModDetails ReadQuiltModInfo(QByteArray contents)
 {
     ModDetails details;
@@ -385,7 +372,6 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
         auto object = Json::requireObject(jsonDoc, "quilt.mod.json");
         auto schemaVersion = object.value("schema_version").toInt();
 
-        // https://github.com/QuiltMC/rfcs/blob/be6ba280d785395fefa90a43db48e5bfc1d15eb4/specification/0002-quilt.mod.json.md
         if (schemaVersion == 1) {
             auto modInfo = Json::requireObject(object.value("quilt_loader"), "Quilt mod info");
 
@@ -399,7 +385,6 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
 
             auto modContributors = modMetadata.value("contributors").toObject();
 
-            // We don't really care about the role of a contributor here
             details.authors += modContributors.keys();
 
             auto modContact = modMetadata.value("contact").toObject();
@@ -436,7 +421,7 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
                 auto icon = modMetadata.value("icon");
                 if (icon.isObject()) {
                     auto obj = icon.toObject();
-                    // take the largest icon
+
                     int largest = 0;
                     for (auto key : obj.keys()) {
                         auto size = key.split('x').first().toInt();
@@ -447,8 +432,8 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
                     if (largest > 0) {
                         auto key = QString::number(largest) + "x" + QString::number(largest);
                         details.icon_file = obj.value(key).toString();
-                    } else {  // parsing the sizes failed
-                        // take the first
+                    } else {
+
                         if (auto it = obj.begin(); it != obj.end()) {
                             details.icon_file = it->toString();
                         }
@@ -491,7 +476,7 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
 ModDetails ReadForgeInfo(QByteArray contents)
 {
     ModDetails details;
-    // Read the data
+
     details.name = "Minecraft Forge";
     details.mod_id = "Forge";
     details.homeurl = "http://www.minecraftforge.net/forum/";
@@ -532,7 +517,6 @@ ModDetails ReadLiteModInfo(QByteArray contents)
     return details;
 }
 
-// https://git.sleeping.town/unascribed/NilLoader/src/commit/d7fc87b255fc31019ff90f80d45894927fac6efc/src/main/java/nilloader/api/NilMetadata.java#L64
 ModDetails ReadNilModInfo(QByteArray contents, QString fname)
 {
     ModDetails details;
@@ -601,7 +585,7 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
                 return true;
             }
             if (filePath == "META-INF/MANIFEST.MF") {
-                // quick and dirty line-by-line parser
+
                 auto manifestLines = QString(file->readAll()).split(s_newlineRegex);
                 manifestVersion = "";
                 for (auto& line : manifestLines) {
@@ -611,8 +595,6 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
                     }
                 }
 
-                // some mods use ${projectversion} in their build.gradle, causing this mess to show up in MANIFEST.MF
-                // also keep with forge's behavior of setting the version to "NONE" if none is found
                 if (manifestVersion.contains("task ':jar' property 'archiveVersion'") || manifestVersion == "") {
                     manifestVersion = "NONE";
                 }
@@ -647,14 +629,13 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
                 return true;
             }
             if (filePath == "META-INF/nil/mappings.json") {
-                // nilloader uses the filename of the metadata file for the modid, so we can't know the exact filename
-                // thankfully, there is a good file to use as a canary so we don't look for nil meta all the time
+
                 isNilMod = true;
                 stop = !nilFilePath.isEmpty();
                 file->skip();
                 return true;
             }
-            // nilmods can shade nilloader to be able to run as a standalone agent - which includes nilloader's own meta file
+
             if (filePath.endsWith(".nilmod.css") && filePath != "nilloader.nilmod.css") {
                 nilData = file->readAll();
                 nilFilePath = filePath;
@@ -674,7 +655,8 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
         mod.setDetails(details);
         return true;
     }
-    return false;  // no valid mod found in archive
+    return false;
+
 }
 
 bool processFolder(Mod& mod, [[maybe_unused]] ProcessingLevel level)
@@ -695,7 +677,8 @@ bool processFolder(Mod& mod, [[maybe_unused]] ProcessingLevel level)
         return true;
     }
 
-    return false;  // no valid mcmod.info file found
+    return false;
+
 }
 
 bool processLitemod(Mod& mod, [[maybe_unused]] ProcessingLevel level)
@@ -711,10 +694,10 @@ bool processLitemod(Mod& mod, [[maybe_unused]] ProcessingLevel level)
         return true;
     }
 
-    return false;  // no valid litemod.json found in archive
+    return false;
+
 }
 
-/** Checks whether a file is valid as a mod or not. */
 bool validate(QFileInfo file)
 {
     Mod mod{ file };
@@ -760,7 +743,8 @@ bool loadIconFile(const Mod& mod, QPixmap* pixmap)
                 icon.close();
 
                 if (!icon_result) {
-                    return png_invalid("invalid png image");  // icon invalid
+                    return png_invalid("invalid png image");
+
                 }
                 return true;
             }
@@ -775,22 +759,25 @@ bool loadIconFile(const Mod& mod, QPixmap* pixmap)
                 bool icon_result = ModUtils::processIconPNG(mod, std::move(data), pixmap);
 
                 if (!icon_result) {
-                    return png_invalid("invalid png image");  // icon png invalid
+                    return png_invalid("invalid png image");
+
                 }
                 return true;
             }
             return png_invalid("Failed to set '" + mod.iconPath() +
-                               "' as current file in zip archive");  // could not set icon as current file.
+                               "' as current file in zip archive");
+
         }
         case ResourceType::LITEMOD: {
-            return png_invalid("litemods do not have icons");  // can lightmods even have icons?
+            return png_invalid("litemods do not have icons");
+
         }
         default:
             return png_invalid("Invalid type for mod, can not load icon.");
     }
 }
 
-}  // namespace ModUtils
+}
 
 LocalModParseTask::LocalModParseTask(int token, ResourceType type, const QFileInfo& modFile)
     : Task(false), m_token(token), m_type(type), m_modFile(modFile), m_result(new Result())

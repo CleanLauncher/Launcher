@@ -55,32 +55,18 @@ class MinecraftAccount;
 using MinecraftAccountPtr = shared_qobject_ptr<MinecraftAccount>;
 Q_DECLARE_METATYPE(MinecraftAccountPtr)
 
-/**
- * A profile within someone's Mojang account.
- *
- * Currently, the profile system has not been implemented by Mojang yet,
- * but we might as well add some things for it in Launcher right now so
- * we don't have to rip the code to pieces to add it later.
- */
 struct AccountProfile {
     QString id;
     QString name;
     bool legacy;
 };
 
-/**
- * Object that stores information about a certain Mojang account.
- *
- * Said information may include things such as that account's username, client token, and access
- * token if the user chose to stay logged in.
- */
 class MinecraftAccount : public QObject, public Usable {
     Q_OBJECT
-   public: /* construction */
-    //! Do not copy accounts. ever.
+   public:
+
     explicit MinecraftAccount(const MinecraftAccount& other, QObject* parent) = delete;
 
-    //! Default constructor
     explicit MinecraftAccount(QObject* parent = 0);
 
     static MinecraftAccountPtr createBlank(AccountType type);
@@ -91,17 +77,16 @@ class MinecraftAccount : public QObject, public Usable {
 
     static QUuid uuidFromUsername(QString username);
 
-    //! Saves a MinecraftAccount to a JSON object and returns it.
     QJsonObject saveToJson() const;
 
-   public: /* manipulation */
+   public:
     shared_qobject_ptr<AuthFlow> login(bool useDeviceCode = false);
 
     shared_qobject_ptr<AuthFlow> refresh();
 
     shared_qobject_ptr<AuthFlow> currentTask();
 
-   public: /* queries */
+   public:
     QString internalId() const { return data.internalId; }
 
     QString accessToken() const { return data.accessToken(); }
@@ -127,7 +112,8 @@ class MinecraftAccount : public QObject, public Usable {
                 return "msa";
             } break;
             case AccountType::Ely: {
-                return "msa"; // required for chat signing
+                return "msa";
+
             } break;
             case AccountType::Offline: {
                 return "offline";
@@ -158,7 +144,6 @@ class MinecraftAccount : public QObject, public Usable {
 
     QPixmap getFace(int width = 64, int height = 64) const;
 
-    //! Returns the current state of the account
     AccountState accountState() const;
 
     AccountData* accountData() { return &data; }
@@ -170,22 +155,17 @@ class MinecraftAccount : public QObject, public Usable {
     QString lastError() const { return data.lastError(); }
 
    signals:
-    /**
-     * This signal is emitted when the account changes
-     */
+
     void changed();
 
     void activityChanged(bool active);
 
-    // TODO: better signalling for the various possible state changes - especially errors
-
-   protected: /* variables */
+   protected:
     AccountData data;
 
-    // current task we are executing here
     shared_qobject_ptr<AuthFlow> m_currentTask;
 
-   protected: /* methods */
+   protected:
     void incrementUses() override;
     void decrementUses() override;
 

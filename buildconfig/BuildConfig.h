@@ -39,9 +39,6 @@
 #include <QList>
 #include <QString>
 
-/**
- * \brief The Config class holds all the build-time information passed from the build system.
- */
 class Config {
    public:
     Config();
@@ -56,116 +53,65 @@ class Config {
     QString LAUNCHER_SVGFILENAME;
     QString LAUNCHER_ENVNAME;
 
-    /// The major version number.
     int VERSION_MAJOR;
-    /// The minor version number.
+
     int VERSION_MINOR;
-    /// The patch version number.
+
     int VERSION_PATCH;
 
-    /**
-     * The version channel
-     * This is used by the updater to determine what channel the current version came from.
-     */
     QString VERSION_CHANNEL;
 
     bool UPDATER_ENABLED = false;
     bool JAVA_DOWNLOADER_ENABLED = false;
 
-    /// A short string identifying this build's platform or distribution.
     QString BUILD_PLATFORM;
 
-    /// A short string identifying this build's valid artifacts int he updater. For example, "lin64" or "win32".
     QString BUILD_ARTIFACT;
 
-    /// A string containing the build timestamp
     QString BUILD_DATE;
 
-    /// A string identifying the compiler use to build
     QString COMPILER_NAME;
 
-    /// A string identifying the compiler version used to build
     QString COMPILER_VERSION;
 
-    /// A string identifying the compiler target system os
     QString COMPILER_TARGET_SYSTEM;
 
-    /// A String identifying the compiler target system version
     QString COMPILER_TARGET_SYSTEM_VERSION;
 
-    /// A String identifying the compiler target processor
     QString COMPILER_TARGET_SYSTEM_PROCESSOR;
 
-    /// URL for the updater's channel
     QString UPDATER_GITHUB_REPO;
 
-    /// The public key used to sign releases for the Sparkle updater appcast
     QString MAC_SPARKLE_PUB_KEY;
 
-    /// URL for the Sparkle updater's appcast
     QString MAC_SPARKLE_APPCAST_URL;
 
-    /// User-Agent to use.
     QString USER_AGENT;
 
-    /// The git commit hash of this build
     QString GIT_COMMIT;
 
-    /// The git tag of this build
     QString GIT_TAG;
 
-    /// The git refspec of this build
     QString GIT_REFSPEC;
 
-    /**
-     * This is used to fetch the news RSS feed.
-     * It defaults in CMakeLists.txt to "https://multimc.org/rss.xml"
-     */
     QString NEWS_RSS_URL;
 
-    /**
-     * URL that gets opened when the user clicks "More News"
-     */
     QString NEWS_OPEN_URL;
 
-    /**
-     * URL that gets opened when the user clicks 'Launcher Help'
-     */
     QString WIKI_URL;
 
-    /**
-     * URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window
-     */
     QString HELP_URL;
 
-    /**
-     * URL that gets opened when the user succesfully logins.
-     */
     QString LOGIN_CALLBACK_URL;
 
-    /**
-     * Client ID you can get from Imgur when you register an application
-     */
     QString IMGUR_CLIENT_ID;
 
-    /**
-     * Client ID you can get from Microsoft Identity Platform when you register an application
-     */
     QString MSA_CLIENT_ID;
 
-    /**
-     * Client ID you can get from Ely.by Accounts for developers when you register an application
-     */
     QString ELY_CLIENT_ID;
 
-    /**
-     * Client API key for CurseForge
-     */
     QString FLAME_API_KEY;
 
-    /**
-     * Metadata repository URL prefix
-     */
     QString META_URL;
 
     QString GLFW_LIBRARY_NAME;
@@ -191,9 +137,7 @@ class Config {
     QString ATL_API_BASE_URL = "https://api.atlauncher.com/v1/";
 
     QString TECHNIC_API_BASE_URL = "https://api.technicpack.net/";
-    /**
-     * The build that is reported to the Technic API.
-     */
+
     QString TECHNIC_API_BUILD = "multimc";
 
     QString MODRINTH_STAGING_URL = "https://staging-api.modrinth.com/v2";
@@ -205,22 +149,11 @@ class Config {
     QString FLAME_DOWNLOAD_HOST = "edge.forgecdn.net";
 
     QString versionString() const;
-    /**
-     * \brief Converts the Version to a string.
-     * \return The version number in string format (major.minor.revision.build).
-     */
+
     QString printableVersionString() const;
 
-    /**
-     * \brief Compiler ID String
-     * \return a string of the form "Name - Version"  of just "Name" if the version is empty
-     */
     QString compilerID() const;
 
-    /**
-     * \brief System ID String
-     * \return a string of the form "OS Verison Processor"
-     */
     QString systemID() const;
 };
 

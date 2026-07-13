@@ -72,7 +72,6 @@ class NetRequest : public Task {
     void setNetwork(QNetworkAccessManager* network) { m_network = network; }
     void addHeaderProxy(std::unique_ptr<Net::HeaderProxy> proxy) { m_headerProxies.push_back(std::move(proxy)); }
 
-    // automatically handle HTTP 429 Too Many Requests errors and retry
     void enableAutoRetry(bool enable);
 
     QUrl url() const;
@@ -107,17 +106,15 @@ class NetRequest : public Task {
 
     QNetworkAccessManager* m_network;
 
-    /// the network reply
     std::unique_ptr<QNetworkReply> m_reply;
     QByteArray m_errorResponse;
 
-    /// source URL
     QUrl m_url;
     std::vector<std::unique_ptr<Net::HeaderProxy>> m_headerProxies;
 
     int m_retryCount = 0;
     QTimer m_retryTimer;
 };
-}  // namespace Net
+}
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Net::NetRequest::Options)

@@ -58,7 +58,6 @@ class LogParser {
     QList<ParsedItem> parseAvailable();
     std::optional<Error> getError();
 
-    /// guess log level from a line of game log
     static MessageLevel guessLevel(const QString& line, MessageLevel previous);
 
    protected:

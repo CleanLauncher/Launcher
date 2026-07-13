@@ -13,7 +13,7 @@ class VanillaCreationTask final : public InstanceCreationTask {
     std::unique_ptr<MinecraftInstance> createInstance() override;
 
    private:
-    // Version to update to / create of the instance.
+
     BaseVersion::Ptr m_version;
 
     bool m_using_loader = false;

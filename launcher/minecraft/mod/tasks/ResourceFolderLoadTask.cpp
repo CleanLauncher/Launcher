@@ -65,11 +65,10 @@ void ResourceFolderLoadTask::executeTask()
     }
 
     if (m_is_indexed) {
-        // Read metadata first
+
         getFromMetadata();
     }
 
-    // Read JAR files that don't have metadata
     m_resource_dir.refresh();
     for (auto entry : m_resource_dir.entryInfoList()) {
         auto filePath = entry.absoluteFilePath();
@@ -87,7 +86,7 @@ void ResourceFolderLoadTask::executeTask()
         if (resource->enabled()) {
             if (m_result->resources.contains(resource->internalId())) {
                 m_result->resources[resource->internalId()]->setStatus(ResourceStatus::Installed);
-                // Delete the object we just created, since a valid one is already in the mods list.
+
                 delete resource;
             } else {
                 m_result->resources[resource->internalId()].reset(resource);
@@ -112,8 +111,6 @@ void ResourceFolderLoadTask::executeTask()
         }
     }
 
-    // Remove orphan metadata to prevent issues
-    // See https://github.com/PolyMC/PolyMC/issues/996
     if (m_clean_orphan) {
         QMutableMapIterator iter(m_result->resources);
         while (iter.hasNext()) {

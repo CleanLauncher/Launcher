@@ -27,7 +27,7 @@ class PackwizTest : public QObject {
     Q_OBJECT
 
    private slots:
-    // Files taken from https://github.com/packwiz/packwiz-example-pack
+
     void loadFromFile_Modrinth()
     {
         QString source = QFINDTESTDATA("testdata/Packwiz");
@@ -64,7 +64,6 @@ class PackwizTest : public QObject {
         QString name_mod("screenshot-to-clipboard-fabric.pw.toml");
         QVERIFY(index_dir.entryList().contains(name_mod));
 
-        // Try without the .pw.toml at the end
         name_mod.chop(8);
 
         auto metadata = Packwiz::V1::getIndexForMod(index_dir, name_mod);

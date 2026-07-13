@@ -152,7 +152,7 @@ void FtbPage::onSortingSelectionChanged(QString selected)
     m_filterModel->setSorting(toSet);
 }
 
-void FtbPage::onSelectionChanged(QModelIndex first, QModelIndex /*second*/)
+void FtbPage::onSelectionChanged(QModelIndex first, QModelIndex )
 {
     m_ui->versionSelectionBox->clear();
 
@@ -168,7 +168,6 @@ void FtbPage::onSelectionChanged(QModelIndex first, QModelIndex /*second*/)
     QString output = markdownToHTML(m_selected.description.toUtf8());
     m_ui->packDescription->setHtml(output);
 
-    // reverse foreach, so that the newest versions are first
     for (auto i = m_selected.versions.size(); i--;) {
         m_ui->versionSelectionBox->addItem(m_selected.versions.at(i).name);
     }

@@ -23,7 +23,7 @@
 class LaunchTask;
 class LaunchStep : public Task {
     Q_OBJECT
-   public: /* methods */
+   public:
     explicit LaunchStep(LaunchTask* parent);
     virtual ~LaunchStep() = default;
 
@@ -35,9 +35,9 @@ class LaunchStep : public Task {
 
    public slots:
     virtual void proceed() {};
-    // called in the opposite order than the Task launch(), used to clean up or otherwise undo things after the launch ends
+
     virtual void finalize() {};
 
-   protected: /* data */
+   protected:
     LaunchTask* m_parent;
 };

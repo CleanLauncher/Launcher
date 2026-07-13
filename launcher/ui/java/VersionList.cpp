@@ -74,7 +74,8 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
         case VersionRole:
             return version->version.toString();
         case RecommendedRole:
-            return false;  // do not recommend any version
+            return false;
+
         case JavaNameRole:
             return version->name();
         case JavaMajorRole: {
@@ -123,4 +124,4 @@ void VersionList::sortVersions()
     endResetModel();
 }
 
-}  // namespace Java
+}

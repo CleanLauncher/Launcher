@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -47,43 +47,26 @@ class ManagedPackPage : public QWidget, public BasePage {
     bool apply() override { return true; }
     void retranslate() override;
 
-    /** Gets the necessary information about the managed pack, such as
-     *  available versions*/
     virtual void parseManagedPack() {};
 
-    /** URL of the managed pack.
-     *  Not the version-specific one.
-     */
     virtual QString url() const { return {}; };
 
     void setInstanceWindow(InstanceWindow* window) { m_instance_window = window; }
 
    public slots:
-    /** Gets the current version selection and update the UI, including the update button and the changelog.
-     */
+
     virtual void suggestVersion();
 
     virtual void update() {};
     virtual void updateFromFile() {};
 
    protected slots:
-    /** Does the necessary UI changes for when something failed.
-     *
-     *  This includes:
-     *  - Setting an appropriate text on the version selector to indicate a fail;
-     *  - Setting an appropriate text on the changelog text browser to indicate a fail;
-     *  - Disable the update button.
-     */
+
     void setFailState();
 
    protected:
     ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent = nullptr);
 
-    /** Run the InstanceTask, with a progress dialog and all.
-     *  Similar to MainWindow::instanceFromInstanceTask
-     *
-     *  Returns whether the task was successful.
-     */
     bool runUpdateTask(InstanceTask*);
 
     void updatePack(const QUrl& url, QString versionID = {}, QString versionName = {});
@@ -99,7 +82,6 @@ class ManagedPackPage : public QWidget, public BasePage {
     void onUpdateTaskCompleted(bool did_succeed) const;
 };
 
-/** Simple page for when we aren't a managed pack. */
 class GenericManagedPackPage final : public ManagedPackPage {
     Q_OBJECT
 
@@ -109,7 +91,6 @@ class GenericManagedPackPage final : public ManagedPackPage {
     {}
     ~GenericManagedPackPage() override = default;
 
-    // TODO: We may want to show this page with some useful info at some point.
     bool shouldDisplay() const override { return false; };
 };
 

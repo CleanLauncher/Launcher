@@ -42,20 +42,6 @@
 #include <net/ApiDownload.h>
 #include <net/ChecksumValidator.h>
 
-/**
- * @brief Collect applicable files for the library.
- *
- * Depending on whether the library is native or not, it adds paths to the
- * appropriate lists for jar files, native libraries for 32-bit, and native
- * libraries for 64-bit.
- *
- * @param runtimeContext The current runtime context.
- * @param jar List to store paths for jar files.
- * @param native List to store paths for native libraries.
- * @param native32 List to store paths for 32-bit native libraries.
- * @param native64 List to store paths for 64-bit native libraries.
- * @param overridePath Optional path to override the default storage path.
- */
 void Library::getApplicableFiles(const RuntimeContext& runtimeContext,
                                  QStringList& jar,
                                  QStringList& native,
@@ -64,7 +50,7 @@ void Library::getApplicableFiles(const RuntimeContext& runtimeContext,
                                  const QString& overridePath) const
 {
     bool local = isLocal();
-    // Lambda function to get the absolute file path
+
     auto actualPath = [this, local, overridePath](QString relPath) {
         relPath = FS::RemoveInvalidPathChars(relPath);
         QFileInfo out(FS::PathCombine(storagePrefix(), relPath));
@@ -92,19 +78,6 @@ void Library::getApplicableFiles(const RuntimeContext& runtimeContext,
     }
 }
 
-/**
- * @brief Get download requests for the library files.
- *
- * Depending on whether the library is native or not, and the current runtime context,
- * this function prepares download requests for the necessary files. It handles both local
- * and remote files, checks for stale cache entries, and adds checksummed downloads.
- *
- * @param runtimeContext The current runtime context.
- * @param cache Pointer to the HTTP meta cache.
- * @param failedLocalFiles List to store paths for failed local files.
- * @param overridePath Optional path to override the default storage path.
- * @return QList<Net::NetRequest::Ptr> List of download requests.
- */
 QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeContext,
                                                   class HttpMetaCache* cache,
                                                   QStringList& failedLocalFiles,
@@ -114,7 +87,6 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
     bool stale = isAlwaysStale();
     bool local = isLocal();
 
-    // Lambda function to check if a local file exists
     auto check_local_file = [overridePath, &failedLocalFiles](QString storage) {
         QFileInfo fileinfo(storage);
         QString fileName = fileinfo.fileName();
@@ -127,7 +99,6 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
         return true;
     };
 
-    // Lambda function to add a download request
     auto add_download = [this, local, check_local_file, cache, stale, &out](QString storage, QString url, QString sha1) {
         if (local) {
             return check_local_file(storage);
@@ -143,7 +114,6 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
             options |= Net::Download::Option::AcceptLocalFiles;
         }
 
-        // Don't add a time limit for the libraries cache entry validity
         options |= Net::Download::Option::MakeEternal;
 
         if (sha1.size()) {
@@ -227,15 +197,6 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
     return out;
 }
 
-/**
- * @brief Check if the library is active in the given runtime context.
- *
- * This function evaluates rules to determine if the library should be active,
- * considering both general rules and native compatibility.
- *
- * @param runtimeContext The current runtime context.
- * @return bool True if the library is active, false otherwise.
- */
 bool Library::isActive(const RuntimeContext& runtimeContext) const
 {
     bool result = true;
@@ -256,40 +217,21 @@ bool Library::isActive(const RuntimeContext& runtimeContext) const
     return result;
 }
 
-/**
- * @brief Check if the library is considered local.
- *
- * @return bool True if the library is local, false otherwise.
- */
 bool Library::isLocal() const
 {
     return m_hint == "local";
 }
 
-/**
- * @brief Check if the library is always considered stale.
- *
- * @return bool True if the library is always stale, false otherwise.
- */
 bool Library::isAlwaysStale() const
 {
     return m_hint == "always-stale";
 }
 
-/**
- * @brief Get the compatible native classifier for the current runtime context.
- *
- * This function attempts to match the current runtime context with the appropriate
- * native classifier.
- *
- * @param runtimeContext The current runtime context.
- * @return QString The compatible native classifier, or an empty string if none is found.
- */
 QString Library::getCompatibleNative(const RuntimeContext& runtimeContext) const
 {
-    // try to match precise classifier "[os]-[arch]"
+
     auto entry = m_nativeClassifiers.constFind(runtimeContext.getClassifier());
-    // try to match imprecise classifier on legacy architectures "[os]"
+
     if (entry == m_nativeClassifiers.constEnd() && runtimeContext.isLegacyArch())
         entry = m_nativeClassifiers.constFind(runtimeContext.system);
 
@@ -299,31 +241,16 @@ QString Library::getCompatibleNative(const RuntimeContext& runtimeContext) const
     return entry.value();
 }
 
-/**
- * @brief Set the storage prefix for the library.
- *
- * @param prefix The storage prefix to set.
- */
 void Library::setStoragePrefix(QString prefix)
 {
     m_storagePrefix = prefix;
 }
 
-/**
- * @brief Get the default storage prefix for libraries.
- *
- * @return QString The default storage prefix.
- */
 QString Library::defaultStoragePrefix()
 {
     return "libraries/";
 }
 
-/**
- * @brief Get the current storage prefix for the library.
- *
- * @return QString The current storage prefix.
- */
 QString Library::storagePrefix() const
 {
     if (m_storagePrefix.isEmpty()) {
@@ -332,26 +259,16 @@ QString Library::storagePrefix() const
     return m_storagePrefix;
 }
 
-/**
- * @brief Get the filename for the library in the current runtime context.
- *
- * This function determines the appropriate filename for the library, taking into
- * account native classifiers if applicable.
- *
- * @param runtimeContext The current runtime context.
- * @return QString The filename of the library.
- */
 QString Library::filename(const RuntimeContext& runtimeContext) const
 {
     if (!m_filename.isEmpty()) {
         return m_filename;
     }
-    // non-native? use only the gradle specifier
+
     if (!isNative()) {
         return m_name.getFileName();
     }
 
-    // otherwise native, override classifiers. Mojang HACK!
     GradleSpecifier nativeSpec = m_name;
     QString nativeClassifier = getCompatibleNative(runtimeContext);
     if (!nativeClassifier.isNull()) {
@@ -362,15 +279,6 @@ QString Library::filename(const RuntimeContext& runtimeContext) const
     return nativeSpec.getFileName();
 }
 
-/**
- * @brief Get the display name for the library in the current runtime context.
- *
- * This function returns the display name for the library, defaulting to the filename
- * if no display name is set.
- *
- * @param runtimeContext The current runtime context.
- * @return QString The display name of the library.
- */
 QString Library::displayName(const RuntimeContext& runtimeContext) const
 {
     if (!m_displayname.isEmpty())
@@ -378,23 +286,13 @@ QString Library::displayName(const RuntimeContext& runtimeContext) const
     return filename(runtimeContext);
 }
 
-/**
- * @brief Get the storage suffix for the library in the current runtime context.
- *
- * This function determines the appropriate storage suffix for the library, taking into
- * account native classifiers if applicable.
- *
- * @param runtimeContext The current runtime context.
- * @return QString The storage suffix of the library.
- */
 QString Library::storageSuffix(const RuntimeContext& runtimeContext) const
 {
-    // non-native? use only the gradle specifier
+
     if (!isNative()) {
         return m_name.toPath(m_filename);
     }
 
-    // otherwise native, override classifiers. Mojang HACK!
     GradleSpecifier nativeSpec = m_name;
     QString nativeClassifier = getCompatibleNative(runtimeContext);
     if (!nativeClassifier.isNull()) {

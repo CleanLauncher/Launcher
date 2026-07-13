@@ -23,4 +23,4 @@ class PasteWizardPage : public BaseWizardPage {
     Ui::PasteWizardPage* ui;
 };
 
-#endif  // PASTEDEFAULTSCONFIRMATIONWIZARD_H
+#endif

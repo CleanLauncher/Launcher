@@ -1,10 +1,3 @@
-//-----------------------------------------------------------------------------
-// The original MurmurHash2 was written by Austin Appleby, and is placed in the
-// public domain. The author hereby disclaims copyright to this source code.
-//
-// This was modified as to possibilitate it's usage incrementally.
-// Those modifications are also placed in the public domain, and the author of
-// such modifications hereby disclaims copyright to this source code.
 
 #pragma once
 
@@ -32,4 +25,4 @@ struct IncrementalHashInfo {
 };
 
 void FourBytes_MurmurHash2(const unsigned char* data, IncrementalHashInfo& prev);
-}  // namespace Murmur2
+}

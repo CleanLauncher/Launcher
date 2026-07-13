@@ -6,7 +6,7 @@ MinecraftLoadAndCheck::MinecraftLoadAndCheck(MinecraftInstance* inst, Net::Mode 
 
 void MinecraftLoadAndCheck::executeTask()
 {
-    // add offline metadata load task
+
     auto components = m_inst->getPackProfile();
     if (auto result = components->reload(m_netmode); !result) {
         emitFailed(result.error);

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 kumquat-ir 66188216+kumquat-ir@users.noreply.github.com
-//
+
 // SPDX-License-Identifier: LGPL-3.0-only
 
 #include "qdcss.h"
@@ -13,8 +13,7 @@ static const QRegularExpression s_ruleRe(R"((\S+?)\s*:\s*(?:\"(.*?)(?<!\\)\"|'(.
 
 QDCSS::QDCSS(QString s)
 {
-    // not much error handling over here...
-    // the original java code used indeces returned by the matcher for them, but QRE does not expose those
+
     QRegularExpressionMatchIterator ruleset_i = s_rulesetRe.globalMatch(s);
     while (ruleset_i.hasNext()) {
         QRegularExpressionMatch ruleset = ruleset_i.next();

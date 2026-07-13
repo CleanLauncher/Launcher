@@ -147,8 +147,6 @@
     return false;
 }
 
-// all of this because keeping things compatible with deprecated old settings
-// if either of the settings {a, b} is true, this also resolves to true
 class OrSetting : public Setting {
     Q_OBJECT
    public:
@@ -185,7 +183,6 @@ void MinecraftInstance::loadSpecificSettings()
     if (isSpecificSettingsLoaded())
         return;
 
-    // Java Settings
     auto locationOverride = m_settings->registerSetting("OverrideJavaLocation", false);
     auto argsOverride = m_settings->registerSetting("OverrideJavaArgs", false);
     m_settings->registerSetting("AutomaticJava", false);
@@ -197,50 +194,42 @@ void MinecraftInstance::loadSpecificSettings()
         m_settings->registerOverride(global_settings->getSetting("UseOptimizedJvmArgs"), argsOverride);
         m_settings->registerOverride(global_settings->getSetting("GarbageCollectorPreset"), argsOverride);
 
-        // special!
         m_settings->registerPassthrough(global_settings->getSetting("JavaSignature"), locationOverride);
         m_settings->registerPassthrough(global_settings->getSetting("JavaArchitecture"), locationOverride);
         m_settings->registerPassthrough(global_settings->getSetting("JavaRealArchitecture"), locationOverride);
         m_settings->registerPassthrough(global_settings->getSetting("JavaVersion"), locationOverride);
         m_settings->registerPassthrough(global_settings->getSetting("JavaVendor"), locationOverride);
 
-        // Window Size
         auto windowSetting = m_settings->registerSetting("OverrideWindow", false);
         m_settings->registerOverride(global_settings->getSetting("LaunchMaximized"), windowSetting);
         m_settings->registerOverride(global_settings->getSetting("MinecraftWinWidth"), windowSetting);
         m_settings->registerOverride(global_settings->getSetting("MinecraftWinHeight"), windowSetting);
 
-        // Memory
         auto memorySetting = m_settings->registerSetting("OverrideMemory", false);
         m_settings->registerOverride(global_settings->getSetting("MinMemAlloc"), memorySetting);
         m_settings->registerOverride(global_settings->getSetting("MaxMemAlloc"), memorySetting);
         m_settings->registerOverride(global_settings->getSetting("PermGen"), memorySetting);
         m_settings->registerOverride(global_settings->getSetting("LowMemWarning"), memorySetting);
 
-        // Native library workarounds
         auto nativeLibraryWorkaroundsOverride = m_settings->registerSetting("OverrideNativeWorkarounds", false);
         m_settings->registerOverride(global_settings->getSetting("UseNativeOpenAL"), nativeLibraryWorkaroundsOverride);
         m_settings->registerOverride(global_settings->getSetting("CustomOpenALPath"), nativeLibraryWorkaroundsOverride);
         m_settings->registerOverride(global_settings->getSetting("UseNativeGLFW"), nativeLibraryWorkaroundsOverride);
         m_settings->registerOverride(global_settings->getSetting("CustomGLFWPath"), nativeLibraryWorkaroundsOverride);
 
-        // Performance related options
         auto performanceOverride = m_settings->registerSetting("OverridePerformance", false);
         m_settings->registerOverride(global_settings->getSetting("EnableFeralGamemode"), performanceOverride);
         m_settings->registerOverride(global_settings->getSetting("EnableMangoHud"), performanceOverride);
         m_settings->registerOverride(global_settings->getSetting("UseDiscreteGpu"), performanceOverride);
         m_settings->registerOverride(global_settings->getSetting("UseZink"), performanceOverride);
 
-        // Miscellaneous
         auto miscellaneousOverride = m_settings->registerSetting("OverrideMiscellaneous", false);
         m_settings->registerOverride(global_settings->getSetting("CloseAfterLaunch"), miscellaneousOverride);
         m_settings->registerOverride(global_settings->getSetting("QuitAfterGameStop"), miscellaneousOverride);
 
-        // Legacy-related options
         auto legacySettings = m_settings->registerSetting("OverrideLegacySettings", false);
         m_settings->registerOverride(global_settings->getSetting("OnlineFixes"), legacySettings);
 
-        // Ely-related options
         auto elySettings = m_settings->registerSetting("OverrideElySettings", false);
         m_settings->registerOverride(global_settings->getSetting("ElyPatchPreference"), elySettings);
 
@@ -250,12 +239,10 @@ void MinecraftInstance::loadSpecificSettings()
         m_settings->set("InstanceType", "OneSix");
     }
 
-    // Join server on launch, this does not have a global override
     m_settings->registerSetting("JoinServerOnLaunch", false);
     m_settings->registerSetting("JoinServerOnLaunchAddress", "");
     m_settings->registerSetting("JoinWorldOnLaunch", "");
 
-    // Use account for instance, this does not have a global override
     m_settings->registerSetting("UseAccountForInstance", false);
     m_settings->registerSetting("InstanceAccountId", "");
 
@@ -272,7 +259,6 @@ void MinecraftInstance::loadSpecificSettings()
     connect(dataPacksEnabled.get(), &Setting::SettingChanged, this, [this] { m_data_pack_list.reset(); });
     connect(dataPacksPath.get(), &Setting::SettingChanged, this, [this] { m_data_pack_list.reset(); });
 
-    // Join server on launch, this does not have a global override
     m_settings->registerSetting("OverrideModDownloadLoaders", false);
     m_settings->registerSetting("ModDownloadLoaders", "[]");
 
@@ -312,7 +298,6 @@ QSet<QString> MinecraftInstance::traits() const
     return profile->getTraits();
 }
 
-// FIXME: move UI code out of MinecraftInstance
 void MinecraftInstance::populateLaunchMenu(QMenu* menu)
 {
     QAction* normalLaunch = menu->addAction(tr("&Launch"));
@@ -387,8 +372,7 @@ QString MinecraftInstance::getLocalLibraryPath() const
 bool MinecraftInstance::supportsDemo() const
 {
     Version instance_ver{ getPackProfile()->getComponentVersion("net.minecraft") };
-    // Demo mode was introduced in 1.3.1: https://minecraft.wiki/w/Demo_mode#History
-    // FIXME: Due to Version constraints atm, this can't handle well non-release versions
+
     return instance_ver >= Version("1.3.1");
 }
 
@@ -502,7 +486,7 @@ QStringList MinecraftInstance::getNativeJars()
 
 static QString replaceTokensIn(const QString& text, const QMap<QString, QString>& with)
 {
-    // TODO: does this still work??
+
     QString result;
     static const QRegularExpression s_token_regexp("\\$\\{(.+)\\}", QRegularExpression::InvertedGreedinessOption);
     QStringList list;
@@ -582,35 +566,28 @@ QStringList MinecraftInstance::javaArguments()
 
     args << "-Duser.language=en";
 
-    // custom args go first. we want to override them if we have our own here.
     args.append(extraArguments());
 
-    // OSX dock icon and name
 #ifdef Q_OS_MAC
     args << "-Xdock:icon=icon.png";
     args << QString("-Xdock:name=\"%1\"").arg(windowTitle());
 #endif
     auto traits_ = traits();
-    // HACK: fix issues on macOS with 1.13 snapshots
-    // NOTE: Oracle Java option. if there are alternate jvm implementations, this would be the place to customize this for them
+
 #ifdef Q_OS_MAC
     if (traits_.contains("FirstThreadOnMacOS")) {
         args << QString("-XstartOnFirstThread");
     }
 #endif
 
-    // HACK: Stupid hack for Intel drivers. See: https://mojang.atlassian.net/browse/MCL-767
 #ifdef Q_OS_WIN32
     args << QString(
         "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_"
         "minecraft.exe.heapdump");
 #endif
 
-    // LWJGL2 reads `LWJGL_DISABLE_XRANDR` to force disable xrandr usage and fall back to xf86videomode.
-    // It *SHOULD* check for the executable to exist before trying to use it for queries but it doesnt,
-    // so WE can and force disable xrandr if it is not available.
 #ifdef Q_OS_LINUX
-    // LWJGL2 is "org.lwjgl" LWJGL3 is "org.lwjgl3"
+
     if (m_components->getComponent("org.lwjgl") != nullptr && QStandardPaths::findExecutable("xrandr").isEmpty()) {
         args << QString("-DLWJGL_DISABLE_XRANDR=true");
     }
@@ -626,7 +603,6 @@ QStringList MinecraftInstance::javaArguments()
         args << QString("-Xmx%1m").arg(min);
     }
 
-    // No PermGen in newer java.
     JavaVersion javaVersion = getJavaVersion();
     if (javaVersion.requiresPermGen()) {
         auto permgen = settings()->get("PermGen").toInt();
@@ -640,7 +616,7 @@ QStringList MinecraftInstance::javaArguments()
     args.append(JavaPerformance::getCompletePerformanceArgs(javaVersion, m_settings->get("UseOptimizedJvmArgs").toBool(), preset));
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
-        // allow reflective access to java.net - required by the skin fix
+
         args << "--add-opens" << "java.base/java.net=ALL-UNNAMED";
 
     return args;
@@ -648,7 +624,7 @@ QStringList MinecraftInstance::javaArguments()
 
 QString MinecraftInstance::getLauncher()
 {
-    // use legacy launcher if the traits are set
+
     if (isLegacy())
         return "legacy";
 
@@ -671,7 +647,7 @@ QMap<QString, QString> MinecraftInstance::getVariables()
     out.insert("INST_JAVA_ARGS", javaArguments().join(' '));
     out.insert("NO_COLOR", "1");
 #ifdef Q_OS_MACOS
-    // get library for Steam overlay support
+
     QString steamDyldInsertLibraries = qEnvironmentVariable("STEAM_DYLD_INSERT_LIBRARIES");
     if (!steamDyldInsertLibraries.isEmpty()) {
         out.insert("DYLD_INSERT_LIBRARIES", steamDyldInsertLibraries);
@@ -682,15 +658,13 @@ QMap<QString, QString> MinecraftInstance::getVariables()
 
 QProcessEnvironment MinecraftInstance::createEnvironment()
 {
-    // prepare the process environment
+
     QProcessEnvironment env = CleanEnviroment();
 
-    // export some infos
     auto variables = getVariables();
     for (auto it = variables.begin(); it != variables.end(); ++it) {
         env.insert(it.key(), it.value());
     }
-    // custom env
 
     auto insertEnv = [&env](QString value) {
         auto envMap = Json::toMap(value);
@@ -707,7 +681,7 @@ QProcessEnvironment MinecraftInstance::createEnvironment()
 
 QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
 {
-    // prepare the process environment
+
     QProcessEnvironment env = createEnvironment();
 
 #ifdef Q_OS_LINUX
@@ -725,7 +699,6 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
                     preloadList << FS::PathCombine(libPath, fileName);
             };
 
-            // dlsym variant is only needed for OpenGL and not included in the vulkan layer
             appendLib("libMangoHud_dlsym.so");
             appendLib("libMangoHud_opengl.so");
             appendLib("libMangoHud_shim.so");
@@ -738,9 +711,9 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
 
     if (settings()->get("UseDiscreteGpu").toBool()) {
         if (!switcherooSetupGPU(env)) {
-            // Open Source Drivers
+
             env.insert("DRI_PRIME", "1");
-            // Proprietary Nvidia Drivers
+
             env.insert("__NV_PRIME_RENDER_OFFLOAD", "1");
             env.insert("__VK_LAYER_NV_optimus", "NVIDIA_only");
             env.insert("__GLX_VENDOR_LIBRARY_NAME", "nvidia");
@@ -748,7 +721,7 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
     }
 
     if (settings()->get("UseZink").toBool()) {
-        // taken from https://wiki.archlinux.org/title/OpenGL#OpenGL_over_Vulkan_(Zink)
+
         env.insert("__GLX_VENDOR_LIBRARY_NAME", "mesa");
         env.insert("MESA_LOADER_DRIVER_OVERRIDE", "zink");
         env.insert("GALLIUM_DRIVER", "zink");
@@ -781,9 +754,8 @@ QStringList MinecraftInstance::processMinecraftArgs(AuthSessionPtr session, Mine
 
     QMap<QString, QString> tokenMapping = makeProfileVarMapping(profile);
 
-    // yggdrasil!
     if (session) {
-        // token_mapping["auth_username"] = session->username;
+
         tokenMapping["auth_session"] = session->session;
         tokenMapping["auth_access_token"] = session->access_token;
         tokenMapping["auth_player_name"] = session->player_name;
@@ -830,22 +802,19 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
         }
     }
 
-    // generic minecraft params
-    for (auto param : processMinecraftArgs(session, nullptr /* When using a launch script, the server parameters are handled by it*/
+    for (auto param : processMinecraftArgs(session, nullptr
                                            )) {
         launchScript += "param " + param + "\n";
     }
 
-    // window size, title and state, legacy
     {
         QString windowParams;
         if (settings()->get("LaunchMaximized").toBool()) {
-            // FIXME doesn't support maximisation
+
             if (!isLegacy()) {
                 auto screen = QGuiApplication::primaryScreen();
                 auto screenGeometry = screen->availableSize();
 
-                // small hack to get the widow decorations
                 for (auto w : QApplication::topLevelWidgets()) {
                     auto mainWindow = qobject_cast<QMainWindow*>(w);
                     if (mainWindow) {
@@ -867,20 +836,18 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
         launchScript += "windowParams " + windowParams + "\n";
     }
 
-    // launcher info
     {
         launchScript += "launcherBrand " + BuildConfig.LAUNCHER_NAME + "\n";
         launchScript += "launcherVersion " + BuildConfig.printableVersionString() + "\n";
     }
 
-    // instance info
     {
         launchScript += "instanceName " + name() + "\n";
         launchScript += "instanceIconKey " + name() + "\n";
-        launchScript += "instanceIconPath icon.png\n";  // we already save a copy here
+        launchScript += "instanceIconPath icon.png\n";
+
     }
 
-    // legacy auth
     if (session) {
         launchScript += "userName " + session->player_name + "\n";
         launchScript += "sessionId " + session->session + "\n";
@@ -895,7 +862,6 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
 
     launchScript += "launcher " + getLauncher() + "\n";
 
-    // qDebug() << "Generated launch script:" << launchScript;
     return launchScript;
 }
 
@@ -919,7 +885,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
 
     auto profile = m_components->getProfile();
 
-    // mods and core mods
     auto printModList = [&out](const QString& label, ModFolderModel& model) {
         if (model.size()) {
             out << QString("%1:").arg(label);
@@ -948,7 +913,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
     printModList("Mods", *loaderModList());
     printModList("Core Mods", *coreModList());
 
-    // jar mods
     auto& jarMods = profile->getJarMods();
     if (jarMods.size()) {
         out << "Jar Mods:";
@@ -964,7 +928,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
         out << emptyLine;
     }
 
-    // traits
     auto alltraits = traits();
     if (alltraits.size()) {
         out << "Traits:";
@@ -974,7 +937,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
         out << emptyLine;
     }
 
-    // native libraries
     auto settings = this->settings();
     bool nativeOpenAL = settings->get("UseNativeOpenAL").toBool();
     bool nativeGLFW = settings->get("UseNativeGLFW").toBool();
@@ -986,7 +948,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
         out << emptyLine;
     }
 
-    // libraries and class path.
     {
         out << "Libraries:";
         QStringList jars, nativeJars;
@@ -1004,13 +965,11 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
 
     out << "Natives path:" << indent + getNativePath() << emptyLine;
 
-    // minecraft arguments
     auto params = processMinecraftArgs(nullptr, targetToJoin);
     out << "Minecraft arguments:";
     out << indent + params.join(' ');
     out << emptyLine;
 
-    // window size
     QString windowParams;
     if (settings->get("LaunchMaximized").toBool()) {
         out << "Window size: max (if available)";
@@ -1021,7 +980,6 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
     }
     out << emptyLine;
 
-    // environment variables
     const QString env = settings->get("Env").toString();
     if (auto envMap = Json::toMap(env); !envMap.isEmpty()) {
         out << "Custom environment variables:";
@@ -1071,7 +1029,6 @@ QMap<QString, QString> MinecraftInstance::makeProfileVarMapping(std::shared_ptr<
     auto assets = profile->getMinecraftAssets();
     result["game_assets"] = AssetsUtils::getAssetsDir(assets->id, resourcesDir()).absolutePath();
 
-    // 1.7.3+ assets tokens
     result["assets_root"] = absAssetsDir;
     result["assets_index_name"] = assets->id;
 
@@ -1094,7 +1051,7 @@ QString MinecraftInstance::getStatusbarDescription()
 
     QString mcVersion = m_components->getComponentVersion("net.minecraft");
     if (mcVersion.isEmpty()) {
-        // Load component info if needed
+
         m_components->reload(Net::Mode::Offline);
         mcVersion = m_components->getComponentVersion("net.minecraft");
     }
@@ -1125,13 +1082,13 @@ QString MinecraftInstance::getStatusbarDescription()
 QList<LaunchStep::Ptr> MinecraftInstance::createUpdateTask()
 {
     return {
-        // create folders
+
         makeShared<FoldersTask>(this),
-        // libraries download
+
         makeShared<LibrariesTask>(this),
-        // FML libraries download and copy into the instance
+
         makeShared<LegacyFMLLibrariesTask>(this),
-        // assets update
+
         makeShared<AssetUpdateTask>(this),
     };
 }
@@ -1144,12 +1101,10 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
 
     APPLICATION->icons()->saveIcon(iconKey(), FS::PathCombine(gameRoot(), "icon.png"), "PNG");
 
-    // print a header
     {
         process->appendStep(makeShared<TextPrint>(pptr, "Minecraft folder is:\n  " + gameRoot() + "\n", MessageLevel::Launcher));
     }
 
-    // create the .minecraft folder and server-resource-packs (workaround for Minecraft bug MCL-3732)
     {
         process->appendStep(makeShared<CreateGameFolders>(pptr));
     }
@@ -1167,40 +1122,35 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
     }
 
     if (targetToJoin && targetToJoin->port == 25565) {
-        // Resolve server address to join on launch
+
         auto step = makeShared<LookupServerAddress>(pptr);
         step->setLookupAddress(targetToJoin->address);
         step->setOutputAddressPtr(targetToJoin);
         process->appendStep(step);
     }
 
-    // load meta
     auto mode = session->launchMode != LaunchMode::Offline ? Net::Mode::Online : Net::Mode::Offline;
     {
         process->appendStep(makeShared<TaskStepWrapper>(pptr, makeShared<MinecraftLoadAndCheck>(this, mode)));
     }
 
-    // check java
     {
         process->appendStep(makeShared<AutoInstallJava>(pptr));
         process->appendStep(makeShared<CheckJava>(pptr));
-        // verify that minimum Java requirements are met
+
         process->appendStep(makeShared<VerifyJavaInstall>(pptr));
     }
 
-    // run pre-launch command if that's needed
     if (getPreLaunchCommand().size()) {
         auto step = makeShared<PreLaunchCommand>(pptr);
         step->setWorkingDirectory(gameRoot());
         process->appendStep(step);
     }
 
-    // prepare Ely patch
     if (session->wantsElyPatch) {
         process->appendStep(makeShared<TaskStepWrapper>(pptr, makeShared<ElyPatchTask>(this, runtimeContext(), mode)));
     }
 
-    // if we aren't in offline mode
     if (session->launchMode != LaunchMode::Offline) {
         process->appendStep(makeShared<ClaimAccount>(pptr, session));
         for (auto t : createUpdateTask()) {
@@ -1210,38 +1160,32 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
         process->appendStep(makeShared<EnsureOfflineLibraries>(pptr, this));
     }
 
-    // if there are any jar mods
     {
         process->appendStep(makeShared<ModMinecraftJar>(pptr));
     }
 
-    // Scan mods folders for mods
     {
         process->appendStep(makeShared<ScanModFolders>(pptr));
     }
 
-    // make sure we have enough RAM, warn the user if we don't
     {
         process->appendStep(makeShared<EnsureAvailableMemory>(pptr, this));
     }
 
-    // print some instance info here...
     {
         process->appendStep(makeShared<PrintInstanceInfo>(pptr, session, targetToJoin));
     }
 
-    // extract native jars if needed
     {
         process->appendStep(makeShared<ExtractNatives>(pptr));
     }
 
-    // reconstruct assets if needed
     {
         process->appendStep(makeShared<ReconstructAssets>(pptr));
     }
 
     {
-        // actually launch the game
+
         auto step = makeShared<LauncherPartLaunch>(pptr);
         step->setWorkingDirectory(gameRoot());
         step->setAuthSession(session);
@@ -1249,7 +1193,6 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
         process->appendStep(step);
     }
 
-    // run post-exit command if that's needed
     if (getPostExitCommand().size()) {
         auto step = makeShared<PostLaunchCommand>(pptr);
         step->setWorkingDirectory(gameRoot());
@@ -1354,7 +1297,7 @@ QList<Mod*> MinecraftInstance::getJarMods() const
     for (auto jarmod : profile->getJarMods()) {
         QStringList jar, temp1, temp2, temp3;
         jarmod->getApplicableFiles(runtimeContext(), jar, temp1, temp2, temp3, jarmodsPath().absolutePath());
-        // QString filePath = jarmodsPath().absoluteFilePath(jarmod->filename(currentSystem));
+
         mods.push_back(new Mod(QFileInfo(jar[0])));
     }
     return mods;

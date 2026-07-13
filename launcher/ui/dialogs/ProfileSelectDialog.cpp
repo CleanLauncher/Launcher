@@ -23,7 +23,6 @@
 
 #include "Application.h"
 
-// HACK: hide checkboxes from AccountList
 class HideCheckboxProxyModel : public QIdentityProxyModel {
    public:
     using QIdentityProxyModel::QIdentityProxyModel;
@@ -49,16 +48,13 @@ ProfileSelectDialog::ProfileSelectDialog(const QString& message, int flags, QWid
     proxy->setSourceModel(m_accounts);
     ui->view->setModel(proxy);
 
-    // Set the message label.
     ui->msgLabel->setVisible(!message.isEmpty());
     ui->msgLabel->setText(message);
 
-    // Flags...
     ui->globalDefaultCheck->setVisible(flags & GlobalDefaultCheckbox);
     ui->instDefaultCheck->setVisible(flags & InstanceDefaultCheckbox);
     qDebug() << flags;
 
-    // Select the first entry in the list.
     ui->view->setCurrentIndex(ui->view->model()->index(0, 0));
 
     connect(ui->view, &QAbstractItemView::doubleClicked, this, &ProfileSelectDialog::on_buttonBox_accepted);

@@ -18,14 +18,14 @@ class InstanceCopyTask : public InstanceTask {
     explicit InstanceCopyTask(BaseInstance* origInstance, const InstanceCopyPrefs& prefs);
 
    protected:
-    //! Entry point for tasks.
+
     virtual void executeTask() override;
     bool abort() override;
     void copyFinished();
     void copyAborted();
 
    private:
-    /* data */
+
     BaseInstance* m_origInstance;
     QFuture<bool> m_copyFuture;
     QFutureWatcher<bool> m_copyFutureWatcher;

@@ -101,7 +101,7 @@ void VersionListView::updateEmptyViewPort()
 {
 #ifndef QT_NO_ACCESSIBILITY
     setAccessibleDescription(currentEmptyString());
-#endif /* !QT_NO_ACCESSIBILITY */
+#endif
 
     if (!m_itemCount) {
         viewport()->update();
@@ -132,7 +132,6 @@ void VersionListView::paintInfoLabel(QPaintEvent* event) const
 {
     QString emptyString = currentEmptyString();
 
-    // calculate the rect for the overlay
     QPainter painter(viewport());
     painter.setRenderHint(QPainter::Antialiasing, true);
     QFont font("sans", 20);
@@ -154,7 +153,6 @@ void VersionListView::paintInfoLabel(QPaintEvent* event) const
     auto wrapRect = textRect;
     wrapRect.adjust(-10, -10, 10, 10);
 
-    // check if we are allowed to draw in our area
     if (!event->rect().intersects(wrapRect)) {
         return;
     }

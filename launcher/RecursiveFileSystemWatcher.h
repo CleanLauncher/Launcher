@@ -12,7 +12,6 @@ class RecursiveFileSystemWatcher : public QObject {
     void setRootDir(const QDir& root);
     QDir rootDir() const { return m_root; }
 
-    // WARNING: setting this to true may be bad for performance
     void setWatchFiles(bool watchFiles);
     bool watchFiles() const { return m_watchFiles; }
 

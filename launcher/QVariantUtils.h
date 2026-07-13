@@ -66,4 +66,4 @@ inline QVariant fromList(QList<T> val)
     return variantList;
 }
 
-}  // namespace QVariantUtils
+}

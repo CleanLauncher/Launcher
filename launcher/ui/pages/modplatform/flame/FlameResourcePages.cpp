@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -55,8 +55,6 @@ FlameModPage::FlameModPage(ModDownloadDialog* dialog, BaseInstance& instance) : 
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's contructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &FlameModPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FlameModPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &FlameModPage::onVersionSelectionChanged);
@@ -71,9 +69,10 @@ void FlameModPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-            // attempt to resolve url from warning page
+
             query.remove(0, 10);
-            ModPage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });  // double decoding is necessary
+            ModPage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+
             return;
         }
     }
@@ -89,8 +88,6 @@ FlameResourcePackPage::FlameResourcePackPage(ResourcePackDownloadDialog* dialog,
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's contructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &FlameResourcePackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FlameResourcePackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &FlameResourcePackPage::onVersionSelectionChanged);
@@ -105,9 +102,10 @@ void FlameResourcePackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-            // attempt to resolve url from warning page
+
             query.remove(0, 10);
-            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });  // double decoding is necessary
+            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+
             return;
         }
     }
@@ -123,8 +121,6 @@ FlameTexturePackPage::FlameTexturePackPage(TexturePackDownloadDialog* dialog, Ba
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's contructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &FlameTexturePackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FlameTexturePackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &FlameTexturePackPage::onVersionSelectionChanged);
@@ -139,9 +135,10 @@ void FlameTexturePackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-            // attempt to resolve url from warning page
+
             query.remove(0, 10);
-            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });  // double decoding is necessary
+            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+
             return;
         }
     }
@@ -155,9 +152,10 @@ void FlameDataPackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-            // attempt to resolve url from warning page
+
             query.remove(0, 10);
-            DataPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });  // double decoding is necessary
+            DataPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+
             return;
         }
     }
@@ -173,8 +171,6 @@ FlameShaderPackPage::FlameShaderPackPage(ShaderPackDownloadDialog* dialog, BaseI
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &FlameShaderPackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FlameShaderPackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &FlameShaderPackPage::onVersionSelectionChanged);
@@ -190,8 +186,6 @@ FlameDataPackPage::FlameDataPackPage(DataPackDownloadDialog* dialog, BaseInstanc
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &FlameDataPackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &FlameDataPackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &FlameDataPackPage::onVersionSelectionChanged);
@@ -206,9 +200,10 @@ void FlameShaderPackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-            // attempt to resolve url from warning page
+
             query.remove(0, 10);
-            ShaderPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });  // double decoding is necessary
+            ShaderPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+
             return;
         }
     }
@@ -216,9 +211,6 @@ void FlameShaderPackPage::openUrl(const QUrl& url)
     ShaderPackResourcePage::openUrl(url);
 }
 
-// I don't know why, but doing this on the parent class makes it so that
-// other mod providers start loading before being selected, at least with
-// my Qt, so we need to implement this in every derived class...
 auto FlameModPage::shouldDisplay() const -> bool
 {
     return true;
@@ -255,4 +247,4 @@ void FlameModPage::prepareProviderCategories()
     });
     m_categoriesTask->start();
 };
-}  // namespace ResourceDownload
+}

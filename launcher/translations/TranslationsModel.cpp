@@ -65,7 +65,7 @@ QString getSystemLanguage()
 {
     return getSystemLocaleName().split('_').front();
 }
-}  // namespace
+}
 
 struct Language {
     Language() : updated(true) {}
@@ -80,7 +80,8 @@ struct Language {
         } else if (key == "es_UY") {
             result = u8"Español de Latinoamérica";
         } else if (key == "en_NZ") {
-            result = u8"New Zealand English";  // No idea why qt translates this to just english and not to New Zealand English
+            result = u8"New Zealand English";
+
         } else if (key == "en@pirate") {
             result = u8"Tongue of the High Seas";
         } else if (key == "en@uwu") {
@@ -88,7 +89,8 @@ struct Language {
         } else if (key == "tok") {
             result = u8"toki pona";
         } else if (key == "nan") {
-            result = u8"閩南語";  // Using traditional Chinese script. Not sure if we should use simplified instead?
+            result = u8"閩南語";
+
         } else {
             result = locale.nativeLanguageName();
         }
@@ -157,7 +159,6 @@ struct Language {
 struct TranslationsModel::Private {
     QDir m_dir;
 
-    // initial state is just english
     QList<Language> m_languages = { Language(g_defaultLangCode) };
 
     QString m_selectedLanguage = g_defaultLangCode;
@@ -260,7 +261,7 @@ void readIndex(const QString& path, QMap<QString, Language>& languages)
         qCritical() << "Translations Download Failed: index file could not be parsed as json";
     }
 }
-}  // namespace
+}
 
 void TranslationsModel::reloadLocalFiles()
 {
@@ -290,7 +291,7 @@ void TranslationsModel::reloadLocalFiles()
         auto langIter = languages.find(langCode);
         if (langIter != languages.end()) {
             auto& language = *langIter;
-            // TODO: use std::to_underlying in C++23
+
             if (static_cast<int>(fileType) > static_cast<int>(language.localFileType)) {
                 language.localFileType = fileType;
             }
@@ -303,7 +304,6 @@ void TranslationsModel::reloadLocalFiles()
         }
     }
 
-    // changed and removed languages
     for (auto iter = d->m_languages.begin(); iter != d->m_languages.end();) {
         auto& language = *iter;
         auto row = iter - d->m_languages.begin();
@@ -324,7 +324,7 @@ void TranslationsModel::reloadLocalFiles()
             endRemoveRows();
         }
     }
-    // added languages
+
     if (languages.isEmpty()) {
         return;
     }
@@ -460,7 +460,6 @@ bool TranslationsModel::selectLanguage(QString key) const
         langCode = langPtr->key;
     }
 
-    // uninstall existing translators if there are any
     if (d->m_appTranslator) {
         QCoreApplication::removeTranslator(d->m_appTranslator.get());
         d->m_appTranslator.reset();
@@ -470,23 +469,16 @@ bool TranslationsModel::selectLanguage(QString key) const
         d->m_qtTranslator.reset();
     }
 
-    /*
-     * FIXME: potential source of crashes:
-     * In a multithreaded application, the default locale should be set at application startup, before any non-GUI threads are created.
-     * This function is not reentrant.
-     */
     const bool useSystemLocale = APPLICATION->settings()->get("UseSystemLocale").toBool();
     QLocale::setDefault(useSystemLocale ? QLocale::system() : QLocale(langCode));
 
-    // if it's the default UI language, finish
     if (langCode == g_defaultLangCode) {
         d->m_selectedLanguage = langCode;
         return true;
     }
 
-    // otherwise install new translations
     bool successful = false;
-    // FIXME: this is likely never present. FIX IT.
+
     d->m_qtTranslator = std::make_unique<QTranslator>();
     if (d->m_qtTranslator->load("qt_" + langCode, QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
         qDebug() << "Loading Qt Language File for" << langCode.toLocal8Bit().constData() << "...";

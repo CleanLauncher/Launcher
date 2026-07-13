@@ -46,22 +46,17 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLStreamHandler;
 
-/**
- * A utility class for URLs which uses reflection to access constructors for
- * internal classes.
- */
 public final class UrlUtils {
     private static URLStreamHandler http;
     private static MethodHandle openConnection;
 
     static {
         try {
-            // we first obtain the stock URLStreamHandler for http as we overwrite it later
+
             Method getURLStreamHandler = URL.class.getDeclaredMethod("getURLStreamHandler", String.class);
             getURLStreamHandler.setAccessible(true);
             http = (URLStreamHandler) getURLStreamHandler.invoke(null, "http");
 
-            // we next find the openConnection method
             Method openConnectionReflect = URLStreamHandler.class.getDeclaredMethod("openConnection", URL.class, Proxy.class);
             openConnectionReflect.setAccessible(true);
             openConnection = MethodHandles.lookup().unreflect(openConnectionReflect);
@@ -70,11 +65,6 @@ public final class UrlUtils {
         }
     }
 
-    /**
-     * Determines whether all the features of this class are available.
-     *
-     * @return <code>true</code> if all features can be used
-     */
     public static boolean isSupported() {
         return http != null && openConnection != null;
     }
@@ -86,9 +76,6 @@ public final class UrlUtils {
         if (url.getProtocol().equals("http"))
             return openConnection(http, url, proxy);
 
-        // fall back to Java's default method
-        // at this point, this should not cause a StackOverflowError unless we've missed
-        // a protocol out from the if statements
         return url.openConnection();
     }
 
@@ -99,9 +86,11 @@ public final class UrlUtils {
         try {
             return (URLConnection) openConnection.invokeExact(handler, url, proxy);
         } catch (IOException | Error | RuntimeException e) {
-            throw e; // rethrow if possible
+            throw e;
+
         } catch (Throwable e) {
-            throw new AssertionError("openConnection should not throw", e); // oh dear! this isn't meant to happen
+            throw new AssertionError("openConnection should not throw", e);
+
         }
     }
 }

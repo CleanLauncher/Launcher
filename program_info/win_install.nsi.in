@@ -154,7 +154,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
 
   !insertmacro APP_SETUP_Def `${DESCRIPTION}` `${ICON}` `${APP_ID}` `${APP_NAME}` `${APP_EXE}` `${COMMANDTEXT}` `${COMMAND}`
 
-  # Register "Default Programs"
   WriteRegStr ShCtx "Software\Classes\Applications\${APP_EXE}\Capabilities" "ApplicationDescription" `${DESCRIPTION}`
   WriteRegStr ShCtx "Software\RegisteredApplications" `${APP_NAME}` "Software\Classes\Applications\${APP_EXE}\Capabilities"
 
@@ -183,14 +182,12 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
 
   !insertmacro APP_ASSOCIATE_Def `${EXT}` `${APP_ID}` `${APP_EXE}` `${OVERWIRTE}`
 
-  # Register "Default Programs"
   WriteRegStr ShCtx "Software\Classes\Applications\${APP_EXE}\Capabilities\FileAssociations" "${EXT}" "${APP_ID}"
 
 !macroend
 
 !macro APP_UNASSOCIATE EXT APP_ID APP_EXE
 
-  # Unregister file type
   ClearErrors
   ; restore backup
   ReadRegStr $R1 ShCtx "Software\Classes\${EXT}" ""
@@ -214,7 +211,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
   DeleteRegKey /IfEmpty ShCtx "Software\Classes\${EXT}\OpenWithProgids"
   DeleteRegKey /IfEmpty  ShCtx "Software\Classes\${EXT}"
 
-  # Attempt to clean up junk left behind by the Windows shell
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts" "${APP_ID}_${EXT}"
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\ApplicationAssociationToasts" "Applications\${APP_EXE}_${EXT}"
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\${EXT}\OpenWithProgids" "${APP_ID}"
@@ -226,20 +222,17 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
 
 !macro APP_TEARDOWN_Def APP_ID APP_NAME APP_EXE
 
-  # Unregister file type
   ClearErrors
   DeleteRegKey /IfEmpty ShCtx "Software\Classes\${APP_ID}\shell"
   ${IfNot} ${Errors}
     DeleteRegKey ShCtx "Software\Classes\${APP_ID}\DefaultIcon"
   ${EndIf}
 
-  # Unregister "Open With"
   DeleteRegKey ShCtx "Software\Classes\Applications\${APP_EXE}"
 
   DeleteRegKey ShCtx `Software\Classes\${APP_ID}`
   DeleteRegKey ShCtx "Software\Classes\Applications\${APP_EXE}"
 
-  # Attempt to clean up junk left behind by the Windows shell
   DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Search\JumplistData" "$INSTDIR\${APP_EXE}"
   DeleteRegValue HKCU "Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\${APP_EXE}.FriendlyAppName"
   DeleteRegValue HKCU "Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\${APP_EXE}.ApplicationCompany"
@@ -258,7 +251,6 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
 
   !insertmacro APP_TEARDOWN_Def `${APP_ID}` `${APP_NAME}` `${APP_EXE}`
 
-  # Unregister "Default Programs"
   DeleteRegValue ShCtx "Software\RegisteredApplications" `${APP_NAME}`
   DeleteRegKey ShCtx "Software\Classes\Applications\${APP_EXE}\Capabilities"
   DeleteRegKey /IfEmpty ShCtx "Software\Classes\Applications\${APP_EXE}"
@@ -275,14 +267,11 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "@Launcher_VERSION_NAME4@
 !endif
 !define SHCNF_FLUSH        0x1000
 
-
-# ensure this is called at the end of any section that changes shell keys
 !macro NotifyShell_AssocChanged
 ; Using the system.dll plugin to call the SHChangeNotify Win32 API function so we
 ; can update the shell.
   System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)"
 !macroend
-
 
 ;------------------------------------------
 ; Uninstall Previous install
@@ -441,7 +430,6 @@ Section /o "Desktop Shortcut" DESKTOP_SHORTCUTS
 
 SectionEnd
 
-
 !define APPID "@Launcher_CommonName@.App"
 !define APPEXE "@Launcher_APP_BINARY_NAME@.exe"
 !define APPICON "$INSTDIR\${APPEXE},0"
@@ -458,7 +446,6 @@ Section /o "Shell Association (Open-With dialog)" SHELL_ASSOC
 
   !insertmacro NotifyShell_AssocChanged
 SectionEnd
-
 
 ;--------------------------------
 

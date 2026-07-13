@@ -53,7 +53,7 @@ class LaunchTask : public Task {
    public:
     enum State { NotStarted, Running, Waiting, Failed, Aborted, Finished };
 
-   public: /* methods */
+   public:
     static std::unique_ptr<LaunchTask> create(MinecraftInstance* inst);
     virtual ~LaunchTask() = default;
 
@@ -67,19 +67,10 @@ class LaunchTask : public Task {
 
     qint64 pid() { return m_pid; }
 
-    /**
-     * @brief prepare the process for launch (for multi-stage launch)
-     */
     virtual void executeTask() override;
 
-    /**
-     * @brief launch the armed instance
-     */
     void proceed();
 
-    /**
-     * @brief abort launch
-     */
     bool abort() override;
 
     bool canAbort() const override;
@@ -90,14 +81,12 @@ class LaunchTask : public Task {
     QString substituteVariables(QString& cmd, bool isLaunch = false) const;
     QString censorPrivateInfo(QString in);
 
-   protected: /* methods */
+   protected:
     virtual void emitFailed(QString reason) override;
     virtual void emitSucceeded() override;
 
    signals:
-    /**
-     * @brief emitted when the launch preparations are done
-     */
+
     void readyForLaunch();
 
     void requestProgress(Task* task);
@@ -111,13 +100,13 @@ class LaunchTask : public Task {
     void onStepFinished();
     void onProgressReportingRequested();
 
-   private: /*methods */
+   private:
     void finalizeSteps(bool successful, const QString& error);
 
    protected:
     bool parseXmlLogs(QString const& line, MessageLevel level);
 
-   protected: /* data */
+   protected:
     MinecraftInstance* m_instance;
     shared_qobject_ptr<LogModel> m_logModel;
     QList<shared_qobject_ptr<LaunchStep>> m_steps;

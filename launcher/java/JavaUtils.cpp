@@ -71,7 +71,7 @@ QString stripVariableEntries(QString name, QString target, QString remove)
 
 QProcessEnvironment CleanEnviroment()
 {
-    // prepare the process environment
+
     QProcessEnvironment rawenv = QProcessEnvironment::systemEnvironment();
     QProcessEnvironment env;
 
@@ -86,15 +86,12 @@ QProcessEnvironment CleanEnviroment()
     };
     for (auto key : rawenv.keys()) {
         auto value = rawenv.value(key);
-        // filter out dangerous java crap
+
         if (ignored.contains(key)) {
             qDebug() << "Env: ignoring" << key << value;
             continue;
         }
 
-        // These are used to strip the original variables
-        // If there is "LD_LIBRARY_PATH" and "LAUNCHER_LD_LIBRARY_PATH", we want to
-        // remove all values in "LAUNCHER_LD_LIBRARY_PATH" from "LD_LIBRARY_PATH"
         if (key.startsWith("LAUNCHER_")) {
             qDebug() << "Env: ignoring" << key << value;
             continue;
@@ -107,19 +104,18 @@ QProcessEnvironment CleanEnviroment()
             value = newValue;
         }
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
-        // Strip IBus
-        // IBus is a Linux IME framework. For some reason, it breaks MC?
+
         if (key == "XMODIFIERS" && value.contains(IBUS)) {
             QString save = value;
             value.replace(IBUS, "");
             qDebug() << "Env: stripped" << IBUS << "from" << save << ":" << value;
         }
 #endif
-        // qDebug() << "Env: " << key << value;
+
         env.insert(key, value);
     }
 #ifdef Q_OS_LINUX
-    // HACK: Workaround for QTBUG-42500
+
     if (!env.contains("LD_LIBRARY_PATH")) {
         env.insert("LD_LIBRARY_PATH", "");
     }
@@ -189,29 +185,25 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
         HKEY jreKey;
         if (RegOpenKeyExW(baseRegistry, keyName.toStdWString().c_str(), 0, KEY_READ | keyType | KEY_ENUMERATE_SUB_KEYS, &jreKey) ==
             ERROR_SUCCESS) {
-            // Read the current type version from the registry.
-            // This will be used to find any key that contains the JavaHome value.
 
             WCHAR subKeyName[255];
             DWORD subKeyNameSize, numSubKeys, retCode;
 
-            // Get the number of subkeys
             RegQueryInfoKeyW(jreKey, NULL, NULL, NULL, &numSubKeys, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
-            // Iterate until RegEnumKeyEx fails
             if (numSubKeys > 0) {
                 for (DWORD i = 0; i < numSubKeys; i++) {
                     subKeyNameSize = 255;
                     retCode = RegEnumKeyExW(jreKey, i, subKeyName, &subKeyNameSize, NULL, NULL, NULL, NULL);
                     QString newSubkeyName = QString::fromWCharArray(subKeyName);
                     if (retCode == ERROR_SUCCESS) {
-                        // Now open the registry key for the version that we just got.
+
                         QString newKeyName = keyName + "\\" + newSubkeyName + subkeySuffix;
 
                         HKEY newKey;
                         if (RegOpenKeyExW(baseRegistry, newKeyName.toStdWString().c_str(), 0, KEY_READ | keyType, &newKey) ==
                             ERROR_SUCCESS) {
-                            // Read the JavaHome value to find where Java is installed.
+
                             DWORD valueSz = 0;
                             if (RegQueryValueExW(newKey, keyJavaDir.toStdWString().c_str(), NULL, NULL, NULL, &valueSz) == ERROR_SUCCESS) {
                                 WCHAR* value = new WCHAR[valueSz];
@@ -220,7 +212,6 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
                                 QString newValue = QString::fromWCharArray(value);
                                 delete[] value;
 
-                                // Now, we construct the version object and add it to the list.
                                 JavaInstallPtr javaVersion(new JavaInstall());
 
                                 javaVersion->id = newSubkeyName;
@@ -246,7 +237,6 @@ QList<QString> JavaUtils::FindJavaPaths()
 {
     QList<JavaInstallPtr> java_candidates;
 
-    // Oracle
     QList<JavaInstallPtr> JRE64s =
         this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\Java Runtime Environment", "JavaHome");
     QList<JavaInstallPtr> JDK64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\Java Development Kit", "JavaHome");
@@ -254,13 +244,11 @@ QList<QString> JavaUtils::FindJavaPaths()
         this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\Java Runtime Environment", "JavaHome");
     QList<JavaInstallPtr> JDK32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\Java Development Kit", "JavaHome");
 
-    // Oracle for Java 9 and newer
     QList<JavaInstallPtr> NEWJRE64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\JRE", "JavaHome");
     QList<JavaInstallPtr> NEWJDK64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\JavaSoft\\JDK", "JavaHome");
     QList<JavaInstallPtr> NEWJRE32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\JRE", "JavaHome");
     QList<JavaInstallPtr> NEWJDK32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\JavaSoft\\JDK", "JavaHome");
 
-    // AdoptOpenJDK
     QList<JavaInstallPtr> ADOPTOPENJRE32s =
         this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\AdoptOpenJDK\\JRE", "Path", "\\hotspot\\MSI");
     QList<JavaInstallPtr> ADOPTOPENJRE64s =
@@ -270,13 +258,11 @@ QList<QString> JavaUtils::FindJavaPaths()
     QList<JavaInstallPtr> ADOPTOPENJDK64s =
         this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\AdoptOpenJDK\\JDK", "Path", "\\hotspot\\MSI");
 
-    // Eclipse Foundation
     QList<JavaInstallPtr> FOUNDATIONJDK32s =
         this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\Eclipse Foundation\\JDK", "Path", "\\hotspot\\MSI");
     QList<JavaInstallPtr> FOUNDATIONJDK64s =
         this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Eclipse Foundation\\JDK", "Path", "\\hotspot\\MSI");
 
-    // Eclipse Adoptium
     QList<JavaInstallPtr> ADOPTIUMJRE32s =
         this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\Eclipse Adoptium\\JRE", "Path", "\\hotspot\\MSI");
     QList<JavaInstallPtr> ADOPTIUMJRE64s =
@@ -286,25 +272,20 @@ QList<QString> JavaUtils::FindJavaPaths()
     QList<JavaInstallPtr> ADOPTIUMJDK64s =
         this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Eclipse Adoptium\\JDK", "Path", "\\hotspot\\MSI");
 
-    // IBM Semeru
     QList<JavaInstallPtr> SEMERUJRE32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\Semeru\\JRE", "Path", "\\openj9\\MSI");
     QList<JavaInstallPtr> SEMERUJRE64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Semeru\\JRE", "Path", "\\openj9\\MSI");
     QList<JavaInstallPtr> SEMERUJDK32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\Semeru\\JDK", "Path", "\\openj9\\MSI");
     QList<JavaInstallPtr> SEMERUJDK64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Semeru\\JDK", "Path", "\\openj9\\MSI");
 
-    // Microsoft
     QList<JavaInstallPtr> MICROSOFTJDK64s =
         this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Microsoft\\JDK", "Path", "\\hotspot\\MSI");
 
-    // Azul Zulu
     QList<JavaInstallPtr> ZULU64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\Azul Systems\\Zulu", "InstallationPath");
     QList<JavaInstallPtr> ZULU32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\Azul Systems\\Zulu", "InstallationPath");
 
-    // BellSoft Liberica
     QList<JavaInstallPtr> LIBERICA64s = this->FindJavaFromRegistryKey(KEY_WOW64_64KEY, "SOFTWARE\\BellSoft\\Liberica", "InstallationPath");
     QList<JavaInstallPtr> LIBERICA32s = this->FindJavaFromRegistryKey(KEY_WOW64_32KEY, "SOFTWARE\\BellSoft\\Liberica", "InstallationPath");
 
-    // List x64 before x86
     java_candidates.append(JRE64s);
     java_candidates.append(NEWJRE64s);
     java_candidates.append(ADOPTOPENJRE64s);
@@ -379,7 +360,6 @@ QList<QString> JavaUtils::FindJavaPaths()
 
     auto home = qEnvironmentVariable("HOME");
 
-    // javas downloaded by sdkman
     QString sdkmanDir = qEnvironmentVariable("SDKMAN_DIR", FS::PathCombine(home, ".sdkman"));
     QDir sdkmanJavaDir(FS::PathCombine(sdkmanDir, "candidates/java"));
     QStringList sdkmanJavas = sdkmanJavaDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -387,7 +367,6 @@ QList<QString> JavaUtils::FindJavaPaths()
         javas.append(sdkmanJavaDir.absolutePath() + "/" + java + "/bin/java");
     }
 
-    // javas downloaded by asdf
     QString asdfDataDir = qEnvironmentVariable("ASDF_DATA_DIR", FS::PathCombine(home, ".asdf"));
     QDir asdfJavaDir(FS::PathCombine(asdfDataDir, "installs/java"));
     QStringList asdfJavas = asdfJavaDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
@@ -395,7 +374,6 @@ QList<QString> JavaUtils::FindJavaPaths()
         javas.append(asdfJavaDir.absolutePath() + "/" + java + "/bin/java");
     }
 
-    // java in user library folder (like from intellij downloads)
     QDir userLibraryJVMDir(FS::PathCombine(home, "Library/Java/JavaVirtualMachines/"));
     QStringList userLibraryJVMJavas = userLibraryJVMDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : userLibraryJVMJavas) {
@@ -432,7 +410,7 @@ QList<QString> JavaUtils::FindJavaPaths()
             javas.append(FS::PathCombine(prefix, "bin/java"));
         }
     };
-    // java installed in a snap is installed in the standard directory, but underneath $SNAP
+
     auto snap = qEnvironmentVariable("SNAP");
     auto scanJavaDirs = [scanJavaDir, snap](const QString& dirPath) {
         scanJavaDir(dirPath);
@@ -441,18 +419,18 @@ QList<QString> JavaUtils::FindJavaPaths()
         }
     };
 #if defined(Q_OS_LINUX)
-    // oracle RPMs
+
     scanJavaDirs("/usr/java");
-    // general locations used by distro packaging
+
     scanJavaDirs("/usr/lib/jvm");
     scanJavaDirs("/usr/lib64/jvm");
     scanJavaDirs("/usr/lib32/jvm");
-    // Gentoo's locations for openjdk and openjdk-bin respectively
+
     auto gentooFilter = [](const QFileInfo& info) {
         QString fileName = info.fileName();
         return fileName.startsWith("openjdk-") || fileName.startsWith("openj9-");
     };
-    // AOSC OS's locations for openjdk
+
     auto aoscFilter = [](const QFileInfo& info) {
         QString fileName = info.fileName();
         return fileName == "java" || fileName.startsWith("java-");
@@ -461,29 +439,28 @@ QList<QString> JavaUtils::FindJavaPaths()
     scanJavaDir("/usr/lib", gentooFilter);
     scanJavaDir("/opt", gentooFilter);
     scanJavaDir("/usr/lib", aoscFilter);
-    // javas stored in Launcher's folder
+
     scanJavaDirs("java");
-    // manually installed JDKs in /opt
+
     scanJavaDirs("/opt/jdk");
     scanJavaDirs("/opt/jdks");
-    scanJavaDirs("/opt/ibm");  // IBM Semeru Certified Edition
-    // flatpak
+    scanJavaDirs("/opt/ibm");
+
     scanJavaDirs("/app/jdk");
 #elif defined(Q_OS_OPENBSD) || defined(Q_OS_FREEBSD)
-    // ports install to /usr/local on OpenBSD & FreeBSD
+
     scanJavaDirs("/usr/local");
 #endif
     auto home = qEnvironmentVariable("HOME");
 
-    // javas downloaded by IntelliJ
     scanJavaDirs(FS::PathCombine(home, ".jdks"));
-    // javas downloaded by sdkman
+
     QString sdkmanDir = qEnvironmentVariable("SDKMAN_DIR", FS::PathCombine(home, ".sdkman"));
     scanJavaDirs(FS::PathCombine(sdkmanDir, "candidates/java"));
-    // javas downloaded by asdf
+
     QString asdfDataDir = qEnvironmentVariable("ASDF_DATA_DIR", FS::PathCombine(home, ".asdf"));
     scanJavaDirs(FS::PathCombine(asdfDataDir, "installs/java"));
-    // javas downloaded by gradle (toolchains)
+
     QString gradleUserHome = qEnvironmentVariable("GRADLE_USER_HOME", FS::PathCombine(home, ".gradle"));
     scanJavaDirs(FS::PathCombine(gradleUserHome, "jdks"));
 
@@ -523,8 +500,6 @@ QStringList getMinecraftJavaBundle()
     auto appDataPath = QProcessEnvironment::systemEnvironment().value("APPDATA", "");
     processpaths << FS::PathCombine(QFileInfo(appDataPath).absoluteFilePath(), ".minecraft", "runtime");
 
-    // add the microsoft store version of the launcher to the search. the current path is:
-    // C:\Users\USERNAME\AppData\Local\Packages\Microsoft.4297127D64EC6_8wekyb3d8bbwe\LocalCache\Local\runtime
     auto localAppDataPath = QProcessEnvironment::systemEnvironment().value("LOCALAPPDATA", "");
     auto minecraftMSStorePath =
         FS::PathCombine(QFileInfo(localAppDataPath).absoluteFilePath(), "Packages", "Microsoft.4297127D64EC6_8wekyb3d8bbwe");

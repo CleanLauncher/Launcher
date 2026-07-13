@@ -29,19 +29,17 @@ class EnsureMetadataTask : public Task {
     void executeTask() override;
 
    private:
-    // FIXME: Move to their own namespace
+
     Task::Ptr modrinthVersionsTask();
     Task::Ptr modrinthProjectsTask();
 
     Task::Ptr flameVersionsTask();
     Task::Ptr flameProjectsTask();
 
-    // Helpers
     enum class RemoveFromList { Yes, No };
     void emitReady(Resource*, QString key = {}, RemoveFromList = RemoveFromList::Yes);
     void emitFail(Resource*, QString key = {}, RemoveFromList = RemoveFromList::Yes);
 
-    // Hashes and stuff
     Hashing::Hasher::Ptr createNewHash(Resource*);
     QString getExistingHash(Resource*);
 

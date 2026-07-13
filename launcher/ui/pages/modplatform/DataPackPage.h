@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
 // SPDX-FileCopyrightText: 2023 TheKodeToad <TheKodeToad@proton.me>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -33,9 +33,8 @@ class DataPackResourcePage : public ResourcePage {
         return page;
     }
 
-    //: The plural version of 'data pack'
     inline QString resourcesString() const override { return tr("data packs"); }
-    //: The singular version of 'data packs'
+
     inline QString resourceString() const override { return tr("data pack"); }
 
     bool supportsFiltering() const override { return false; };
@@ -49,4 +48,4 @@ class DataPackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}  // namespace ResourceDownload
+}

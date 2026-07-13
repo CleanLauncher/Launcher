@@ -183,10 +183,9 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
         out.skin.url.replace("http://textures.minecraft.net", "https://textures.minecraft.net");
         out.skin.variant = variantV.toString();
 
-        // data for skin is optional
         auto dataV = skinObj.value("data");
         if (dataV.isString()) {
-            // TODO: validate base64
+
             out.skin.data = QByteArray::fromBase64(dataV.toString().toLatin1());
         } else if (!dataV.isUndefined()) {
             qWarning() << "skin data is something unexpected";
@@ -220,10 +219,9 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
             cape.url.replace("http://textures.minecraft.net", "https://textures.minecraft.net");
             cape.alias = aliasV.toString();
 
-            // data for cape is optional.
             auto dataV = capeObj.value("data");
             if (dataV.isString()) {
-                // TODO: validate base64
+
                 cape.data = QByteArray::fromBase64(dataV.toString().toLatin1());
             } else if (!dataV.isUndefined()) {
                 qWarning() << "cape data is something unexpected";
@@ -232,7 +230,7 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
             out.capes[cape.id] = cape;
         }
     }
-    // current cape
+
     {
         auto capeV = tokenObject.value("cape");
         if (capeV.isString()) {
@@ -277,7 +275,7 @@ bool entitlementFromJSONV3(const QJsonObject& parent, MinecraftEntitlement& out)
     return true;
 }
 
-}  // namespace
+}
 
 bool AccountData::resumeStateFromV3(QJsonObject data)
 {
@@ -302,14 +300,15 @@ bool AccountData::resumeStateFromV3(QJsonObject data)
         auto clientIDV = data.value("msa-client-id");
         if (clientIDV.isString()) {
             msaClientID = clientIDV.toString();
-        }  // leave msaClientID empty if it doesn't exist or isn't a string
+        }
+
         msaToken = tokenFromJSONV3(data, "msa");
         userToken = tokenFromJSONV3(data, "utoken");
         mojangservicesToken = tokenFromJSONV3(data, "xrp-mc");
     }
 
     yggdrasilToken = tokenFromJSONV3(data, "ygg");
-    // versions before 7.2 used "offline" as the offline token
+
     if (yggdrasilToken.token == "offline")
         yggdrasilToken.token = "0";
 

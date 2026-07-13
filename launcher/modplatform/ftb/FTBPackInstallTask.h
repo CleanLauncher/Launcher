@@ -91,8 +91,7 @@ class PackInstallTask final : public InstanceTask {
     QMap<QString, QString> m_filesToCopy;
     QList<BlockedMod> m_blockedMods;
 
-    // FIXME: nuke
     QWidget* m_parent;
 };
 
-}  // namespace FTB
+}

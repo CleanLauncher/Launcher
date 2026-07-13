@@ -77,7 +77,6 @@ void PackInstallTask::executeTask()
     setStatus(tr("Getting the manifest..."));
     setAbortable(false);
 
-    // Find pack version
     auto version_it = std::find_if(m_pack.versions.constBegin(), m_pack.versions.constEnd(),
                                    [this](const FTB::VersionInfo& a) { return a.name == m_versionName; });
 
@@ -108,7 +107,7 @@ void PackInstallTask::executeTask()
 
 void PackInstallTask::onManifestDownloadSucceeded(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by m_net_job.reset()
+
     QByteArray response = std::move(*responsePtr);
     m_net_job.reset();
 
@@ -186,7 +185,6 @@ void PackInstallTask::onResolveModsSucceeded()
         Flame::File resultsFile = results.files[file_id];
         VersionFile& localFile = m_version.files[index];
 
-        // First check for blocked mods
         if (resultsFile.version.downloadUrl.isEmpty()) {
             BlockedMod blocked_mod;
             blocked_mod.name = resultsFile.version.fileName;
@@ -264,7 +262,6 @@ void PackInstallTask::createInstance()
         }
     }
 
-    // install any jar mods
     QDir jarModsDir(FS::PathCombine(m_stagingPath, "minecraft", "jarmods"));
     if (jarModsDir.exists()) {
         QStringList jarMods;
@@ -315,7 +312,8 @@ void PackInstallTask::downloadPack()
         jobPtr->addNetAction(dl);
     }
 
-    jobPtr->setMaxConcurrent(1);  // FTB blocks multiple requests at a time
+    jobPtr->setMaxConcurrent(1);
+
     connect(jobPtr.get(), &NetJob::succeeded, this, &PackInstallTask::onModDownloadSucceeded);
     connect(jobPtr.get(), &NetJob::failed, this, &PackInstallTask::onModDownloadFailed);
     connect(jobPtr.get(), &NetJob::aborted, this, &PackInstallTask::abort);
@@ -356,7 +354,6 @@ void PackInstallTask::onModDownloadFailed(QString reason)
     emitFailed(reason);
 }
 
-/// @brief copy the matched blocked mods to the instance staging area
 void PackInstallTask::copyBlockedMods()
 {
     setStatus(tr("Copying Blocked Mods..."));
@@ -387,4 +384,4 @@ void PackInstallTask::copyBlockedMods()
     setAbortable(true);
 }
 
-}  // namespace FTB
+}

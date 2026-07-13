@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -31,32 +31,27 @@ class ResourcePage : public QWidget, public BasePage {
     using DownloadTaskPtr = shared_qobject_ptr<ResourceDownloadTask>;
     ~ResourcePage() override;
 
-    /* Affects what the user sees */
     auto displayName() const -> QString override = 0;
     auto icon() const -> QIcon override = 0;
     auto id() const -> QString override = 0;
     auto helpPage() const -> QString override = 0;
     bool shouldDisplay() const override = 0;
 
-    /* Used internally */
     virtual auto metaEntryBase() const -> QString = 0;
     virtual auto debugName() const -> QString = 0;
 
-    //: The plural version of 'resource'
     virtual QString resourcesString() const { return tr("resources"); }
-    //: The singular version of 'resources'
+
     virtual QString resourceString() const { return tr("resource"); }
 
-    /* Features this resource's page supports */
     virtual bool supportsFiltering() const = 0;
 
     void retranslate() override;
     void openedImpl() override;
     auto eventFilter(QObject* watched, QEvent* event) -> bool override;
 
-    /** Get the current term in the search bar. */
     auto getSearchTerm() const -> QString;
-    /** Programatically set the term in the search bar. */
+
     void setSearchTerm(const QString&);
 
     bool setCurrentPack(ModPlatform::IndexedPack::Ptr);
@@ -99,7 +94,6 @@ class ResourcePage : public QWidget, public BasePage {
     void onResourceSelected();
     void onResourceToggle(const QModelIndex& index);
 
-    /** Associates regex expressions to pages in the order they're given in the map. */
     virtual QMap<QString, QString> urlHandlers() const = 0;
     virtual void openUrl(const QUrl&);
 
@@ -116,7 +110,6 @@ class ResourcePage : public QWidget, public BasePage {
 
     ProgressWidget m_fetchProgress;
 
-    // Used to do instant searching with a delay to cache quick changes
     QTimer m_searchTimer;
 
     bool m_doNotJumpToMod = false;
@@ -127,4 +120,4 @@ class ResourcePage : public QWidget, public BasePage {
     bool m_suppressInitialSearch = false;
 };
 
-}  // namespace ResourceDownload
+}

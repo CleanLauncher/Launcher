@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022-2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -80,7 +80,7 @@ class ModrinthAPI : public ResourceAPI {
             case ModPlatform::Side::UniversalSide:
                 return { R"("client_side:required"],["server_side:required")" };
             case ModPlatform::Side::NoSide:
-            // fallthrough
+
             default:
                 return {};
         }
@@ -206,7 +206,8 @@ class ModrinthAPI : public ResourceAPI {
         for (const auto& ver : mcVersions) {
             s += QString(R"("versions:%1",)").arg(mapMCVersionToModrinth(ver));
         }
-        s.remove(s.length() - 1, 1);  // remove last comma
+        s.remove(s.length() - 1, 1);
+
         return s.isEmpty() ? QString() : s;
     }
 
@@ -231,7 +232,7 @@ class ModrinthAPI : public ResourceAPI {
 
     QJsonArray documentToArray(QJsonDocument& obj) const override { return obj.object().value("hits").toArray(); }
     void loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { Modrinth::loadIndexedPack(m, obj); }
-    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType /*unused*/) const override
+    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType ) const override
     {
         return Modrinth::loadIndexedPackVersion(obj);
     };

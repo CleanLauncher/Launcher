@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -35,7 +35,7 @@ ModPlatform::ResourceType identify(QFileInfo file)
 {
     if (file.exists() && file.isFile()) {
         if (ModUtils::validate(file)) {
-            // mods can contain resource and data packs so they must be tested first
+
             qDebug() << file.fileName() << "is a mod";
             return ModPlatform::ResourceType::Mod;
         } else if (DataPackUtils::validateResourcePack(file)) {
@@ -62,4 +62,4 @@ ModPlatform::ResourceType identify(QFileInfo file)
     return ModPlatform::ResourceType::Unknown;
 }
 
-}  // namespace ResourceUtils
+}

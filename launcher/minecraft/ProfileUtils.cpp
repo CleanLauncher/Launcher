@@ -60,7 +60,6 @@ bool readOverrideOrders(QString path, PatchOrder& order)
         return false;
     }
 
-    // and it's valid JSON
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(orderFile.readAll(), &error);
     if (error.error != QJsonParseError::NoError) {
@@ -69,10 +68,9 @@ bool readOverrideOrders(QString path, PatchOrder& order)
         return false;
     }
 
-    // and then read it and process it if all above is true.
     try {
         auto obj = Json::requireObject(doc);
-        // check order file version.
+
         auto version = Json::requireInteger(obj.value("version"));
         if (version != currentOrderFileVersion) {
             throw JSONValidationError(QObject::tr("Invalid order file version, expected %1").arg(currentOrderFileVersion));
@@ -94,7 +92,7 @@ static VersionFilePtr createErrorVersionFile(QString fileId, QString filepath, Q
 {
     auto outError = std::make_shared<VersionFile>();
     outError->uid = outError->name = fileId;
-    // outError->filename = filepath;
+
     outError->addProblem(ProblemSeverity::Error, error);
     return outError;
 }
@@ -169,4 +167,4 @@ void removeLwjglFromPatch(VersionFilePtr patch)
     };
     filter(patch->libraries);
 }
-}  // namespace ProfileUtils
+}

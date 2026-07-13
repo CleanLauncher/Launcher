@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -79,7 +79,8 @@ ShaderPackPage::ShaderPackPage(MinecraftInstance* instance, ShaderPackFolderMode
 void ShaderPackPage::downloadShaderPack()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     m_downloadDialog = new ResourceDownload::ShaderPackDownloadDialog(this, m_model, m_instance);
@@ -132,7 +133,8 @@ void ShaderPackPage::downloadDialogFinished(int result)
 void ShaderPackPage::updateShaderPacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -236,7 +238,8 @@ void ShaderPackPage::deleteShaderPackMetadata()
 void ShaderPackPage::changeShaderPackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

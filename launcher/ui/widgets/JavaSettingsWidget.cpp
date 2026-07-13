@@ -132,7 +132,6 @@ void JavaSettingsWidget::loadSettings()
     else
         settings = APPLICATION->settings();
 
-    // Java Settings
     m_ui->javaInstallationGroupBox->setChecked(settings->get("OverrideJavaLocation").toBool());
     m_ui->javaPathTextBox->setText(settings->get("JavaPath").toString());
 
@@ -148,7 +147,6 @@ void JavaSettingsWidget::loadSettings()
         m_ui->autodownloadJavaCheckBox->setChecked(settings->get("AutomaticJavaDownload").toBool());
     }
 
-    // Memory
     m_ui->memoryGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideMemory").toBool());
     int min = settings->get("MinMemAlloc").toInt();
     int max = settings->get("MaxMemAlloc").toInt();
@@ -162,7 +160,6 @@ void JavaSettingsWidget::loadSettings()
     m_ui->permGenSpinBox->setValue(settings->get("PermGen").toInt());
     m_ui->lowMemWarningCheckBox->setChecked(settings->get("LowMemWarning").toBool());
 
-    // Java arguments
     m_ui->javaArgumentsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideJavaArgs").toBool());
     m_ui->userArgsTextBox->setPlainText(settings->get("JvmArgs").toString());
 
@@ -194,7 +191,6 @@ void JavaSettingsWidget::saveSettings()
 
     SettingsObject::Lock lock(settings);
 
-    // Java Install Settings
     bool javaInstall = m_instance == nullptr || m_ui->javaInstallationGroupBox->isChecked();
 
     if (m_instance != nullptr)
@@ -214,7 +210,6 @@ void JavaSettingsWidget::saveSettings()
         settings->set("AutomaticJavaDownload", m_ui->autodownloadJavaCheckBox->isChecked());
     }
 
-    // Memory
     bool memory = m_instance == nullptr || m_ui->memoryGroupBox->isChecked();
 
     if (m_instance != nullptr)
@@ -239,7 +234,6 @@ void JavaSettingsWidget::saveSettings()
         settings->reset("LowMemWarning");
     }
 
-    // Java arguments
     bool javaArgs = m_instance == nullptr || m_ui->javaArgumentsGroupBox->isChecked();
 
     if (m_instance != nullptr)
@@ -260,7 +254,6 @@ void JavaSettingsWidget::onJavaBrowse()
 {
     QString rawPath = QFileDialog::getOpenFileName(this, tr("Find Java executable"));
 
-    // do not allow current dir - it's dirty. Do not allow dirs that don't exist
     if (rawPath.isEmpty()) {
         return;
     }

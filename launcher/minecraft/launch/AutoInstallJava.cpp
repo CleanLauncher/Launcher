@@ -144,9 +144,7 @@ void AutoInstallJava::setJavaPathFromPartial()
     auto packProfile = m_instance->getPackProfile();
     auto javaName = packProfile->getProfile()->getCompatibleJavaName();
     QDir javaDir(APPLICATION->javaPath());
-    // just checking if the executable is there should suffice
-    // but if needed this can be achieved through refreshing the javalist
-    // and retrieving the path that contains the java name
+
     auto relativeBinary = FS::PathCombine(javaName, "bin", JavaUtils::javaExecutable);
     auto finalPath = javaDir.absoluteFilePath(relativeBinary);
     if (QFileInfo::exists(finalPath)) {

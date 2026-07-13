@@ -16,10 +16,10 @@ class JavaWizardPage : public BaseWizardPage {
     void initializePage() override;
     bool validatePage() override;
 
-   protected: /* methods */
+   protected:
     void setupUi();
     void retranslate() override;
 
-   private: /* data */
+   private:
     JavaWizardWidget* m_java_widget = nullptr;
 };

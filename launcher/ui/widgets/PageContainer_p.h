@@ -54,7 +54,7 @@ class PageModel : public QAbstractListModel {
                 QIcon icon = m_pages.at(index.row())->icon();
                 if (icon.isNull())
                     icon = m_emptyIcon;
-                // HACK: fixes icon stretching on windows. TODO: report Qt bug for this
+
                 return QIcon(icon.pixmap(QSize(48, 48)));
             }
         }

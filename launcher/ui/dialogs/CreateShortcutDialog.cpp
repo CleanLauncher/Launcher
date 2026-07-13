@@ -76,7 +76,6 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
         ui->serverLabel->show();
     }
 
-    // Populate save targets
     if (!DesktopServices::isFlatpak()) {
         QString desktopDir = FS::getDesktopDir();
         QString applicationDir = FS::getApplicationsDir();
@@ -89,17 +88,15 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
     }
     ui->saveTargetSelectionBox->addItem(tr("Other..."), QVariant::fromValue(ShortcutTarget::Other));
 
-    // Populate worlds
     if (m_QuickJoinSupported) {
         for (const auto& world : worldList->allWorlds()) {
-            // Entry name: World Name [Game Mode] - Last Played: DateTime
+
             QString entry_name = tr("%1 [%2] - Last Played: %3")
                                      .arg(world.name(), world.gameType().toTranslatedString(), world.lastPlayed().toString(Qt::ISODate));
             ui->worldSelectionBox->addItem(entry_name, world.name());
         }
     }
 
-    // Populate accounts
     auto accounts = APPLICATION->accounts();
     MinecraftAccountPtr defaultAccount = accounts->defaultAccount();
     if (accounts->count() <= 0) {
@@ -190,7 +187,6 @@ void CreateShortcutDialog::stateChanged()
     }
 }
 
-// Real work
 void CreateShortcutDialog::createShortcut()
 {
     QString targetString = tr("instance");

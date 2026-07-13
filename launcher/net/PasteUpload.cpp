@@ -208,7 +208,6 @@ PasteUpload::PasteUpload(const QString& log, QString url, PasteType pasteType) :
     if (m_baseUrl.isEmpty())
         m_baseUrl = base.defaultBase;
 
-    // HACK: Paste's docs say the standard API path is at /api/<version> but the official instance paste.gg doesn't follow that??
     if (pasteType == PasteUpload::PasteGG && m_baseUrl == base.defaultBase)
         m_url = "https://api.paste.gg/v1/pastes";
     else

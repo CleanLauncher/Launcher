@@ -79,12 +79,6 @@ Q_DECLARE_METATYPE(TaskStepProgress)
 
 using TaskStepProgressList = QList<std::shared_ptr<TaskStepProgress>>;
 
-/*!
- * Represents a task that has to be done.
- * To create a task, you need to subclass this class, implement the executeTask() method and call
- * emitSucceeded() or emitFailed() when the task is done.
- * the caller needs to call start() to start the task.
- */
 class Task : public QObject, public QRunnable {
     Q_OBJECT
    public:
@@ -100,16 +94,8 @@ class Task : public QObject, public QRunnable {
     bool isFinished() const;
     bool wasSuccessful() const;
 
-    /*!
-     * MultiStep tasks are combinations of multiple tasks into a single logical task.
-     * The main usage of this is in SequencialTask.
-     */
     virtual auto isMultiStep() const -> bool { return false; }
 
-    /*!
-     * Returns the string that was passed to emitFailed as the error message when the task failed.
-     * If the task hasn't failed, returns an empty string.
-     */
     QString failReason() const;
 
     virtual QStringList warnings() const;
@@ -127,7 +113,6 @@ class Task : public QObject, public QRunnable {
 
     QUuid getUid() { return m_uid; }
 
-    // Copies the other task's status, details, progress, and step progress to this task; and sets up connections for future propagation
     void propagateFromOther(Task* other);
 
    protected:
@@ -139,11 +124,11 @@ class Task : public QObject, public QRunnable {
    signals:
     void started();
     void progress(qint64 current, qint64 total);
-    //! called when a task has either succeeded, aborted or failed.
+
     void finished();
-    //! called when a task has succeeded
+
     void succeeded();
-    //! called when a task has been aborted by calling abort()
+
     void aborted();
     void failed(QString reason);
     void status(QString status);
@@ -151,18 +136,16 @@ class Task : public QObject, public QRunnable {
     void warningLogged(const QString& warning);
     void stepProgress(TaskStepProgress const& task_progress);
 
-    //! Emitted when the canAbort() status has changed. */
     void abortStatusChanged(bool can_abort);
 
     void abortButtonTextChanged(QString text);
 
    public slots:
-    // QRunnable's interface
+
     void run() override { start(); }
 
-    //! used by the task caller to start the task
     virtual void start();
-    //! used by external code to ask the task to abort
+
     virtual bool abort()
     {
         if (canAbort() && isRunning())
@@ -182,16 +165,15 @@ class Task : public QObject, public QRunnable {
     }
 
    protected:
-    //! The task subclass must implement this method. This method is called to start to run the task.
-    //! The task is not finished when this method returns. the subclass must manually call emitSucceeded() or emitFailed() instead.
+
     virtual void executeTask() = 0;
 
    protected slots:
-    //! The Task subclass must call this method when the task has succeeded
+
     virtual void emitSucceeded();
-    //! **The Task subclass** must call this method when the task has aborted. External code should call abort() instead.
+
     virtual void emitAborted();
-    //! The Task subclass must call this method when the task has failed
+
     virtual void emitFailed(QString reason = "");
 
     virtual void propagateStepProgress(TaskStepProgress const& task_progress);
@@ -210,11 +192,10 @@ class Task : public QObject, public QRunnable {
     int m_progress = 0;
     int m_progressTotal = 100;
 
-    // TODO: Nuke in favor of QLoggingCategory
     bool m_show_debug = true;
 
    private:
-    // Change using setAbortStatus
+
     bool m_can_abort = false;
     QUuid m_uid;
 };

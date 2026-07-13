@@ -28,7 +28,7 @@ ImportResourceDialog::ImportResourceDialog(QString file_path, ModPlatform::Resou
     contentsWidget->setSpacing(5);
     contentsWidget->setWordWrap(true);
     contentsWidget->setWrapping(true);
-    // NOTE: We can't have uniform sizes because the text may wrap if it's too long. If we set this, it will cut off the wrapped text.
+
     contentsWidget->setUniformItemSizes(false);
     contentsWidget->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     contentsWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

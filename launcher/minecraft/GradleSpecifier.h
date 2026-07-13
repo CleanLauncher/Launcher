@@ -43,15 +43,7 @@ struct GradleSpecifier {
     GradleSpecifier() { m_valid = false; }
     GradleSpecifier(const QString& value)
     {
-        /*
-        org.gradle.test.classifiers : service : 1.0 : jdk15 @ jar
-         0 "org.gradle.test.classifiers:service:1.0:jdk15@jar"
-         1 "org.gradle.test.classifiers"
-         2 "service"
-         3 "1.0"
-         4 "jdk15"
-         5 "jar"
-        */
+
         static const QRegularExpression s_matcher(
             QRegularExpression::anchoredPattern("([^:@]+):([^:@]+):([^:@]+)"
                                                 "(?::([^:@]+))?"

@@ -43,4 +43,4 @@ class ArchiveWriter {
     QString m_filename;
     QString m_format = "zip";
 };
-}  // namespace MMCZip
+}

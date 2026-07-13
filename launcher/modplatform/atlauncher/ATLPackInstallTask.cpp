@@ -73,7 +73,7 @@ Meta::Version::Ptr getComponentVersion(const QString& uid, const QString& versio
 {
     return APPLICATION->metadataIndex()->getLoadedVersion(uid, version);
 }
-}  // namespace
+}
 
 namespace ATLauncher {
 
@@ -114,7 +114,6 @@ void PackInstallTask::onDownloadSucceeded(QByteArray* responsePtr)
 {
     qDebug() << "PackInstallTask::onDownloadSucceeded:" << QThread::currentThreadId();
 
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 
@@ -136,7 +135,6 @@ void PackInstallTask::onDownloadSucceeded(QByteArray* responsePtr)
     }
     m_version = version;
 
-    // Derived from the installation mode
     QString message;
     bool resetDirectory = false;
 
@@ -157,7 +155,6 @@ void PackInstallTask::onDownloadSucceeded(QByteArray* responsePtr)
             return;
     }
 
-    // Display message if one exists
     if (!message.isEmpty()) {
         m_support->displayMessage(message);
     }
@@ -197,13 +194,11 @@ void PackInstallTask::deleteExistingFiles()
 {
     setStatus(tr("Deleting existing files..."));
 
-    // Setup defaults, as per https://wiki.atlauncher.com/pack-admin/xml/delete
     VersionDeletes deletes;
     deletes.folders.append(VersionDelete{ "root", "mods%s%" });
     deletes.folders.append(VersionDelete{ "root", "configs%s%" });
     deletes.folders.append(VersionDelete{ "root", "bin%s%" });
 
-    // Setup defaults, as per https://wiki.atlauncher.com/pack-admin/xml/keep
     VersionKeeps keeps;
     keeps.files.append(VersionKeep{ "root", "mods%s%PortalGunSounds.pak" });
     keeps.folders.append(VersionKeep{ "root", "mods%s%rei_minimap%s%" });
@@ -212,7 +207,6 @@ void PackInstallTask::deleteExistingFiles()
     keeps.files.append(VersionKeep{ "root", "options.txt" });
     keeps.files.append(VersionKeep{ "root", "servers.dat" });
 
-    // Merge with version deletes and keeps
     for (const auto& item : m_version.deletes.files) {
         deletes.files.append(item);
     }
@@ -267,7 +261,6 @@ void PackInstallTask::deleteExistingFiles()
         return false;
     };
 
-    // Keep track of files to delete
     QSet<QString> filesToDelete;
 
     for (const auto& item : deletes.files) {
@@ -299,7 +292,6 @@ void PackInstallTask::deleteExistingFiles()
         }
     }
 
-    // Delete the files
     for (const auto& item : filesToDelete) {
         FS::deletePath(item);
     }
@@ -308,8 +300,7 @@ void PackInstallTask::deleteExistingFiles()
 QString PackInstallTask::getDirForModType(ModType type, const QString& raw)
 {
     switch (type) {
-        // Mod types that can either be ignored at this stage, or ignored
-        // completely.
+
         case ModType::Root:
         case ModType::Extract:
         case ModType::Decomp:
@@ -318,8 +309,7 @@ QString PackInstallTask::getDirForModType(ModType type, const QString& raw)
         case ModType::MCPC:
             return Q_NULLPTR;
         case ModType::Forge:
-            // Forge detection happens later on, if it cannot be detected it will
-            // install a jarmod component.
+
         case ModType::Jar:
             return "jarmods";
         case ModType::Mods:
@@ -369,9 +359,6 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
                 auto version = vlist->versions().at(i);
                 auto reqs = version->requiredSet();
 
-                // filter by minecraft version, if the loader depends on a certain version.
-                // not all mod loaders depend on a given Minecraft version, so we won't do this
-                // filtering for those loaders.
                 if (m_version.loader.type != "fabric") {
                     auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Meta::Require& req) { return req.uid == "net.minecraft"; });
                     if (iter == reqs.end()) {
@@ -383,7 +370,7 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
                 }
 
                 if (m_version.loader.recommended) {
-                    // first recommended build we find, we use.
+
                     if (!version->isRecommended()) {
                         continue;
                     }
@@ -396,7 +383,7 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
             return Q_NULLPTR;
         }
         if (m_version.loader.choose) {
-            // Fabric Loader doesn't depend on a given Minecraft version.
+
             if (m_version.loader.type == "fabric") {
                 return m_support->chooseVersion(vlist, Q_NULLPTR);
             }
@@ -415,7 +402,7 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
 
 QString PackInstallTask::detectLibrary(const VersionLibrary& library)
 {
-    // Try to detect what the library is
+
     if (!library.server.isEmpty() && library.server.split("/").length() >= 3) {
         auto lastSlash = library.server.lastIndexOf("/");
         auto locationAndVersion = library.server.mid(0, lastSlash);
@@ -503,7 +490,7 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
     };
 
     for (const auto& lib : m_version.libraries) {
-        // If the library is LiteLoader, we need to ignore it and handle it separately.
+
         if (s_liteLoaderMap.contains(lib.md5)) {
             auto ver = getComponentVersion("com.mumfrey.liteloader", s_liteLoaderMap.value(lib.md5));
             if (ver) {
@@ -518,7 +505,7 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
         bool libExempt = false;
         for (const auto& existingLib : exempt) {
             if (libSpecifier.matchName(existingLib)) {
-                // If the pack specifies a newer version of the lib, use that!
+
                 libExempt = Version(libSpecifier.version()) >= Version(existingLib.version());
             }
         }
@@ -619,7 +606,6 @@ bool PackInstallTask::createPackComponent(const QString& instanceRoot, PackProfi
         f->mainClass = mainClass;
     }
 
-    // Parse out tweakers
     auto args = extraArguments.split(" ");
     QString previous;
     for (auto arg : args) {
@@ -716,7 +702,6 @@ void PackInstallTask::downloadMods()
         }
     }
 
-    // Select optional mods, if pack contains any
     QList<QString> selectedMods;
     if (!optionalMods.isEmpty()) {
         setStatus(tr("Selecting optional mods..."));
@@ -735,12 +720,11 @@ void PackInstallTask::downloadMods()
 
     QList<VersionMod> blockedMods;
     for (const auto& mod : m_version.mods) {
-        // skip non-client mods
+
         if (!mod.client) {
             continue;
         }
 
-        // skip optional mods that were not selected
         if (mod.optional && !selectedMods.contains(mod.name)) {
             continue;
         }
@@ -818,7 +802,6 @@ void PackInstallTask::downloadMods()
                 jarmods.push_back(path);
             }
 
-            // Download after Forge handling, to avoid downloading Forge twice.
             qDebug() << "Will download" << url << "to" << path;
             modsToCopy[entry->getFullPath()] = path;
         }
@@ -973,7 +956,7 @@ bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
 
         qDebug() << "Extracting " + mod.file + " to " + extractToDir;
         if (!MMCZip::extractDir(modPath, folderToExtract, extractToPath)) {
-            // assume error
+
             return false;
         }
     }
@@ -1002,8 +985,6 @@ bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
         const auto& from = iter.key();
         const auto& to = iter.value();
 
-        // If the file already exists, assume the mod is the correct copy - and remove
-        // the copy from the Configs.zip
         QFileInfo fileInfo(to);
         if (fileInfo.exists()) {
             if (!FS::deletePath(to)) {
@@ -1033,16 +1014,13 @@ void PackInstallTask::install()
         auto* components = instance.getPackProfile();
         components->buildingFromScratch();
 
-        // Use a component to add libraries BEFORE Minecraft
         if (!createLibrariesComponent(instance.instanceRoot(), components)) {
             emitFailed(tr("Failed to create libraries component"));
             return;
         }
 
-        // Minecraft
         components->setComponentVersion("net.minecraft", m_version.minecraft, true);
 
-        // Loader
         if (m_version.loader.type == QString("forge")) {
             auto version = getVersionForLoader("net.minecraftforge");
             if (version == Q_NULLPTR) {
@@ -1076,8 +1054,6 @@ void PackInstallTask::install()
 
         components->installJarMods(jarmods);
 
-        // Use a component to fill in the rest of the data
-        // todo: use more detection
         if (!createPackComponent(instance.instanceRoot(), components)) {
             emitFailed(tr("Failed to create pack component"));
             return;
@@ -1094,4 +1070,4 @@ void PackInstallTask::install()
     emitSucceeded();
 }
 
-}  // namespace ATLauncher
+}

@@ -53,7 +53,6 @@ void NewsChecker::reloadNews(const QString& newUrl)
         m_feedUrl = newUrl;
     }
 
-    // Start a netjob to download the RSS feed and call rssDownloadFinished() when it's done.
     if (isLoadingNews()) {
         qDebug() << "Ignored request to reload news. Currently reloading already.";
         return;
@@ -74,13 +73,13 @@ void NewsChecker::reloadNews(const QString& newUrl)
 
 void NewsChecker::rssDownloadFinished()
 {
-    // Parse the XML file and process the RSS feed entries.
+
     qDebug() << "Finished loading RSS feed.";
 
     m_newsNetJob.reset();
     QDomDocument doc;
     {
-        // Stuff to store error info in.
+
         QString errorMsg = "Unknown error.";
         int errorLine = -1;
         int errorCol = -1;
@@ -89,7 +88,7 @@ void NewsChecker::rssDownloadFinished()
 
         if (feed.open(QFile::ReadOnly | QFile::Text)) {
             QTextStream in(&feed);
-            // Parse the XML.
+
             if (!doc.setContent(in.readAll(), false, &errorMsg, &errorLine, &errorCol)) {
                 fail(QString("Error parsing RSS feed XML. %1 at %2:%3.").arg(errorMsg).arg(errorLine).arg(errorCol));
                 return;
@@ -97,7 +96,6 @@ void NewsChecker::rssDownloadFinished()
         }
     }
 
-    // If the parsing succeeded, read it.
     QDomNodeList items = doc.elementsByTagName("entry");
     m_newsEntries.clear();
     for (int i = 0; i < items.length(); i++) {
@@ -118,7 +116,7 @@ void NewsChecker::rssDownloadFinished()
 
 void NewsChecker::rssDownloadFailed(QString reason)
 {
-    // Set an error message and fail.
+
     fail(tr("Failed to load news RSS feed:\n%1").arg(reason));
 }
 

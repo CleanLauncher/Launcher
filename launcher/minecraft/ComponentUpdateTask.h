@@ -26,7 +26,7 @@ class ComponentUpdateTask : public Task {
 
    private:
     void loadComponents();
-    /// collects components that are dependent on or dependencies of the component
+
     QList<ComponentPtr> collectTreeLinked(const QString& uid);
     void resolveDependencies(bool checkOnly);
     void performUpdateActions();

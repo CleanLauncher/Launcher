@@ -140,7 +140,6 @@ QVariant ModFolderModel::data(const QModelIndex& index, int role) const
             break;
     }
 
-    // map the columns to the base equivilents
     QModelIndex mappedIndex;
     switch (column) {
         case ActiveColumn:
@@ -277,7 +276,7 @@ Mod* findById(QSet<Mod*> mods, const QString& resourceId)
     auto found = std::ranges::find_if(mods, [resourceId](Mod* m) { return m->mod_id() == resourceId; });
     return found != mods.end() ? *found : nullptr;
 }
-}  // namespace
+}
 
 void ModFolderModel::onParseFinished()
 {
@@ -350,13 +349,13 @@ QSet<Mod*> collectMods(const QSet<Mod*>& mods, QHash<QString, QSet<Mod*>> relati
             }
         }
     }
-    // collect the affected mods until all of them are included in the list
+
     if (!needToCheck.isEmpty()) {
         affectedList += collectMods(needToCheck, relation, seen, shouldBeEnabled);
     }
     return affectedList;
 }
-}  // namespace
+}
 
 QModelIndexList ModFolderModel::getAffectedMods(const QModelIndexList& indexes, EnableAction action)
 {
@@ -379,7 +378,8 @@ QModelIndexList ModFolderModel::getAffectedMods(const QModelIndexList& indexes, 
             break;
         }
         case EnableAction::TOGGLE: {
-            return {};  // this function should not be called with TOGGLE
+            return {};
+
         }
     }
     for (auto* affected : affectedMods) {
@@ -492,7 +492,7 @@ QStringList reqToList(const QSet<Mod*>& l)
     }
     return req;
 }
-}  // namespace
+}
 
 QStringList ModFolderModel::requiresList(const QString& id)
 {
@@ -509,8 +509,7 @@ bool ModFolderModel::deleteResources(const QModelIndexList& indexes)
     auto deleteInvalid = [](QSet<Mod*>& mods) {
         for (auto it = mods.begin(); it != mods.end();) {
             auto* mod = *it;
-            // the QFileInfo::exists is used instead of mod->fileinfo().exists
-            // because the later somehow caches that the file exists
+
             if (!mod || !QFileInfo::exists(mod->fileinfo().absoluteFilePath())) {
                 it = mods.erase(it);
             } else {

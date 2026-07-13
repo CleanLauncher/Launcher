@@ -17,8 +17,7 @@ static void loadModloaderV1(Flame::Modloader& m, QJsonObject& modLoader)
 static void loadMinecraftV1(Flame::Minecraft& m, QJsonObject& minecraft)
 {
     m.version = Json::requireString(minecraft, "version");
-    // extra libraries... apparently only used for a custom Minecraft launcher in the 1.2.5 FTB retro pack
-    // intended use is likely hardcoded in the 'Flame' client, the manifest says nothing
+
     m.libraries = minecraft["libraries"].toString();
     auto arr = minecraft["modLoaders"].toArray();
     for (QJsonValueRef item : arr) {

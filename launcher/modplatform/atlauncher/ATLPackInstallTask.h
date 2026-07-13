@@ -58,20 +58,11 @@ enum class InstallMode : std::uint8_t {
 
 class UserInteractionSupport {
    public:
-    /**
-     * Requests a user interaction to select which optional mods should be installed.
-     */
+
     virtual std::optional<QList<QString>> chooseOptionalMods(const PackVersion& version, QList<ATLauncher::VersionMod> mods) = 0;
 
-    /**
-     * Requests a user interaction to select a component version from a given version list
-     * and constrained to a given Minecraft version.
-     */
     virtual QString chooseVersion(Meta::VersionList::Ptr vlist, QString minecraftVersion) = 0;
 
-    /**
-     * Requests a user interaction to display a message.
-     */
     virtual void displayMessage(QString message) = 0;
 
     virtual ~UserInteractionSupport() = default;
@@ -147,4 +138,4 @@ class PackInstallTask : public InstanceTask {
     QFutureWatcher<bool> m_modExtractFutureWatcher;
 };
 
-}  // namespace ATLauncher
+}

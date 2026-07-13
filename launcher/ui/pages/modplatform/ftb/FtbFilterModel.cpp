@@ -83,9 +83,8 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
         return StringUtils::naturalCompare(leftPack.name, rightPack.name, Qt::CaseSensitive) >= 0;
     }
 
-    // Invalid sorting set, somehow...
     qWarning() << "Invalid sorting set!";
     return true;
 }
 
-}  // namespace Ftb
+}

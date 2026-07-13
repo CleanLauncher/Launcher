@@ -40,8 +40,6 @@
         return ret;                                                                                                  \
     }
 
-/** A wrapper around QPixmapCache with thread affinity with the main thread.
- */
 class PixmapCache final : public QObject {
     Q_OBJECT
 
@@ -66,7 +64,6 @@ class PixmapCache final : public QObject {
     DEFINE_FUNC_NO_PARAM(markCacheMissByEviciton, bool, false)
     DEFINE_FUNC_ONE_PARAM(setFastEvictionThreshold, bool, false, int)
 
-    // NOTE: Every function returns something non-void to simplify the macros.
    private slots:
     int _cacheLimit() { return QPixmapCache::cacheLimit(); }
     bool _clear()
@@ -95,10 +92,6 @@ class PixmapCache final : public QObject {
         return true;
     }
 
-    /**
-     *  Mark that a cache miss occurred because of a eviction if too many of these occur too fast the cache size is increased
-     * @return if the cache size was increased
-     */
     bool _markCacheMissByEviciton()
     {
         static constexpr uint maxCache = static_cast<uint>(std::numeric_limits<int>::max()) / 4;
@@ -108,7 +101,8 @@ class PixmapCache final : public QObject {
         auto now = QTime::currentTime();
         if (!m_last_cache_miss_by_eviciton.isNull()) {
             auto diff = m_last_cache_miss_by_eviciton.msecsTo(now);
-            if (diff < oneSecond) {  // less than a second ago
+            if (diff < oneSecond) {
+
                 ++m_consecutive_fast_evicitons;
             } else {
                 m_consecutive_fast_evicitons = 0;
@@ -116,9 +110,10 @@ class PixmapCache final : public QObject {
         }
         m_last_cache_miss_by_eviciton = now;
         if (m_consecutive_fast_evicitons >= m_consecutive_fast_evicitons_threshold) {
-            // increase the cache size
+
             uint newSize = _cacheLimit() + step;
-            if (newSize >= maxCache) {  // increase it until you overflow :D
+            if (newSize >= maxCache) {
+
                 newSize = maxCache;
                 qDebug() << m_consecutive_fast_evicitons
                          << tr("pixmap cache misses by eviction happened too fast, doing nothing as the cache size reached it's limit");

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ManagedPackPage.h"
@@ -31,9 +31,6 @@
 
 #include "net/ApiDownload.h"
 
-/** This is just to override the combo box popup behavior so that the combo box doesn't take the whole screen.
- *  ... thanks Qt.
- */
 class NoBigComboBoxStyle : public QProxyStyle {
     Q_OBJECT
 
@@ -48,13 +45,6 @@ class NoBigComboBoxStyle : public QProxyStyle {
     }
     // clang-format on
 
-    /**
-     * Something about QProxyStyle and QStyle objects means they can't be free'd just
-     * because all the widgets using them are gone.
-     * They seems to be tied to the QApplicaiton lifecycle.
-     * So make singletons tied to the lifetime of the application to clean them up and ensure they aren't
-     * being remade over and over again, thus leaking memory.
-     */
    public:
     static NoBigComboBoxStyle* getInstance(QStyle* style)
     {
@@ -96,8 +86,6 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
 
     ui->setupUi(this);
 
-    // NOTE: GTK2 themes crash with the proxy style.
-    // This seems like an upstream bug, so there's not much else that can be done.
     if (!QStyleFactory::keys().contains("gtk2")) {
         auto comboStyle = NoBigComboBoxStyle::getInstance(ui->versionsComboBox->style());
         ui->versionsComboBox->setStyle(comboStyle);
@@ -111,14 +99,15 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
         ui->reloadButton->setVisible(false);
 
         m_loaded = false;
-        // Pretend we're opening the page again
+
         openedImpl();
     });
 
     connect(ui->changelogTextBrowser, &QTextBrowser::anchorClicked, this, [](const QUrl url) {
         if (url.scheme().isEmpty()) {
             auto querry =
-                QUrlQuery(url.query()).queryItemValue("remoteUrl", QUrl::FullyDecoded);  // curseforge workaround for linkout?remoteUrl=
+                QUrlQuery(url.query()).queryItemValue("remoteUrl", QUrl::FullyDecoded);
+
             auto decoded = QUrl::fromPercentEncoding(querry.toUtf8());
             auto newUrl = QUrl(decoded);
             if (newUrl.isValid() && (newUrl.scheme() == "http" || newUrl.scheme() == "https"))
@@ -232,7 +221,6 @@ void ManagedPackPage::setFailState()
 {
     qDebug() << "Setting fail state!";
 
-    // We block signals here so that suggestVersion() doesn't get called, causing an assertion fail.
     ui->versionsComboBox->blockSignals(true);
     ui->versionsComboBox->clear();
     ui->versionsComboBox->addItem(tr("Failed to search for available versions."), {});
@@ -255,12 +243,10 @@ ModrinthManagedPackPage::ModrinthManagedPackPage(BaseInstance* inst, InstanceWin
     connect(ui->updateFromFileButton, &QPushButton::clicked, this, &ModrinthManagedPackPage::updateFromFile);
 }
 
-// MODRINTH
 void ModrinthManagedPackPage::parseManagedPack()
 {
     qDebug() << "Parsing Modrinth pack";
 
-    // No need for the extra work because we already have everything we need.
     if (m_loaded) {
         return;
     }
@@ -272,12 +258,10 @@ void ModrinthManagedPackPage::parseManagedPack()
     ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
     m_pack = { .addonId = m_inst->getManagedPackID() };
 
-    // Use default if no callbacks are set
     callbacks.on_succeed = [this](auto& doc) {
         m_pack.versions = doc;
         m_pack.versionsLoaded = true;
 
-        // We block signals here so that suggestVersion() doesn't get called, causing an assertion fail.
         ui->versionsComboBox->blockSignals(true);
         ui->versionsComboBox->clear();
         ui->versionsComboBox->blockSignals(false);
@@ -285,8 +269,6 @@ void ModrinthManagedPackPage::parseManagedPack()
         for (const auto& version : m_pack.versions) {
             QString name = version.getVersionDisplayString();
 
-            // NOTE: the id from version isn't the same id in the modpack format spec...
-            // e.g. HexMC's 4.4.0 has versionId 4.0.0 in the modpack index..............
             if (version.version == m_inst->getManagedPackVersionName()) {
                 name = tr("%1 (Current)").arg(name);
             }
@@ -298,7 +280,7 @@ void ModrinthManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString& /*reason*/, int) { setFailState(); };
+    callbacks.on_fail = [this](const QString& , int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
     m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
                                              .mcVersions = {},
@@ -331,12 +313,9 @@ void ModrinthManagedPackPage::suggestVersion()
     ManagedPackPage::suggestVersion();
 }
 
-/// @brief Called when the update task has completed.
-/// Internally handles the closing of the instance window if the update was successful and shows a message box.
-/// @param did_succeed Whether the update task was successful.
 void ManagedPackPage::onUpdateTaskCompleted(bool did_succeed) const
 {
-    // Close the window if the update was successful
+
     if (did_succeed) {
         if (m_instance_window != nullptr)
             m_instance_window->close();
@@ -381,7 +360,6 @@ void ModrinthManagedPackPage::updateFromFile()
     updatePack(output);
 }
 
-// FLAME
 FlameManagedPackPage::FlameManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent)
     : ManagedPackPage(inst, instance_window, parent)
 {
@@ -395,7 +373,6 @@ void FlameManagedPackPage::parseManagedPack()
 {
     qDebug() << "Parsing Flame pack";
 
-    // We need to tell the user to redownload the pack, since we didn't save the required info previously
     if (m_inst->getManagedPackID().isEmpty()) {
         setFailState();
         QString message =
@@ -413,7 +390,6 @@ void FlameManagedPackPage::parseManagedPack()
         return;
     }
 
-    // No need for the extra work because we already have everything we need.
     if (m_loaded) {
         return;
     }
@@ -427,12 +403,10 @@ void FlameManagedPackPage::parseManagedPack()
 
     ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
-    // Use default if no callbacks are set
     callbacks.on_succeed = [this](auto& doc) {
         m_pack.versions = doc;
         m_pack.versionsLoaded = true;
 
-        // We block signals here so that suggestVersion() doesn't get called, causing an assertion fail.
         ui->versionsComboBox->blockSignals(true);
         ui->versionsComboBox->clear();
         ui->versionsComboBox->blockSignals(false);
@@ -451,7 +425,7 @@ void FlameManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString& /*reason*/, int) { setFailState(); };
+    callbacks.on_fail = [this](const QString& , int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
     m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
                                              .mcVersions = {},
@@ -465,7 +439,7 @@ void FlameManagedPackPage::parseManagedPack()
 
 QString FlameManagedPackPage::url() const
 {
-    // FIXME: We should display the websiteUrl field, but this requires doing the API request first :(
+
     return "https://www.curseforge.com/projects/" + m_inst->getManagedPackID();
 }
 
@@ -513,7 +487,7 @@ void FlameManagedPackPage::updateFromFile()
 void ManagedPackPage::updatePack(const QUrl& url, QString versionID, QString versionName)
 {
     QMap<QString, QString> extra_info;
-    // NOTE: Don't use 'm_pack.id' here, since we didn't completely parse all the metadata for the pack, including this field.
+
     extra_info.insert("pack_id", m_inst->getManagedPackID());
     extra_info.insert("pack_version_id", versionID);
     extra_info.insert("original_instance_id", m_inst->id());
@@ -531,7 +505,6 @@ void ManagedPackPage::updatePack(const QUrl& url, QString versionID, QString ver
     extracted->setIcon(m_inst->iconKey());
     extracted->setConfirmUpdate(false);
 
-    // Run our task then handle the result
     auto did_succeed = runUpdateTask(extracted);
     onUpdateTaskCompleted(did_succeed);
 }

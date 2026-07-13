@@ -49,8 +49,6 @@ void EntitlementsStep::onRequestDone(QByteArray* response)
 {
     qCDebug(authCredentials()) << *response;
 
-    // TODO: check presence of same entitlementsRequestId?
-    // TODO: validate JWTs?
     Parsers::parseMinecraftEntitlements(*response, m_data->minecraftEntitlement);
 
     emit finished(AccountTaskState::STATE_WORKING, tr("Got entitlements"));

@@ -42,7 +42,6 @@
 #include "net/NetRequest.h"
 #include "tasks/ConcurrentTask.h"
 
-// Those are included so that they are also included by anyone using NetJob
 #include "net/Download.h"
 #include "net/HttpMetaCache.h"
 
@@ -50,7 +49,7 @@ class NetJob : public ConcurrentTask {
     Q_OBJECT
 
    public:
-    // TODO: delete
+
     using Ptr = shared_qobject_ptr<NetJob>;
 
     explicit NetJob(QString job_name, QNetworkAccessManager* network, int max_concurrent = -1);
@@ -66,7 +65,7 @@ class NetJob : public ConcurrentTask {
     void setAskRetry(bool askRetry);
 
    public slots:
-    // Qt can't handle auto at the start for some reason?
+
     bool abort() override;
     void emitFailed(QString reason) override;
 

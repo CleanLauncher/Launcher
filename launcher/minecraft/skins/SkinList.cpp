@@ -119,7 +119,7 @@ bool SkinList::update()
     }
 
     auto folderContents = m_dir.entryInfoList();
-    // if there are any untracked files...
+
     for (QFileInfo entry : folderContents) {
         if (!entry.isFile() || entry.suffix() != "png")
             continue;
@@ -199,16 +199,15 @@ bool SkinList::dropMimeData(const QMimeData* data,
 {
     if (action == Qt::IgnoreAction)
         return true;
-    // check if the action is supported
+
     if (!data || !(action & supportedDropActions()))
         return false;
 
-    // files dropped from outside?
     if (data->hasUrls()) {
         auto urls = data->urls();
         QStringList skinFiles;
         for (auto url : urls) {
-            // only local files may be dropped...
+
             if (!url.isLocalFile())
                 continue;
             skinFiles << url.toLocalFile();

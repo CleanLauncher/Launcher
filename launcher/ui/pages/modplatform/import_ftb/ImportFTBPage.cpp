@@ -114,7 +114,8 @@ QString saveIconToTempFile(const QIcon& icon)
         return QString();
     }
 
-    return tempPath;  // Success
+    return tempPath;
+
 }
 
 void ImportFTBPage::suggestCurrent()
@@ -131,7 +132,7 @@ void ImportFTBPage::suggestCurrent()
     QString editedLogoName = QString("ftb_%1_%2.jpg").arg(selected.name, QString::number(selected.id));
     auto iconPath = FS::PathCombine(selected.path, "folder.jpg");
     if (!QFileInfo::exists(iconPath)) {
-        // need to save the icon as that actual logo is not a image on the disk
+
         iconPath = saveIconToTempFile(selected.icon);
     }
     if (!iconPath.isEmpty() && QFileInfo::exists(iconPath)) {
@@ -183,4 +184,4 @@ QString ImportFTBPage::getSerachTerm() const
 {
     return ui->searchEdit->text();
 }
-}  // namespace FTBImportAPP
+}

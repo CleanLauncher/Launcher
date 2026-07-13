@@ -78,7 +78,6 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
         return StringUtils::naturalCompare(leftPack.name, rightPack.name, Qt::CaseSensitive) >= 0;
     }
 
-    // UHM, some inavlid value set?!
     qWarning() << "Invalid sorting set!";
     return true;
 }
@@ -163,7 +162,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack.description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack.description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -185,11 +184,10 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
         }
         case Qt::ForegroundRole: {
             if (pack.broken) {
-                // FIXME: Hardcoded color
+
                 return QColor(255, 0, 50);
             } else if (pack.bugged) {
-                // FIXME: Hardcoded color
-                // bugged pack, currently only indicates bugged xml
+
                 return QColor(244, 229, 66);
             }
             return {};
@@ -198,7 +196,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
             return pack.name;
         case Qt::SizeHintRole:
             return QSize(0, 58);
-        // Custom data
+
         case UserDataTypes::TITLE:
             return pack.name;
         case UserDataTypes::DESCRIPTION:
@@ -306,4 +304,4 @@ Qt::ItemFlags ListModel::flags(const QModelIndex& index) const
     return QAbstractListModel::flags(index);
 }
 
-}  // namespace LegacyFTB
+}

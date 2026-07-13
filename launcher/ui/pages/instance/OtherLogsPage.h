@@ -98,7 +98,7 @@ class OtherLogsPage : public QWidget, public BasePage {
 
     Ui::OtherLogsPage* ui;
     BaseInstance* m_instance;
-    /** Path to display log paths relative to. */
+
     QString m_basePath;
     QStringList m_logSearchPaths;
     QString m_currentFile;

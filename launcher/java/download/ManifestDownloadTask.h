@@ -43,4 +43,4 @@ class ManifestDownloadTask : public Task {
     QString m_checksum_hash;
     Task::Ptr m_task;
 };
-}  // namespace Java
+}

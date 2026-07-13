@@ -56,7 +56,6 @@ class ResourceDownloadDialog : public QDialog, public BasePageProvider {
     void initializeContainer();
     void connectButtons();
 
-    //: String that gets appended to the download dialog title ("Download " + resourcesString())
     virtual QString resourcesString() const { return tr("resources"); }
 
     QString dialogTitle() override { return tr("Download %1").arg(resourcesString()); };
@@ -106,7 +105,6 @@ class ModDownloadDialog final : public ResourceDownloadDialog {
     explicit ModDownloadDialog(QWidget* parent, ModFolderModel* mods, BaseInstance* instance, bool suppressInitialSearch = false);
     ~ModDownloadDialog() override = default;
 
-    //: String that gets appended to the mod download dialog title ("Download " + resourcesString())
     QString resourcesString() const override { return tr("mods"); }
     QString geometrySaveKey() const override { return "ModDownloadGeometry"; }
 
@@ -127,7 +125,6 @@ class ResourcePackDownloadDialog final : public ResourceDownloadDialog {
                                         bool suppressInitialSearch = false);
     ~ResourcePackDownloadDialog() override = default;
 
-    //: String that gets appended to the resource pack download dialog title ("Download " + resourcesString())
     QString resourcesString() const override { return tr("resource packs"); }
     QString geometrySaveKey() const override { return "RPDownloadGeometry"; }
 
@@ -147,7 +144,6 @@ class TexturePackDownloadDialog final : public ResourceDownloadDialog {
                                        bool suppressInitialSearch = false);
     ~TexturePackDownloadDialog() override = default;
 
-    //: String that gets appended to the texture pack download dialog title ("Download " + resourcesString())
     QString resourcesString() const override { return tr("texture packs"); }
     QString geometrySaveKey() const override { return "TPDownloadGeometry"; }
 
@@ -167,7 +163,6 @@ class ShaderPackDownloadDialog final : public ResourceDownloadDialog {
                                       bool suppressInitialSearch = false);
     ~ShaderPackDownloadDialog() override = default;
 
-    //: String that gets appended to the shader pack download dialog title ("Download " + resourcesString())
     QString resourcesString() const override { return tr("shader packs"); }
     QString geometrySaveKey() const override { return "ShaderDownloadGeometry"; }
 
@@ -187,7 +182,6 @@ class DataPackDownloadDialog final : public ResourceDownloadDialog {
                                     bool suppressInitialSearch = false);
     ~DataPackDownloadDialog() override = default;
 
-    //: String that gets appended to the data pack download dialog title ("Download " + resourcesString())
     QString resourcesString() const override { return tr("data packs"); }
     QString geometrySaveKey() const override { return "DataPackDownloadGeometry"; }
 
@@ -197,4 +191,4 @@ class DataPackDownloadDialog final : public ResourceDownloadDialog {
     BaseInstance* m_instance;
 };
 
-}  // namespace ResourceDownload
+}

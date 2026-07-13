@@ -37,13 +37,8 @@ package org.launcher.utils.logging;
 
 import java.io.PrintStream;
 
-/**
- * Used to print messages with different levels used to colourise the output.
- * Used instead of a logging framework, as the launcher knows how to parse these
- * messages.
- */
 public final class Log {
-    // original before possibly overridden by MC
+
     private static final PrintStream OUT = new PrintStream(System.out), ERR = new PrintStream(System.err);
     private static final boolean DEBUG = Boolean.getBoolean("org.launcher.debug");
 
@@ -77,21 +72,14 @@ public final class Log {
         e.printStackTrace(ERR);
     }
 
-    /**
-     * Logs a message with the prefix <code>!![LEVEL]!</code>. This is picked up by
-     * the log viewer to give it nice colours.
-     *
-     * @param message The message
-     * @param level   The level
-     */
     public static void log(String message, Level level) {
         if (!DEBUG && level == Level.DEBUG)
             return;
 
         String prefix = "!![" + level.name + "]!";
-        // prefix first line
+
         message = prefix + message;
-        // prefix subsequent lines
+
         message = message.replace("\n", "\n" + prefix);
 
         if (level.stderr)

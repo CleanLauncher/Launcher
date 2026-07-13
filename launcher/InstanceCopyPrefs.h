@@ -1,6 +1,3 @@
-//
-// Created by marcelohdez on 10/22/22.
-//
 
 #pragma once
 
@@ -11,7 +8,7 @@ struct InstanceCopyPrefs {
     bool allTrue() const;
     QString getSelectedFiltersAsRegex() const;
     QString getSelectedFiltersAsRegex(const QStringList& additionalFilters) const;
-    // Getters
+
     bool isCopySavesEnabled() const;
     bool isKeepPlaytimeEnabled() const;
     bool isCopyGameOptionsEnabled() const;
@@ -25,7 +22,7 @@ struct InstanceCopyPrefs {
     bool isUseHardLinksEnabled() const;
     bool isDontLinkSavesEnabled() const;
     bool isUseCloneEnabled() const;
-    // Setters
+
     void enableCopySaves(bool b);
     void enableKeepPlaytime(bool b);
     void enableCopyGameOptions(bool b);
@@ -40,7 +37,8 @@ struct InstanceCopyPrefs {
     void enableDontLinkSaves(bool b);
     void enableUseClone(bool b);
 
-   protected:  // data
+   protected:
+
     bool copySaves = true;
     bool keepPlaytime = true;
     bool copyGameOptions = true;

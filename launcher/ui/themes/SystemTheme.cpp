@@ -40,16 +40,13 @@
 #include "HintOverrideProxyStyle.h"
 #include "ThemeManager.h"
 
-// See https://github.com/MultiMC/Launcher/issues/1790
-// or https://github.com/CleanLauncher/Launcher/issues/490
 static const QStringList S_NATIVE_STYLES{ "windows11", "windowsvista", "macos", "system", "windows" };
 
 SystemTheme::SystemTheme(const QString& styleName, const QPalette& defaultPalette, bool isDefaultTheme)
 {
     m_themeName = isDefaultTheme ? "system" : styleName;
     m_widgetTheme = styleName;
-    // NOTE: SystemTheme is reconstructed on page refresh. We can't accurately determine the system palette here
-    // See also S_NATIVE_STYLES comment
+
     if (S_NATIVE_STYLES.contains(m_themeName)) {
         m_colorPalette = defaultPalette;
     } else {
@@ -61,7 +58,7 @@ SystemTheme::SystemTheme(const QString& styleName, const QPalette& defaultPalett
 
 void SystemTheme::apply(bool initial)
 {
-    // See S_NATIVE_STYLES comment
+
     if (initial && S_NATIVE_STYLES.contains(m_themeName)) {
         QApplication::setStyle(new HintOverrideProxyStyle(QStyleFactory::create(qtTheme())));
         return;

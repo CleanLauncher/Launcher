@@ -88,7 +88,7 @@ InstallLoaderDialog::InstallLoaderDialog(PackProfile* profile, const QString& ui
     : QDialog(parent), profile(profile), container(new PageContainer(this, QString(), this)), buttons(new QDialogButtonBox(this))
 {
     auto layout = new QVBoxLayout(this);
-    // small margins look ugly on macOS on modal windows
+
     #ifndef Q_OS_MACOS
     layout->setContentsMargins(0, 0, 0, 0);
     #endif
@@ -96,7 +96,7 @@ InstallLoaderDialog::InstallLoaderDialog(PackProfile* profile, const QString& ui
     layout->addWidget(container);
 
     auto buttonLayout = new QHBoxLayout(this);
-    // small margins look ugly on macOS on modal windows
+
     #ifndef Q_OS_MACOS
     buttonLayout->setContentsMargins(0, 0, 6, 6);
     #endif
@@ -134,15 +134,16 @@ InstallLoaderDialog::InstallLoaderDialog(PackProfile* profile, const QString& ui
 
 QList<BasePage*> InstallLoaderDialog::getPages()
 {
-    return { // NeoForge
+    return {
+
              new InstallLoaderPage("net.neoforged", "neoforged", tr("NeoForge"), {}, profile),
-             // Forge
+
              new InstallLoaderPage("net.minecraftforge", "forge", tr("Forge"), {}, profile),
-             // Fabric
+
              new InstallLoaderPage("net.fabricmc.fabric-loader", "fabricmc", tr("Fabric"), Version("1.14"), profile),
-             // Quilt
+
              new InstallLoaderPage("org.quiltmc.quilt-loader", "quiltmc", tr("Quilt"), Version("1.14"), profile),
-             // LiteLoader
+
              new InstallLoaderPage("com.mumfrey.liteloader", "liteloader", tr("LiteLoader"), {}, profile)
     };
 }

@@ -86,7 +86,7 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
     }
 #elif defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
     if (appPath.startsWith("/tmp/.mount_")) {
-        // AppImage!
+
         appPath = QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE"));
         if (appPath.isEmpty()) {
             QMessageBox::critical(
@@ -121,8 +121,6 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
 #elif defined(Q_OS_WIN)
     iconPath = FS::PathCombine(shortcut.instance->instanceRoot(), "icon.ico");
 
-    // part of fix for weird bug involving the window icon being replaced
-    // dunno why it happens, but parent 2-line fix seems to be enough, so w/e
     auto appIcon = APPLICATION->logo();
 
     QFile iconFile(iconPath);
@@ -133,7 +131,6 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
     bool success = icon->icon().pixmap(64, 64).save(&iconFile, "ICO");
     iconFile.close();
 
-    // restore original window icon
     QGuiApplication::setWindowIcon(appIcon);
 
     if (!success) {
@@ -228,13 +225,13 @@ bool createInstanceShortcutInOther(const Shortcut& shortcut)
 
     QString shortcutFilePath = FS::PathCombine(defaultedDir, FS::RemoveInvalidFilenameChars(shortcut.name) + extension);
     QFileDialog fileDialog;
-    // workaround to make sure the portal file dialog opens in the desktop directory
+
     fileDialog.setDirectoryUrl(defaultedDir);
 
     shortcutFilePath = fileDialog.getSaveFileName(shortcut.parent, QObject::tr("Create Shortcut"), shortcutFilePath,
                                                   QObject::tr("Desktop Entries") + " (*" + extension + ")");
     if (shortcutFilePath.isEmpty())
-        return false;  // file dialog canceled by user
+        return false;
 
     if (shortcutFilePath.endsWith(extension))
         shortcutFilePath = shortcutFilePath.mid(0, shortcutFilePath.length() - extension.length());
@@ -245,4 +242,4 @@ bool createInstanceShortcutInOther(const Shortcut& shortcut)
     return true;
 }
 
-}  // namespace ShortcutUtils
+}

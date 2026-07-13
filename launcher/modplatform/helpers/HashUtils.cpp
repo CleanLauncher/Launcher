@@ -56,7 +56,7 @@ QString algorithmToString(Algorithm type)
             return "sha512";
         case Algorithm::Murmur2:
             return "murmur2";
-        // case Algorithm::Unknown:
+
         default:
             break;
     }
@@ -101,7 +101,8 @@ QString hash(QIODevice* device, Algorithm type)
         case Algorithm::Sha512:
             alg = QCryptographicHash::Algorithm::Sha512;
             break;
-        case Algorithm::Murmur2: {  // CF-specific
+        case Algorithm::Murmur2: {
+
             auto should_filter_out = [](char c) { return (c == 9 || c == 10 || c == 13 || c == 32); };
             auto reader = std::make_unique<QIODeviceReader>(device);
             auto result = QString::number(Murmur2::hash(reader.get(), 4 * MiB, should_filter_out));
@@ -156,10 +157,9 @@ bool Hasher::abort()
 {
     if (m_future.isRunning()) {
         m_future.cancel();
-        // NOTE: Here we don't do `emitAborted()` because it will be done when `m_build_zip_future` actually cancels, which may not
-        // occur immediately.
+
         return true;
     }
     return false;
 }
-}  // namespace Hashing
+}

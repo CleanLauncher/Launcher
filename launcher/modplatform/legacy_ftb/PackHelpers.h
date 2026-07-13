@@ -7,7 +7,6 @@
 
 namespace LegacyFTB {
 
-// Header for structs etc...
 enum class PackType { Public, ThirdParty, Private };
 
 struct Modpack {
@@ -20,9 +19,8 @@ struct Modpack {
     QString mods;
     QString logo;
 
-    // Technical data
     QString dir;
-    QString file;  //<- Url in the xml, but doesn't make much sense
+    QString file;
 
     bool bugged = false;
     bool broken = false;
@@ -33,7 +31,6 @@ struct Modpack {
 
 using ModpackList = QList<Modpack>;
 
-}  // namespace LegacyFTB
+}
 
-// We need it for the proxy model
 Q_DECLARE_METATYPE(LegacyFTB::Modpack)

@@ -97,7 +97,6 @@ ExportInstanceDialog::~ExportInstanceDialog()
     delete m_ui;
 }
 
-/// Save icon to instance's folder is needed
 void SaveIcon(BaseInstance* m_instance)
 {
     auto iconKey = m_instance->iconKey();
@@ -120,7 +119,7 @@ void SaveIcon(BaseInstance* m_instance)
     }
     auto areaOf = [](QSize size) { return size.width() * size.height(); };
     QSize largest = sizes[0];
-    // find variant with largest area
+
     for (auto size : sizes) {
         if (areaOf(largest) < areaOf(size)) {
             largest = size;
@@ -175,7 +174,7 @@ void ExportInstanceDialog::done(int result)
 
 void ExportInstanceDialog::rowsInserted(QModelIndex parent, int top, int bottom)
 {
-    // WARNING: possible off-by-one?
+
     for (int i = top; i < bottom; i++) {
         auto node = m_proxyModel->index(i, 0, parent);
         if (m_proxyModel->shouldExpand(node)) {

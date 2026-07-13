@@ -67,11 +67,9 @@ auto ExtractZipTask::extractZip() -> ZipResult
             auto original_name = relative_file_name;
             setStatus("Unpacking: " + relative_file_name);
 
-            // Fix subdirs/files ending with a / getting transformed into absolute paths
             if (relative_file_name.startsWith('/'))
                 relative_file_name = relative_file_name.mid(1);
 
-            // Fix weird "folders with a single file get squashed" thing
             QString sub_path;
             if (relative_file_name.contains('/') && !relative_file_name.endsWith('/')) {
                 sub_path = relative_file_name.section('/', 0, -2) + '/';
@@ -125,11 +123,10 @@ bool ExtractZipTask::abort()
 {
     if (m_zipFuture.isRunning()) {
         m_zipFuture.cancel();
-        // NOTE: Here we don't do `emitAborted()` because it will be done when `m_build_zip_future` actually cancels, which may not occur
-        // immediately.
+
         return true;
     }
     return false;
 }
 
-}  // namespace MMCZip
+}

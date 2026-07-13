@@ -140,7 +140,7 @@ void JavaChecker::finished(int exitcode, QProcess::ExitStatus status)
     QStringList lines = m_stdout.split("\n", Qt::SkipEmptyParts);
     for (QString line : lines) {
         line = line.trimmed();
-        // NOTE: workaround for GH-4125, where garbage is getting printed into stdout on bedrock linux
+
         if (line.contains("/bedrock/strata")) {
             continue;
         }
@@ -199,7 +199,7 @@ void JavaChecker::error(QProcess::ProcessError err)
 
 void JavaChecker::timeout()
 {
-    // NO MERCY. NO ABUSE.
+
     if (process) {
         qDebug() << "Java checker has been killed by timeout.";
         process->kill();

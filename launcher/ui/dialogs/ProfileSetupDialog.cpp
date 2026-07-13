@@ -251,16 +251,13 @@ struct MojangError {
     QString errorMessage;
 };
 
-}  // namespace
+}
 
 void ProfileSetupDialog::setupProfileFinished(QByteArray* response)
 {
     isWorking = false;
     if (m_profile_task->error() == QNetworkReply::NoError) {
-        /*
-         * data contains the profile in the response
-         * ... we could parse it and update the account, but let's just return back to the normal login flow instead...
-         */
+
         accept();
     } else {
         auto parsedError = MojangError::fromJSON(*response);

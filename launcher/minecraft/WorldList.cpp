@@ -91,7 +91,7 @@ bool WorldList::update()
     QList<World> newWorlds;
     m_dir.refresh();
     auto folderContents = m_dir.entryInfoList();
-    // if there are any untracked files...
+
     for (QFileInfo entry : folderContents) {
         if (!entry.isDir())
             continue;
@@ -266,10 +266,10 @@ QVariant WorldList::headerData(int section, [[maybe_unused]] Qt::Orientation ori
                 case LastPlayedColumn:
                     return tr("Last Played");
                 case SizeColumn:
-                    //: World size on disk
+
                     return tr("Size");
                 case InfoColumn:
-                    //: special warnings?
+
                     return tr("Info");
                 default:
                     return QVariant();
@@ -340,13 +340,13 @@ Qt::ItemFlags WorldList::flags(const QModelIndex& index) const
 
 Qt::DropActions WorldList::supportedDragActions() const
 {
-    // move to other mod lists or VOID
+
     return Qt::MoveAction;
 }
 
 Qt::DropActions WorldList::supportedDropActions() const
 {
-    // copy from outside, move from within and other mod lists
+
     return Qt::CopyAction | Qt::MoveAction;
 }
 
@@ -368,17 +368,17 @@ bool WorldList::dropMimeData(const QMimeData* data,
 {
     if (action == Qt::IgnoreAction)
         return true;
-    // check if the action is supported
+
     if (!data || !(action & supportedDropActions()))
         return false;
-    // files dropped from outside?
+
     if (data->hasUrls()) {
         bool was_watching = m_isWatching;
         if (was_watching)
             stopWatching();
         auto urls = data->urls();
         for (auto url : urls) {
-            // only local files may be dropped...
+
             if (!url.isLocalFile())
                 continue;
             QString filename = url.toLocalFile();
@@ -426,7 +426,6 @@ void WorldList::loadWorldsAsync()
                     if (row < m_worlds.size() && m_worlds[row].container() == file) {
                         m_worlds[row].setSize(size);
 
-                        // Notify views
                         QModelIndex modelIndex = index(row, SizeColumn);
                         emit dataChanged(modelIndex, modelIndex, { SizeRole });
                     }

@@ -2,18 +2,15 @@
 
 #include <QStyledItemDelegate>
 
-/* Custom data types for our custom list models :) */
 enum UserDataTypes {
-    TITLE = 257,        // QString
-    DESCRIPTION = 258,  // QString
-    INSTALLED = 259     // bool
+    TITLE = 257,
+
+    DESCRIPTION = 258,
+
+    INSTALLED = 259
+
 };
 
-/** This is an item delegate composed of:
- *  - An Icon on the left
- *  - A title
- *  - A description
- * */
 class ProjectItemDelegate final : public QStyledItemDelegate {
     Q_OBJECT
 

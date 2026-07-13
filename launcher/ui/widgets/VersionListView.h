@@ -36,12 +36,12 @@ class VersionListView : public QTreeView {
     virtual void rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end) override;
     virtual void rowsInserted(const QModelIndex& parent, int start, int end) override;
 
-   private: /* methods */
+   private:
     void paintInfoLabel(QPaintEvent* event) const;
     void updateEmptyViewPort();
     QString currentEmptyString() const;
 
-   private: /* variables */
+   private:
     int m_itemCount = 0;
     QString m_emptyString;
     QString m_emptyErrorString;

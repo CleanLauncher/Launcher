@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -26,7 +26,6 @@ class ModModel : public ResourceModel {
    public:
     ModModel(BaseInstance&, ResourceAPI* api, QString debugName, QString metaEntryBase);
 
-    /* Ask the API for more information */
     void searchWithTerm(const QString& term, unsigned int sort, bool filter_changed);
 
     void setFilter(std::shared_ptr<ModFilterWidget::Filter> filter) { m_filter = filter; }
@@ -56,4 +55,4 @@ class ModModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}  // namespace ResourceDownload
+}

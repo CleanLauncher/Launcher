@@ -120,7 +120,6 @@ void PackFetchTask::fileDownloadFinished(QByteArray* publicPtr, QByteArray* thir
         failedLists.append(tr("Third Party Packs"));
     }
 
-    // NOTE(TheKodeToad): we don't want to reset the jobPtr earlier as it may invalidate the responses!
     jobPtr.reset();
 
     if (failedLists.size() > 0) {
@@ -159,7 +158,6 @@ bool PackFetchTask::parseAndAddPacks(QByteArray& data, PackType packType, Modpac
         modpack.broken = false;
         modpack.bugged = false;
 
-        // remove empty if the xml is bugged
         for (QString curr : modpack.oldVersions) {
             if (curr.isNull() || curr.isEmpty()) {
                 modpack.oldVersions.removeAll(curr);
@@ -202,4 +200,4 @@ void PackFetchTask::fileDownloadAborted()
     emit aborted();
 }
 
-}  // namespace LegacyFTB
+}

@@ -24,7 +24,6 @@
 #include <QUrl>
 #include <compare>
 
-/// qDebug print support for the Version class
 QDebug operator<<(QDebug debug, const Version& v)
 {
     const QDebugStateSaver saver(debug);
@@ -47,14 +46,14 @@ QDebug operator<<(QDebug debug, const Version& v)
 
 std::strong_ordering Version::Section::operator<=>(const Section& other) const
 {
-    // If both components are numeric, compare numerically (codepoint-wise)
+
     if (this->t == Type::Numeric && other.t == Type::Numeric) {
         auto aLen = this->value.size();
         if (aLen != other.value.size()) {
-            // Lengths differ; compare by length
+
             return aLen <=> other.value.size();
         }
-        // Compare by digits
+
         auto cmp = QString::compare(this->value, other.value);
         if (cmp < 0) {
             return std::strong_ordering::less;
@@ -64,7 +63,7 @@ std::strong_ordering Version::Section::operator<=>(const Section& other) const
         }
         return std::strong_ordering::equal;
     }
-    // One or both are null
+
     if (this->t == Type::Null) {
         if (other.t == Type::PreRelease) {
             return std::strong_ordering::greater;
@@ -77,17 +76,17 @@ std::strong_ordering Version::Section::operator<=>(const Section& other) const
         }
         return std::strong_ordering::greater;
     }
-    // Textual comparison (differing type, or both textual/pre-release)
+
     auto minLen = qMin(this->value.size(), other.value.size());
     for (int i = 0; i < minLen; i++) {
         auto a = this->value.at(i);
         auto b = other.value.at(i);
         if (a != b) {
-            // Compare by rune
+
             return a.unicode() <=> b.unicode();
         }
     }
-    // Compare by length
+
     return this->value.size() <=> other.value.size();
 }
 
@@ -96,7 +95,7 @@ void removeLeadingZeros(QString& s)
 {
     s.remove(0, std::distance(s.begin(), std::ranges::find_if_not(s, [](QChar c) { return c == '0'; })));
 }
-}  // namespace
+}
 
 void Version::parse()
 {
@@ -105,32 +104,35 @@ void Version::parse()
         Section cur(Section::Type::Textual);
         auto c = m_string.at(i);
         if (c == '+') {
-            break;  // Ignore appendices
+            break;
+
         }
-        // custom: the space is special to handle the strings like "1.20 Pre-Release 1"
-        // this is needed to support Modrinth versions
+
         if (c == '-' || c == ' ') {
-            // Add dash to component
+
             cur.value += c;
             i++;
-            // If the next rune is non-digit, mark as pre-release (requires >= 1 non-digit after dash so the component has length > 1)
+
             if (i < len && !m_string.at(i).isDigit()) {
                 cur.t = Section::Type::PreRelease;
             }
         } else if (c.isDigit()) {
-            // Mark as numeric
+
             cur.t = Section::Type::Numeric;
         }
         for (; i < len; i++) {
             auto r = m_string.at(i);
-            if ((r.isDigit() != (cur.t == Section::Type::Numeric))   // starts a new section
-                || (r == ' ' && cur.t == Section::Type::Numeric)     // custom: numeric section then a space is a pre-release
-                || (r == '-' && cur.t != Section::Type::PreRelease)  // "---" is a valid pre-release component
+            if ((r.isDigit() != (cur.t == Section::Type::Numeric))
+
+                || (r == ' ' && cur.t == Section::Type::Numeric)
+
+                || (r == '-' && cur.t != Section::Type::PreRelease)
+
                 || r == '+') {
-                // Run completed (do not consume this rune)
+
                 break;
             }
-            // Add rune to current run
+
             cur.value += r;
         }
         if (!cur.value.isEmpty()) {

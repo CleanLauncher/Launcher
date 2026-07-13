@@ -77,7 +77,7 @@ void AuthFlow::nextStep()
         return;
     }
     if (m_steps.size() == 0) {
-        // we got to the end without an incident... assume this is all.
+
         m_currentStep.reset();
         succeed();
         return;

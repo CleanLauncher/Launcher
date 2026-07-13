@@ -189,7 +189,7 @@ void JavaWizardWidget::initialize()
     m_versionWidget->selectSearch();
     m_versionWidget->setResizeOn(2);
     auto s = APPLICATION->settings();
-    // Memory
+
     observedMinMemory = s->get("MinMemAlloc").toInt();
     observedMaxMemory = s->get("MaxMemAlloc").toInt();
     observedPermGenMemory = s->get("PermGen").toInt();
@@ -219,13 +219,14 @@ JavaWizardWidget::ValidationStatus JavaWizardWidget::validate()
     switch (javaStatus) {
         default:
         case JavaStatus::NotSet:
-            /* fallthrough */
+
         case JavaStatus::DoesNotExist:
-            /* fallthrough */
+
         case JavaStatus::DoesNotStart:
-            /* fallthrough */
+
         case JavaStatus::ReturnedInvalidData: {
-            if (!(BuildConfig.JAVA_DOWNLOADER_ENABLED && m_autodownloadCheckBox->isChecked())) {  // the java will not be autodownloaded
+            if (!(BuildConfig.JAVA_DOWNLOADER_ENABLED && m_autodownloadCheckBox->isChecked())) {
+
                 int button = QMessageBox::No;
                 if (m_result.mojangPlatform == "32" && maxHeapSize() > 2048) {
                     button = CustomMessageBox::selectable(
@@ -258,7 +259,7 @@ JavaWizardWidget::ValidationStatus JavaWizardWidget::validate()
                         DesktopServices::openUrl(QUrl(BuildConfig.HELP_URL.arg("java-wizard")));
                         [[fallthrough]];
                     case QMessageBox::No:
-                    /* fallthrough */
+
                     default:
                         return ValidationStatus::Bad;
                 }
@@ -401,7 +402,7 @@ void JavaWizardWidget::on_javaStatusBtn_clicked()
                         .arg(m_result.realPlatform, m_result.javaVersion.toString());
             break;
         case JavaStatus::Pending:
-            // TODO: abort here?
+
             return;
     }
     CustomMessageBox::selectable(this, failed ? QObject::tr("Java test failure") : QObject::tr("Java test success"), text,

@@ -70,4 +70,4 @@ class ListModel : public QAbstractListModel {
     void getLogo(const QString& logo, LogoCallback callback);
 };
 
-}  // namespace LegacyFTB
+}

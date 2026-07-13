@@ -54,9 +54,6 @@ ThemeManager::~ThemeManager()
     stopSettingNewWindowColorsOnMac();
 }
 
-/// @brief Adds the Theme to the list of themes
-/// @param theme The Theme to add
-/// @return Theme ID
 QString ThemeManager::addTheme(std::unique_ptr<ITheme> theme)
 {
     QString id = theme->id();
@@ -67,9 +64,6 @@ QString ThemeManager::addTheme(std::unique_ptr<ITheme> theme)
     return id;
 }
 
-/// @brief Gets the Theme from the List via ID
-/// @param themeId Theme ID of theme to fetch
-/// @return Theme at themeId
 ITheme* ThemeManager::getTheme(QString themeId)
 {
     return m_themes[themeId].get();
@@ -87,17 +81,15 @@ QString ThemeManager::addIconTheme(IconTheme theme)
 
 void ThemeManager::initializeThemes()
 {
-    // Icon themes
+
     initializeIcons();
 
-    // Initialize widget themes
     initializeWidgets();
 }
 
 void ThemeManager::initializeIcons()
 {
-    // TODO: icon themes and instance icons do not mesh well together. Rearrange and fix discrepancies!
-    // set icon theme search path!
+
     themeDebugLog() << "<> Initializing Icon Themes";
 
     for (const QString& id : builtinIcons) {

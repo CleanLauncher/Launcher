@@ -27,7 +27,7 @@ class BaseEntityLoadTask;
 class BaseEntity {
     friend BaseEntityLoadTask;
 
-   public: /* types */
+   public:
     using Ptr = std::shared_ptr<BaseEntity>;
     enum class LoadStatus { NotLoaded, Local, Remote };
 
@@ -39,15 +39,15 @@ class BaseEntity {
     bool isLoaded() const;
     LoadStatus status() const;
 
-    /* for parsers */
     void setSha256(QString sha256);
 
     virtual void parse(const QJsonObject& obj) = 0;
     [[nodiscard]] Task::Ptr loadTask(Net::Mode loadType = Net::Mode::Online, bool forceReload = false);
 
    protected:
-    QString m_sha256;       // the expected sha256
-    QString m_file_sha256;  // the file sha256
+    QString m_sha256;
+
+    QString m_file_sha256;
 
    private:
     LoadStatus m_load_status = LoadStatus::NotLoaded;
@@ -71,4 +71,4 @@ class BaseEntityLoadTask : public Task {
     bool m_force_reload = false;
     NetJob::Ptr m_task;
 };
-}  // namespace Meta
+}

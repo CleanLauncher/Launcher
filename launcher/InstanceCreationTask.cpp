@@ -31,7 +31,6 @@ void InstanceCreationTask::executeTask()
         return;
     }
 
-    // When the user aborted in the update stage.
     if (m_abort) {
         emitAborted();
         return;
@@ -54,9 +53,6 @@ void InstanceCreationTask::executeTask()
         return;
     }
 
-    // If this is set, it means we're updating an instance. So, we now need to remove the
-    // files scheduled to, and we'd better not let the user abort in the middle of it, since it'd
-    // put the instance in an invalid state.
     if (shouldOverride()) {
         bool deleteFailed = false;
 
@@ -133,7 +129,8 @@ void InstanceCreationTask::scheduleToDelete(QWidget* parent, const QDir& dir, co
     qDebug() << "Scheduling" << path << "for removal";
     m_filesToRemove.append(dir.absoluteFilePath(path));
     if (checkDisabled) {
-        if (path.endsWith(".disabled")) {  // remove it if it was enabled/disabled by user
+        if (path.endsWith(".disabled")) {
+
             m_filesToRemove.append(dir.absoluteFilePath(path.chopped(9)));
         } else {
             m_filesToRemove.append(dir.absoluteFilePath(path + ".disabled"));

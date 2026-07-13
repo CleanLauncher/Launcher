@@ -101,7 +101,8 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                         return isOnlyVersion ? i.version == ver_dep.version : i.addonId == ver_dep.addonId;
                                     });
             dep != c_dependencies.end()) {
-            continue;  // check the current dependency list
+            continue;
+
         }
 
         if (auto dep = std::find_if(m_selected.begin(), m_selected.end(),
@@ -110,7 +111,8 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                                                                                    : i->pack->addonId == ver_dep.addonId);
                                     });
             dep != m_selected.end()) {
-            continue;  // check the selected versions
+            continue;
+
         }
 
         if (auto dep = std::find_if(m_mods.begin(), m_mods.end(),
@@ -119,7 +121,8 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                                (isOnlyVersion ? i->file_id == ver_dep.version : i->project_id == ver_dep.addonId);
                                     });
             dep != m_mods.end()) {
-            continue;  // check the existing mods
+            continue;
+
         }
 
         if (auto dep = std::find_if(m_pack_dependencies.begin(), m_pack_dependencies.end(),
@@ -127,7 +130,8 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                         return i->pack->provider == providerName && (isOnlyVersion ? i->version.version == ver_dep.addonId
                                                                                                    : i->pack->addonId == ver_dep.addonId);
                                     });
-            dep != m_pack_dependencies.end()) {  // check loaded dependencies
+            dep != m_pack_dependencies.end()) {
+
             continue;
         }
 
@@ -195,7 +199,8 @@ Task::Ptr GetModDependenciesTask::prepareDependencyTask(const ModPlatform::Depen
     callbacks.on_succeed = [dep, provider, pDep, level, this](auto& pack) {
         pDep->version = pack;
         if (!pDep->version.addonId.isValid()) {
-            if (m_loaderType & ModPlatform::Quilt) {  // falback for quilt
+            if (m_loaderType & ModPlatform::Quilt) {
+
                 auto overide = ModPlatform::getOverrideDeps();
                 auto over = std::find_if(overide.cbegin(), overide.cend(),
                                          [dep, provider](const auto& o) { return o.provider == provider && dep.addonId == o.quilt; });
@@ -284,28 +289,20 @@ auto GetModDependenciesTask::getExtraInfo() -> QHash<QString, PackDependencyExtr
     return rby;
 }
 
-// super lax compare (but not fuzzy)
-// convert to lowercase
-// convert all speratores to whitespace
-// simplify sequence of internal whitespace to a single space
-// efectivly compare two strings ignoring all separators and case
 auto laxCompare = [](QString fsfilename, QString metadataFilename, bool excludeDigits = false) {
-    // allowed character seperators
+
     QList<QChar> allowedSeperators = { '-', '+', '.', '_' };
     if (excludeDigits)
         allowedSeperators.append({ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
 
-    // copy in lowercase
     auto fsName = fsfilename.toLower();
     auto metaName = metadataFilename.toLower();
 
-    // replace all potential allowed seperatores with whitespace
     for (auto sep : allowedSeperators) {
         fsName = fsName.replace(sep, ' ');
         metaName = metaName.replace(sep, ' ');
     }
 
-    // remove extraneous whitespace
     fsName = fsName.simplified();
     metaName = metaName.simplified();
 
@@ -319,21 +316,23 @@ bool GetModDependenciesTask::isLocalyInstalled(std::shared_ptr<PackDependency> p
            std::find_if(m_selected.begin(), m_selected.end(),
                         [pDep](std::shared_ptr<PackDependency> i) {
                             return !i->version.fileName.isEmpty() && laxCompare(i->version.fileName, pDep->version.fileName);
-                        }) != m_selected.end() ||  // check the selected versions
+                        }) != m_selected.end() ||
 
            std::find_if(m_mods_file_names.begin(), m_mods_file_names.end(),
                         [pDep](QString i) { return !i.isEmpty() && laxCompare(i, pDep->version.fileName); }) !=
-               m_mods_file_names.end() ||  // check the existing mods
+               m_mods_file_names.end() ||
 
            std::find_if(m_pack_dependencies.begin(), m_pack_dependencies.end(), [pDep](std::shared_ptr<PackDependency> i) {
                return pDep->pack->addonId != i->pack->addonId && !i->version.fileName.isEmpty() &&
                       laxCompare(pDep->version.fileName, i->version.fileName);
-           }) != m_pack_dependencies.end();  // check loaded dependencies
+           }) != m_pack_dependencies.end();
+
 }
 
 bool GetModDependenciesTask::maybeInstalled(std::shared_ptr<PackDependency> pDep)
 {
     return std::find_if(m_mods_file_names.begin(), m_mods_file_names.end(), [pDep](QString i) {
                return !i.isEmpty() && laxCompare(i, pDep->version.fileName, true);
-           }) != m_mods_file_names.end();  // check the existing mods
+           }) != m_mods_file_names.end();
+
 }

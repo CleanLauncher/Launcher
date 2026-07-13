@@ -69,9 +69,8 @@ class FtbPage : public QWidget, public ModpackProviderBasePage {
 
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    /** Programatically set the term in the search bar. */
     virtual void setSearchTerm(QString) override;
-    /** Get the current term in the search bar. */
+
     [[nodiscard]] virtual QString getSerachTerm() const override;
 
    private:

@@ -17,7 +17,6 @@
 
 #include <QCoreApplication>
 
-// collections
 #include <QByteArray>
 #include <QHash>
 #include <QList>
@@ -62,4 +61,4 @@
 #include <QUuid>
 #include <QtMath>
 
-#endif  // LAUNCHER_PRECOMPILED_QTCORE_HEADERS_H
+#endif

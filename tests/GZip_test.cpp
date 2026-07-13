@@ -16,7 +16,7 @@ class GZipTest : public QObject {
 
     void test_Through()
     {
-        // test up to 10 MB
+
         static const int size = 10 * 1024 * 1024;
         QByteArray random;
         QByteArray compressed;
@@ -24,16 +24,13 @@ class GZipTest : public QObject {
         std::default_random_engine eng((std::random_device())());
         std::uniform_int_distribution<uint16_t> idis(0, std::numeric_limits<uint8_t>::max());
 
-        // initialize random buffer
         for (int i = 0; i < size; i++) {
             random.append(static_cast<char>(idis(eng)));
         }
 
-        // initialize fibonacci
         int prev = 1;
         int cur = 1;
 
-        // test if fibonacci long random buffers pass through GZip
         do {
             QByteArray copy = random;
             copy.resize(cur);

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "FlameAPI.h"
@@ -161,7 +161,7 @@ std::pair<Task::Ptr, QByteArray*> FlameAPI::getFile(const QString& addonId, cons
 
 QList<ResourceAPI::SortingMethod> FlameAPI::getSortingMethods() const
 {
-    // https://docs.curseforge.com/?python#tocS_ModsSearchSortField
+
     return { { 1, "Featured", QObject::tr("Sort by Featured") },
              { 2, "Popularity", QObject::tr("Sort by Popularity") },
              { 3, "LastUpdated", QObject::tr("Sort by Last Updated") },
@@ -254,14 +254,14 @@ std::optional<ModPlatform::IndexedVersion> FlameAPI::getLatestVersion(QList<ModP
             }
         }
     }
-    // edge case: mod has installed for forge but the instance is fabric => fabric version will be prioritizated on update
+
     auto currentLoaders = instanceLoaders + ModPlatform::modLoaderTypesToList(modLoaders);
-    currentLoaders.append(noLoader);  // add a fallback in case the versions do not define a loader
+    currentLoaders.append(noLoader);
 
     for (auto loader : currentLoaders) {
         if (bestMatch.contains(loader)) {
             auto bestForLoader = bestMatch.value(loader);
-            // awkward case where the mod has only two loaders and one of them is not specified
+
             if (loader != noLoader && bestMatch.contains(noLoader) && bestMatch.size() == 2) {
                 auto bestForNoLoader = bestMatch.value(noLoader);
                 if (bestForNoLoader.date > bestForLoader.date) {

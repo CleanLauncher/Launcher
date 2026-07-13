@@ -111,7 +111,6 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
 
 #if defined Q_OS_WIN32
     {
-        // Windows needs to use this method, thanks I hate it.
 
         auto widePath = fileInfo.absoluteFilePath().toStdWString();
         HANDLE file_handle = CreateFileW(widePath.data(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -132,8 +131,6 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
     }
 #else
     {
-        // this only works for multibyte encoded filenames if the local is properly set,
-        // a wide character version doesn't seem to exist: here's hoping...
 
         QByteArray utf8 = fileInfo.absoluteFilePath().toUtf8();
         const char* cpath = utf8.constData();
@@ -143,18 +140,13 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
             return false;
         }
 
-        // This should handle the copying of most attributes
         archive_entry_copy_stat(entry, &st);
     }
 #endif
 
-    // However:
-    // "The [filetype] constants used by stat(2) may have different numeric values from the corresponding [libarchive constants]."
-    // - `archive_entry_stat(3)`
     if (fileInfo.isSymLink()) {
         archive_entry_set_filetype(entry, AE_IFLNK);
 
-        // We also need to manually copy some attributes from the link itself, as `stat` above operates on its target
         auto target = fileInfo.symLinkTarget().toUtf8();
         archive_entry_set_symlink_utf8(entry, target.constData());
         archive_entry_set_size(entry, 0);
@@ -250,4 +242,4 @@ std::unique_ptr<archive, void (*)(archive*)> ArchiveWriter::createDiskWriter()
 
     return extPtr;
 }
-}  // namespace MMCZip
+}

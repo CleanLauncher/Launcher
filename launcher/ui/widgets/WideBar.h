@@ -9,8 +9,7 @@
 
 class WideBar : public QToolBar {
     Q_OBJECT
-    // Why: so we can enable / disable alt shortcuts in toolbuttons
-    // with toolbuttons using setDefaultAction, theres no alt shortcuts
+
     Q_PROPERTY(bool useDefaultAction MEMBER m_use_default_action)
 
    public:
@@ -32,9 +31,6 @@ class WideBar : public QToolBar {
 
     void addContextMenuAction(QAction* action);
 
-    // Ideally we would use a QBitArray for this, but it doesn't support string conversion,
-    // so using it in settings is very messy.
-
     QByteArray getVisibilityState() const;
     void setVisibilityState(QByteArray&&);
 
@@ -49,7 +45,6 @@ class WideBar : public QToolBar {
 
     auto getMatching(QAction* act) -> QList<BarEntry>::iterator;
 
-    /** Used to distinguish between versions of the WideBar with different actions */
     QByteArray getHash() const;
     bool checkHash(QByteArray const&) const;
 
@@ -60,7 +55,6 @@ class WideBar : public QToolBar {
 
     bool m_use_default_action = false;
 
-    // Menu to toggle visibility from buttons in the bar
     std::unique_ptr<QMenu> m_bar_menu = nullptr;
     enum class MenuState { Fresh, Dirty } m_menu_state = MenuState::Dirty;
 };

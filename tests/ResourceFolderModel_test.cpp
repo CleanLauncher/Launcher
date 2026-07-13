@@ -65,13 +65,12 @@ class ResourceFolderModelTest : public QObject {
     Q_OBJECT
 
    private slots:
-    // test for GH-1178 - install a folder with files to a mod list
+
     void test_1178()
     {
-        // source
+
         QString source = QFINDTESTDATA("testdata/Resources/test_folder");
 
-        // sanity check
         QVERIFY(!source.endsWith('/'));
 
         auto verify = [](QString path) {
@@ -80,7 +79,6 @@ class ResourceFolderModelTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // 1. test with no trailing /
         {
             QString folder = source;
             QTemporaryDir tempDir;
@@ -106,7 +104,6 @@ class ResourceFolderModelTest : public QObject {
             verify(tempDir.path());
         }
 
-        // 2. test with trailing /
         {
             QString folder = source + '/';
             QTemporaryDir tempDir;

@@ -99,7 +99,7 @@ QString getSupportedJavaArchitecture()
             return "windows-x64";
         if (arch == "i386")
             return "windows-x86";
-        // Unknown, maybe arm, appending arch
+
         return "windows-" + arch;
     }
     if (sys == "osx") {
@@ -109,16 +109,16 @@ QString getSupportedJavaArchitecture()
             return "mac-os-x64";
         if (arch.contains("86"))
             return "mac-os-x86";
-        // Unknown, maybe something new, appending arch
+
         return "mac-os-" + arch;
     } else if (sys == "linux") {
         if (arch == "x86_64")
             return "linux-x64";
         if (arch == "i386")
             return "linux-x86";
-        // will work for arm32 arm(64)
+
         return "linux-" + arch;
     }
     return {};
 }
-}  // namespace SysInfo
+}

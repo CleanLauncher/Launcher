@@ -3,7 +3,6 @@
 #include "settings/SettingsObject.h"
 #include "tasks/Task.h"
 
-/* Helpers */
 enum class InstanceNameChange { ShouldChange, ShouldKeep };
 [[nodiscard]] InstanceNameChange askForChangingInstanceName(QWidget* parent, const QString& old_name, const QString& new_name);
 enum class ShouldUpdate { Update, SkipUpdating, Cancel };
@@ -61,7 +60,7 @@ class InstanceTask : public Task, public InstanceName {
             m_original_instance_id = instance_id_to_override;
     }
 
-   protected: /* data */
+   protected:
     SettingsObject* m_globalSettings;
     QString m_instIcon;
     QString m_instGroup;

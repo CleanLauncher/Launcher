@@ -71,7 +71,6 @@ void ExternalToolsPage::loadSettings()
     ui->jvisualvmPathEdit->setText(s->get("JVisualVMPath").toString());
     ui->mceditPathEdit->setText(s->get("MCEditPath").toString());
 
-    // Editors
     ui->jsonEditorTextBox->setText(s->get("JsonEditor").toString());
 }
 void ExternalToolsPage::applySettings()
@@ -82,7 +81,6 @@ void ExternalToolsPage::applySettings()
     s->set("JVisualVMPath", ui->jvisualvmPathEdit->text());
     s->set("MCEditPath", ui->mceditPathEdit->text());
 
-    // Editors
     QString jsonEditor = ui->jsonEditorTextBox->text();
     if (!jsonEditor.isEmpty() && (!QFileInfo(jsonEditor).exists() || !QFileInfo(jsonEditor).isExecutable())) {
         QString found = QStandardPaths::findExecutable(jsonEditor);
@@ -200,7 +198,6 @@ void ExternalToolsPage::on_jsonEditorBrowseBtn_clicked()
     }
     QString cooked_file = FS::NormalizePath(raw_file);
 
-    // it has to exist and be an executable
     if (QFileInfo(cooked_file).exists() && QFileInfo(cooked_file).isExecutable()) {
         ui->jsonEditorTextBox->setText(cooked_file);
     } else {

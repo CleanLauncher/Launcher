@@ -166,11 +166,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -199,11 +197,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -233,11 +229,9 @@ class FileSystemTest : public QObject {
             QVERIFY(!target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -268,11 +262,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList(filter).contains(".secret_file.txt"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -341,11 +333,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -355,7 +345,7 @@ class FileSystemTest : public QObject {
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
         auto f = [&folder]() {
-            // use working dir to prevent makeing a hard link to a tmpfs or across devices
+
             QTemporaryDir tempDir("./tmp");
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -390,11 +380,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -436,11 +424,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -483,11 +469,9 @@ class FileSystemTest : public QObject {
             QVERIFY(!target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -530,11 +514,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList(filter).contains(".secret_file.txt"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -615,11 +597,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();
@@ -670,11 +650,9 @@ class FileSystemTest : public QObject {
             QVERIFY(target_dir.entryList().contains("assets"));
         };
 
-        // first try variant without trailing /
         QVERIFY(!folder.endsWith('/'));
         f();
 
-        // then variant with trailing /
         folder.append('/');
         QVERIFY(folder.endsWith('/'));
         f();

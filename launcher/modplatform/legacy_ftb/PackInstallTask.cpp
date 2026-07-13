@@ -125,7 +125,7 @@ void PackInstallTask::install()
     progress(3, 4);
     QDir unzipMcDir(m_stagingPath + "/unzip/minecraft");
     if (unzipMcDir.exists()) {
-        // ok, found minecraft dir, move contents to instance dir
+
         if (!FS::move(m_stagingPath + "/unzip/minecraft", m_stagingPath + "/minecraft")) {
             emitFailed(tr("Failed to move unpacked Minecraft!"));
             return;
@@ -143,7 +143,6 @@ void PackInstallTask::install()
 
         bool fallback = true;
 
-        // handle different versions
         QFile packJson(m_stagingPath + "/minecraft/pack.json");
         QDir jarmodDir = QDir(m_stagingPath + "/unzip/instMods");
         if (packJson.exists()) {
@@ -151,7 +150,6 @@ void PackInstallTask::install()
                 QJsonDocument doc = QJsonDocument::fromJson(packJson.readAll());
                 packJson.close();
 
-                // we only care about the libs
                 QJsonArray libs = doc.object().value("libraries").toArray();
 
                 for (const auto& value : libs) {
@@ -186,11 +184,10 @@ void PackInstallTask::install()
             fallback = false;
         }
 
-        // just nuke unzip directory, it s not needed anymore
         FS::deletePath(m_stagingPath + "/unzip");
 
         if (fallback) {
-            // TODO: Some fallback mechanism... or just keep failing!
+
             emitFailed(tr("No installation method found!"));
             return;
         }
@@ -219,4 +216,4 @@ bool PackInstallTask::abort()
     return InstanceTask::abort();
 }
 
-}  // namespace LegacyFTB
+}

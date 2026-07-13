@@ -57,13 +57,12 @@
 #include <QApplication>
 #include <QProcess>
 
-// FIXME: possibly move elsewhere
 enum InstSortMode {
-    // Sort alphabetically by name.
+
     Sort_Name,
-    // Sort by which instance was launched most recently.
+
     Sort_LastLaunch,
-    // Sort by which instance has the most playtime.
+
     Sort_Playtime,
 };
 
@@ -95,7 +94,6 @@ void LauncherPage::on_instDirBrowseBtn_clicked()
 {
     QString rawDir = QFileDialog::getExistingDirectory(this, tr("Instance Folder"), ui->instDirTextBox->text());
 
-    // do not allow current dir - it's dirty. Do not allow dirs that don't exist
     if (!rawDir.isEmpty() && QDir(rawDir).exists()) {
         QString cookedDir = FS::NormalizePath(rawDir);
         if (FS::checkProblemticPathJava(QDir(cookedDir))) {
@@ -138,7 +136,6 @@ void LauncherPage::on_iconsDirBrowseBtn_clicked()
 {
     QString rawDir = QFileDialog::getExistingDirectory(this, tr("Icons Folder"), ui->iconsDirTextBox->text());
 
-    // do not allow current dir - it's dirty. Do not allow dirs that don't exist
     if (!rawDir.isEmpty() && QDir(rawDir).exists()) {
         QString cookedDir = FS::NormalizePath(rawDir);
         ui->iconsDirTextBox->setText(cookedDir);
@@ -149,7 +146,6 @@ void LauncherPage::on_modsDirBrowseBtn_clicked()
 {
     QString rawDir = QFileDialog::getExistingDirectory(this, tr("Mods Folder"), ui->modsDirTextBox->text());
 
-    // do not allow current dir - it's dirty. Do not allow dirs that don't exist
     if (!rawDir.isEmpty() && QDir(rawDir).exists()) {
         QString cookedDir = FS::NormalizePath(rawDir);
         ui->modsDirTextBox->setText(cookedDir);
@@ -180,7 +176,6 @@ void LauncherPage::on_skinsDirBrowseBtn_clicked()
 {
     QString rawDir = QFileDialog::getExistingDirectory(this, tr("Skins Folder"), ui->skinsDirTextBox->text());
 
-    // do not allow current dir - it's dirty. Do not allow dirs that don't exist
     if (!rawDir.isEmpty() && QDir(rawDir).exists()) {
         QString cookedDir = FS::NormalizePath(rawDir);
         ui->skinsDirTextBox->setText(cookedDir);
@@ -196,7 +191,6 @@ void LauncherPage::applySettings()
 {
     auto* s = APPLICATION->settings();
 
-    // Updates
     if (APPLICATION->updater()) {
         APPLICATION->updater()->setAutomaticallyChecksForUpdates(ui->autoUpdateCheckBox->isChecked());
         APPLICATION->updater()->setUpdateCheckInterval(ui->updateIntervalSpinBox->value() * 3600);
@@ -209,12 +203,9 @@ void LauncherPage::applySettings()
     s->set("NumberOfManualRetries", ui->numberOfManualRetriesSpinBox->value());
     s->set("RequestTimeout", ui->timeoutSecondsSpinBox->value());
 
-    // Console settings
     s->set("ConsoleMaxLines", ui->lineLimitSpinBox->value());
     s->set("ConsoleOverflowStop", ui->checkStopLogging->checkState() != Qt::Unchecked);
 
-    // Folders
-    // TODO: Offer to move instances to new instance folder.
     s->set("InstanceDir", ui->instDirTextBox->text());
     s->set("CentralModsDir", ui->modsDirTextBox->text());
     s->set("IconsDir", ui->iconsDirTextBox->text());
@@ -224,7 +215,6 @@ void LauncherPage::applySettings()
     s->set("DownloadsDirWatchRecursive", ui->downloadsDirWatchRecursiveCheckBox->isChecked());
     s->set("MoveModsFromDownloadsDir", ui->downloadsDirMoveCheckBox->isChecked());
 
-    // Instance
     auto sortMode = (InstSortMode)ui->sortingModeGroup->checkedId();
     switch (sortMode) {
         case Sort_LastLaunch:
@@ -247,7 +237,6 @@ void LauncherPage::applySettings()
         s->set("InstRenamingMode", "MetadataOnly");
     }
 
-    // Mods
     s->set("ModMetadataDisabled", !ui->metadataEnableBtn->isChecked());
     s->set("ModDependenciesDisabled", !ui->dependenciesEnableBtn->isChecked());
     s->set("ShowModIncompat", ui->showModIncompatCheckBox->isChecked());
@@ -257,7 +246,7 @@ void LauncherPage::applySettings()
 void LauncherPage::loadSettings()
 {
     auto* s = APPLICATION->settings();
-    // Updates
+
     if (APPLICATION->updater()) {
         ui->autoUpdateCheckBox->setChecked(APPLICATION->updater()->getAutomaticallyChecksForUpdates());
         ui->updateIntervalSpinBox->setValue(APPLICATION->updater()->getUpdateCheckInterval() / 3600);
@@ -270,11 +259,9 @@ void LauncherPage::loadSettings()
     ui->numberOfManualRetriesSpinBox->setValue(s->get("NumberOfManualRetries").toInt());
     ui->timeoutSecondsSpinBox->setValue(s->get("RequestTimeout").toInt());
 
-    // Console settings
     ui->lineLimitSpinBox->setValue(s->get("ConsoleMaxLines").toInt());
     ui->checkStopLogging->setChecked(s->get("ConsoleOverflowStop").toBool());
 
-    // Folders
     ui->instDirTextBox->setText(s->get("InstanceDir").toString());
     ui->modsDirTextBox->setText(s->get("CentralModsDir").toString());
     ui->iconsDirTextBox->setText(s->get("IconsDir").toString());
@@ -284,7 +271,6 @@ void LauncherPage::loadSettings()
     ui->downloadsDirWatchRecursiveCheckBox->setChecked(s->get("DownloadsDirWatchRecursive").toBool());
     ui->downloadsDirMoveCheckBox->setChecked(s->get("MoveModsFromDownloadsDir").toBool());
 
-    // Instance
     QString sortMode = s->get("InstSortMode").toString();
     if (sortMode == "LastLaunch") {
         ui->sortLastLaunchedBtn->setChecked(true);
@@ -299,7 +285,6 @@ void LauncherPage::loadSettings()
     ui->alwaysRenameDirBtn->setChecked(renamingMode == "PhysicalDir");
     ui->neverRenameDirBtn->setChecked(renamingMode == "MetadataOnly");
 
-    // Mods
     ui->metadataEnableBtn->setChecked(!s->get("ModMetadataDisabled").toBool());
     ui->metadataWarningLabel->setHidden(ui->metadataEnableBtn->isChecked());
     ui->dependenciesEnableBtn->setChecked(!s->get("ModDependenciesDisabled").toBool());

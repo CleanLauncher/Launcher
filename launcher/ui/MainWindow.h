@@ -160,9 +160,6 @@ class MainWindow : public QMainWindow {
 
     void taskEnd();
 
-    /**
-     * called when an icon is changed in the icon model.
-     */
     void iconUpdated(QString);
 
     void showInstanceContextMenu(const QPoint&);
@@ -222,7 +219,7 @@ class MainWindow : public QMainWindow {
 
    private:
     Ui::MainWindow* ui;
-    // these are managed by Qt's memory management model!
+
     InstanceView* view = nullptr;
     InstanceProxyModel* proxymodel = nullptr;
     QToolButton* newsLabel = nullptr;
@@ -240,6 +237,5 @@ class MainWindow : public QMainWindow {
     BaseInstance* m_selectedInstance = nullptr;
     QString m_currentInstIcon;
 
-    // managed by the application object
     Task* m_versionLoadTask = nullptr;
 };

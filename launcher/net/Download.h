@@ -58,14 +58,10 @@ class Download : public NetRequest {
     static auto makeCached(QUrl url, MetaEntryPtr entry, Options options = Option::NoOptions) -> Download::Ptr;
 #endif
 
-    /**
-     * Creates a request downloading to the returned QByteArray,.
-     * The QByteArray will live as long as the Download object.
-     */
     static auto makeByteArray(QUrl url, Options options = Option::NoOptions) -> std::pair<Download::Ptr, QByteArray*>;
     static auto makeFile(QUrl url, QString path, Options options = Option::NoOptions) -> Download::Ptr;
 
    protected:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
 };
-}  // namespace Net
+}

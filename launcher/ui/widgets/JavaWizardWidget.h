@@ -55,13 +55,13 @@ class JavaWizardWidget : public QWidget {
     void javaDownloadBtn_clicked();
     void checkFinished(const JavaChecker::Result& result);
 
-   protected: /* methods */
+   protected:
     void checkJavaPathOnEdit(const QString& path);
     void checkJavaPath(const QString& path);
     void setJavaStatus(JavaStatus status);
     void setupUi();
 
-   private: /* data */
+   private:
     VersionSelectWidget* m_versionWidget = nullptr;
     QVBoxLayout* m_verticalLayout = nullptr;
     QSpacerItem* m_verticalSpacer = nullptr;

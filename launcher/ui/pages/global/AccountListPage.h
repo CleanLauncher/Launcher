@@ -82,7 +82,6 @@ class AccountListPage : public QMainWindow, public BasePage {
 
     void listChanged();
 
-    //! Updates the states of the dialog's buttons.
     void updateButtonStates();
 
    protected slots:

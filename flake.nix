@@ -20,9 +20,6 @@
     let
       inherit (nixpkgs) lib;
 
-      # While we only officially support aarch and x86_64 on Linux and MacOS,
-      # we expose a reasonable amount of other systems for users who want to
-      # build for most exotic platforms
       systems = lib.systems.flakeExposed;
 
       forAllSystems = lib.genAttrs systems;
@@ -101,22 +98,17 @@
             And thanks for helping out :)
           '';
 
-          # Re-use our package wrapper to wrap our development environment
           qt-wrapper-env = packages'.launcher.overrideAttrs (old: {
             name = "qt-wrapper-env";
 
-            # Required to use script-based makeWrapper below
             strictDeps = true;
 
-            # We don't need/want the unwrapped Launcher package
             paths = [ ];
 
             nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [
-              # Ensure the wrapper is script based so it can be sourced
               pkgs.makeWrapper
             ];
 
-            # Inspired by https://discourse.nixos.org/t/python-qt-woes/11808/10
             buildCommand = ''
               makeQtWrapper ${lib.getExe pkgs.runtimeShellPackage} "$out"
               sed -i '/^exec/d' "$out"
@@ -133,7 +125,7 @@
             packages = [
               pkgs.ccache
               llvm.clang-tools
-              python # NOTE(@getchoo): Required for run-clang-tidy, etc.
+              python
 
               (pkgs.stdenvNoCC.mkDerivation {
                 pname = "clang-tidy-diff";
@@ -202,21 +194,17 @@
         let
           pkgs = nixpkgsFor.${system};
 
-          # Build a scope from our overlay
           launcherPackages = lib.makeScope pkgs.newScope (final: self.overlays.default final pkgs);
 
-          # Grab our packages from it and set the default
           packages = {
             inherit (launcherPackages) launcher-unwrapped launcher;
             default = launcherPackages.launcher;
           };
         in
 
-        # Only output them if they're available on the current system
         lib.filterAttrs (_: lib.meta.availableOn pkgs.stdenv.hostPlatform) packages
       );
 
-      # We put these under legacyPackages as they are meant for CI, not end user consumption
       legacyPackages = forAllSystems (
         system:
 

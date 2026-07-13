@@ -143,14 +143,16 @@ static void loadVersionFile(FTB::VersionFile& a, QJsonObject& obj)
     a.path = Json::requireString(obj, "path");
     a.name = Json::requireString(obj, "name");
     a.version = Json::requireString(obj, "version");
-    a.url = obj["url"].toString();  // optional
+    a.url = obj["url"].toString();
+
     a.sha1 = Json::requireString(obj, "sha1");
     a.size = obj["size"].toInt();
     a.clientOnly = Json::requireBoolean(obj, "clientonly");
     a.serverOnly = Json::requireBoolean(obj, "serveronly");
     a.optional = Json::requireBoolean(obj, "optional");
     a.updated = Json::requireInteger(obj, "updated");
-    auto curseforgeObj = obj["curseforge"].toObject();  // optional
+    auto curseforgeObj = obj["curseforge"].toObject();
+
     a.curseforge.project_id = curseforgeObj["project"].toInt();
     a.curseforge.file_id = curseforgeObj["file"].toInt();
 }

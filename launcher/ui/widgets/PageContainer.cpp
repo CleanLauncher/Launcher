@@ -71,7 +71,7 @@ class PageEntryFilterModel : public QSortFilterProxyModel {
         if (!page->shouldDisplay()) {
             return false;
         }
-        // Regular contents check, then check page-filter.
+
         return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
     }
 };
@@ -117,7 +117,7 @@ PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, 
 
 bool PageContainer::selectPage(QString pageId)
 {
-    // now find what we want to have selected...
+
     auto* page = m_model->findPageEntryById(pageId);
     QModelIndex index;
     if (page) {
@@ -156,7 +156,7 @@ void PageContainer::refreshContainer()
         if (index.isValid()) {
             m_pageList->setCurrentIndex(index);
         } else {
-            // FIXME: unhandled corner case: what to do when there's no page to select?
+
         }
     }
 }

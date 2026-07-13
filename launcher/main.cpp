@@ -44,11 +44,10 @@
 int main(int argc, char* argv[])
 {
 #if defined Q_OS_WIN32
-    // used on Windows to attach the standard IO streams
+
     console::WindowsConsoleGuard _consoleGuard;
 #endif
 
-    // initialize Qt
     Application app(argc, argv);
     switch (app.status()) {
         case Application::StartingUp:

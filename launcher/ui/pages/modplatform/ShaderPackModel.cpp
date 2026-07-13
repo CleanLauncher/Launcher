@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ShaderPackModel.h"
@@ -15,8 +15,6 @@ ShaderPackResourceModel::ShaderPackResourceModel(const BaseInstance& base_inst,
                                                  QString metaEntryBase)
     : ResourceModel(api), m_base_instance(base_inst), m_debugName(debugName + " (Model)"), m_metaEntryBase(std::move(metaEntryBase))
 {}
-
-/******** Make data requests ********/
 
 ResourceAPI::SearchArgs ShaderPackResourceModel::createSearchArguments()
 {
@@ -58,4 +56,4 @@ void ShaderPackResourceModel::searchWithTerm(const QString& term, unsigned int s
     refresh();
 }
 
-}  // namespace ResourceDownload
+}

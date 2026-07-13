@@ -98,7 +98,7 @@ void ModrinthPackExportTask::collectHashes()
         QCoreApplication::processEvents();
 
         const QString relative = gameRoot.relativeFilePath(file.absoluteFilePath());
-        // require sensible file types
+
         if (!std::any_of(PREFIXES.begin(), PREFIXES.end(), [&relative](const QString& prefix) { return relative.startsWith(prefix); }))
             continue;
         if (!std::any_of(FILE_EXTENSIONS.begin(), FILE_EXTENSIONS.end(), [&relative](const QString& extension) {
@@ -125,7 +125,7 @@ void ModrinthPackExportTask::collectHashes()
             const Mod* mod = *modIter;
             if (mod->metadata() != nullptr) {
                 const QUrl& url = mod->metadata()->url;
-                // ensure the url is permitted on modrinth.com
+
                 if (!url.isEmpty() && BuildConfig.MODRINTH_MRPACK_HOSTS.contains(url.host())) {
                     qDebug() << "Resolving" << relative << "from index";
 
@@ -134,8 +134,6 @@ void ModrinthPackExportTask::collectHashes()
                     ResolvedFile resolvedFile{ sha1, sha512, url.toEncoded(), openFile.size(), mod->metadata()->side };
                     resolvedFiles[relative] = resolvedFile;
 
-                    // nice! we've managed to resolve based on local metadata!
-                    // no need to enqueue it
                     continue;
                 }
             }
@@ -183,7 +181,7 @@ void ModrinthPackExportTask::parseApiResponse(QByteArray* response)
             if (auto fileIter = std::find_if(files_array.begin(), files_array.end(),
                                              [&iterator](const QJsonValue& file) { return file["hashes"]["sha512"] == iterator.value(); });
                 fileIter != files_array.end()) {
-                // map the file to the url
+
                 resolvedFiles[iterator.key()] =
                     ResolvedFile{ fileIter->toObject()["hashes"].toObject()["sha1"].toString(), iterator.value(),
                                   fileIter->toObject()["url"].toString(), fileIter->toObject()["size"].toInt() };
@@ -245,14 +243,13 @@ QByteArray ModrinthPackExportTask::generateIndex()
 
     if (mcInstance) {
         auto profile = mcInstance->getPackProfile();
-        // collect all supported components
+
         const ComponentPtr minecraft = profile->getComponent("net.minecraft");
         const ComponentPtr quilt = profile->getComponent("org.quiltmc.quilt-loader");
         const ComponentPtr fabric = profile->getComponent("net.fabricmc.fabric-loader");
         const ComponentPtr forge = profile->getComponent("net.minecraftforge");
         const ComponentPtr neoForge = profile->getComponent("net.neoforged");
 
-        // convert all available components to mrpack dependencies
         QJsonObject dependencies;
         if (minecraft != nullptr)
             dependencies["minecraft"] = minecraft->m_version;
@@ -277,10 +274,9 @@ QByteArray ModrinthPackExportTask::generateIndex()
 
         QJsonObject env;
 
-        // detect disabled mod
         const QFileInfo pathInfo(path);
         if (optionalFiles && pathInfo.suffix() == "disabled") {
-            // rename it
+
             path = pathInfo.dir().filePath(pathInfo.completeBaseName());
             env["client"] = "optional";
             env["server"] = "optional";
@@ -289,8 +285,6 @@ QByteArray ModrinthPackExportTask::generateIndex()
             env["server"] = "required";
         }
 
-        // a server side mod does not imply that the mod does not work on the client
-        // however, if a mrpack mod is marked as server-only it will not install on the client
         if (iterator->side == ModPlatform::Side::ClientSide)
             env["server"] = "unsupported";
 

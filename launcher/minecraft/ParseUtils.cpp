@@ -11,7 +11,7 @@ QDateTime timeFromS3Time(QString str)
 
 QString timeToS3Time(QDateTime time)
 {
-    // this all because Qt can't format timestamps right.
+
     int offsetRaw = time.offsetFromUtc();
     bool negative = offsetRaw < 0;
     int offsetAbs = std::abs(offsetRaw);

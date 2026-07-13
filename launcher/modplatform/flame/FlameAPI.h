@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -59,7 +59,7 @@ class FlameAPI : public ResourceAPI {
 
     static int getMappedModLoader(ModPlatform::ModLoaderType loaders)
     {
-        // https://docs.curseforge.com/?http#tocS_ModLoaderType
+
         switch (loaders) {
             case ModPlatform::Forge:
                 return 1;
@@ -80,7 +80,8 @@ class FlameAPI : public ResourceAPI {
             case ModPlatform::Ornithe:
             case ModPlatform::Rift:
             case ModPlatform::None:
-                break;  // not supported
+                break;
+
         }
         return 0;
     }
@@ -149,7 +150,7 @@ class FlameAPI : public ResourceAPI {
         if (resourceType != ModPlatform::ResourceType::TexturePack) {
             return arr;
         }
-        // FIXME: Client-side version filtering. This won't take into account any user-selected filtering.
+
         const auto& mc_versions = arr.mcVersion;
 
         if (std::any_of(mc_versions.constBegin(), mc_versions.constEnd(),

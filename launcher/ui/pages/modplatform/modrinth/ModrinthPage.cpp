@@ -155,7 +155,8 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         };
         callbacks.on_succeed = [this, id, curr](auto& pack) {
             if (id != m_current->addonId) {
-                return;  // wrong request?
+                return;
+
             }
 
             QVariant current_updated;
@@ -181,10 +182,11 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
         auto addonId = m_current->addonId;
-        // Use default if no callbacks are set
+
         callbacks.on_succeed = [this, curr, addonId](auto& doc) {
             if (addonId != m_current->addonId) {
-                return;  // wrong request
+                return;
+
             }
 
             m_current->versions = doc;
@@ -364,7 +366,7 @@ void ModrinthPage::createFilterWidget()
     auto widget = ModFilterWidget::create(nullptr, true);
     m_filterWidget.swap(widget);
     auto old = m_ui->splitter->replaceWidget(0, m_filterWidget.get());
-    // because we replaced the widget we also need to delete it
+
     if (old) {
         delete old;
     }

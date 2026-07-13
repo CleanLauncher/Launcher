@@ -91,7 +91,6 @@ class Index;
 #endif
 #define APPLICATION (static_cast<Application*>(QCoreApplication::instance()))
 
-// Used for checking if is a test
 #if defined(APPLICATION_DYN)
 #undef APPLICATION_DYN
 #endif
@@ -158,10 +157,6 @@ class Application : public QApplication {
 
     void detectLibraries();
 
-    /*!
-     * Finds and returns the full path to a jar file.
-     * Returns a null-string if it could not be found.
-     */
     QString getJarPath(QString jarFile);
 
     QString getMSAClientID();
@@ -170,23 +165,16 @@ class Application : public QApplication {
     QString getModrinthAPIToken();
     QString getUserAgent();
 
-    /// this is the root of the 'installation'. Used for automatic updates
     const QString& root() { return m_rootPath; }
 
-    /// the data path the application is using
     const QString& dataRoot() { return m_dataPath; }
 
-    /// the java installed path the application is using
     const QString javaPath();
 
     bool isPortable() { return m_portable; }
 
     const Capabilities capabilities() { return m_capabilities; }
 
-    /*!
-     * Opens a json file using either a system default editor, or, if not empty, the editor
-     * specified in the settings
-     */
     bool openJsonEditor(const QString& filename);
 
     InstanceWindow* showInstanceWindow(BaseInstance* instance, QString page = QString());
@@ -236,7 +224,6 @@ class Application : public QApplication {
     bool createSetupWizard();
     void performMainStartupAction();
 
-    // sets the fatal error message and m_status to Failed.
     void showFatalErrorMessage(const QString& title, const QString& content);
 
    private:
@@ -281,7 +268,6 @@ class Application : public QApplication {
     Qt::ApplicationState m_prevAppState = Qt::ApplicationInactive;
 #endif
 
-    // FIXME: attach to instances instead.
     struct InstanceXtras {
         InstanceWindow* window = nullptr;
         std::unique_ptr<LaunchController> controller;
@@ -289,18 +275,14 @@ class Application : public QApplication {
     std::map<QString, InstanceXtras> m_instanceExtras;
     mutable QMutex m_instanceExtrasMutex;
 
-    // main state variables
     size_t m_openWindows = 0;
     size_t m_runningInstances = 0;
     bool m_updateRunning = false;
 
-    // main window, if any
     MainWindow* m_mainWindow = nullptr;
 
-    // log window, if any
     ViewLogWindow* m_viewLogWindow = nullptr;
 
-    // peer launcher instance connector - used to implement single instance launcher and signalling
     LocalPeer* m_peerInstance = nullptr;
 
     SetupWizard* m_setupWizard = nullptr;

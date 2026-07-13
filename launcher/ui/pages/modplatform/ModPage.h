@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -20,7 +20,6 @@ namespace ResourceDownload {
 
 class ModDownloadDialog;
 
-/* This page handles most logic related to browsing and selecting mods to download. */
 class ModPage : public ResourcePage {
     Q_OBJECT
 
@@ -42,16 +41,15 @@ class ModPage : public ResourcePage {
         return page;
     }
 
-    //: The plural version of 'mod'
     QString resourcesString() const override { return tr("mods"); }
-    //: The singular version of 'mods'
+
     QString resourceString() const override { return tr("mod"); }
 
     QMap<QString, QString> urlHandlers() const override;
 
-    void addResourceToPage(ModPlatform::IndexedPack::Ptr /*unused*/,
-                           ModPlatform::IndexedVersion& /*unused*/,
-                           ResourceFolderModel* /*unused*/,
+    void addResourceToPage(ModPlatform::IndexedPack::Ptr ,
+                           ModPlatform::IndexedVersion& ,
+                           ResourceFolderModel* ,
                            QString downloadReason = "standalone") override;
 
     virtual std::unique_ptr<ModFilterWidget> createFilterWidget() = 0;
@@ -74,4 +72,4 @@ class ModPage : public ResourcePage {
     std::shared_ptr<ModFilterWidget::Filter> m_filter;
 };
 
-}  // namespace ResourceDownload
+}

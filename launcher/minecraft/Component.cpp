@@ -84,7 +84,7 @@ std::shared_ptr<Meta::Version> Component::getMeta()
 
 void Component::applyTo(LaunchProfile* profile)
 {
-    // do not apply disabled components
+
     if (!isEnabled()) {
         return;
     }
@@ -107,7 +107,7 @@ std::shared_ptr<class VersionFile> Component::getVersionFile() const
 
 std::shared_ptr<class Meta::VersionList> Component::getVersionList() const
 {
-    // FIXME: what if the metadata index isn't loaded yet?
+
     if (APPLICATION->metadataIndex()->hasUid(m_uid)) {
         return APPLICATION->metadataIndex()->get(m_uid);
     }
@@ -163,7 +163,7 @@ QDateTime Component::getReleaseDateTime()
     if (vfile) {
         return vfile->releaseTime;
     }
-    // FIXME: fake
+
     return QDateTime::currentDateTime();
 }
 
@@ -218,7 +218,7 @@ bool Component::isRevertible()
 
 bool Component::isMoveable()
 {
-    // HACK, FIXME: this was too dumb and wouldn't follow dependency constraints anyway. For now hardcoded to 'true'.
+
     return true;
 }
 
@@ -303,26 +303,26 @@ void Component::setVersion(const QString& version)
     }
     m_version = version;
     if (m_loaded) {
-        // we are loaded and potentially have state to invalidate
+
         if (m_file) {
-            // we have a file... explicit version has been changed and there is nothing else to do.
+
         } else {
-            // we don't have a file, therefore we are loaded with metadata
+
             m_cachedVersion = version;
-            // see if the meta version is loaded
+
             auto metaVersion = APPLICATION->metadataIndex()->get(m_uid, version);
             if (metaVersion->isLoaded()) {
-                // if yes, we can continue with that.
+
                 m_metaVersion = metaVersion;
             } else {
-                // if not, we need loading
+
                 m_metaVersion.reset();
                 m_loaded = false;
             }
             updateCachedData();
         }
     } else {
-        // not loaded... assume it will be sorted out later by the update task
+
     }
     emit dataChanged();
 }
@@ -337,7 +337,7 @@ bool Component::customize()
     if (!FS::ensureFilePathExists(filename)) {
         return false;
     }
-    // FIXME: get rid of this try-catch.
+
     try {
         QSaveFile jsonFile(filename);
         if (!jsonFile.open(QIODevice::WriteOnly)) {
@@ -364,20 +364,19 @@ bool Component::customize()
 bool Component::revert()
 {
     if (!isCustom()) {
-        // already not custom
+
         return true;
     }
     auto filename = getFilename();
     bool result = true;
-    // just kill the file and reload
+
     if (QFile::exists(filename)) {
         result = FS::deletePath(filename);
     }
     if (result) {
-        // file gone...
+
         m_file.reset();
 
-        // check local cache for metadata...
         auto version = APPLICATION->metadataIndex()->get(m_uid, m_version);
         if (version->isLoaded()) {
             m_metaVersion = version;
@@ -390,14 +389,9 @@ bool Component::revert()
     return result;
 }
 
-/**
- * deep inspecting compare for requirement sets
- * By default, only uids are compared for set operations.
- * This compares all fields of the Require structs in the sets.
- */
 static bool deepCompare(const std::set<Meta::Require>& a, const std::set<Meta::Require>& b)
 {
-    // NOTE: this needs to be rewritten if the type of Meta::RequireSet changes
+
     if (a.size() != b.size()) {
         return false;
     }
@@ -443,7 +437,7 @@ void Component::updateCachedData()
             emit dataChanged();
         }
     } else {
-        // in case we removed all the metadata
+
         m_cachedRequires.clear();
         m_cachedConflicts.clear();
         emit dataChanged();
@@ -454,7 +448,7 @@ void Component::waitLoadMeta()
 {
     if (!m_loaded) {
         if (!m_metaVersion || !m_metaVersion->isLoaded()) {
-            // wait for the loaded version from meta
+
             m_metaVersion = APPLICATION->metadataIndex()->getLoadedVersion(m_uid, m_version);
         }
         m_loaded = true;

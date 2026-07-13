@@ -72,7 +72,7 @@ bool ConcurrentTask::abort()
     m_queue.clear();
 
     if (m_doing.isEmpty()) {
-        // Don't call emitAborted() here, we want to bypass the 'is the task running' check
+
         emit aborted();
         emit finished();
 
@@ -123,7 +123,8 @@ void ConcurrentTask::executeNextSubTask()
             } else if (m_failed.count() == 1) {
                 auto task = m_failed.keys().first();
                 auto reason = task->failReason();
-                if (reason.isEmpty()) {  // clearly a bug somewhere
+                if (reason.isEmpty()) {
+
                     reason = tr("Task failed");
                 }
                 emitFailed(reason);
@@ -152,7 +153,7 @@ void ConcurrentTask::startSubTask(Task::Ptr next)
 {
     connect(next.get(), &Task::succeeded, this, [this, next]() { subTaskSucceeded(next); });
     connect(next.get(), &Task::failed, this, [this, next](QString msg) { subTaskFailed(next, msg); });
-    // this should never happen but if it does, it's better to fail the task than get stuck
+
     connect(next.get(), &Task::aborted, this, [this, next] { subTaskFailed(next, "Aborted"); });
 
     connect(next.get(), &Task::status, this, [this, next](QString msg) { subTaskStatus(next, msg); });

@@ -85,4 +85,4 @@ class ChecksumValidator : public Validator {
     QCryptographicHash m_checksum;
     QByteArray m_expected;
 };
-}  // namespace Net
+}

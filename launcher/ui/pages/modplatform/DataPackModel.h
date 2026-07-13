@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
 // SPDX-FileCopyrightText: 2023 TheKodeToad <TheKodeToad@proton.me>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -23,7 +23,6 @@ class DataPackResourceModel : public ResourceModel {
    public:
     DataPackResourceModel(BaseInstance const&, ResourceAPI*, QString, QString);
 
-    /* Ask the API for more information */
     void searchWithTerm(const QString& term, unsigned int sort);
 
     [[nodiscard]] QString debugName() const override { return m_debugName; }
@@ -42,4 +41,4 @@ class DataPackResourceModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}  // namespace ResourceDownload
+}

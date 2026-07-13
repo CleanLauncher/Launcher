@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022-2023 Sefa Eyeoglu <contact@scrumplex.net>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 
 /*
@@ -288,7 +288,7 @@ void VersionPage::on_actionRemove_triggered()
         if (response != QMessageBox::Yes)
             return;
     }
-    // FIXME: use actual model, not reloading.
+
     if (!m_profile->remove(index)) {
         QMessageBox::critical(this, tr("Error"), tr("Couldn't remove file"));
     }
@@ -378,7 +378,6 @@ void VersionPage::on_actionChange_version_triggered()
     }
     auto uid = list->uid();
 
-    // recommend the correct lwjgl version for the current minecraft version
     if (uid == "org.lwjgl" || uid == "org.lwjgl3") {
         auto minecraft = m_profile->getComponent("net.minecraft");
         auto lwjglReq = std::find_if(minecraft->m_cachedRequires.cbegin(), minecraft->m_cachedRequires.cend(),
@@ -441,7 +440,7 @@ void VersionPage::on_actionDownload_All_triggered()
     }
     ProgressDialog tDialog(this);
     connect(task.get(), &Task::failed, this, &VersionPage::onGameUpdateError);
-    // FIXME: unused return value
+
     tDialog.execWithTask(task.get());
     updateButtons();
     m_container->refreshContainer();
@@ -532,11 +531,11 @@ void VersionPage::on_actionCustomize_triggered()
     }
     auto patch = m_profile->getComponent(version);
     if (!patch->getVersionFile()) {
-        // TODO: wait for the update task to finish here...
+
         return;
     }
     if (!m_profile->customize(version)) {
-        // TODO: some error box here
+
     }
     updateButtons();
     preselect(currentIdx);
@@ -576,7 +575,7 @@ void VersionPage::on_actionRevert_triggered()
         return;
 
     if (!m_profile->revertToBase(version)) {
-        // TODO: some error box here
+
     }
     updateButtons();
     preselect(currentIdx);

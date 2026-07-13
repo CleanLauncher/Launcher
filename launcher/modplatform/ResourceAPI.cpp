@@ -55,9 +55,6 @@ Task::Ptr ResourceAPI::searchProjects(SearchArgs&& args, Callback<QList<ModPlatf
         callbacks.on_succeed(newList);
     });
 
-    // Capture a weak_ptr instead of a shared_ptr to avoid circular dependency issues.
-    // This prevents the lambda from extending the lifetime of the shared resource,
-    // as it only temporarily locks the resource when needed.
     auto weak = netJob.toWeakRef();
     QObject::connect(netJob.get(), &NetJob::failed, [weak, callbacks](const QString& reason) {
         int network_error_code = -1;
@@ -110,13 +107,14 @@ Task::Ptr ResourceAPI::getProjectVersions(VersionSearchArgs&& args, Callback<QVe
                     file.addonId = args.pack->addonId;
                 }
 
-                if (file.fileId.isValid() && !file.downloadUrl.isEmpty()) {  // Heuristic to check if the returned value is valid
+                if (file.fileId.isValid() && !file.downloadUrl.isEmpty()) {
+
                     unsortedVersions.append(file);
                 }
             }
 
             auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-                // dates are in RFC 3339 format
+
                 return a.date > b.date;
             };
             std::sort(unsortedVersions.begin(), unsortedVersions.end(), orderSortPredicate);
@@ -128,9 +126,6 @@ Task::Ptr ResourceAPI::getProjectVersions(VersionSearchArgs&& args, Callback<QVe
         callbacks.on_succeed(unsortedVersions);
     });
 
-    // Capture a weak_ptr instead of a shared_ptr to avoid circular dependency issues.
-    // This prevents the lambda from extending the lifetime of the shared resource,
-    // as it only temporarily locks the resource when needed.
     auto weak = netJob.toWeakRef();
     QObject::connect(netJob.get(), &NetJob::failed, [weak, callbacks](const QString& reason) {
         int network_error_code = -1;
@@ -174,9 +169,7 @@ Task::Ptr ResourceAPI::getProjectInfo(ProjectInfoArgs&& args, Callback<ModPlatfo
         }
         callbacks.on_succeed(pack);
     });
-    // Capture a weak_ptr instead of a shared_ptr to avoid circular dependency issues.
-    // This prevents the lambda from extending the lifetime of the shared resource,
-    // as it only temporarily locks the resource when needed.
+
     auto weak = job.toWeakRef();
     QObject::connect(job.get(), &NetJob::failed, [weak, callbacks](const QString& reason) {
         int network_error_code = -1;
@@ -234,12 +227,13 @@ Task::Ptr ResourceAPI::getDependencyVersion(DependencySearchArgs&& args, Callbac
                 file.addonId = args.dependency.addonId;
 
             if (file.fileId.isValid() &&
-                (!file.loaders || args.loader & file.loaders))  // Heuristic to check if the returned value is valid
+                (!file.loaders || args.loader & file.loaders))
+
                 versions.append(file);
         }
 
         auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-            // dates are in RFC 3339 format
+
             return a.date > b.date;
         };
         std::sort(versions.begin(), versions.end(), orderSortPredicate);
@@ -247,9 +241,6 @@ Task::Ptr ResourceAPI::getDependencyVersion(DependencySearchArgs&& args, Callbac
         callbacks.on_succeed(bestMatch);
     });
 
-    // Capture a weak_ptr instead of a shared_ptr to avoid circular dependency issues.
-    // This prevents the lambda from extending the lifetime of the shared resource,
-    // as it only temporarily locks the resource when needed.
     auto weak = netJob.toWeakRef();
     QObject::connect(netJob.get(), &NetJob::failed, [weak, callbacks](const QString& reason) {
         int network_error_code = -1;
@@ -268,7 +259,8 @@ QString ResourceAPI::getGameVersionsString(std::vector<Version> mcVersions) cons
     for (auto& ver : mcVersions) {
         s += QString("\"%1\",").arg(mapMCVersionToModrinth(ver));
     }
-    s.remove(s.length() - 1, 1);  // remove last comma
+    s.remove(s.length() - 1, 1);
+
     return s;
 }
 

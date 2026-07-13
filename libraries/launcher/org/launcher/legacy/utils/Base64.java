@@ -42,10 +42,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Uses Base64 with Java 8 or later, otherwise DatatypeConverter. In the latter
- * case, reflection is used to allow using newer compilers.
- */
 public final class Base64 {
     private static boolean supported = true;
     private static MethodHandle legacy;
@@ -65,11 +61,6 @@ public final class Base64 {
         }
     }
 
-    /**
-     * Determines whether base64 is supported.
-     *
-     * @return <code>true</code> if base64 can be parsed
-     */
     public static boolean isSupported() {
         return supported;
     }

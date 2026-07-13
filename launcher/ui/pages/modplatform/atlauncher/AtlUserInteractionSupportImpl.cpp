@@ -63,12 +63,10 @@ QString AtlUserInteractionSupportImpl::chooseVersion(Meta::VersionList::Ptr vlis
     }
     vselect.setEmptyErrorString(tr("Couldn't load or download the version lists!"));
 
-    // select recommended build
     for (int i = 0; i < vlist->versions().size(); i++) {
         auto version = vlist->versions().at(i);
         auto reqs = version->requiredSet();
 
-        // filter by minecraft version, if the loader depends on a certain version.
         if (minecraftVersion != nullptr) {
             auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Meta::Require& req) { return req.uid == "net.minecraft"; });
             if (iter == reqs.end())
@@ -77,7 +75,6 @@ QString AtlUserInteractionSupportImpl::chooseVersion(Meta::VersionList::Ptr vlis
                 continue;
         }
 
-        // first recommended build we find, we use.
         if (version->isRecommended()) {
             vselect.setCurrentVersion(version->descriptor());
             break;

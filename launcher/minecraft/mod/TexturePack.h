@@ -36,16 +36,12 @@ class TexturePack : public Resource {
     TexturePack(QObject* parent = nullptr) : Resource(parent) {}
     TexturePack(QFileInfo file_info) : Resource(file_info) {}
 
-    /** Gets the description of the texture pack. */
     QString description() const { return m_description; }
 
-    /** Gets the image of the texture pack, converted to a QPixmap for drawing, and scaled to size. */
     QPixmap image(QSize size, Qt::AspectRatioMode mode = Qt::AspectRatioMode::IgnoreAspectRatio) const;
 
-    /** Thread-safe. */
     void setDescription(QString new_description);
 
-    /** Thread-safe. */
     void setImage(QImage new_image) const;
 
     bool valid() const override;
@@ -53,15 +49,8 @@ class TexturePack : public Resource {
    protected:
     mutable QMutex m_data_lock;
 
-    /** The texture pack's description, as defined in the pack.txt file.
-     */
     QString m_description;
 
-    /** The texture pack's image file cache key, for access in the QPixmapCache global instance.
-     *
-     *  The 'was_ever_used' state simply identifies whether the key was never inserted on the cache (true),
-     *  so as to tell whether a cache entry is inexistent or if it was just evicted from the cache.
-     */
     struct {
         QPixmapCache::Key key;
         bool was_ever_used = false;

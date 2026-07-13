@@ -10,4 +10,4 @@ std::optional<QString> uploadPaste(const QString& name, const QString& data, QWi
 void setClipboardText(QString text);
 QStringList BrowseForFiles(QString context, QString caption, QString filter, QString defaultPath, QWidget* parentWidget);
 QString BrowseForFile(QString context, QString caption, QString filter, QString defaultPath, QWidget* parentWidget);
-}  // namespace GuiUtil
+}

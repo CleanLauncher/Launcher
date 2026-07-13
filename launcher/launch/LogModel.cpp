@@ -36,10 +36,10 @@ void LogModel::append(MessageLevel level, QString line)
         return;
     }
     int lineNum = (m_firstLine + m_numLines) % m_maxLines;
-    // overflow
+
     if (m_numLines == m_maxLines) {
         if (m_stopOnOverflow) {
-            // nothing more to do, the buffer is full
+
             return;
         }
         beginRemoveRows(QModelIndex(), 0, 0);
@@ -89,27 +89,27 @@ QString LogModel::toPlainText()
 
 void LogModel::setMaxLines(int maxLines)
 {
-    // no-op
+
     if (maxLines == m_maxLines) {
         return;
     }
-    // if it all still fits in the buffer, just resize it
+
     if (m_firstLine + m_numLines < m_maxLines) {
         m_maxLines = maxLines;
         m_content.resize(maxLines);
         return;
     }
-    // otherwise, we need to reorganize the data because it crosses the wrap boundary
+
     QList<entry> newContent;
     newContent.resize(maxLines);
     if (m_numLines <= maxLines) {
-        // if it all fits in the new buffer, just copy it over
+
         for (int i = 0; i < m_numLines; i++) {
             newContent[i] = m_content[(m_firstLine + i) % m_maxLines];
         }
         m_content.swap(newContent);
     } else {
-        // if it doesn't fit, part of the data needs to be thrown away (the oldest log messages)
+
         int lead = m_numLines - maxLines;
         beginRemoveRows(QModelIndex(), 0, lead - 1);
         for (int i = 0; i < maxLines; i++) {

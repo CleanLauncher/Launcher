@@ -106,7 +106,7 @@ void LaunchProfile::applyTraits(const QSet<QString>& traits)
 
 void LaunchProfile::applyTweakers(const QStringList& tweakers)
 {
-    // if the applied tweakers override an existing one, skip it. this effectively moves it later in the sequence
+
     QStringList newTweakers;
     for (auto& tweaker : m_tweakers) {
         if (tweakers.contains(tweaker)) {
@@ -114,7 +114,7 @@ void LaunchProfile::applyTweakers(const QStringList& tweakers)
         }
         newTweakers.append(tweaker);
     }
-    // then just append the new tweakers (or moved original ones)
+
     newTweakers += tweakers;
     m_tweakers = newTweakers;
 }
@@ -129,7 +129,7 @@ static int findLibraryByName(QList<LibraryPtr>* haystack, const GradleSpecifier&
     int retval = -1;
     for (int i = 0; i < haystack->size(); ++i) {
         if (haystack->at(i)->rawName().matchName(needle)) {
-            // only one is allowed.
+
             if (retval != -1)
                 return -1;
             retval = i;
@@ -144,16 +144,15 @@ void LaunchProfile::applyMods(const QList<LibraryPtr>& mods)
     for (auto& mod : mods) {
         auto modCopy = Library::limitedCopy(mod);
 
-        // find the mod by name.
         const int index = findLibraryByName(list, mod->rawName());
-        // mod not found? just add it.
+
         if (index < 0) {
             list->append(modCopy);
             return;
         }
 
         auto existingLibrary = list->at(index);
-        // if we are higher it means we should update
+
         if (Version(mod->version()) > Version(existingLibrary->version())) {
             list->replace(index, modCopy);
         }
@@ -184,16 +183,15 @@ void LaunchProfile::applyLibrary(LibraryPtr library, const RuntimeContext& runti
 
     auto libraryCopy = Library::limitedCopy(library);
 
-    // find the library by name.
     const int index = findLibraryByName(list, library->rawName());
-    // library not found? just add it.
+
     if (index < 0) {
         list->append(libraryCopy);
         return;
     }
 
     auto existingLibrary = list->at(index);
-    // if we are higher it means we should update
+
     if (Version(library->version()) > Version(existingLibrary->version())) {
         list->replace(index, libraryCopy);
     }
@@ -209,7 +207,6 @@ void LaunchProfile::applyMavenFile(LibraryPtr mavenFile, const RuntimeContext& r
         return;
     }
 
-    // unlike libraries, we do not keep only one version or try to dedupe them
     m_mavenFiles.append(Library::limitedCopy(mavenFile));
 }
 
@@ -248,7 +245,7 @@ void LaunchProfile::applyProblemSeverity(ProblemSeverity severity)
 
 const QList<PatchProblem> LaunchProfile::getProblems() const
 {
-    // FIXME: implement something that actually makes sense here
+
     return {};
 }
 
@@ -358,9 +355,9 @@ void LaunchProfile::getLibraryFiles(const RuntimeContext& runtimeContext,
     for (auto lib : getLibraries()) {
         lib->getApplicableFiles(runtimeContext, jars, nativeJars, native32, native64, overridePath);
     }
-    // NOTE: order is important here, add main jar last to the lists
+
     if (m_mainJar) {
-        // FIXME: HACK!! jar modding is weird and unsystematic!
+
         if (m_jarMods.size() && addJarMods) {
             QDir tempDir(tempPath);
             jars.append(tempDir.absoluteFilePath("minecraft.jar"));

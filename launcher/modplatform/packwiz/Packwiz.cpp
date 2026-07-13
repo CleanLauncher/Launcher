@@ -45,7 +45,7 @@ auto getRealIndexName(const QDir& indexDir, const QString& normalizedFname, bool
 
     QString realFname = normalizedFname;
     if (!indexFile.exists()) {
-        // Tries to get similar entries
+
         for (auto& fileName : indexDir.entryList(QDir::Filter::Files)) {
             if (QString::compare(normalizedFname, fileName, Qt::CaseInsensitive) == 0) {
                 realFname = fileName;
@@ -63,7 +63,6 @@ auto getRealIndexName(const QDir& indexDir, const QString& normalizedFname, bool
     return realFname;
 }
 
-// Helpers
 auto indexFileName(const QString& modSlug) -> QString
 {
     if (modSlug.endsWith(".pw.toml")) {
@@ -72,7 +71,6 @@ auto indexFileName(const QString& modSlug) -> QString
     return QString("%1.pw.toml").arg(modSlug);
 }
 
-// Helper functions for extracting data from the TOML file
 auto stringEntry(toml::table table, const QString& entryName) -> QString
 {
     auto* node = table.get(StringUtils::toStdString(entryName));
@@ -104,7 +102,8 @@ bool sortMCVersions(const QString& a, const QString& b)
     return cmp == std::strong_ordering::less;
 }
 
-}  // namespace
+}
+
 auto V1::createModFormat([[maybe_unused]] const QDir& index_dir,
                          ModPlatform::IndexedPack& mod_pack,
                          ModPlatform::IndexedVersion& mod_version) -> Mod
@@ -136,7 +135,8 @@ auto V1::createModFormat([[maybe_unused]] const QDir& index_dir,
     mod.releaseType = mod_version.version_type;
 
     mod.version_number = mod_version.version_number;
-    if (mod.version_number.isNull())  // on CurseForge, there is only a version name - not a version number
+    if (mod.version_number.isNull())
+
         mod.version_number = mod_version.version;
 
     mod.dependencies = mod_version.dependencies;
@@ -150,8 +150,6 @@ void V1::updateModIndex(const QDir& index_dir, Mod& mod)
         return;
     }
 
-    // Ensure the corresponding mod's info exists, and create it if not
-
     auto normalized_fname = indexFileName(mod.slug);
     auto real_fname = getRealIndexName(index_dir, normalized_fname);
 
@@ -160,10 +158,6 @@ void V1::updateModIndex(const QDir& index_dir, Mod& mod)
     if (real_fname != normalized_fname)
         index_file.rename(normalized_fname);
 
-    // There's already data on there!
-    // TODO: We should do more stuff here, as the user is likely trying to
-    // override a file. In this case, check versions and ask the user what
-    // they want to do!
     if (index_file.exists()) {
         index_file.remove();
     } else {
@@ -218,7 +212,6 @@ void V1::updateModIndex(const QDir& index_dir, Mod& mod)
         deps.push_back(tbl);
     }
 
-    // Put TOML data into the file
     QTextStream in_stream(&index_file);
     {
         auto tbl = toml::table{ { "name", mod.name.toStdString() },
@@ -293,11 +286,10 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
     table = result.table();
 #endif
 
-    // index_file.close();
-
     mod.slug = slug;
 
-    {  // Basic info
+    {
+
         mod.name = stringEntry(table, "name");
         mod.filename = stringEntry(table, "filename");
         mod.side = ModPlatform::SideUtils::fromString(stringEntry(table, "side"));
@@ -324,7 +316,8 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
     }
     mod.version_number = table["x-launcher-version-number"].value_or("");
 
-    {  // [download] info
+    {
+
         auto download_table = table["download"].as_table();
         if (!download_table) {
             qCritical() << QString("No [download] section found on mod metadata!");
@@ -337,7 +330,8 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
         mod.hash = stringEntry(*download_table, "hash");
     }
 
-    {  // [update] info
+    {
+
         using Provider = ModPlatform::ResourceProvider;
 
         auto update_table = table["update"];
@@ -360,7 +354,8 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
             return {};
         }
     }
-    {  // dependencies
+    {
+
         auto deps = table["x-launcher-dependencies"].as_array();
         if (deps) {
             for (auto&& depNode : *deps) {
@@ -393,4 +388,4 @@ auto V1::getIndexForMod(const QDir& index_dir, QVariant& mod_id) -> Mod
     return {};
 }
 
-}  // namespace Packwiz
+}

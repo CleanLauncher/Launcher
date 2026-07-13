@@ -61,9 +61,9 @@ static void readString(const QJsonObject& root, const QString& key, QString& var
 
 static void readDownloadInfo(MojangDownloadInfo::Ptr out, const QJsonObject& obj)
 {
-    // optional, not used
+
     readString(obj, "path", out->path);
-    // required!
+
     out->sha1 = requireString(obj, "sha1");
     out->url = requireString(obj, "url");
     out->size = requireInteger(obj, "size");
@@ -73,9 +73,9 @@ static void readAssetIndex(MojangAssetIndexInfo::Ptr out, const QJsonObject& obj
 {
     out->totalSize = requireInteger(obj, "totalSize");
     out->id = requireString(obj, "id");
-    // out->known = true;
+
 }
-}  // namespace Bits
+}
 
 MojangDownloadInfo::Ptr downloadInfoFromJson(const QJsonObject& obj)
 {
@@ -216,7 +216,6 @@ VersionFilePtr MojangVersionFormat::versionFileFromJson(const QJsonDocument& doc
     out->name = "Minecraft";
     out->uid = "net.minecraft";
     out->version = out->minecraftVersion;
-    // out->filename = filename;
 
     if (root.contains("libraries")) {
         for (auto libVal : requireArray(root.value("libraries"))) {
@@ -279,7 +278,6 @@ QJsonDocument MojangVersionFormat::versionFileToJson(const VersionFilePtr& patch
         root.insert("libraries", array);
     }
 
-    // write the contents to a json document.
     {
         QJsonDocument out;
         out.setObject(root);
@@ -313,7 +311,7 @@ LibraryPtr MojangVersionFormat::libraryFromJson(ProblemContainer& problems, cons
             if (!it.value().isString()) {
                 qWarning() << filename << "contains an invalid native (skipping)";
             }
-            // FIXME: Skip unknown platforms
+
             out->m_nativeClassifiers[it.key()] = it.value().toString();
         }
     }

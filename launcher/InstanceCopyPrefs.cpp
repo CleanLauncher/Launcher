@@ -1,6 +1,3 @@
-//
-// Created by marcelohdez on 10/22/22.
-//
 
 #include "InstanceCopyPrefs.h"
 
@@ -10,7 +7,6 @@ bool InstanceCopyPrefs::allTrue() const
            copyScreenshots;
 }
 
-// Returns a single RegEx string of the selected folders/files to filter out (ex: ".minecraft/saves|.minecraft/server.dat")
 QString InstanceCopyPrefs::getSelectedFiltersAsRegex() const
 {
     return getSelectedFiltersAsRegex({});
@@ -49,17 +45,15 @@ QString InstanceCopyPrefs::getSelectedFiltersAsRegex(const QStringList& addition
         filters << filter;
     }
 
-    // If we have any filters to add, join them as a single regex string to return:
     if (!filters.isEmpty()) {
         const QString MC_ROOT = "[.]?minecraft/";
-        // Ensure first filter starts with root, then join other filters with OR regex before root (ex: ".minecraft/saves|.minecraft/mods"):
+
         return MC_ROOT + filters.join("|" + MC_ROOT);
     }
 
     return {};
 }
 
-// ======= Getters =======
 bool InstanceCopyPrefs::isCopySavesEnabled() const
 {
     return copySaves;
@@ -125,7 +119,6 @@ bool InstanceCopyPrefs::isUseCloneEnabled() const
     return useClone;
 }
 
-// ======= Setters =======
 void InstanceCopyPrefs::enableCopySaves(bool b)
 {
     copySaves = b;

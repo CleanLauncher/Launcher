@@ -63,7 +63,8 @@ class GameOptionsPage : public QWidget, public BasePage {
     virtual QString helpPage() const override { return "Game-Options-management"; }
     void retranslate() override;
 
-   private:  // data
+   private:
+
     Ui::GameOptionsPage* ui = nullptr;
     std::shared_ptr<GameOptions> m_model;
 };

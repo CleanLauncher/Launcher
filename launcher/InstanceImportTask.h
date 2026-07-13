@@ -48,7 +48,7 @@ class InstanceImportTask : public InstanceTask {
     bool abort() override;
 
    protected:
-    //! Entry point for tasks.
+
     virtual void executeTask() override;
 
    private:
@@ -61,7 +61,7 @@ class InstanceImportTask : public InstanceTask {
     void processZipPack();
     void extractFinished();
 
-   private: /* data */
+   private:
     QUrl m_sourceUrl;
     QString m_archivePath;
     Task::Ptr m_task;
@@ -73,11 +73,8 @@ class InstanceImportTask : public InstanceTask {
         Modrinth,
     } m_modpackType = ModpackType::Unknown;
 
-    // Extra info we might need, that's available before, but can't be derived from
-    // the source URL / the resource it points to alone.
     QMap<QString, QString> m_extra_info;
 
-    // FIXME: nuke
     QWidget* m_parent;
     void downloadFromUrl();
 };

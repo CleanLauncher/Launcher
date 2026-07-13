@@ -62,7 +62,7 @@ class Library {
    public:
     Library() {}
     Library(const QString& name) { m_name = name; }
-    /// limited copy without some data. TODO: why?
+
     static LibraryPtr limitedCopy(LibraryPtr base)
     {
         auto newlib = std::make_shared<Library>();
@@ -79,29 +79,24 @@ class Library {
         return newlib;
     }
 
-   public: /* methods */
-    /// Returns the raw name field
+   public:
+
     const GradleSpecifier& rawName() const { return m_name; }
 
     void setRawName(const GradleSpecifier& spec) { m_name = spec; }
 
     void setClassifier(const QString& spec) { m_name.setClassifier(spec); }
 
-    /// returns the full group and artifact prefix
     QString artifactPrefix() const { return m_name.artifactPrefix(); }
 
-    /// get the artifact ID
     QString artifactId() const { return m_name.artifactId(); }
 
-    /// get the artifact version
     QString version() const { return m_name.version(); }
 
-    /// Returns true if the library is native
     bool isNative() const { return m_nativeClassifiers.size() != 0; }
 
     void setStoragePrefix(QString prefix = QString());
 
-    /// Set the url base for downloads
     void setRepositoryURL(const QString& base_url) { m_repositoryURL = base_url; }
 
     void getApplicableFiles(const RuntimeContext& runtimeContext,
@@ -115,35 +110,26 @@ class Library {
 
     void setFilename(const QString& filename) { m_filename = filename; }
 
-    /// Get the file name of the library
     QString filename(const RuntimeContext& runtimeContext) const;
 
-    // DEPRECATED: set a display name, used by jar mods only
     void setDisplayName(const QString& displayName) { m_displayname = displayName; }
 
-    /// Get the file name of the library
     QString displayName(const RuntimeContext& runtimeContext) const;
 
     void setMojangDownloadInfo(MojangLibraryDownloadInfo::Ptr info) { m_mojangDownloads = info; }
 
     void setHint(const QString& hint) { m_hint = hint; }
 
-    /// Set the load rules
     void setRules(QList<Rule> rules) { m_rules = rules; }
 
-    /// Returns true if the library should be loaded (or extracted, in case of natives)
     bool isActive(const RuntimeContext& runtimeContext) const;
 
-    /// Returns true if the library is contained in an instance and false if it is shared
     bool isLocal() const;
 
-    /// Returns true if the library is to always be checked for updates
     bool isAlwaysStale() const;
 
-    /// Return true if the library requires forge XZ hacks
     bool isForge() const;
 
-    // Get a list of downloads for this library
     QList<Net::NetRequest::Ptr> getDownloads(const RuntimeContext& runtimeContext,
                                              class HttpMetaCache* cache,
                                              QStringList& failedLocalFiles,
@@ -151,60 +137,41 @@ class Library {
 
     QString getCompatibleNative(const RuntimeContext& runtimeContext) const;
 
-   private: /* methods */
-    /// the default storage prefix used by Launcher
+   private:
+
     static QString defaultStoragePrefix();
 
-    /// Get the prefix - root of the storage to be used
     QString storagePrefix() const;
 
-    /// Get the relative file path where the library should be saved
     QString storageSuffix(const RuntimeContext& runtimeContext) const;
 
     QString hint() const { return m_hint; }
 
-   protected: /* data */
-    /// the basic gradle dependency specifier.
+   protected:
+
     GradleSpecifier m_name;
 
-    /// DEPRECATED URL prefix of the maven repo where the file can be downloaded
     QString m_repositoryURL;
 
-    /// DEPRECATED: Launcher-specific absolute URL. takes precedence over the implicit maven repo URL, if defined
     QString m_absoluteURL;
 
-    /// Launcher extension - filename override
     QString m_filename;
 
-    /// DEPRECATED Launcher extension - display name
     QString m_displayname;
 
-    /**
-     * Launcher-specific type hint - modifies how the library is treated
-     */
     QString m_hint;
 
-    /**
-     * storage - by default the local libraries folder in Launcher, but could be elsewhere
-     * Launcher specific, because of FTB.
-     */
     QString m_storagePrefix;
 
-    /// true if the library had an extract/excludes section (even empty)
     bool m_hasExcludes = false;
 
-    /// a list of files that shouldn't be extracted from the library
     QStringList m_extractExcludes;
 
-    /// native suffixes per OS
     QMap<QString, QString> m_nativeClassifiers;
 
-    /// true if the library had a rules section (even empty)
     bool applyRules = false;
 
-    /// rules associated with the library
     QList<Rule> m_rules;
 
-    /// MOJANG: container with Mojang style download info
     MojangLibraryDownloadInfo::Ptr m_mojangDownloads;
 };

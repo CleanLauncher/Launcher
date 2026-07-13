@@ -52,17 +52,17 @@ static QImage improveSkin(QImage skin)
 {
     int height = skin.height();
     int width = skin.width();
-    if (width != 64 || (height != 32 && height != 64)) {  // this is no minecraft skin
+    if (width != 64 || (height != 32 && height != 64)) {
+
         return skin;
     }
-    // It seems some older skins may use this format, which can't be drawn onto
-    // https://github.com/CleanLauncher/Launcher/issues/4032
-    // https://doc.qt.io/qt-6/qpainter.html#begin
+
     if (skin.format() <= QImage::Format_Indexed8 || !skin.hasAlphaChannel()) {
         skin = skin.convertToFormat(QImage::Format_ARGB32);
     }
 
-    auto isLegacy = height == 32;  // old format
+    auto isLegacy = height == 32;
+
     if (isLegacy) {
         auto newSkin = QImage(QSize(64, 64), skin.format());
         newSkin.fill(Qt::transparent);
@@ -117,46 +117,42 @@ static QImage generatePreviews(QImage texture, bool slim)
     preview.fill(Qt::transparent);
     QPainter paint(&preview);
 
-    // head
     paint.drawImage(4, 2, texture.copy(8, 8, 8, 8));
     paint.drawImage(4, 2, texture.copy(40, 8, 8, 8));
-    // torso
+
     paint.drawImage(4, 10, texture.copy(20, 20, 8, 12));
     paint.drawImage(4, 10, texture.copy(20, 36, 8, 12));
-    // right leg
+
     paint.drawImage(4, 22, texture.copy(4, 20, 4, 12));
     paint.drawImage(4, 22, texture.copy(4, 36, 4, 12));
-    // left leg
+
     paint.drawImage(8, 22, texture.copy(20, 52, 4, 12));
     paint.drawImage(8, 22, texture.copy(4, 52, 4, 12));
 
     auto armWidth = slim ? 3 : 4;
     auto armPosX = slim ? 1 : 0;
-    // right arm
+
     paint.drawImage(armPosX, 10, texture.copy(44, 20, armWidth, 12));
     paint.drawImage(armPosX, 10, texture.copy(44, 36, armWidth, 12));
-    // left arm
+
     paint.drawImage(12, 10, texture.copy(36, 52, armWidth, 12));
     paint.drawImage(12, 10, texture.copy(52, 52, armWidth, 12));
 
-    // back
-    // head
     paint.drawImage(24, 2, texture.copy(24, 8, 8, 8));
     paint.drawImage(24, 2, texture.copy(56, 8, 8, 8));
-    // torso
+
     paint.drawImage(24, 10, texture.copy(32, 20, 8, 12));
     paint.drawImage(24, 10, texture.copy(32, 36, 8, 12));
-    // right leg
+
     paint.drawImage(24, 22, texture.copy(12, 20, 4, 12));
     paint.drawImage(24, 22, texture.copy(12, 36, 4, 12));
-    // left leg
+
     paint.drawImage(28, 22, texture.copy(28, 52, 4, 12));
     paint.drawImage(28, 22, texture.copy(12, 52, 4, 12));
 
-    // right arm
     paint.drawImage(armPosX + 20, 10, texture.copy(48 + armWidth, 20, armWidth, 12));
     paint.drawImage(armPosX + 20, 10, texture.copy(48 + armWidth, 36, armWidth, 12));
-    // left arm
+
     paint.drawImage(32, 10, texture.copy(40 + armWidth, 52, armWidth, 12));
     paint.drawImage(32, 10, texture.copy(56 + armWidth, 52, armWidth, 12));
 

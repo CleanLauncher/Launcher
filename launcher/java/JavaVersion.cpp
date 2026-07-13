@@ -54,7 +54,7 @@ bool JavaVersion::requiresPermGen() const
 
 bool JavaVersion::defaultsToUtf8() const
 {
-    // starting from Java 18, UTF-8 is the default charset: https://openjdk.org/jeps/400
+
     return m_parseable && m_major >= 18;
 }
 
@@ -82,20 +82,19 @@ bool JavaVersion::operator<(const JavaVersion& rhs) const
         if (m_security > rhs.m_security)
             return false;
 
-        // everything else being equal, consider prerelease status
         bool thisPre = !m_prerelease.isEmpty();
         bool rhsPre = !rhs.m_prerelease.isEmpty();
         if (thisPre && !rhsPre) {
-            // this is a prerelease and the other one isn't -> lesser
+
             return true;
         } else if (!thisPre && rhsPre) {
-            // this isn't a prerelease and the other one is -> greater
+
             return false;
         } else if (thisPre && rhsPre) {
-            // both are prereleases - use natural compare...
+
             return StringUtils::naturalCompare(m_prerelease, rhs.m_prerelease, Qt::CaseSensitive) < 0;
         }
-        // neither is prerelease, so they are the same -> this cannot be less than rhs
+
         return false;
     } else
         return StringUtils::naturalCompare(m_string, rhs.m_string, Qt::CaseSensitive) < 0;

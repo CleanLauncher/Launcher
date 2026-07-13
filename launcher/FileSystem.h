@@ -56,52 +56,22 @@ class FileSystemException : public ::Exception {
     FileSystemException(const QString& message) : Exception(message) {}
 };
 
-/**
- * write data to a file safely
- */
 void write(const QString& filename, const QByteArray& data);
 
-/**
- * append data to a file safely
- */
 void appendSafe(const QString& filename, const QByteArray& data);
 
-/**
- * append data to a file
- */
 void append(const QString& filename, const QByteArray& data);
 
-/**
- * read data from a file safely
- */
 QByteArray read(const QString& filename);
 
-/**
- * Update the last changed timestamp of an existing file
- */
 bool updateTimestamp(const QString& filename);
 
-/**
- * Creates all the folders in a path for the specified path
- * last segment of the path is treated as a file name and is ignored!
- */
 bool ensureFilePathExists(QString filenamepath);
 
-/**
- * Creates all the folders in a path for the specified path
- * last segment of the path is treated as a folder name and is created!
- */
 bool ensureFolderPathExists(const QFileInfo folderPath);
 
-/**
- * Creates all the folders in a path for the specified path
- * last segment of the path is treated as a folder name and is created!
- */
 bool ensureFolderPathExists(const QString folderPathName);
 
-/**
- * @brief Copies a directory and it's contents from src to dest
- */
 class copy : public QObject {
     Q_OBJECT
    public:
@@ -140,7 +110,6 @@ class copy : public QObject {
    signals:
     void fileCopied(const QString& relativeName);
     void copyFailed(const QString& relativeName);
-    // TODO: maybe add a "shouldCopy" signal in the future?
 
    private:
     bool operator()(const QString& offset, bool dryRun = false);
@@ -192,9 +161,6 @@ class ExternalLinkFileProcess : public QThread {
     QString m_server;
 };
 
-/**
- * @brief links (a file / a directory and it's contents) from src to dest
- */
 class create_link : public QObject {
     Q_OBJECT
    public:
@@ -264,7 +230,6 @@ class create_link : public QObject {
     bool m_whitelist = false;
     bool m_recursive = true;
 
-    /// @brief >= -1 = infinite, 0 = link files at src/* to dest/*, 1 = link files at src/*/* to dest/*/*, etc.
     int m_max_depth = -1;
 
     QList<LinkPair> m_path_pairs;
@@ -278,31 +243,14 @@ class create_link : public QObject {
     QLocalServer m_linkServer;
 };
 
-/**
- * @brief moves a file by renaming it
- * @param source source file path
- * @param dest destination filepath
- *
- */
 bool move(const QString& source, const QString& dest);
 
-/**
- * Delete a folder recursively
- */
 bool deletePath(QString path);
 
-/**
- * Delete a folder's contents recursively but not the folder itself.
- * @param path The path to the folder.
- * @return Whether the deletion was completely successful.
- */
 bool deleteContents(const QString& path);
 
 bool removeFiles(QStringList listFile);
 
-/**
- * Trash a folder / file
- */
 bool trash(QString path, QString* pathInTrash = nullptr);
 
 QString PathCombine(const QString& path1, const QString& path2);
@@ -311,43 +259,12 @@ QString PathCombine(const QString& path1, const QString& path2, const QString& p
 
 QString AbsolutePath(const QString& path);
 
-/**
- * @brief depth of path. "foo.txt" -> 0 , "bar/foo.txt" -> 1, /baz/bar/foo.txt -> 2, etc.
- *
- * @param path path to measure
- * @return int number of components before base path
- */
 int pathDepth(const QString& path);
 
-/**
- * @brief  cut off segments of path until it is a max of length depth
- *
- * @param path path to truncate
- * @param depth max depth of new path
- * @return QString truncated path
- */
 QString pathTruncate(const QString& path, int depth);
 
-/**
- * Resolve an executable
- *
- * Will resolve:
- *   single executable (by name)
- *   relative path
- *   absolute path
- *
- * @return absolute path to executable or null string
- */
 QString ResolveExecutable(QString path);
 
-/**
- * Normalize path
- *
- * Any paths inside the current directory will be normalized to relative paths (to current)
- * Other paths will be made absolute
- *
- * Returns false if the path logic somehow filed (and normalizedPath in invalid)
- */
 QString NormalizePath(QString path);
 
 QString RemoveInvalidFilenameChars(QString string, QChar replaceWith = '-');
@@ -356,23 +273,14 @@ QString RemoveInvalidPathChars(QString string, QChar replaceWith = '-');
 
 QString DirNameFromString(QString string, QString inDir = ".");
 
-/// Checks if the a given Path contains "!"
 bool checkProblemticPathJava(QDir folder);
 
-// Get the Directory representing the User's Desktop
 QString getDesktopDir();
 
-// Get the Directory representing the User's Applications directory
 QString getApplicationsDir();
 
-// Overrides one folder with the contents of another, preserving items exclusive to the first folder
-// Equivalent to doing QDir::rename, but allowing for overrides
 bool overrideFolder(QString overwritten_path, QString override_path);
 
-/**
- * Creates a shortcut to the specified target file at the specified destination path.
- * Returns null QString if creation failed; otherwise returns the path to the created shortcut.
- */
 QString createShortcut(QString destination, QString target, QStringList args, QString name, QString icon);
 
 enum class FilesystemType {
@@ -396,14 +304,6 @@ enum class FilesystemType {
     UNKNOWN
 };
 
-/**
- * @brief Ordered Mapping of enum types to reported filesystem names
- * this mapping is non exsaustive, it just attempts to capture the filesystems which could be reasonalbly be in use .
- * all string values are in uppercase, use `QString.toUpper()` or equivalent during lookup.
- *
- * QMap is ordered
- *
- */
 static const QMap<FilesystemType, QStringList> s_filesystem_type_names = { { FilesystemType::FAT, { "FAT" } },
                                                                            { FilesystemType::NTFS, { "NTFS" } },
                                                                            { FilesystemType::REFS, { "REFS" } },
@@ -424,30 +324,10 @@ static const QMap<FilesystemType, QStringList> s_filesystem_type_names = { { Fil
                                                                            { FilesystemType::BCACHEFS, { "BCACHEFS" } },
                                                                            { FilesystemType::UNKNOWN, { "UNKNOWN" } } };
 
-/**
- * @brief Get the string name of Filesystem enum object
- *
- * @param type
- * @return QString
- */
 QString getFilesystemTypeName(FilesystemType type);
 
-/**
- * @brief Get the Filesystem enum object from a name
- *  Does a lookup of the type name and returns an exact match
- *
- * @param name
- * @return FilesystemType
- */
 FilesystemType getFilesystemType(const QString& name);
 
-/**
- * @brief Get the Filesystem enum object from a name
- *  Does a fuzzy lookup of the type name and returns an apropreate match
- *
- * @param name
- * @return FilesystemType
- */
 FilesystemType getFilesystemTypeFuzzy(const QString& name);
 
 struct FilesystemInfo {
@@ -461,38 +341,19 @@ struct FilesystemInfo {
     QString rootPath;
 };
 
-/**
- * @brief path to the near ancestor that exists
- *
- */
 QString nearestExistentAncestor(const QString& path);
 
-/**
- * @brief colect information about the filesystem under a file
- *
- */
 FilesystemInfo statFS(const QString& path);
 
 static const QList<FilesystemType> s_clone_filesystems = { FilesystemType::BTRFS, FilesystemType::APFS, FilesystemType::ZFS,
                                                            FilesystemType::XFS,   FilesystemType::REFS, FilesystemType::BCACHEFS };
 
-/**
- * @brief if the Filesystem is reflink/clone capable
- *
- */
 bool canCloneOnFS(const QString& path);
 bool canCloneOnFS(const FilesystemInfo& info);
 bool canCloneOnFS(FilesystemType type);
 
-/**
- * @brief if the Filesystems are reflink/clone capable and both are on the same device
- *
- */
 bool canClone(const QString& src, const QString& dst);
 
-/**
- * @brief Copies a directory and it's contents from src to dest
- */
 class clone : public QObject {
     Q_OBJECT
    public:
@@ -535,10 +396,6 @@ class clone : public QObject {
     QList<QPair<QString, QString>> m_failedClones;
 };
 
-/**
- * @brief clone/reflink file from src to dst
- *
- */
 bool clone_file(const QString& src, const QString& dst, std::error_code& ec);
 
 #if defined(Q_OS_WIN)
@@ -553,18 +410,10 @@ static const QList<FilesystemType> s_non_link_filesystems = {
     FilesystemType::FAT,
 };
 
-/**
- * @brief if the Filesystem is symlink capable
- *
- */
 bool canLinkOnFS(const QString& path);
 bool canLinkOnFS(const FilesystemInfo& info);
 bool canLinkOnFS(FilesystemType type);
 
-/**
- * @brief if the Filesystem is symlink capable on both ends
- *
- */
 bool canLink(const QString& src, const QString& dst);
 
 uintmax_t hardLinkCount(const QString& path);
@@ -575,4 +424,4 @@ QString getPathNameInLocal8bit(const QString& file);
 
 QString getUniqueResourceName(const QString& filePath);
 
-}  // namespace FS
+}

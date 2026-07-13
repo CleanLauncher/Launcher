@@ -46,4 +46,4 @@ class PackInstallTask : public InstanceTask {
     const Modpack m_pack;
 };
 
-}  // namespace FTBImportAPP
+}

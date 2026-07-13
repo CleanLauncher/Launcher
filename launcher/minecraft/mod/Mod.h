@@ -79,11 +79,10 @@ class Mod : public Resource {
     void setRequiredByCount(int value);
     void setRequiresCount(int value);
 
-    /** Get the intneral path to the mod's icon file*/
     QString iconPath() const { return m_local_details.icon_file; }
-    /** Gets the icon of the mod, converted to a QPixmap for drawing, and scaled to size. */
+
     QPixmap icon(QSize size, Qt::AspectRatioMode mode = Qt::AspectRatioMode::IgnoreAspectRatio) const;
-    /** Thread-safe. */
+
     QPixmap setIcon(QImage new_image) const;
 
     void setDetails(const ModDetails& details);
@@ -93,9 +92,8 @@ class Mod : public Resource {
     [[nodiscard]] int compare(const Resource& other, SortType type) const override;
     [[nodiscard]] bool applyFilter(QRegularExpression filter) const override;
 
-    // Delete all the files of this mod
     auto destroy(QDir& index_dir, bool preserve_metadata = false, bool attempt_trash = true) -> bool;
-    // Delete the metadata only
+
     void destroyMetadata(QDir& index_dir);
 
     void finishResolvingWithDetails(ModDetails&& details);

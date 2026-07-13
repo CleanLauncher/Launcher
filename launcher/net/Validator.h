@@ -38,14 +38,14 @@
 
 namespace Net {
 class Validator {
-   public: /* con/des */
+   public:
     Validator() {}
     virtual ~Validator() {}
 
-   public: /* methods */
+   public:
     virtual bool init(QNetworkRequest& request) = 0;
     virtual bool write(QByteArray& data) = 0;
     virtual bool abort() = 0;
     virtual bool validate(QNetworkReply& reply) = 0;
 };
-}  // namespace Net
+}

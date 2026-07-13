@@ -56,7 +56,8 @@ bool readFromOutput(const char* command, F function)
 
     return true;
 }
-}  // namespace
+}
+
 #endif
 
 #ifdef Q_OS_WINDOWS
@@ -83,7 +84,7 @@ uint64_t HardwareInfo::totalRamMiB()
     status.dwLength = sizeof status;
 
     if (GlobalMemoryStatusEx(&status) == TRUE) {
-        // transforming bytes -> mib
+
         return status.ullTotalPhys / 1024 / 1024;
     }
 
@@ -97,7 +98,7 @@ uint64_t HardwareInfo::availableRamMiB()
     status.dwLength = sizeof status;
 
     if (GlobalMemoryStatusEx(&status) == TRUE) {
-        // transforming bytes -> mib
+
         return status.ullAvailPhys / 1024 / 1024;
     }
 
@@ -152,7 +153,7 @@ uint64_t HardwareInfo::totalRamMiB()
     uint64_t memsize = 0;
     size_t memsizeSize = sizeof memsize;
     if (sysctlbyname("hw.memsize", &memsize, &memsizeSize, nullptr, 0) == 0) {
-        // transforming bytes -> mib
+
         return memsize / 1024 / 1024;
     }
 
@@ -179,7 +180,7 @@ MacOSHardwareInfo::MemoryPressureLevel MacOSHardwareInfo::memoryPressureLevel()
 
 QString MacOSHardwareInfo::memoryPressureLevelName()
 {
-    // The names are internal, users refer to levels by their graph colors in Activity Monitor
+
     switch (memoryPressureLevel()) {
         case MemoryPressureLevel::Normal:
             return "Green";
@@ -197,7 +198,7 @@ QStringList HardwareInfo::gpuInfo()
 {
     QStringList out;
     const bool success = readFromOutput("system_profiler SPDisplaysDataType", [&](const QString& str) {
-        // Chipset Model: Intel HD Graphics 620
+
         if (str.contains("Chipset Model")) {
             out << "GPU: " + afterColon(str);
         }
@@ -216,7 +217,7 @@ QString HardwareInfo::cpuInfo()
 {
     std::ifstream cpuin("/proc/cpuinfo");
     for (std::string line; std::getline(cpuin, line);) {
-        // model name      : AMD Ryzen 7 5800X 8-Core Processor
+
         if (const QString str = QString::fromStdString(line); str.startsWith("model name")) {
             return afterColon(str);
         }
@@ -231,7 +232,7 @@ uint64_t readMemInfo(const QString& searchTarget)
 {
     std::ifstream memin("/proc/meminfo");
     for (std::string line; std::getline(memin, line);) {
-        // MemTotal:       16287480 kB
+
         if (const QString str = QString::fromStdString(line); str.startsWith(searchTarget)) {
             bool ok = false;
             const uint total = str.simplified().section(' ', 1, 1).toUInt(&ok);
@@ -240,7 +241,6 @@ uint64_t readMemInfo(const QString& searchTarget)
                 return 0;
             }
 
-            // transforming kib -> mib
             return total / 1024;
         }
     }
@@ -248,7 +248,7 @@ uint64_t readMemInfo(const QString& searchTarget)
     qWarning() << "Could not read /proc/meminfo: search target not found:" << searchTarget;
     return 0;
 }
-}  // namespace
+}
 
 uint64_t HardwareInfo::totalRamMiB()
 {
@@ -270,10 +270,7 @@ QStringList HardwareInfo::gpuInfo()
 
     const bool success = readFromOutput("lspci -k", [&](const QString& str) {
         // clang-format off
-        // 04:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Ellesmere [Radeon RX 470/480/570/570X/580/580X/590] (rev e7)
-        // Subsystem: Sapphire Technology Limited Radeon RX 580 Pulse 4GB
-        // Kernel driver in use: amdgpu
-        // Kernel modules: amdgpu
+
         // clang-format on
         if (str.contains("VGA compatible controller") || str.contains("3D controller")) {
             readingGpuInfo = true;
@@ -325,7 +322,6 @@ uint64_t HardwareInfo::totalRamMiB()
     const bool success = readFromOutput("sysctl hw.physmem", [&](const QString& str) {
         const uint64_t mem = str.mid(12).toULong();
 
-        // transforming kib -> mib
         out = mem / 1024;
     });
     if (!success) {

@@ -95,7 +95,7 @@ class ParserArray : public QByteArray {
                         break;
                     }
                     case 'x': {
-                        // chomp the 'x'
+
                         i++;
                         int hex_start = i;
                         while (isxdigit(operator[](i))) {
@@ -151,7 +151,7 @@ void POTranslatorPrivate::reload()
     QHash<QByteArray, POEntry> newMapping_disambiguation;
     auto endEntry = [&]() {
         auto strStr = QString::fromUtf8(str);
-        // NOTE: PO header has empty id. We skip it.
+
         if (!id.isEmpty()) {
             auto normalKey = context + "|" + id;
             newMapping.insert(normalKey, { strStr, fuzzy });
@@ -177,7 +177,7 @@ void POTranslatorPrivate::reload()
         }
 
         if (!line.size()) {
-            // NIL
+
         } else if (line[0] == '#') {
             if (line.contains(", fuzzy")) {
                 nextFuzzy = true;

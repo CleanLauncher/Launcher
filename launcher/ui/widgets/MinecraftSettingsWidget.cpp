@@ -162,11 +162,9 @@ void MinecraftSettingsWidget::loadSettings()
     else
         settings = APPLICATION->settings();
 
-    // Ely.by patch
     m_ui->elyGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideElySettings").toBool());
     m_ui->applyElyPatch->setCurrentIndex(settings->get("ElyPatchPreference").toInt());
 
-    // Game Window
     m_ui->windowSizeGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideWindow").toBool() ||
                                          settings->get("OverrideMiscellaneous").toBool());
     m_ui->maximizedCheckBox->setChecked(settings->get("LaunchMaximized").toBool());
@@ -175,14 +173,12 @@ void MinecraftSettingsWidget::loadSettings()
     m_ui->closeAfterLaunchCheck->setChecked(settings->get("CloseAfterLaunch").toBool());
     m_ui->quitAfterGameStopCheck->setChecked(settings->get("QuitAfterGameStop").toBool());
 
-    // Game Time
     m_ui->gameTimeGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideGameTime").toBool());
     m_ui->showGameTime->setChecked(settings->get("ShowGameTime").toBool());
     m_ui->recordGameTime->setChecked(settings->get("RecordGameTime").toBool());
     m_ui->showGlobalGameTime->setChecked(m_instance == nullptr && settings->get("ShowGlobalGameTime").toBool());
     m_ui->showGameTimeWithoutDays->setChecked(m_instance == nullptr && settings->get("ShowGameTimeWithoutDays").toBool());
 
-    // Console
     m_ui->consoleSettingsBox->setChecked(m_instance == nullptr || settings->get("OverrideConsole").toBool());
     m_ui->showConsoleCheck->setChecked(settings->get("ShowConsole").toBool());
     m_ui->autoCloseConsoleCheck->setChecked(settings->get("AutoCloseConsole").toBool());
@@ -191,20 +187,16 @@ void MinecraftSettingsWidget::loadSettings()
     if (m_javaSettings != nullptr)
         m_javaSettings->loadSettings();
 
-    // Custom commands
     m_ui->customCommands->initialize(m_instance != nullptr, m_instance == nullptr || settings->get("OverrideCommands").toBool(),
                                      settings->get("PreLaunchCommand").toString(), settings->get("WrapperCommand").toString(),
                                      settings->get("PostExitCommand").toString());
 
-    // Environment variables
     m_ui->environmentVariables->initialize(m_instance != nullptr, m_instance == nullptr || settings->get("OverrideEnv").toBool(),
                                            Json::toMap(settings->get("Env").toString()));
 
-    // Legacy Tweaks
     m_ui->legacySettingsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideLegacySettings").toBool());
     m_ui->onlineFixes->setChecked(settings->get("OnlineFixes").toBool());
 
-    // Native Libraries
     m_ui->nativeWorkaroundsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideNativeWorkarounds").toBool());
     m_ui->useNativeGLFWCheck->setChecked(settings->get("UseNativeGLFW").toBool());
     m_ui->lineEditGLFWPath->setText(settings->get("CustomGLFWPath").toString().trimmed());
@@ -221,7 +213,6 @@ void MinecraftSettingsWidget::loadSettings()
     m_ui->lineEditOpenALPath->setPlaceholderText(tr("Path to %1 library file").arg(BuildConfig.OPENAL_LIBRARY_NAME));
 #endif
 
-    // Performance
     m_ui->perfomanceGroupBox->setChecked(m_instance == nullptr || settings->get("OverridePerformance").toBool());
     m_ui->enableFeralGamemodeCheck->setChecked(settings->get("EnableFeralGamemode").toBool());
     m_ui->enableMangoHud->setChecked(settings->get("EnableMangoHud").toBool());
@@ -229,7 +220,7 @@ void MinecraftSettingsWidget::loadSettings()
     m_ui->useZink->setChecked(settings->get("UseZink").toBool());
 
     if (m_instance != nullptr) {
-        // HACK: if we change enable state of child widgets while it's unchecked this creates inconsistency
+
         m_ui->serverJoinGroupBox->setChecked(true);
 
         if (auto server = settings->get("JoinServerOnLaunchAddress").toString(); !server.isEmpty()) {
@@ -323,7 +314,6 @@ void MinecraftSettingsWidget::saveSettings()
     {
         SettingsObject::Lock lock(settings);
 
-        // Ely.by patch
         bool ely = m_instance == nullptr || m_ui->elyGroupBox->isChecked();
 
         if (m_instance != nullptr)
@@ -335,7 +325,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("ElyPatchPreference");
         }
 
-        // Console
         bool console = m_instance == nullptr || m_ui->consoleSettingsBox->isChecked();
 
         if (m_instance != nullptr)
@@ -351,7 +340,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("ShowConsoleOnError");
         }
 
-        // Game Window
         bool window = m_instance == nullptr || m_ui->windowSizeGroupBox->isChecked();
 
         if (m_instance != nullptr) {
@@ -373,7 +361,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("QuitAfterGameStop");
         }
 
-        // Custom Commands
         bool custcmd = m_instance == nullptr || m_ui->customCommands->checked();
 
         if (m_instance != nullptr)
@@ -389,7 +376,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("PostExitCommand");
         }
 
-        // Environment Variables
         auto env = m_instance == nullptr || m_ui->environmentVariables->override();
 
         if (m_instance != nullptr)
@@ -400,7 +386,6 @@ void MinecraftSettingsWidget::saveSettings()
         else
             settings->reset("Env");
 
-        // Workarounds
         bool workarounds = m_instance == nullptr || m_ui->nativeWorkaroundsGroupBox->isChecked();
 
         if (m_instance != nullptr)
@@ -418,7 +403,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("CustomOpenALPath");
         }
 
-        // Performance
         bool performance = m_instance == nullptr || m_ui->perfomanceGroupBox->isChecked();
 
         if (m_instance != nullptr)
@@ -436,7 +420,6 @@ void MinecraftSettingsWidget::saveSettings()
             settings->reset("UseZink");
         }
 
-        // Game time
         bool gameTime = m_instance == nullptr || m_ui->gameTimeGroupBox->isChecked();
 
         if (m_instance != nullptr)
@@ -456,7 +439,7 @@ void MinecraftSettingsWidget::saveSettings()
         }
 
         if (m_instance != nullptr) {
-            // Join server on launch
+
             bool joinServerOnLaunch = m_ui->serverJoinGroupBox->isChecked();
             settings->set("JoinServerOnLaunch", joinServerOnLaunch);
             if (joinServerOnLaunch) {
@@ -472,7 +455,6 @@ void MinecraftSettingsWidget::saveSettings()
                 settings->reset("JoinWorldOnLaunch");
             }
 
-            // Use an account for this instance
             bool useAccountForInstance = m_ui->instanceAccountGroupBox->isChecked();
             settings->set("UseAccountForInstance", useAccountForInstance);
             if (useAccountForInstance) {
@@ -512,7 +494,8 @@ void MinecraftSettingsWidget::openGlobalSettings()
 
     if (id == "javaPage")
         APPLICATION->ShowGlobalSettings(this, "java-settings");
-    else  // TODO select tab
+    else
+
         APPLICATION->ShowGlobalSettings(this, "minecraft-settings");
 }
 
@@ -583,9 +566,6 @@ void MinecraftSettingsWidget::selectDataPacksFolder()
 
     if (path.isEmpty())
         return;
-
-    // if it's inside the instance dir, set path relative to .minecraft
-    // (so that if it's directly in instance dir it will still lead with .. but more than two levels up are kept absolute)
 
     const QUrl instanceRootUrl = QUrl::fromLocalFile(m_instance->instanceRoot());
     const QUrl pathUrl = QUrl::fromLocalFile(path);

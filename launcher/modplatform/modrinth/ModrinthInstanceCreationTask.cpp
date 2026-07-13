@@ -46,7 +46,6 @@ bool ModrinthCreationTask::updateInstance()
 {
     auto* instanceList = APPLICATION->instances();
 
-    // FIXME: How to handle situations when there's more than one install already for a given modpack?
     BaseInstance* inst = nullptr;
     if (auto originalId = originalInstanceID(); !originalId.isEmpty()) {
         inst = instanceList->getInstanceById(originalId);
@@ -83,7 +82,6 @@ bool ModrinthCreationTask::updateInstance()
         }
     }
 
-    // Remove repeated files, we don't need to download them!
     QDir oldInstDir(inst->instanceRoot());
 
     QString oldIndexFolder(FS::PathCombine(oldInstDir.absolutePath(), "mrpack"));
@@ -94,7 +92,6 @@ bool ModrinthCreationTask::updateInstance()
         std::vector<File> oldFiles;
         parseManifest(oldIndexPath, oldFiles, false, false);
 
-        // Let's remove all duplicated, identical resources!
         auto filesIterator = m_files.begin();
     begin:
         while (filesIterator != m_files.end()) {
@@ -108,7 +105,8 @@ bool ModrinthCreationTask::updateInstance()
                     qDebug() << "Removed file at" << file.path << "from list of downloads";
                     filesIterator = m_files.erase(filesIterator);
                     oldFilesIterator = oldFiles.erase(oldFilesIterator);
-                    goto begin;  // Sorry :c
+                    goto begin;
+
                 }
 
                 oldFilesIterator++;
@@ -119,17 +117,12 @@ bool ModrinthCreationTask::updateInstance()
 
         QDir oldMinecraftDir(inst->gameRoot());
 
-        // Some files were removed from the old version, and some will be downloaded in an updated version,
-        // so we're fine removing them!
         if (!oldFiles.empty()) {
             for (const auto& file : oldFiles) {
                 scheduleToDelete(m_parent, oldMinecraftDir, file.path, true);
             }
         }
 
-        // We will remove all the previous overrides, to prevent duplicate files!
-        // TODO: Currently 'overrides' will always override the stuff on update. How do we preserve unchanged overrides?
-        // FIXME: We may want to do something about disabled mods.
         auto oldOverrides = Override::readOverrides("overrides", oldIndexFolder);
         for (const auto& entry : oldOverrides) {
             scheduleToDelete(m_parent, oldMinecraftDir, entry);
@@ -140,7 +133,7 @@ bool ModrinthCreationTask::updateInstance()
             scheduleToDelete(m_parent, oldMinecraftDir, entry);
         }
     } else {
-        // We don't have an old index file, so we may duplicate stuff!
+
         auto* dialog = CustomMessageBox::selectable(m_parent, tr("No index file."),
                                                     tr("We couldn't find a suitable index file for the older version. This may cause some "
                                                        "of the files to be duplicated. Do you want to continue?"),
@@ -157,11 +150,9 @@ bool ModrinthCreationTask::updateInstance()
 
     m_instance = inst;
 
-    // We let it go through the createInstance() stage, just with a couple modifications for updating
     return false;
 }
 
-// https://docs.modrinth.com/docs/modpacks/format_definition/
 std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 {
     QEventLoop loop;
@@ -173,7 +164,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         return nullptr;
     }
 
-    // Keep index file in case we need it some other time (like when changing versions)
     QString newIndexPlace(FS::PathCombine(parentFolder, "modrinth.index.json"));
     FS::ensureFilePathExists(newIndexPlace);
     FS::move(indexPath, newIndexPlace);
@@ -182,23 +172,20 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 
     auto overridePath = FS::PathCombine(m_stagingPath, "overrides");
     if (QFile::exists(overridePath)) {
-        // Create a list of overrides in "overrides.txt" inside mrpack/
+
         Override::createOverrides("overrides", parentFolder, overridePath);
 
-        // Apply the overrides
         if (!FS::move(overridePath, mcPath)) {
             setError(tr("Could not rename the overrides folder:\n") + "overrides");
             return nullptr;
         }
     }
 
-    // Do client overrides
     auto clientOverridePath = FS::PathCombine(m_stagingPath, "client-overrides");
     if (QFile::exists(clientOverridePath)) {
-        // Create a list of overrides in "client-overrides.txt" inside mrpack/
+
         Override::createOverrides("client-overrides", parentFolder, clientOverridePath);
 
-        // Apply the overrides
         if (!FS::overrideFolder(mcPath, clientOverridePath)) {
             setError(tr("Could not rename the client overrides folder:\n") + "client overrides");
             return nullptr;
@@ -237,7 +224,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         instance->setIconKey("modrinth");
     }
 
-    // Don't add managed info to packs without an ID (most likely imported from ZIP)
     if (!m_managed_id.isEmpty()) {
         instance->setManagedPack("modrinth", m_managed_id, m_managed_name, m_managed_version_id, version());
     } else {
@@ -251,14 +237,14 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 
     auto rootModpackPath = FS::PathCombine(m_stagingPath, m_root_path);
     auto rootModpackUrl = QUrl::fromLocalFile(rootModpackPath);
-    // TODO make this work with other sorts of resource
+
     QHash<QString, Resource*> resources;
     for (auto& file : m_files) {
         auto fileName = file.path;
         fileName = FS::RemoveInvalidPathChars(fileName);
         auto filePath = FS::PathCombine(rootModpackPath, fileName);
         if (!rootModpackUrl.isParentOf(QUrl::fromLocalFile(filePath))) {
-            // This means we somehow got out of the root folder, so abort here to prevent exploits
+
             setError(tr("One of the files has a path that leads to an arbitrary location (%1). This is a security risk and isn't allowed.")
                          .arg(fileName));
             return nullptr;
@@ -287,8 +273,7 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         dl->addValidator(new Net::ChecksumValidator(file.hashAlgorithm, file.hash));
         downloadMods->addNetAction(dl);
         if (!file.downloads.empty()) {
-            // FIXME: This really needs to be put into a ConcurrentTask of
-            // MultipleOptionsTask's , once those exist :)
+
             auto param = dl.toWeakRef();
             connect(dl.get(), &Task::failed, [&file, filePath, param, downloadMods, meta] {
                 QUrl fallbackUrl = file.downloads.dequeue();
@@ -349,14 +334,10 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
     }
     resources.clear();
 
-    // Update information of the already installed instance, if any.
     if (m_instance && endedWell) {
         setAbortable(false);
         auto* inst = m_instance.value();
 
-        // Only change the name if it didn't use a custom name, so that the previous custom name
-        // is preserved, but if we're using the original one, we update the version string.
-        // NOTE: This needs to come before the copyManagedPack call!
         if (inst->name().contains(inst->getManagedPackVersionName()) && inst->name() != instance->name()) {
             if (askForChangingInstanceName(m_parent, inst->name(), instance->name()) == InstanceNameChange::ShouldChange) {
                 inst->setName(instance->name());
@@ -398,7 +379,7 @@ bool ModrinthCreationTask::parseManifest(const QString& indexPath, std::vector<F
                 file.path = Json::requireString(modInfo, "path").replace("\\", "/");
 
                 auto env = modInfo["env"].toObject();
-                // 'env' field is optional
+
                 if (!env.isEmpty()) {
                     QString support = env["client"].toString("unsupported");
                     if (support == "unsupported") {
@@ -412,9 +393,6 @@ bool ModrinthCreationTask::parseManifest(const QString& indexPath, std::vector<F
                 QJsonObject hashes = Json::requireObject(modInfo, "hashes");
                 file.hash = QByteArray::fromHex(Json::requireString(hashes, "sha512").toLatin1());
                 file.hashAlgorithm = QCryptographicHash::Sha512;
-
-                // Do not use requireUrl, which uses StrictMode, instead use QUrl's default TolerantMode
-                // (as Modrinth seems to incorrectly handle spaces)
 
                 auto downloadArr = modInfo["downloads"].toArray();
                 for (auto download : downloadArr) {

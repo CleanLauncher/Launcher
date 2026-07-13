@@ -23,18 +23,19 @@ void XboxUserStep::perform()
         "SiteName": "user.auth.xboxlive.com",
         "RpsTicket": "d=%1"
     },
-    "RelyingParty": "http://auth.xboxlive.com",
+    "RelyingParty": "http:
+
     "TokenType": "JWT"
 }
 )XXX";
     auto xbox_auth_data = xbox_auth_template.arg(m_data->msaToken.token);
 
-    QUrl url("https://user.auth.xboxlive.com/user/authenticate");
+    QUrl url("https:
+
     auto headers = QList<Net::HeaderPair>{
         { "Content-Type", "application/json" },
         { "Accept", "application/json" },
-        // set contract-version header (prevent err 400 bad-request?)
-        // https://learn.microsoft.com/en-us/gaming/gdk/_content/gc/reference/live/rest/additional/httpstandardheaders
+
         { "x-xbl-contract-version", "1" }
     };
     auto [request, response] = Net::Upload::makeByteArray(url, xbox_auth_data.toUtf8());

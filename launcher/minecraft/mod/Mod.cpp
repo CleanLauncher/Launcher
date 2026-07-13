@@ -76,7 +76,7 @@ int compareVersionLists(const QStringList& leftVersions, const QStringList& righ
     return 0;
 }
 
-}  // namespace
+}
 
 Mod::Mod(const QFileInfo& file) : Resource(file), m_local_details()
 {
@@ -287,7 +287,6 @@ QPixmap Mod::setIcon(QImage new_image) const
     if (m_packImageCacheKey.key.isValid())
         PixmapCache::remove(m_packImageCacheKey.key);
 
-    // scale the image to avoid flooding the pixmapcache
     auto pixmap =
         QPixmap::fromImage(new_image.scaled({ 64, 64 }, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
@@ -310,7 +309,6 @@ QPixmap Mod::icon(QSize size, Qt::AspectRatioMode mode) const
         return pixmap_transform(cached_image);
     }
 
-    // No valid image we can get
     if ((!m_packImageCacheKey.wasEverUsed && m_packImageCacheKey.wasReadAttempt) || iconPath().isEmpty())
         return {};
 
@@ -318,12 +316,12 @@ QPixmap Mod::icon(QSize size, Qt::AspectRatioMode mode) const
         qDebug() << "Mod" << name() << "Had it's icon evicted from the cache. reloading...";
         PixmapCache::markCacheMissByEviciton();
     }
-    // Image got evicted from the cache or an attempt to load it has not been made. load it and retry.
+
     m_packImageCacheKey.wasReadAttempt = true;
     if (ModUtils::loadIconFile(*this, &cached_image)) {
         return pixmap_transform(cached_image);
     }
-    // Image failed to load
+
     return {};
 }
 

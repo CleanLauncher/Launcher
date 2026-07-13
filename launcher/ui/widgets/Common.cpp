@@ -1,8 +1,5 @@
 #include "Common.h"
 
-// Origin: Qt
-// More specifically, this is a trimmed down version on the algorithm in:
-// https://code.woboq.org/qt5/qtbase/src/widgets/styles/qcommonstyle.cpp.html#846
 QList<std::pair<qreal, QString>> viewItemTextLayout(QTextLayout& textLayout, int lineWidth, qreal& height)
 {
     QList<std::pair<qreal, QString>> lines;

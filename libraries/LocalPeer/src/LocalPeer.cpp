@@ -138,7 +138,7 @@ bool LocalPeer::isClient()
 
     bool res = server->listen(socketName);
 #if defined(Q_OS_UNIX)
-    // ### Workaround
+
     if (!res && server->serverError() == QAbstractSocket::AddressInUseError) {
         QLocalServer::removeServer(socketName);
         res = server->listen(socketName);
@@ -159,7 +159,7 @@ bool LocalPeer::sendMessage(const QByteArray& message, int timeout)
     bool connOk = false;
     int tries = 2;
     for (int i = 0; i < tries; i++) {
-        // Try twice, in case the other instance is just starting up
+
         socket.connectToServer(socketName);
         connOk = socket.waitForConnected(timeout / 2);
         if (!connOk && i < (tries - 1)) {
@@ -178,12 +178,10 @@ bool LocalPeer::sendMessage(const QByteArray& message, int timeout)
         return false;
     }
 
-    // wait for 'ack'
     if (!socket.waitForReadyRead(timeout)) {
         return false;
     }
 
-    // make sure we got 'ack'
     if (!(socket.read(qstrlen(ack)) == ack)) {
         return false;
     }
@@ -219,7 +217,9 @@ void LocalPeer::receiveConnection()
     }
     socket->write(ack, qstrlen(ack));
     socket->waitForBytesWritten(1000);
-    socket->waitForDisconnected(1000);  // make sure client reads ack
+    socket->waitForDisconnected(1000);
+
     delete socket;
-    emit messageReceived(uMsg);  // ### (might take a long time to return)
+    emit messageReceived(uMsg);
+
 }

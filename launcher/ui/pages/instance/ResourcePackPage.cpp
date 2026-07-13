@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -82,7 +82,8 @@ void ResourcePackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] 
 void ResourcePackPage::downloadResourcePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     m_downloadDialog = new ResourceDownload::ResourcePackDownloadDialog(this, m_model, m_instance);
@@ -135,7 +136,8 @@ void ResourcePackPage::downloadDialogFinished(int result)
 void ResourcePackPage::updateResourcePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -239,7 +241,8 @@ void ResourcePackPage::deleteResourcePackMetadata()
 void ResourcePackPage::changeResourcePackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

@@ -1,4 +1,3 @@
-// Licensed under the Apache-2.0 license. See README.md for details.
 
 #pragma once
 
@@ -14,31 +13,22 @@ class ProgressWidget : public QWidget {
    public:
     explicit ProgressWidget(QWidget* parent = nullptr, bool show_label = true);
 
-    /** Whether to hide the widget automatically if it's watching no running task. */
     void hideIfInactive(bool hide) { m_hide_if_inactive = hide; }
 
-    /** Reset the displayed progress to 0 */
     void reset();
 
-    /** The text that shows up in the middle of the progress bar.
-     *  By default it's '%p%', with '%p' being the total progress in percentage.
-     */
     void progressFormat(QString);
 
    public slots:
-    /** Watch the progress of a task. */
+
     void watch(Task* task);
 
-    /** Watch the progress of a task, and start it if needed */
     void start(Task* task);
 
-    /** Blocking way of waiting for a task to finish. */
     bool exec(std::shared_ptr<Task> task);
 
-    /** Un-hide the widget if needed. */
     void show();
 
-    /** Make the widget invisible. */
     void hide();
 
    private slots:

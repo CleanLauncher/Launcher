@@ -202,7 +202,7 @@ QPixmap previewCape(QImage capeImage, bool elytra = false)
 
 void SkinManageDialog::setupCapes()
 {
-    // FIXME: add a model for this, download/refresh the capes on demand
+
     auto& accountData = *m_acct->accountData();
     int index = 0;
     m_ui->capeCombo->addItem(tr("No Cape"), QVariant());

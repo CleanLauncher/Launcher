@@ -57,7 +57,6 @@ MSALoginDialog::MSALoginDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MS
 {
     ui->setupUi(this);
 
-    // make font monospace
     QFont font;
     font.setPixelSize(ui->code->fontInfo().pixelSize());
     font.setFamily(APPLICATION->settings()->get("ConsoleFont").toString());
@@ -79,7 +78,7 @@ MSALoginDialog::MSALoginDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MS
 
 int MSALoginDialog::exec()
 {
-    // Setup the login task and start it
+
     m_account = MinecraftAccount::createBlank(m_accountType);
     m_authflow_task = m_account->login(false);
     connect(m_authflow_task.get(), &Task::failed, this, &MSALoginDialog::onTaskFailed);
@@ -111,7 +110,7 @@ MSALoginDialog::~MSALoginDialog()
 
 void MSALoginDialog::onTaskFailed(QString reason)
 {
-    // Set message
+
     m_authflow_task->disconnect();
     m_devicecode_task->disconnect();
     ui->stackedWidget->setCurrentIndex(0);
@@ -158,13 +157,11 @@ void paintQR(QPainter& painter, const QSize canvasSize, const QString& data, QCo
     painter.setPen(Qt::NoPen);
     painter.setBrush(fg);
 
-    // Make sure the QR code fits in the canvas with some padding
     const auto qrSize = qr->width;
     const auto canvasWidth = canvasSize.width();
     const auto canvasHeight = canvasSize.height();
     const auto scale = 0.8 * std::min(canvasWidth / qrSize, canvasHeight / qrSize);
 
-    // Find an offset to center it in the canvas
     const auto offsetX = (canvasWidth - qrSize * scale) / 2;
     const auto offsetY = (canvasHeight - qrSize * scale) / 2;
 
@@ -199,7 +196,6 @@ void MSALoginDialog::authorizeWithBrowserWithExtra(QString url, QString code, [[
     QPainter painter(&pixmap);
     paintQR(painter, size, url, Qt::black);
 
-    // Set the generated pixmap to the label
     ui->qr->setPixmap(pixmap);
 
     ui->qrMessage->setText(tr("Open %1 or scan the QR and enter the above code if needed.").arg(linkString));
@@ -223,7 +219,6 @@ void MSALoginDialog::onAuthFlowStatus(QString status)
     ui->status2->setText(status);
 }
 
-// Public interface
 MinecraftAccountPtr MSALoginDialog::newAccount(QWidget* parent)
 {
     MSALoginDialog dlg(parent);

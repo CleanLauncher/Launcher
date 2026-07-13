@@ -23,12 +23,11 @@ bool processZIP(Mod& mod, ProcessingLevel level = ProcessingLevel::Full);
 bool processFolder(Mod& mod, ProcessingLevel level = ProcessingLevel::Full);
 bool processLitemod(Mod& mod, ProcessingLevel level = ProcessingLevel::Full);
 
-/** Checks whether a file is valid as a mod or not. */
 bool validate(QFileInfo file);
 
 bool processIconPNG(const Mod& mod, QByteArray&& raw_data, QPixmap* pixmap);
 bool loadIconFile(const Mod& mod, QPixmap* pixmap);
-}  // namespace ModUtils
+}
 
 class LocalModParseTask : public Task {
     Q_OBJECT

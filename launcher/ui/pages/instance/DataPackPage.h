@@ -47,9 +47,6 @@ class DataPackPage : public ExternalResourcesPage {
     QPointer<ResourceDownload::DataPackDownloadDialog> m_downloadDialog;
 };
 
-/**
- * Syncs DataPackPage with GlobalDataPacksPath and shows/hides based on GlobalDataPacksEnabled.
- */
 class GlobalDataPackPage : public QWidget, public BasePage {
    public:
     explicit GlobalDataPackPage(MinecraftInstance* instance, QWidget* parent = nullptr);

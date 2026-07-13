@@ -12,7 +12,7 @@ class ActionButton : public QToolButton {
     {
         setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        // workaround for breeze and breeze forks
+
         setProperty("_kde_toolButton_alignment", Qt::AlignLeft);
 
         if (m_use_default_action) {
@@ -28,7 +28,7 @@ class ActionButton : public QToolButton {
     void actionChanged()
     {
         setEnabled(m_action->isEnabled());
-        // better pop up mode
+
         if (m_action->menu()) {
             setPopupMode(QToolButton::MenuButtonPopup);
         }
@@ -117,10 +117,9 @@ void WideBar::insertActionAfter(QAction* after, QAction* action)
         return;
 
     iter++;
-    // the action to insert after is present
-    // however, the element after it isn't valid
+
     if (iter == m_entries.end()) {
-        // append the action instead of inserting it
+
         addAction(action);
         return;
     }
@@ -232,7 +231,6 @@ void WideBar::showVisibilityMenu(QPoint const& position)
             connect(act, &QAction::toggled, entry.bar_action, [this, &entry](bool toggled) {
                 entry.bar_action->setVisible(toggled);
 
-                // NOTE: This is needed so that disabled actions get reflected on the button when it is made visible.
                 static_cast<ActionButton*>(widgetForAction(entry.bar_action))->actionChanged();
             });
 
@@ -274,7 +272,6 @@ void WideBar::setVisibilityState(QByteArray&& state)
     auto bits = split.first();
     auto hash = split.last();
 
-    // If the actions changed, we better not try to load the old one to avoid unwanted hiding
     if (!checkHash(hash))
         return;
 
@@ -287,7 +284,6 @@ void WideBar::setVisibilityState(QByteArray&& state)
 
         entry.bar_action->setVisible(bits.at(i++) == '1');
 
-        // NOTE: This is needed so that disabled actions get reflected on the button when it is made visible.
         static_cast<ActionButton*>(widgetForAction(entry.bar_action))->actionChanged();
     }
 }

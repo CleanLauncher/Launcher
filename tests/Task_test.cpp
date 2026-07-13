@@ -9,7 +9,6 @@
 
 #include <array>
 
-/* Does nothing. Only used for testing. */
 class BasicTask : public Task {
     Q_OBJECT
 
@@ -22,7 +21,6 @@ class BasicTask : public Task {
     void executeTask() override { emitSucceeded(); }
 };
 
-/* Does nothing. Only used for testing. */
 class BasicTask_MultiStep : public Task {
     Q_OBJECT
 
@@ -39,8 +37,7 @@ class BigConcurrentTask : public ConcurrentTask {
 
     void executeNextSubTask() override
     {
-        // This is here only to help fill the stack a bit more quickly (if there's an issue, of course :^))
-        // Each tasks thus adds 1024 * 4 bytes to the stack, at the very least.
+
         [[maybe_unused]] volatile std::array<uint32_t, 1024> some_data_on_the_stack{};
 
         ConcurrentTask::executeNextSubTask();
@@ -56,9 +53,6 @@ class BigConcurrentTaskThread : public QThread {
         BigConcurrentTask big_task;
         m_deadline.setInterval(10000);
 
-        // NOTE: Arbitrary value that manages to trigger a problem when there is one.
-        //       Considering each tasks, in a problematic state, adds 1024 * 4 bytes to the stack,
-        //       this number is enough to fill up 16 MiB of stack, more than enough to cause a problem.
         static const unsigned s_num_tasks = 1 << 12;
         for (unsigned i = 0; i < s_num_tasks; i++) {
             auto sub_task = makeShared<BasicTask>(false);
@@ -107,8 +101,7 @@ class TaskTest : public QObject {
         t.setStatus(status);
 
         QCOMPARE(t.getStatus(), status);
-        // Even though it is multi step, it does not override the getStepStatus method,
-        // so it should remain the same.
+
         QCOMPARE(t.getStepProgress().isEmpty(), TaskStepProgressList{}.isEmpty());
     }
 
@@ -157,7 +150,6 @@ class TaskTest : public QObject {
         QVERIFY2(QTest::qWaitFor([&t]() { return t.isFinished(); }, 1000), "Task didn't finish as it should.");
     }
 
-    // Tests if starting new tasks after the 6 initial ones is working
     void test_moreConcurrentRun()
     {
         auto t1 = makeShared<BasicTask>();

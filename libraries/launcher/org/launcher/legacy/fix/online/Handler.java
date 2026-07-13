@@ -53,7 +53,6 @@ final class Handler extends URLStreamHandler {
     protected URLConnection openConnection(URL address, Proxy proxy) throws IOException {
         URLConnection result;
 
-        // try various fixes...
         result = SkinFix.openConnection(address, proxy);
         if (result != null)
             return result;
@@ -62,7 +61,6 @@ final class Handler extends URLStreamHandler {
         if (result != null)
             return result;
 
-        // ...then give up and make the request directly
         return UrlUtils.openConnection(address, proxy);
     }
 }

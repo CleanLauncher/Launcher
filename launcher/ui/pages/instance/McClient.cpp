@@ -32,15 +32,22 @@ void McClient::getStatusData()
 void McClient::sendRequest()
 {
     QByteArray data;
-    writeVarInt(data, 0x00);      // packet ID
-    writeVarInt(data, 763);       // hardcoded protocol version (763 = 1.20.1)
-    writeString(data, m_domain);  // server address
-    writeUInt16(data, m_port);    // server port
-    writeVarInt(data, 0x01);      // next state
-    writePacketToSocket(data);    // send handshake packet
+    writeVarInt(data, 0x00);
 
-    writeVarInt(data, 0x00);    // packet ID
-    writePacketToSocket(data);  // send status packet
+    writeVarInt(data, 763);
+
+    writeString(data, m_domain);
+
+    writeUInt16(data, m_port);
+
+    writeVarInt(data, 0x01);
+
+    writePacketToSocket(data);
+
+    writeVarInt(data, 0x00);
+
+    writePacketToSocket(data);
+
 }
 
 void McClient::readRawResponse()
@@ -78,9 +85,8 @@ void McClient::parseResponse()
         throw Exception(QString("Packet ID doesn't match expected value (0x00 vs 0x%1)").arg(packetID, 0, 16));
     }
 
-    Q_UNUSED(readVarInt(m_resp));  // json length
+    Q_UNUSED(readVarInt(m_resp));
 
-    // 'resp' should now be the JSON string
     QJsonParseError parseError;
     const QJsonDocument doc = Json::parseUntilGarbage(m_resp, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
@@ -93,24 +99,20 @@ void McClient::parseResponse()
 
 // NOLINTBEGIN(*-signed-bitwise)
 
-// From https://wiki.vg/Protocol#VarInt_and_VarLong
 constexpr uint8_t g_varIntValueMask = 0x7F;
 constexpr uint8_t g_varIntContinue = 0x80;
 
 void McClient::writeVarInt(QByteArray& data, int value)
 {
-    while ((value & ~g_varIntValueMask) != 0) {  // check if the value is too big to fit in 7 bits
-        // Write 7 bits
+    while ((value & ~g_varIntValueMask) != 0) {
+
         data.append(static_cast<uint8_t>((value & ~g_varIntValueMask) | g_varIntContinue)); // NOLINT(*-narrowing-conversions)
 
-        // Erase theses 7 bits from the value to write
-        // Note: >>> means that the sign bit is shifted with the rest of the number rather than being left alone
         value >>= 7;
     }
     data.append(static_cast<uint8_t>(value)); // NOLINT(*-narrowing-conversions)
 }
 
-// From https://wiki.vg/Protocol#VarInt_and_VarLong
 int McClient::readVarInt(QByteArray& data)
 {
     int value = 0;
@@ -162,12 +164,11 @@ void McClient::writeString(QByteArray& data, const QString& value)
 
 void McClient::writePacketToSocket(QByteArray& data)
 {
-    // we prefix the packet with its length
+
     QByteArray dataWithSize;
     writeVarInt(dataWithSize, static_cast<int32_t>(data.size()));
     dataWithSize.append(data);
 
-    // write it to the socket
     m_socket.write(dataWithSize);
     m_socket.flush();
 

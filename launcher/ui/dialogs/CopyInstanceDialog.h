@@ -46,7 +46,7 @@ class CopyInstanceDialog : public QDialog {
    private slots:
     void on_iconButton_clicked();
     void on_instNameTextBox_textChanged(const QString& arg1);
-    // Checkboxes
+
     void on_selectAllCheckbox_stateChanged(int state);
     void on_copySavesCheckbox_stateChanged(int state);
     void on_keepPlaytimeCheckbox_stateChanged(int state);
@@ -68,7 +68,6 @@ class CopyInstanceDialog : public QDialog {
     void updateUseCloneCheckbox();
     void updateLinkOptions();
 
-    /* data */
     Ui::CopyInstanceDialog* ui;
     QString InstIconKey;
     BaseInstance* m_original;

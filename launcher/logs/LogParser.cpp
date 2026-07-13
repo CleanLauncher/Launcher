@@ -83,7 +83,8 @@ void LogParser::setError()
 
 void LogParser::clearError()
 {
-    m_error = {};  // clear previous error
+    m_error = {};
+
 }
 
 bool isPotentialLog4JStart(QStringView buffer)
@@ -110,7 +111,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
         return LogParser::PlainText{ text };
     }
 
-    // check if we have a full xml log4j event
     bool isCompleteLog4j = false;
     m_parser.clear();
     m_parser.setNamespaceProcessing(false);
@@ -129,10 +129,11 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
                         depth -= 1;
                     } break;
                     case QXmlStreamReader::TokenType::EndDocument: {
-                        eod = true;  // break outer while loop
+                        eod = true;
+
                     } break;
                     default: {
-                        // no op
+
                     }
                 }
                 if (m_parser.hasError()) {
@@ -175,7 +176,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
             }
         }
 
-        // no log4j found, all plain text
         auto text = QString(m_buffer);
         m_buffer.clear();
         return LogParser::PlainText{ text };
@@ -244,10 +244,11 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                             }
                         } break;
                         case QXmlStreamReader::TokenType::EndDocument: {
-                            return parseError;  // parse fail
+                            return parseError;
+
                         } break;
                         default: {
-                            // no op
+
                         }
                     }
 
@@ -270,7 +271,7 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                     auto consumed = m_parser.characterOffset();
                     if (consumed > 0 && consumed <= m_buffer.length()) {
                         m_buffer = m_buffer.right(m_buffer.length() - consumed);
-                        // potential whitespace preserved for next item
+
                     }
                     clearError();
                     return entryReady;
@@ -296,18 +297,19 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                     return {};
                 } break;
                 default: {
-                    // no op
+
                 }
             }
 
             switch (op) {
                 case parseError:
-                    return {};  // parse fail or error
+                    return {};
+
                 case entryReady:
                     return entry;
                 case noOp:
                 default: {
-                    // no op
+
                 }
             }
 
@@ -325,13 +327,13 @@ MessageLevel LogParser::guessLevel(const QString& line, MessageLevel previous)
     static const QRegularExpression LINE_WITH_LEVEL("^\\[(?<timestamp>[0-9:]+)\\] \\[[^/]+/(?<level>[^\\]]+)\\]");
     auto match = LINE_WITH_LEVEL.match(line);
     if (match.hasMatch()) {
-        // New style logs from log4j
+
         QString timestamp = match.captured("timestamp");
         QString levelStr = match.captured("level");
 
         return MessageLevel::fromName(levelStr);
     } else {
-        // Old style forge logs
+
         if (line.contains("[INFO]") || line.contains("[CONFIG]") || line.contains("[FINE]") || line.contains("[FINER]") ||
             line.contains("[FINEST]"))
             return MessageLevel::Info;

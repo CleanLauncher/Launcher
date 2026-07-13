@@ -47,22 +47,22 @@ class QLocalServer;
 class LockedFile;
 
 class ApplicationId {
-   public: /* methods */
-    // traditional app = installed system wide and used in a multi-user environment
+   public:
+
     static ApplicationId fromTraditionalApp();
-    // ID based on a path with all the application data (no two instances with the same data path should run)
+
     static ApplicationId fromPathAndVersion(const QString& dataPath, const QString& version);
-    // custom ID
+
     static ApplicationId fromCustomId(const QString& id);
-    // custom ID, based on a raw string previously acquired from 'toString'
+
     static ApplicationId fromRawString(const QString& id);
 
     QString toString() { return m_id; }
 
-   private: /* methods */
+   private:
     ApplicationId(const QString& value) { m_id = value; }
 
-   private: /* data */
+   private:
     QString m_id;
 };
 

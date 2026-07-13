@@ -1,4 +1,3 @@
-######## Configure the file with build properties ########
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/BuildConfig.cpp.in" "${CMAKE_CURRENT_BINARY_DIR}/BuildConfig.cpp")
 

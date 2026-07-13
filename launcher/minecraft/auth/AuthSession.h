@@ -13,19 +13,18 @@ struct AuthSession {
 
     QString serializeUserProperties();
 
-    // combined session ID
     QString session;
-    // volatile auth token
+
     QString access_token;
-    // profile name
+
     QString player_name;
-    // profile ID
+
     QString uuid;
-    // 'msa' or 'offline', depending on account type
+
     QString user_type;
-    // the actual launch mode for this session
+
     LaunchMode launchMode;
-    // settings & account type allow for Ely.by patch?
+
     bool wantsElyPatch = false;
 };
 

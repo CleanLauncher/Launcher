@@ -42,7 +42,7 @@
 LoggedProcess::LoggedProcess(const QStringConverter::Encoding output_codec, QObject* parent)
     : QProcess(parent), m_err_decoder(output_codec), m_out_decoder(output_codec)
 {
-    // QProcess has a strange interface... let's map a lot of those into a few.
+
     connect(this, &QProcess::readyReadStandardOutput, this, &LoggedProcess::on_stdOut);
     connect(this, &QProcess::readyReadStandardError, this, &LoggedProcess::on_stdErr);
     connect(this, &QProcess::finished, this, &LoggedProcess::on_exit);
@@ -86,17 +86,16 @@ void LoggedProcess::on_stdOut()
 
 void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
 {
-    // save the exit code
+
     m_exit_code = exit_code;
 
-    // based on state, send signals
     if (!m_is_aborting) {
         if (status == QProcess::NormalExit) {
-            //: Message displayed on instance exit
+
             emit log({ tr("Process exited with code %1.").arg(exit_code) }, MessageLevel::Launcher);
             changeState(LoggedProcess::Finished);
         } else {
-            //: Message displayed on instance crashed
+
             if (exit_code == -1)
                 emit log({ tr("Process crashed.") }, MessageLevel::Launcher);
             else
@@ -104,7 +103,7 @@ void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
             changeState(LoggedProcess::Crashed);
         }
     } else {
-        //: Message displayed after the instance exits due to kill request
+
         emit log({ tr("Process was killed by user.") }, MessageLevel::Error);
         changeState(LoggedProcess::Aborted);
     }
@@ -118,7 +117,7 @@ void LoggedProcess::on_error(QProcess::ProcessError error)
             changeState(LoggedProcess::FailedToStart);
             break;
         }
-        // we'll just ignore those... never needed them
+
         case QProcess::Crashed:
         case QProcess::ReadError:
         case QProcess::Timedout:
@@ -156,7 +155,8 @@ void LoggedProcess::on_stateChange(QProcess::ProcessState state)
 {
     switch (state) {
         case QProcess::NotRunning:
-            break;  // let's not - there are too many that handle this already.
+            break;
+
         case QProcess::Starting: {
             if (m_state != LoggedProcess::NotRunning) {
                 qWarning() << "Wrong state change for process from state" << m_state << "to" << (int)LoggedProcess::Starting;

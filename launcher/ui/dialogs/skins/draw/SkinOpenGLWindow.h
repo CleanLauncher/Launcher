@@ -73,8 +73,9 @@ class SkinOpenGLWindow : public QOpenGLWindow, protected QOpenGLFunctions {
 
     bool m_isMousePressed = false;
     float m_distance = 48;
-    float m_yaw = 90;   // Horizontal rotation angle
-    float m_pitch = 0;  // Vertical rotation angle
+    float m_yaw = 90;
+
+    float m_pitch = 0;
 
     bool m_isFirstFrame = true;
 

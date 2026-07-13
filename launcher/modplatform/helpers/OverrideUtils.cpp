@@ -25,7 +25,7 @@ void createOverrides(const QString& name, const QString& parent_folder, const QS
         auto override_file_path = override_iterator.next();
         QFileInfo info(override_file_path);
         if (info.isFile()) {
-            // Absolute path with temp directory -> relative path
+
             override_file_path = override_file_path.split(name).last().remove(0, 1);
 
             file.write(override_file_path.toUtf8());
@@ -62,4 +62,4 @@ QStringList readOverrides(const QString& name, const QString& parent_folder)
     return previous_overrides;
 }
 
-}  // namespace Override
+}

@@ -29,52 +29,52 @@ Scene::Scene(const QImage& skin, bool slim, const QImage& cape) : QOpenGLFunctio
 {
     initializeOpenGLFunctions();
     m_staticComponents = {
-        // head
+
         new opengl::BoxGeometry(QVector3D(8, 8, 8), QVector3D(0, 4, 0), QPoint(0, 0), QVector3D(8, 8, 8)),
-        // body
+
         new opengl::BoxGeometry(QVector3D(8, 12, 4), QVector3D(0, -6, 0), QPoint(16, 16), QVector3D(8, 12, 4)),
-        // right leg
+
         new opengl::BoxGeometry(QVector3D(4, 12, 4), QVector3D(-1.9f, -18, -0.1f), QPoint(0, 16), QVector3D(4, 12, 4)),
-        // left leg
+
         new opengl::BoxGeometry(QVector3D(4, 12, 4), QVector3D(1.9f, -18, -0.1f), QPoint(16, 48), QVector3D(4, 12, 4)),
     };
 
     m_staticComponentsOverlay = {
-        // head
+
         new opengl::BoxGeometry(QVector3D(9, 9, 9), QVector3D(0, 4, 0), QPoint(32, 0), QVector3D(8, 8, 8)),
-        // body
+
         new opengl::BoxGeometry(QVector3D(8.5, 12.5, 4.5), QVector3D(0, -6, 0), QPoint(16, 32), QVector3D(8, 12, 4)),
-        // right leg
+
         new opengl::BoxGeometry(QVector3D(4.5f, 12.5f, 4.5f), QVector3D(-1.9f, -18, -0.1f), QPoint(0, 32), QVector3D(4, 12, 4)),
-        // left leg
+
         new opengl::BoxGeometry(QVector3D(4.5f, 12.5f, 4.5f), QVector3D(1.9f, -18, -0.1f), QPoint(0, 48), QVector3D(4, 12, 4)),
     };
 
     m_normalArms = {
-        // Right Arm
+
         new opengl::BoxGeometry(QVector3D(4, 12, 4), QVector3D(-6, -6, 0), QPoint(40, 16), QVector3D(4, 12, 4)),
-        // Left Arm
+
         new opengl::BoxGeometry(QVector3D(4, 12, 4), QVector3D(6, -6, 0), QPoint(32, 48), QVector3D(4, 12, 4)),
     };
 
     m_normalArmsOverlay = {
-        // Right Arm
+
         new opengl::BoxGeometry(QVector3D(4.5, 12.5, 4.5), QVector3D(-6, -6, 0), QPoint(40, 32), QVector3D(4, 12, 4)),
-        // Left Arm
+
         new opengl::BoxGeometry(QVector3D(4.5, 12.5, 4.5), QVector3D(6, -6, 0), QPoint(48, 48), QVector3D(4, 12, 4)),
     };
 
     m_slimArms = {
-        // Right Arm
+
         new opengl::BoxGeometry(QVector3D(3, 12, 4), QVector3D(-5.5, -6, 0), QPoint(40, 16), QVector3D(3, 12, 4)),
-        // Left Arm
+
         new opengl::BoxGeometry(QVector3D(3, 12, 4), QVector3D(5.5, -6, 0), QPoint(32, 48), QVector3D(3, 12, 4)),
     };
 
     m_slimArmsOverlay = {
-        // Right Arm
+
         new opengl::BoxGeometry(QVector3D(3.5, 12.5, 4.5), QVector3D(-5.5, -6, 0), QPoint(40, 32), QVector3D(3, 12, 4)),
-        // Left Arm
+
         new opengl::BoxGeometry(QVector3D(3.5, 12.5, 4.5), QVector3D(5.5, -6, 0), QPoint(48, 48), QVector3D(3, 12, 4)),
     };
 
@@ -95,7 +95,6 @@ Scene::Scene(const QImage& skin, bool slim, const QImage& cape) : QOpenGLFunctio
     rightWing->rotate(1, QVector3D(1, 0, 0));
     m_elytra << leftWing << rightWing;
 
-    // texture init
     m_skinTexture = new QOpenGLTexture(skin.mirrored());
     m_skinTexture->setMinificationFilter(QOpenGLTexture::Nearest);
     m_skinTexture->setMagnificationFilter(QOpenGLTexture::Nearest);
@@ -181,4 +180,4 @@ void Scene::setElytraVisible(bool elytraVisible)
 {
     m_elytraVisible = elytraVisible;
 }
-}  // namespace opengl
+}

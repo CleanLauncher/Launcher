@@ -40,9 +40,6 @@
 
 const char* themeFile = "theme.json";
 
-/// @param baseTheme Base Theme
-/// @param fileInfo FileInfo object for file to load
-/// @param isManifest whether to load a theme manifest or a qss file
 CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest)
 {
     if (isManifest) {
@@ -67,7 +64,7 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
         bool hasCustomLogColors = false;
 
         if (read(themeFilePath, hasCustomLogColors)) {
-            // If theme data was found, fade "Disabled" color of each role according to FadeAmount
+
             m_palette = fadeInactive(m_palette, m_fadeAmount, m_fadeColor);
 
             if (!hasCustomLogColors)
@@ -82,7 +79,7 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
         QFileInfo info(qssFilePath);
         if (info.isFile()) {
             try {
-                // TODO: validate qss?
+
                 m_styleSheet = QString::fromUtf8(FS::read(qssFilePath));
             } catch (const Exception& e) {
                 themeWarningLog() << "Couldn't load qss:" << e.cause() << "from" << qssFilePath;
@@ -95,9 +92,6 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
         m_id = fileInfo.fileName();
         m_name = fileInfo.baseName();
         QString path = fileInfo.filePath();
-        // themeDebugLog << "Theme ID: " << m_id;
-        // themeDebugLog << "Theme Name: " << m_name;
-        // themeDebugLog << "Theme Path: " << path;
 
         if (!FS::ensureFilePathExists(path)) {
             themeWarningLog().nospace() << m_name << ": Theme file path doesn't exist!";
@@ -108,7 +102,7 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
 
         m_palette = baseTheme->colorScheme();
         try {
-            // TODO: validate qss?
+
             m_styleSheet = QString::fromUtf8(FS::read(path));
         } catch (const Exception& e) {
             themeWarningLog() << "Couldn't load qss:" << e.cause() << "from" << path;
@@ -205,7 +199,6 @@ bool CustomTheme::read(const QString& path, bool& hasCustomLogColors)
                     }
                 };
 
-                // palette
                 readAndSetPaletteColor(QPalette::Window, "Window");
                 readAndSetPaletteColor(QPalette::WindowText, "WindowText");
                 readAndSetPaletteColor(QPalette::Base, "Base");
@@ -220,7 +213,6 @@ bool CustomTheme::read(const QString& path, bool& hasCustomLogColors)
                 readAndSetPaletteColor(QPalette::Highlight, "Highlight");
                 readAndSetPaletteColor(QPalette::HighlightedText, "HighlightedText");
 
-                // fade
                 m_fadeColor = readColor(colorsRoot, "fadeColor");
                 m_fadeAmount = colorsRoot["fadeAmount"].toDouble(0.5);
             }

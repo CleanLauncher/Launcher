@@ -26,7 +26,7 @@ class BaseWizardPage;
 class SetupWizard : public QWizard {
     Q_OBJECT
 
-   public: /* con/destructors */
+   public:
     explicit SetupWizard(QWidget* parent = 0);
     virtual ~SetupWizard();
 
@@ -37,6 +37,6 @@ class SetupWizard : public QWizard {
    private slots:
     void pageChanged(int id);
 
-   private: /* methods */
+   private:
     void retranslate();
 };

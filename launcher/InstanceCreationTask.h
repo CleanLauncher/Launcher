@@ -15,23 +15,8 @@ class InstanceCreationTask : public InstanceTask {
    protected:
     void executeTask() final override;
 
-    /**
-     * Tries to update an already existing instance.
-     *
-     * This can be implemented by subclasses to provide a way of updating an already existing
-     * instance, according to that implementation's concept of 'identity' (i.e. instances that
-     * are updates / downgrades of one another).
-     *
-     * If this returns true, createInstance() will not run, so you should do all update steps in here.
-     * Otherwise, createInstance() is run as normal.
-     */
     virtual bool updateInstance() { return false; };
 
-    /**
-     * Creates a new instance.
-     *
-     * Returns the instance if it was created or nullptr otherwise.
-     */
     virtual std::unique_ptr<MinecraftInstance> createInstance() { return nullptr; }
 
     QString getError() const { return m_error_message; }

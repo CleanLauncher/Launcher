@@ -33,13 +33,11 @@ class IniFileTest : public QObject {
         QString b = "a\nb\t\n\\\\\\C:\\Program files\\terrible\\name\\of something\\#thisIsNotAComment";
         QString filename = "test_SaveLoad.ini";
 
-        // save
         INIFile f;
         f.set("a", a);
         f.set("b", b);
         f.saveFile(filename);
 
-        // load
         INIFile f2;
         f2.loadFile(filename);
         QCOMPARE(f2.get("a", "NOT SET").toString(), a);
@@ -61,7 +59,6 @@ class IniFileTest : public QObject {
         f.set("list_numbers", QVariantUtils::fromList(list_numbers));
         f.saveFile(filename);
 
-        // load
         INIFile f2;
         f2.loadFile(filename);
 
@@ -100,7 +97,6 @@ Wrapperommand=)";
         stream << fileContent;
         file.close();
 
-        // load
         INIFile f1;
         f1.loadFile(fileName);
         QCOMPARE(f1.get("PreLaunchCommand", "NOT SET").toString(), "\"$INST_JAVA\" -jar packwiz-installer-bootstrap.jar link");
@@ -141,7 +137,6 @@ Wrapperommand=)";
 
         QCOMPARE(settings.status(), QSettings::Status::NoError);
 
-        // load
         INIFile f1;
         f1.loadFile(fileName);
         for (auto key : settings.allKeys())
@@ -181,7 +176,6 @@ PreLaunchCommand=)";
         stream << fileContent;
         file.close();
 
-        // load
         INIFile f1;
         f1.loadFile(fileName);
         QCOMPARE(f1.get("PreLaunchCommand", "NOT SET").toString(), "env mesa=true");

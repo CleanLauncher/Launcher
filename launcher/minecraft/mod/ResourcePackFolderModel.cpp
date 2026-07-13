@@ -81,7 +81,7 @@ QVariant ResourcePackFolderModel::data(const QModelIndex& index, int role) const
         }
         case Qt::ToolTipRole: {
             if (column == PackFormatColumn) {
-                //: The string being explained by this is in the format: ID (Lower version - Upper version)
+
                 return tr("The resource pack format ID, as well as the Minecraft versions it was designed for.");
             }
             break;
@@ -95,7 +95,6 @@ QVariant ResourcePackFolderModel::data(const QModelIndex& index, int role) const
             break;
     }
 
-    // map the columns to the base equivilents
     QModelIndex mappedIndex;
     switch (column) {
         case ActiveColumn:
@@ -152,7 +151,7 @@ QVariant ResourcePackFolderModel::headerData(int section, [[maybe_unused]] Qt::O
                 case NameColumn:
                     return tr("The name of the resource pack.");
                 case PackFormatColumn:
-                    //: The string being explained by this is in the format: ID (Lower version - Upper version)
+
                     return tr("The resource pack format ID, as well as the Minecraft versions it was designed for.");
                 case DateColumn:
                     return tr("The date and time this resource pack was last changed (or added).");

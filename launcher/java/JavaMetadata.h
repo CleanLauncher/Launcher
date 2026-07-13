@@ -61,4 +61,4 @@ DownloadType parseDownloadType(QString javaDownload);
 QString downloadTypeToString(DownloadType javaDownload);
 MetadataPtr parseJavaMeta(const QJsonObject& libObj);
 
-}  // namespace Java
+}

@@ -68,14 +68,13 @@ InstanceList::InstanceList(SettingsObject* settings, const QString& instDir, QOb
     : QAbstractListModel(parent), m_globalSettings(settings)
 {
     resumeWatch();
-    // Create aand normalize path
+
     if (!QDir::current().exists(instDir)) {
         QDir::current().mkpath(instDir);
     }
 
     connect(this, &InstanceList::instancesChanged, this, &InstanceList::providerUpdated);
 
-    // NOTE: canonicalPath requires the path to exist. Do not move this above the creation block!
     m_instDir = QDir(instDir).canonicalPath();
     m_watcher = new QFileSystemWatcher(this);
     connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &InstanceList::instanceDirContentsChanged);
@@ -186,7 +185,7 @@ QVariant InstanceList::data(const QModelIndex& index, int role) const
         case Qt::DecorationRole: {
             return pdata->iconKey();
         }
-        // HACK: see InstanceView.h in gui!
+
         case GroupRole: {
             return getInstanceGroup(pdata->id());
         }
@@ -351,7 +350,6 @@ bool InstanceList::trashInstance(const InstanceId& id)
     qDebug() << "Instance" << id << "has been trashed by the launcher.";
     m_trashHistory.push({ id, inst->instanceRoot(), trashedLoc, cachedGroupId });
 
-    // Also trash all of its shortcuts; we remove the shortcuts if trash fails since it is invalid anyway
     for (const auto& [name, filePath, target] : inst->shortcuts()) {
         if (!FS::trash(filePath, &trashedLoc)) {
             qWarning() << "Trash of shortcut" << name << "at path" << filePath << "for instance" << id
@@ -399,7 +397,7 @@ bool InstanceList::undoTrashInstance()
     bool ok = true;
     for (const auto& [data, trashPath] : top.shortcuts) {
         if (QDir(data.filePath).exists()) {
-            // Don't try to append 1 here as the shortcut may have suffixes like .app, just warn and skip it
+
             qWarning() << "Shortcut" << trashPath << "original directory" << data.filePath << "already exists!";
             ok = false;
             continue;
@@ -477,7 +475,7 @@ QList<InstanceId> InstanceList::discoverInstances()
         QFileInfo dirInfo(subDir);
         if (!QFileInfo(FS::PathCombine(subDir, "instance.cfg")).exists())
             continue;
-        // if it is a symlink, ignore it if it goes to the instance folder
+
         if (dirInfo.isSymLink()) {
             QFileInfo targetInfo(dirInfo.symLinkTarget());
             QFileInfo instDirInfo(m_instDir);
@@ -513,13 +511,12 @@ InstanceList::InstListError InstanceList::loadList()
         }
     }
 
-    // TODO: looks like a general algorithm with a few specifics inserted. Do something about it.
     if (!existingIds.isEmpty()) {
-        // get the list of removed instances and sort it by their original index, from last to first
+
         auto deadList = existingIds.values();
         auto orderSortPredicate = [](const InstanceLocator& a, const InstanceLocator& b) -> bool { return a.second > b.second; };
         std::sort(deadList.begin(), deadList.end(), orderSortPredicate);
-        // remove the contiguous ranges of rows
+
         int front_bookmark = -1;
         int back_bookmark = -1;
         int currentItem = -1;
@@ -535,12 +532,12 @@ InstanceList::InstListError InstanceList::loadList()
             instPtr->invalidate();
             currentItem = removedItem.second;
             if (back_bookmark == -1) {
-                // no bookmark yet
+
                 back_bookmark = currentItem;
             } else if (currentItem == front_bookmark - 1) {
-                // part of contiguous sequence, continue
+
             } else {
-                // seam between previous and current item
+
                 removeNow();
             }
             front_bookmark = currentItem;
@@ -671,8 +668,6 @@ std::unique_ptr<BaseInstance> InstanceList::loadInstance(const InstanceId& id)
 
     QString inst_type = instanceSettings->get("InstanceType").toString();
 
-    // NOTE: Some launcher versions didn't save the InstanceType properly. We will just bank on the probability that this is probably a
-    // OneSix instance
     if (inst_type == "OneSix" || inst_type.isEmpty()) {
         inst.reset(new MinecraftInstance(m_globalSettings, std::move(instanceSettings), instanceRoot));
     } else {
@@ -751,7 +746,7 @@ void InstanceList::saveGroupList()
         groupsArr.insert(name, groupObj);
     }
     toplevel.insert("groups", groupsArr);
-    // empty string represents ungrouped "group"
+
     if (m_collapsedGroups.contains("")) {
         QJsonObject ungrouped;
         ungrouped.insert("hidden", QJsonValue(true));
@@ -772,7 +767,6 @@ void InstanceList::loadGroupList()
 
     QString groupFileName = m_instDir + "/instgroups.json";
 
-    // if there's no group file, fail
     if (!QFileInfo(groupFileName).exists())
         return;
 
@@ -787,7 +781,6 @@ void InstanceList::loadGroupList()
     QJsonParseError error;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
 
-    // if the json was bad, fail
     if (error.error != QJsonParseError::NoError) {
         qCritical() << QString("Failed to parse instance group file: %1 at offset %2")
                            .arg(error.errorString(), QString::number(error.offset))
@@ -795,7 +788,6 @@ void InstanceList::loadGroupList()
         return;
     }
 
-    // if the root of the json wasn't an object, fail
     if (!jsonDoc.isObject()) {
         qWarning() << "Invalid group file. Root entry should be an object.";
         return;
@@ -803,11 +795,9 @@ void InstanceList::loadGroupList()
 
     QJsonObject rootObj = jsonDoc.object();
 
-    // Make sure the format version matches, otherwise fail.
     if (rootObj.value("formatVersion").toVariant().toInt() != GROUP_FILE_FORMAT_VERSION)
         return;
 
-    // Get the groups. if it's not an object, fail
     if (!rootObj.value("groups").isObject()) {
         qWarning() << "Invalid group list JSON: 'groups' should be an object.";
         return;
@@ -816,7 +806,6 @@ void InstanceList::loadGroupList()
     m_instanceGroupIndex.clear();
     m_groupNameCache.clear();
 
-    // Iterate through all the groups.
     QJsonObject groupMapping = rootObj.value("groups").toObject();
     for (QJsonObject::iterator iter = groupMapping.begin(); iter != groupMapping.end(); iter++) {
         QString groupName = iter.key();
@@ -826,7 +815,6 @@ void InstanceList::loadGroupList()
             continue;
         }
 
-        // If not an object, complain and skip to the next one.
         if (!iter.value().isObject()) {
             qWarning() << QString("Group '%1' in the group list should be an object").arg(groupName).toUtf8();
             continue;
@@ -844,7 +832,6 @@ void InstanceList::loadGroupList()
         if (hidden)
             m_collapsedGroups.insert(groupName);
 
-        // Iterate through the list of instances in the group.
         QJsonArray instancesArray = groupObj.value("instances").toArray();
 
         for (auto value : instancesArray) {
@@ -859,7 +846,7 @@ void InstanceList::loadGroupList()
         ungroupedHidden = ungrouped.value("hidden").toBool(false);
     }
     if (ungroupedHidden) {
-        // empty string represents ungrouped "group"
+
         m_collapsedGroups.insert("");
     }
     m_groupsLoaded = true;
@@ -928,7 +915,6 @@ class InstanceStaging : public Task {
 
     ~InstanceStaging() override = default;
 
-    // FIXME/TODO: add ability to abort during instance commit retries
     bool abort() override
     {
         if (!canAbort()) {
@@ -960,7 +946,7 @@ class InstanceStaging : public Task {
             emitSucceeded();
             return;
         }
-        // we actually failed, retry?
+
         if (sleepTime == maxBackoff) {
             m_backoffTimer.stop();
             emitFailed(tr("Failed to commit instance, even after multiple retries. It is being blocked by something."));
@@ -985,11 +971,7 @@ class InstanceStaging : public Task {
 
    private:
     InstanceList* m_parent;
-    /*
-     * WHY: the whole reason why this uses an exponential backoff retry scheme is antivirus on Windows.
-     * Basically, it starts messing things up while the launcher is extracting/creating instances
-     * and causes that horrible failure that is NTFS to lock files in place because they are open.
-     */
+
     ExponentialSeries backoff;
     QString m_stagingPath;
     std::unique_ptr<InstanceTask> m_child;

@@ -19,10 +19,6 @@
 #include <java/JavaChecker.h>
 #include <launch/LaunchStep.h>
 
-/*
- * FIXME: maybe do not export
- */
-
 class TextPrint : public LaunchStep {
     Q_OBJECT
    public:

@@ -19,8 +19,7 @@ MessageLevel MessageLevel::fromName(const QString& levelName)
         return MessageLevel::Error;
     else if (name == "FATAL")
         return MessageLevel::Fatal;
-    // Skip PrePost, it's not exposed to !![]!
-    // Also skip StdErr and StdOut
+
     else
         return MessageLevel::Unknown;
 }
@@ -43,10 +42,9 @@ MessageLevel MessageLevel::fromQtMsgType(const QtMsgType& type)
     }
 }
 
-/* Get message level from a line. Line is modified if it was successful. */
 MessageLevel MessageLevel::takeFromLine(QString& line)
 {
-    // Level prefix
+
     int endmark = line.indexOf("]!");
     if (line.startsWith("!![") && endmark != -1) {
         auto level = MessageLevel::fromName(line.left(endmark).mid(3));
@@ -56,10 +54,9 @@ MessageLevel MessageLevel::takeFromLine(QString& line)
     return MessageLevel::Unknown;
 }
 
-/* Get message level from a line from the launcher log. Line is modified if it was successful. */
 MessageLevel MessageLevel::takeFromLauncherLine(QString& line)
 {
-    // Level prefix
+
     int startMark = 0;
     while (startMark < line.size() && (line[startMark].isDigit() || line[startMark].isSpace() || line[startMark] == '.'))
         ++startMark;

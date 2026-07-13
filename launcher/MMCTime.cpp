@@ -47,8 +47,10 @@ QString Time::humanReadableDuration(double duration, int precision)
 
     bool neg = false;
     if (duration < 0) {
-        neg = true;      // flag
-        duration *= -1;  // invert
+        neg = true;
+
+        duration *= -1;
+
     }
 
     auto std_duration = std::chrono::duration<double>(duration);
@@ -77,22 +79,26 @@ QString Time::humanReadableDuration(double duration, int precision)
     if (hc) {
         if (dc)
             os << " ";
-        os << qSetFieldWidth(2) << hc << QObject::tr("h");  // hours
+        os << qSetFieldWidth(2) << hc << QObject::tr("h");
+
     }
     if (mc) {
         if (dc || hc)
             os << " ";
-        os << qSetFieldWidth(2) << mc << QObject::tr("m");  // minutes
+        os << qSetFieldWidth(2) << mc << QObject::tr("m");
+
     }
     if (dc || hc || mc || sc) {
         if (dc || hc || mc)
             os << " ";
-        os << qSetFieldWidth(2) << sc << QObject::tr("s");  // seconds
+        os << qSetFieldWidth(2) << sc << QObject::tr("s");
+
     }
     if ((msc && (precision > 0)) || !(dc || hc || mc || sc)) {
         if (dc || hc || mc || sc)
             os << " ";
-        os << qSetFieldWidth(0) << qSetRealNumberPrecision(precision) << msc << QObject::tr("ms");  // miliseconds
+        os << qSetFieldWidth(0) << qSetRealNumberPrecision(precision) << msc << QObject::tr("ms");
+
     }
 
     os.flush();

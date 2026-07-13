@@ -38,7 +38,8 @@ std::shared_ptr<Setting> SettingsObject::registerOverride(std::shared_ptr<Settin
 {
     if (contains(original->id())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
-        return nullptr;  // Fail
+        return nullptr;
+
     }
     auto override = std::make_shared<OverrideSetting>(original, gate);
     override->m_storage = this;
@@ -51,7 +52,8 @@ std::shared_ptr<Setting> SettingsObject::registerPassthrough(std::shared_ptr<Set
 {
     if (contains(original->id())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
-        return nullptr;  // Fail
+        return nullptr;
+
     }
     auto passthrough = std::make_shared<PassthroughSetting>(original, gate);
     passthrough->m_storage = this;
@@ -66,7 +68,8 @@ std::shared_ptr<Setting> SettingsObject::registerSetting(QStringList synonyms, Q
         return nullptr;
     if (contains(synonyms.first())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(synonyms.first());
-        return nullptr;  // Fail
+        return nullptr;
+
     }
     auto setting = std::make_shared<Setting>(synonyms, defVal);
     setting->m_storage = this;
@@ -77,7 +80,7 @@ std::shared_ptr<Setting> SettingsObject::registerSetting(QStringList synonyms, Q
 
 std::shared_ptr<Setting> SettingsObject::getSetting(const QString& id) const
 {
-    // Make sure there is a setting with the given ID.
+
     if (!m_settings.contains(id))
         return NULL;
 
@@ -89,7 +92,7 @@ QVariant SettingsObject::get(const QString& id)
     auto setting = getSetting(id);
 
 #ifdef Q_OS_MACOS
-    // for macOS, use a security scoped bookmark for the paths
+
     if (id.endsWith("Dir")) {
         return { getPathFromBookmark(id) };
     }
@@ -107,7 +110,7 @@ bool SettingsObject::set(const QString& id, QVariant value)
     }
 
 #ifdef Q_OS_MACOS
-    // for macOS, keep a security scoped bookmark for the paths
+
     if (value.userType() == QMetaType::QString && id.endsWith("Dir")) {
         setPathWithBookmark(id, value.toString());
     }
@@ -126,7 +129,6 @@ QString SettingsObject::getPathFromBookmark(const QString& id)
         return "";
     }
 
-    // there is no need to use bookmarks if the default value is used or the directory is within the data directory (already can access)
     if (setting->get() == setting->defValue() ||
         QDir(setting->get().toString()).absolutePath().startsWith(QDir::current().absolutePath())) {
         return setting->get().toString();
@@ -154,9 +156,7 @@ QString SettingsObject::getPathFromBookmark(const QString& id)
         }
 
         m_sandboxedFileAccess.startUsingSecurityScopedBookmark(bookmark, stale);
-        // already did a stale check, no need to do it again
 
-        // convert to relative path to current directory if `url` is a descendant of the current directory
         QDir currentDir = QDir::current().absolutePath();
         return url.path().startsWith(currentDir.absolutePath()) ? currentDir.relativeFilePath(url.path()) : url.path();
     }
@@ -180,7 +180,7 @@ bool SettingsObject::setPathWithBookmark(const QString& id, const QString& path)
     QString absolutePath = dir.absolutePath();
     QString bookmarkId = id + "Bookmark";
     std::shared_ptr<Setting> bookmarkSetting = getSetting(bookmarkId);
-    // there is no need to use bookmarks if the default value is used or the directory is within the data directory (already can access)
+
     if (path == setting->defValue().toString() || absolutePath.startsWith(QDir::current().absolutePath())) {
         bookmarkSetting->reset();
         return true;
@@ -188,7 +188,7 @@ bool SettingsObject::setPathWithBookmark(const QString& id, const QString& path)
     QByteArray bytes = m_sandboxedFileAccess.pathToSecurityScopedBookmark(absolutePath);
     if (bytes.isEmpty()) {
         qCritical() << QString("Failed to create bookmark for %1 - no access?").arg(id);
-        // TODO: show an alert to the user asking them to reselect the directory
+
         return false;
     }
     auto oldBookmark = bookmarkSetting->get().toByteArray();
@@ -197,7 +197,7 @@ bool SettingsObject::setPathWithBookmark(const QString& id, const QString& path)
         bookmarkSetting->set(bytes);
         bool stale;
         m_sandboxedFileAccess.startUsingSecurityScopedBookmark(bytes, stale);
-        // just created the bookmark, it shouldn't be stale
+
     }
 
     setting->set(path);

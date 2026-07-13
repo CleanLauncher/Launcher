@@ -55,7 +55,7 @@ class SolderPackInstallTask : public InstanceTask {
     bool abort() override;
 
    protected:
-    //! Entry point for tasks.
+
     virtual void executeTask() override;
 
    private slots:
@@ -82,4 +82,4 @@ class SolderPackInstallTask : public InstanceTask {
     QFuture<bool> m_extractFuture;
     QFutureWatcher<bool> m_extractFutureWatcher;
 };
-}  // namespace Technic
+}

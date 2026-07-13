@@ -48,7 +48,6 @@ Task::State FileSink::init(QNetworkRequest& request)
         return result;
     }
 
-    // create a new save file and open it for writing
     if (!FS::ensureFilePathExists(m_filename)) {
         qCCritical(taskNetLogC) << "Could not create folder for " + m_filename;
         m_fail_reason = "Could not create folder";
@@ -107,21 +106,17 @@ Task::State FileSink::finalize(QNetworkReply& reply)
     bool validStatus = false;
     int statusCode = statusCodeV.toInt(&validStatus);
     if (validStatus) {
-        // this leaves out 304 Not Modified
+
         gotFile = statusCode == 200 || statusCode == 203;
     }
 
-    // if we wrote any data to the save file, we try to commit the data to the real file.
-    // if it actually got a proper file, we write it even if it was empty
     if (gotFile || m_wroteAnyData) {
-        // ask validators for data consistency
-        // we only do this for actual downloads, not 'your data is still the same' cache hits
+
         if (!finalizeAllValidators(reply)) {
             m_fail_reason = "Failed to finalize validators";
             return Task::State::Failed;
         }
 
-        // nothing went wrong...
         if (!m_output_file->commit()) {
             const auto error = QString("Failed to commit changes to %1: %2").arg(m_filename).arg(m_output_file->errorString());
             qCCritical(taskNetLogC) << error;
@@ -131,7 +126,6 @@ Task::State FileSink::finalize(QNetworkReply& reply)
         }
     }
 
-    // then get rid of the save file
     m_output_file.reset();
 
     return finalizeCache(reply);
@@ -152,4 +146,4 @@ bool FileSink::hasLocalData()
     QFileInfo info(m_filename);
     return info.exists() && info.size() != 0;
 }
-}  // namespace Net
+}

@@ -58,11 +58,10 @@ class InstanceView : public QAbstractItemView {
     using visibilityFunction = std::function<bool(const QString&)>;
     void setSourceOfGroupCollapseStatus(visibilityFunction f) { m_fVisibility = f; }
 
-    /// return geometry rectangle occupied by the specified model item
     QRect geometryRect(const QModelIndex& index) const;
-    /// return visual rectangle occupied by the specified model item
+
     virtual QRect visualRect(const QModelIndex& index) const override;
-    /// get the model index at the specified visual point
+
     virtual QModelIndex indexAt(const QPoint& point) const override;
     QString groupNameAt(const QPoint& point);
     void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags commands) override;
@@ -117,7 +116,6 @@ class InstanceView : public QAbstractItemView {
 
     visibilityFunction m_fVisibility;
 
-    // geometry
     int m_leftMargin = 5;
     int m_rightMargin = 5;
     int m_bottomMargin = 5;
@@ -128,7 +126,6 @@ class InstanceView : public QAbstractItemView {
     int m_currentCursorColumn = -1;
     mutable QCache<int, QRect> m_geometryCache;
 
-    // point where the currently active mouse action started in geometry coordinates
     QPoint m_pressedPosition;
     QPersistentModelIndex m_pressedIndex;
     bool m_pressedAlreadySelected;
@@ -143,7 +140,7 @@ class InstanceView : public QAbstractItemView {
     int itemsPerRow() const { return m_currentItemsPerRow; };
     int contentWidth() const;
 
-   private: /* methods */
+   private:
     int itemWidth() const;
     int calculateItemsPerRow() const;
     int verticalScrollToValue(const QModelIndex& index, const QRect& rect, QListView::ScrollHint hint) const;

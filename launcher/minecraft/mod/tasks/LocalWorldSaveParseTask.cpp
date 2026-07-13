@@ -1,6 +1,6 @@
 
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -44,14 +44,6 @@ bool process(WorldSave& pack, ProcessingLevel level)
     }
 }
 
-/// @brief checks a folder structure to see if it contains a level.dat
-/// @param dir the path to check
-/// @param saves used in recursive call if a "saves" dir was found
-/// @return std::tuple of (
-///             bool <found level.dat>,
-///             QString <name of folder containing level.dat>,
-///             bool <saves folder found>
-///         )
 static std::tuple<bool, QString, bool> contains_level_dat(QDir dir, bool saves = false)
 {
     for (auto const& entry : dir.entryInfoList()) {
@@ -88,21 +80,14 @@ bool processFolder(WorldSave& save, ProcessingLevel level)
     }
 
     if (level == ProcessingLevel::BasicInfoOnly) {
-        return true;  // only need basic info already checked
+        return true;
+
     }
 
-    // reserved for more intensive processing
+    return true;
 
-    return true;  // all tests passed
 }
 
-/// @brief checks a folder structure to see if it contains a level.dat
-/// @param zip the zip file to check
-/// @return std::tuple of (
-///             bool <found level.dat>,
-///             QString <name of folder containing level.dat>,
-///             bool <saves folder found>
-///         )
 static std::tuple<bool, QString, bool> contains_level_dat(QString fileName)
 {
     MMCZip::ArchiveReader zip(fileName);
@@ -126,12 +111,11 @@ static std::tuple<bool, QString, bool> contains_level_dat(QString fileName)
 
         int slashIndex = relativePath.indexOf('/');
         if (slashIndex == -1)
-            continue;  // malformed: no slash between saves/ and level.dat
+            continue;
 
         QString worldName = relativePath.left(slashIndex);
         QString remaining = relativePath.mid(slashIndex + 1);
 
-        // Check that there's nothing between worldName/ and level.dat
         if (remaining == "level.dat") {
             return std::make_tuple(true, worldName, saves);
         }
@@ -162,10 +146,9 @@ bool processZIP(WorldSave& save, ProcessingLevel level)
     }
 
     if (level == ProcessingLevel::BasicInfoOnly) {
-        return true;  // only need basic info already checked
-    }
+        return true;
 
-    // reserved for more intensive processing
+    }
 
     return true;
 }
@@ -176,7 +159,7 @@ bool validate(QFileInfo file)
     return WorldSaveUtils::process(sp, ProcessingLevel::BasicInfoOnly) && sp.valid();
 }
 
-}  // namespace WorldSaveUtils
+}
 
 LocalWorldSaveParseTask::LocalWorldSaveParseTask(int token, WorldSave& save) : Task(false), m_token(token), m_save(save) {}
 

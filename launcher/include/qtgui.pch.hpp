@@ -44,4 +44,4 @@
 #include <QPixmap>
 #include <QPixmapCache>
 
-#endif  // LAUNCHER_PRECOMPILED_QTGUI_HEADERS_H
+#endif

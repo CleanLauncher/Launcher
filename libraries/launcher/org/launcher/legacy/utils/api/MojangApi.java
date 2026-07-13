@@ -43,9 +43,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-/**
- * Basic wrapper for Mojang's Minecraft API.
- */
 @SuppressWarnings("unchecked")
 public final class MojangApi {
     public static String getUuid(String username) throws IOException {

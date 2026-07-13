@@ -33,4 +33,4 @@ class SymlinkTask : public Task {
     QString m_path;
     Task::Ptr m_task;
 };
-}  // namespace Java
+}

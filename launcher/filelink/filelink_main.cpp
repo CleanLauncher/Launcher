@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -29,7 +29,7 @@
 int main(int argc, char* argv[])
 {
 #if defined Q_OS_WIN32
-    // attach the parent console
+
     console::WindowsConsoleGuard _consoleGuard;
 #endif
 

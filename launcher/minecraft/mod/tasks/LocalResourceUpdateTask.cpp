@@ -29,7 +29,7 @@
 LocalResourceUpdateTask::LocalResourceUpdateTask(QDir index_dir, ModPlatform::IndexedPack& project, ModPlatform::IndexedVersion& version)
     : m_index_dir(index_dir), m_project(project), m_version(version)
 {
-    // Ensure a '.index' folder exists in the mods folder, and create it if it does not
+
     if (!FS::ensureFolderPathExists(index_dir.path())) {
         emitFailed(QString("Unable to create index directory at %1!").arg(index_dir.absolutePath()));
         return;
@@ -40,7 +40,7 @@ LocalResourceUpdateTask::LocalResourceUpdateTask(QDir index_dir, ModPlatform::In
     if (index_dir.dirName().startsWith('.')) {
         SetFileAttributesW(wpath.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
     } else {
-        // fix shaderpacks folder being hidden by Launcher 10.0.1
+
         SetFileAttributesW(wpath.c_str(), FILE_ATTRIBUTE_NORMAL);
     }
 #endif

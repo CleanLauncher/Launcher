@@ -83,4 +83,4 @@ class ApiHeaderProxy : public HeaderProxy {
     ModrinthDownloadMeta m_meta;
 };
 
-}  // namespace Net
+}

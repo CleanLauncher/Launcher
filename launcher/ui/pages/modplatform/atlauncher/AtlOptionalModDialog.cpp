@@ -50,13 +50,12 @@ AtlOptionalModListModel::AtlOptionalModListModel(QWidget* parent,
                                                  QList<ATLauncher::VersionMod> mods)
     : QAbstractListModel(parent), m_version(version), m_mods(mods)
 {
-    // fill mod index
+
     for (int i = 0; i < m_mods.size(); i++) {
         auto mod = m_mods.at(i);
         m_index[mod.name] = i;
     }
 
-    // set initial state
     for (int i = 0; i < m_mods.size(); i++) {
         auto mod = m_mods.at(i);
         m_selection[mod.name] = false;
@@ -84,7 +83,7 @@ int AtlOptionalModListModel::rowCount(const QModelIndex& parent) const
 
 int AtlOptionalModListModel::columnCount(const QModelIndex& parent) const
 {
-    // Enabled, Name, Description
+
     return parent.isValid() ? 0 : 3;
 }
 
@@ -170,7 +169,7 @@ void AtlOptionalModListModel::useShareCode(const QString& code)
 
 void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
+
     QByteArray responseData = *std::move(responsePtr);
     m_jobPtr.reset();
 
@@ -193,19 +192,15 @@ void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
     }
 
     if (response.error) {
-        // fixme: plumb in an error message
+
         qWarning() << "ATLauncher API Response Error" << response.message;
         return;
     }
 
-    // FIXME: verify pack and version, error if not matching.
-
-    // Clear the current selection
     for (const auto& mod : m_mods) {
         m_selection[mod.name] = false;
     }
 
-    // Make the selections, as per the share code.
     for (const auto& mod : response.data.mods) {
         m_selection[mod.name] = mod.selected;
     }
@@ -217,7 +212,6 @@ void AtlOptionalModListModel::shareCodeFailure([[maybe_unused]] const QString& r
 {
     m_jobPtr.reset();
 
-    // fixme: plumb in an error message
 }
 
 void AtlOptionalModListModel::selectRecommended()
@@ -242,11 +236,9 @@ void AtlOptionalModListModel::toggleMod(const ATLauncher::VersionMod& mod, int i
 {
     auto enable = !m_selection[mod.name];
 
-    // If there is a warning for the mod, display that first (if we would be enabling the mod)
     if (enable && !mod.warning.isEmpty() && m_version.warnings.contains(mod.warning)) {
         auto message = QString("%1<br><br>%2").arg(m_version.warnings[mod.warning], tr("Are you sure that you want to enable this mod?"));
 
-        // fixme: avoid casting here
         auto result = QMessageBox::warning((QWidget*)this->parent(), tr("Warning"), message, QMessageBox::Yes | QMessageBox::No);
         if (result != QMessageBox::Yes) {
             return;
@@ -263,7 +255,6 @@ void AtlOptionalModListModel::setMod(const ATLauncher::VersionMod& mod, int inde
 
     m_selection[mod.name] = enable;
 
-    // disable other mods in the group, if applicable
     if (enable && !mod.group.isEmpty()) {
         for (int i = 0; i < m_mods.size(); i++) {
             if (index == i)
@@ -280,14 +271,10 @@ void AtlOptionalModListModel::setMod(const ATLauncher::VersionMod& mod, int inde
         auto dependencyIndex = m_index[dependencyName];
         auto dependencyMod = m_mods.at(dependencyIndex);
 
-        // enable/disable dependencies
         if (enable) {
             setMod(dependencyMod, dependencyIndex, true, shouldEmit);
         }
 
-        // if the dependency is 'effectively hidden', then track which mods
-        // depend on it - so we can efficiently disable it when no more dependents
-        // depend on it.
         auto dependents = m_dependents[dependencyName];
 
         if (enable) {
@@ -295,14 +282,12 @@ void AtlOptionalModListModel::setMod(const ATLauncher::VersionMod& mod, int inde
         } else {
             dependents.removeAll(mod.name);
 
-            // if there are no longer any dependents, let's disable the mod
             if (dependencyMod.effectively_hidden && dependents.isEmpty()) {
                 setMod(dependencyMod, dependencyIndex, false, shouldEmit);
             }
         }
     }
 
-    // disable mods that depend on this one, if disabling
     if (!enable) {
         auto dependents = m_dependents[mod.name];
         for (const auto& dependencyName : dependents) {
@@ -347,7 +332,7 @@ void AtlOptionalModDialog::useShareCode()
     auto shareCode = QInputDialog::getText(this, tr("Select a share code"), tr("Share code:"), QLineEdit::Normal, "", &ok);
 
     if (!ok) {
-        // If the user cancels the dialog, we don't need to show any error dialogs.
+
         return;
     }
 

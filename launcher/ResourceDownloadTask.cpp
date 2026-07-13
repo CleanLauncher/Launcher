@@ -55,7 +55,7 @@ Net::ModrinthDownloadMeta createModrinthMeta(BaseInstance* instance, QString rea
         .loader = !loaders.isEmpty() ? ModPlatform::getModLoaderAsString(loaders.first()) : "",
     };
 }
-}  // namespace
+}
 
 ResourceDownloadTask::ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
                                            ModPlatform::IndexedVersion version,
@@ -119,7 +119,6 @@ void ResourceDownloadTask::downloadSucceeded()
 
     m_pack_model->uninstallResource(oldFilename, true);
 
-    // also rename the shader config file
     if (dynamic_cast<ShaderPackFolderModel*>(m_pack_model) != nullptr) {
         QFileInfo oldConfig(m_pack_model->dir(), oldFilename + ".txt");
         QFileInfo newConfig(m_pack_model->dir(), getFilename() + ".txt");
@@ -145,8 +144,6 @@ void ResourceDownloadTask::downloadProgressChanged(qint64 current, qint64 total)
     emit progress(current, total);
 }
 
-// This indirection is done so that we don't delete a mod before being sure it was
-// downloaded successfully!
 void ResourceDownloadTask::hasOldResource(const QString& name, const QString& filename)
 {
     to_delete = { name, filename };

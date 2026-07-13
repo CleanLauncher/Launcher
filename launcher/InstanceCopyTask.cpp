@@ -28,8 +28,7 @@ InstanceCopyTask::InstanceCopyTask(BaseInstance* origInstance, const InstanceCop
     qDebug() << "CopyFilters:" << filters;
 
     if (!filters.isEmpty()) {
-        // Set regex filter:
-        // FIXME: get this from the original instance type...
+
         QRegularExpression regexp(filters, QRegularExpression::CaseInsensitiveOption);
         m_matcher = Filters::regexp(regexp);
     }
@@ -69,7 +68,8 @@ void InstanceCopyTask::executeTask()
                 connect(savesCopy.get(), &FS::copy::fileCopied, [this](QString src) { setProgress(m_progress + 1, m_progressTotal); });
             }
             FS::create_link folderLink(m_origInstance->instanceRoot(), m_stagingPath);
-            int depth = m_linkRecursively ? -1 : 0;  // we need to at least link the top level instead of the instance folder
+            int depth = m_linkRecursively ? -1 : 0;
+
             folderLink.linkRecursively(true).setMaxDepth(depth).useHardLinks(m_useHardLinks).matcher(m_matcher);
 
             folderLink(true);
@@ -98,7 +98,7 @@ void InstanceCopyTask::executeTask()
                     });
                     folderLink.runPrivileged();
 
-                    loop.exec();  // wait for the finished signal
+                    loop.exec();
 
                     for (auto result : folderLink.getResults()) {
                         if (result.err_value != 0) {
@@ -145,7 +145,6 @@ void InstanceCopyTask::copyFinished()
         return;
     }
 
-    // FIXME: shouldn't this be able to report errors?
     auto instanceSettings = std::make_unique<INISettingsObject>(FS::PathCombine(m_stagingPath, "instance.cfg"));
 
     BaseInstance* inst(new NullInstance(m_globalSettings, std::move(instanceSettings), m_stagingPath));
@@ -162,14 +161,15 @@ void InstanceCopyTask::copyFinished()
         if (allowed_symlinks_file.exists()) {
             allowed_symlinks.append(FS::read(allowed_symlinks_file.filePath()));
             if (allowed_symlinks.right(1) != "\n")
-                allowed_symlinks.append("\n");  // we want to be on a new line
+                allowed_symlinks.append("\n");
+
         }
         allowed_symlinks.append(m_origInstance->gameRoot().toUtf8());
         allowed_symlinks.append("\n");
         if (allowed_symlinks_file.isSymLink())
             FS::deletePath(
                 allowed_symlinks_file
-                    .filePath());  // we dont want to modify the original. also make sure the resulting file is not itself a link.
+                    .filePath());
 
         try {
             FS::write(allowed_symlinks_file.filePath(), allowed_symlinks);
@@ -191,8 +191,7 @@ bool InstanceCopyTask::abort()
 {
     if (m_copyFutureWatcher.isRunning()) {
         m_copyFutureWatcher.cancel();
-        // NOTE: Here we don't do `emitAborted()` because it will be done when `m_copyFutureWatcher` actually cancels, which may not occur
-        // immediately.
+
         return true;
     }
     return false;

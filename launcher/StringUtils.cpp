@@ -40,20 +40,16 @@
 #include <QUuid>
 #include <cmath>
 
-/// If you're wondering where these came from exactly, then know you're not the only one =D
-
-/// TAKEN FROM Qt, because it doesn't expose it intelligently
 static inline QChar getNextChar(const QString& s, int location)
 {
     return (location < s.length()) ? s.at(location) : QChar();
 }
 
-/// TAKEN FROM Qt, because it doesn't expose it intelligently
 int StringUtils::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSensitivity cs)
 {
     int l1 = 0, l2 = 0;
     while (l1 <= s1.size() && l2 <= s2.size()) {
-        // skip spaces, tabs and 0's
+
         QChar c1 = getNextChar(s1, l1);
         while (c1.isSpace())
             c1 = getNextChar(s1, ++l1);
@@ -71,7 +67,7 @@ int StringUtils::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSe
             int lookAheadLocation1 = l1;
             int lookAheadLocation2 = l2;
             int currentReturnValue = 0;
-            // find the last digit, setting currentReturnValue as we go if it isn't equal
+
             for (QChar lookAhead1 = c1, lookAhead2 = c2; (lookAheadLocation1 <= s1.length() && lookAheadLocation2 <= s2.length());
                  lookAhead1 = getNextChar(s1, ++lookAheadLocation1), lookAhead2 = getNextChar(s2, ++lookAheadLocation2)) {
                 bool is1ADigit = !lookAhead1.isNull() && lookAhead1.isDigit();
@@ -111,7 +107,6 @@ int StringUtils::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSe
         l2 += 1;
     }
 
-    // The two strings are the same (02 == 2) so fall back to the normal sort
     return QString::compare(s1, s2, cs);
 }
 
@@ -127,10 +122,10 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
     QString last_path_segment = url_path_parts.takeLast();
 
     if (url_path_parts.size() >= 1 && url_path_parts.first().isEmpty())
-        url_path_parts.removeFirst();  // drop empty first segment (from leading / )
+        url_path_parts.removeFirst();
 
     if (url_path_parts.size() >= 1)
-        url_path_parts.removeLast();  // drop the next to last path segment
+        url_path_parts.removeLast();
 
     auto url_template = QStringLiteral("%1://%2/%3%4");
 
@@ -139,9 +134,9 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
                            : url_template.arg(url.scheme(), url.host(),
                                               QStringList({ url_path_parts.join('/'), "...", last_path_segment }).join('/'), url.query());
 
-    // remove url parts one by one if it's still too long
     while (url_compact.length() > max_len && url_path_parts.size() >= 1) {
-        url_path_parts.removeLast();  // drop the next to last path segment
+        url_path_parts.removeLast();
+
         url_compact = url_path_parts.isEmpty()
                           ? url_template.arg(url.scheme(), url.host(), QStringList({ "...", last_path_segment }).join('/'), url.query())
                           : url_template.arg(url.scheme(), url.host(),
@@ -149,7 +144,7 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
     }
 
     if ((url_compact.length() >= max_len) && hard_limit) {
-        // still too long, truncate normally
+
         url_compact = QString(str_url);
         auto to_remove = url_compact.length() - max_len + 3;
         url_compact.remove(url_compact.length() - to_remove - 1, to_remove);
@@ -218,12 +213,13 @@ QString StringUtils::htmlListPatch(QString htmlStr)
     int pos = htmlStr.indexOf(s_ulMatcher);
     int imgPos;
     while (pos != -1) {
-        pos = htmlStr.indexOf(">", pos) + 1;  // Get the size of the </ul> tag. Add one for zeroeth index
+        pos = htmlStr.indexOf(">", pos) + 1;
+
         imgPos = htmlStr.indexOf("<img ", pos);
         if (imgPos == -1)
-            break;  // no image after the tag
+            break;
 
-        auto textBetween = htmlStr.mid(pos, imgPos - pos).trimmed();  // trim all white spaces
+        auto textBetween = htmlStr.mid(pos, imgPos - pos).trimmed();
 
         if (textBetween.isEmpty())
             htmlStr.insert(pos, "<br>");

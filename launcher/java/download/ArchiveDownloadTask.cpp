@@ -32,7 +32,7 @@ ArchiveDownloadTask::ArchiveDownloadTask(QUrl url, QString final_path, QString c
 
 void ArchiveDownloadTask::executeTask()
 {
-    // JRE found ! download the zip
+
     setStatus(tr("Downloading Java"));
 
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("java", m_url.fileName());
@@ -56,7 +56,7 @@ void ArchiveDownloadTask::executeTask()
     connect(download.get(), &Task::details, this, &ArchiveDownloadTask::setDetails);
     connect(download.get(), &Task::aborted, this, &ArchiveDownloadTask::emitAborted);
     connect(download.get(), &Task::succeeded, [this, fullPath] {
-        // This should do all of the extracting and creating folders
+
         extractJava(fullPath);
     });
     m_task = download;
@@ -114,4 +114,4 @@ bool ArchiveDownloadTask::abort()
         aborted = m_task->abort();
     return aborted;
 };
-}  // namespace Java
+}

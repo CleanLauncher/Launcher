@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -56,11 +56,10 @@ namespace fs = std::filesystem;
 
 #include "MMCZip.h"
 
-/** output to the log file */
 void appDebugOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     static std::mutex loggerMutex;
-    const std::lock_guard<std::mutex> lock(loggerMutex);  // synchronized, QFile logFile is not thread-safe
+    const std::lock_guard<std::mutex> lock(loggerMutex);
 
     QString out = qFormatLogMessage(type, context, msg);
     out += QChar::LineFeed;
@@ -81,7 +80,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     setApplicationName(BuildConfig.LAUNCHER_NAME + "Updater");
     setApplicationVersion(BuildConfig.printableVersionString() + "\n" + BuildConfig.GIT_COMMIT);
 
-    // Command line parsing
     QCommandLineParser parser;
     parser.setApplicationDescription(QObject::tr("An auto-updater for Launcher"));
 
@@ -110,27 +108,27 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     QString origCwdPath = QDir::currentPath();
     QString binPath = applicationDirPath();
 
-    {  // find data director
-       // Root path is used for updates and portable data
+    {
+
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
-        QDir foo(FS::PathCombine(binPath, ".."));  // typically portable-root or /usr
+        QDir foo(FS::PathCombine(binPath, ".."));
+
         m_rootPath = foo.absolutePath();
 #elif defined(Q_OS_WIN32)
         m_rootPath = binPath;
 #elif defined(Q_OS_MAC)
         QDir foo(FS::PathCombine(binPath, "../.."));
         m_rootPath = foo.absolutePath();
-        // on macOS, touch the root to force Finder to reload the .app metadata (and fix any icon change issues)
+
         FS::updateTimestamp(m_rootPath);
 #endif
     }
 
     QString adjustedBy;
-    // change folder
+
     QString dirParam = parser.value("dir");
     if (!dirParam.isEmpty()) {
-        // the dir param. it makes launcher data path point to whatever the user specified
-        // on command line
+
         adjustedBy = "Command line";
         m_dataPath = dirParam;
 #ifndef Q_OS_MACOS
@@ -171,12 +169,14 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
     m_updateLogPath = FS::PathCombine(m_dataPath, "logs", "launcher_update.log");
 
-    {  // setup logging
+    {
+
         FS::ensureFolderPathExists(FS::PathCombine(m_dataPath, "logs"));
         static const QString baseLogFile = BuildConfig.LAUNCHER_NAME + "Updater" + (m_checkOnly ? "-CheckOnly" : "") + "-%0.log";
         static const QString logBase = FS::PathCombine(m_dataPath, "logs", baseLogFile);
 
-        if (FS::ensureFolderPathExists("logs")) {  // enough history to track both launches of the updater during a portable install
+        if (FS::ensureFolderPathExists("logs")) {
+
             FS::move(logBase.arg(1), logBase.arg(2));
             FS::move(logBase.arg(0), logBase.arg(1));
         }
@@ -218,8 +218,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         qDebug() << "Testing" << logRulesPath << "...";
         foundLoggingRules = QFile::exists(logRulesPath);
 
-        // search the dataPath()
-        // seach app data standard path
         if (!foundLoggingRules && !isPortable() && dirParam.isEmpty()) {
             logRulesPath = QStandardPaths::locate(QStandardPaths::AppDataLocation, FS::PathCombine("..", logRulesFile));
             if (!logRulesPath.isEmpty()) {
@@ -227,7 +225,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
                 foundLoggingRules = true;
             }
         }
-        // seach root path
+
         if (!foundLoggingRules) {
             logRulesPath = FS::PathCombine(m_rootPath, logRulesFile);
             qDebug() << "Testing" << logRulesPath << "...";
@@ -235,7 +233,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         }
 
         if (foundLoggingRules) {
-            // load and set logging rules
+
             qDebug() << "Loading logging rules from:" << logRulesPath;
             QSettings loggingRules(logRulesPath, QSettings::IniFormat);
             loggingRules.beginGroup("Rules");
@@ -254,7 +252,8 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         qDebug() << "<> Log initialized.";
     }
 
-    {  // log debug program info
+    {
+
         qDebug() << qPrintable(BuildConfig.LAUNCHER_DISPLAYNAME + " Updater, " +
                                QString(BuildConfig.LAUNCHER_COPYRIGHT).replace("\n", ", "));
         qDebug() << "Version                    :" << BuildConfig.printableVersionString();
@@ -277,7 +276,8 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         qDebug() << "<> Paths set.";
     }
 
-    {  // network
+    {
+
         m_network = std::make_unique<QNetworkAccessManager>();
         qDebug() << "Detecting proxy settings...";
         QNetworkProxy proxy = QNetworkProxy::applicationProxy();
@@ -365,7 +365,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 UpdaterApp::~UpdaterApp()
 {
     qDebug() << "updater shutting down";
-    // Shut down logger by setting the logger function to nothing
+
     qInstallMessageHandler(nullptr);
 }
 
@@ -503,7 +503,7 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
 
     QStringList file_list;
     if (manifest.isFile()) {
-        // load manifest from file
+
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
             auto contents = QString::fromUtf8(FS::read(manifest.absoluteFilePath()));
@@ -943,9 +943,11 @@ void UpdaterApp::unpackAndInstall(QFileInfo archive)
             logUpdate(tr("Failed to launch '%1' %2").arg(new_updater_path).arg(proc.errorString()));
             return exit(10);
         }
-        return exit();  // up to the new updater now
+        return exit();
+
     }
-    return exit(1);  // unpack failure
+    return exit(1);
+
 }
 
 void UpdaterApp::backupAppDir()
@@ -955,7 +957,6 @@ void UpdaterApp::backupAppDir()
 
     QStringList file_list;
     if (manifest.isFile()) {
-        // load manifest from file
 
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
@@ -969,10 +970,11 @@ void UpdaterApp::backupAppDir()
     }
 
     if (file_list.isEmpty()) {
-        // best guess
+
         if (BuildConfig.BUILD_ARTIFACT.toLower().contains("linux")) {
             file_list.append({ "ElyLauncher", "bin", "share", "lib" });
-        } else {  // windows by process of elimination
+        } else {
+
             file_list.append({
                 "jars",
                 "elylauncher.exe",
@@ -1073,7 +1075,8 @@ bool UpdaterApp::loadVersionFromExe(const QString& exe_path)
     if (!proc.waitForStarted(5000)) {
         showFatalErrorMessage(tr("Failed to Check Version"), tr("Failed to launch child process to read version."));
         return false;
-    }  // wait 5 seconds to start
+    }
+
     if (!proc.waitForFinished(5000)) {
         showFatalErrorMessage(tr("Failed to Check Version"), tr("Child launcher process failed."));
         return false;
@@ -1122,7 +1125,8 @@ void UpdaterApp::loadReleaseList()
         return fail("updating from a non github url is not supported");
 
     auto path_parts = github_repo.path().split('/');
-    path_parts.removeFirst();  // empty segment from leading /
+    path_parts.removeFirst();
+
     auto repo_owner = path_parts.takeFirst();
     auto repo_name = path_parts.takeFirst();
     auto api_url = QString("https://api.github.com/repos/%1/%2/releases").arg(repo_owner, repo_name);
@@ -1149,7 +1153,8 @@ void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
 
     connect(download.get(), &Net::Download::succeeded, this, [this, response, per_page, api_url, page]() {
         int num_found = parseReleasePage(response);
-        if (!(num_found < per_page)) {  // there may be more, fetch next page
+        if (!(num_found < per_page)) {
+
             downloadReleasePage(api_url, page + 1);
         } else {
             run();
@@ -1169,7 +1174,8 @@ void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
 
 int UpdaterApp::parseReleasePage(const QByteArray* response)
 {
-    if (response->isEmpty())  // empty page
+    if (response->isEmpty())
+
         return 0;
     int num_releases = 0;
     try {

@@ -40,18 +40,7 @@ namespace LibraryUtils {
 
 QString findMangoHud()
 {
-    /**
-     * Guess MangoHud install location by searching for vulkan layers in this order:
-     *
-     * $VK_LAYER_PATH
-     * $XDG_DATA_DIRS (/usr/local/share/:/usr/share/)
-     * $XDG_DATA_HOME  (~/.local/share)
-     * /etc
-     * $XDG_CONFIG_DIRS (/etc/xdg)
-     * $XDG_CONFIG_HOME (~/.config)
-     *
-     * @returns Absolute path of libMangoHud.so if found and empty QString otherwise.
-     */
+
     QStringList vkLayerList;
     {
         QString home = QDir::homePath();
@@ -87,7 +76,7 @@ QString findMangoHud()
     }
 
     for (const QString& vkLayer : vkLayerList) {
-        // prefer to use architecture specific vulkan layers
+
         QString currentArch = QSysInfo::currentCpuArchitecture();
 
         if (currentArch == "arm64") {
@@ -122,13 +111,13 @@ QString findMangoHud()
             }
 
 #ifdef __GLIBC__
-            // Check whether mangohud is usable on a glibc based system
+
             QString libraryPath = find(libraryName);
             if (!libraryPath.isEmpty()) {
                 return libraryPath;
             }
 #else
-            // Without glibc return recorded shared library as-is.
+
             return libraryName;
 #endif
         } catch (const Exception& e) {
@@ -165,7 +154,7 @@ QString find(QString libName)
     return {};
 #endif
 }
-}  // namespace LibraryUtils
+}
 
 #ifdef UNDEF_GNU_SOURCE
 #undef _GNU_SOURCE

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -37,9 +37,8 @@ bool process(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full);
 bool processZIP(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full);
 bool processFolder(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full);
 
-/** Checks whether a file is valid as a shader pack or not. */
 bool validate(QFileInfo file);
-}  // namespace ShaderPackUtils
+}
 
 class LocalShaderPackParseTask : public Task {
     Q_OBJECT

@@ -19,7 +19,6 @@
 
 class QSortFilterProxyModel;
 
-/* A macro to define useful functions to handle Resource* -> T* more easily on derived classes */
 #define RESOURCE_HELPERS(T)                                         \
     T& at(int index)                                                \
     {                                                               \
@@ -51,13 +50,6 @@ class QSortFilterProxyModel;
         return result;                                              \
     }
 
-/** A basic model for external resources.
- *
- *  This model manages a list of resources. As such, external users of such resources do not own them,
- *  and the resource's lifetime is contingent on the model's lifetime.
- *
- *  TODO: Make the resources unique pointers accessible through weak pointers.
- */
 class ResourceFolderModel : public QAbstractListModel {
     Q_OBJECT
    public:
@@ -66,53 +58,27 @@ class ResourceFolderModel : public QAbstractListModel {
 
     virtual QString id() const { return "resource"; }
 
-    /** Starts watching the paths for changes.
-     *
-     *  Returns whether starting to watch all the paths was successful.
-     *  If one or more fails, it returns false.
-     */
     bool startWatching(const QStringList& paths);
 
-    /** Stops watching the paths for changes.
-     *
-     *  Returns whether stopping to watch all the paths was successful.
-     *  If one or more fails, it returns false.
-     */
     bool stopWatching(const QStringList& paths);
 
-    /* Helper methods for subclasses, using a predetermined list of paths. */
     virtual bool startWatching() { return startWatching({ indexDir().absolutePath(), m_dir.absolutePath() }); }
     virtual bool stopWatching() { return stopWatching({ indexDir().absolutePath(), m_dir.absolutePath() }); }
 
     virtual QDir indexDir() const { return { QString("%1/.index").arg(dir().absolutePath()) }; }
 
-    /** Given a path in the system, install that resource, moving it to its place in the
-     *  instance file hierarchy.
-     *
-     *  Returns whether the installation was succcessful.
-     */
     virtual bool installResource(QString path);
 
     virtual void installResourceWithFlameMetadata(const QString& path, ModPlatform::IndexedVersion& vers);
 
-    /** Uninstall (i.e. remove all data about it) a resource, given its file name.
-     *
-     *  Returns whether the removal was successful.
-     */
     virtual bool uninstallResource(const QString& fileName, bool preserveMetadata = false);
     virtual bool deleteResources(const QModelIndexList&);
     virtual void deleteMetadata(const QModelIndexList&);
 
-    /** Applies the given 'action' to the resources in 'indexes'.
-     *
-     *  Returns whether the action was successfully applied to all resources.
-     */
     virtual bool setResourceEnabled(const QModelIndexList& indexes, EnableAction action);
 
-    /** Creates a new update task and start it. Returns false if no update was done, like when an update is already underway. */
     virtual bool update();
 
-    /** Creates a new parse task, if needed, for 'res' and start it.*/
     virtual void resolveResource(Resource::Ptr res);
 
     qsizetype size() const { return m_resources.size(); }
@@ -127,16 +93,8 @@ class ResourceFolderModel : public QAbstractListModel {
 
     const QDir& dir() const { return m_dir; }
 
-    /** Checks whether there's any parse tasks being done.
-     *
-     *  Since they can be quite expensive, and are usually done in a separate thread, if we were to destroy the model while having
-     *  such tasks would introduce an undefined behavior, most likely resulting in a crash.
-     */
     bool hasPendingParseTasks() const;
 
-    /* Qt behavior */
-
-    /* Basic columns */
     enum Columns : std::uint8_t { ActiveColumn = 0, NameColumn, DateColumn, ProviderColumn, SizeColumn, FileNameColumn, NumColumns };
 
     QStringList columnNames(bool translated = true) const { return translated ? m_columnNamesTranslated : m_columnNames; }
@@ -146,7 +104,6 @@ class ResourceFolderModel : public QAbstractListModel {
 
     Qt::DropActions supportedDropActions() const override;
 
-    /// flags, mostly to support drag&drop
     Qt::ItemFlags flags(const QModelIndex& index) const override;
     QStringList mimeTypes() const override;
     [[nodiscard]] bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent) override;
@@ -164,10 +121,6 @@ class ResourceFolderModel : public QAbstractListModel {
     void loadColumns(QTreeView* tree);
     QMenu* createHeaderContextMenu(QTreeView* tree);
 
-    /** This creates a proxy model to filter / sort the model for a UI.
-     *
-     *  The actual comparisons and filtering are done directly by the Resource, so to modify behavior go there instead!
-     */
     QSortFilterProxyModel* createFilterProxyModel(QObject* parent = nullptr);
 
     SortType columnToSortKey(size_t column) const;
@@ -191,55 +144,26 @@ class ResourceFolderModel : public QAbstractListModel {
 
    protected:
     [[nodiscard]] virtual Task* createPreUpdateTask() { return nullptr; }
-    /** This creates a new update task to be executed by update().
-     *
-     *  The task should load and parse all resources necessary, and provide a way of accessing such results.
-     *
-     *  This Task is normally executed when opening a page, so it shouldn't contain much heavy work.
-     *  If such work is needed, try using it in the Task create by createParseTask() instead!
-     */
+
     [[nodiscard]] Task* createUpdateTask();
 
     [[nodiscard]] virtual Resource* createResource(const QFileInfo& info) { return new Resource(info); }
 
-    /** This creates a new parse task to be executed by onUpdateSucceeded().
-     *
-     *  This task should load and parse all heavy info needed by a resource, such as parsing a manifest. It gets executed
-     *  in the background, so it slowly updates the UI as tasks get done.
-     */
-    [[nodiscard]] virtual Task* createParseTask(Resource& /*unused*/) { return nullptr; }
+    [[nodiscard]] virtual Task* createParseTask(Resource& ) { return nullptr; }
 
-    /** Standard implementation of the model update logic.
-     *
-     *  It uses set operations to find differences between the current state and the updated state,
-     *  to act only on those disparities.
-     *
-     */
     void applyUpdates(QSet<QString>& currentSet, QSet<QString>& newSet, QMap<QString, Resource::Ptr>& newResources);
 
    protected slots:
     void directoryChanged(const QString&);
 
-    /** Called when the update task is successful.
-     *
-     *  This usually calls static_cast on the specific Task type returned by createUpdateTask,
-     *  so care must be taken in such cases.
-     *  TODO: Figure out a way to express this relationship better without templated classes (Q_OBJECT macro disallows that).
-     */
     virtual void onUpdateSucceeded();
     virtual void onUpdateFailed() {}
 
-    /** Called when the parse task with the given ticket is successful.
-     *
-     *  This is just a simple reference implementation. You probably want to override it with your own logic in a subclass
-     *  if the resource is complex and has more stuff to parse.
-     */
     virtual void onParseSucceeded(int ticket, const QString& resourceId);
     virtual void onParseFailed(int ticket, const QString& resourceId);
 
    protected:
-    // Represents the relationship between a column's index (represented by the list index), and it's sorting key.
-    // As such, the order in with they appear is very important!
+
     QList<SortType> m_columnSortKeys = { SortType::Enabled,  SortType::Name, SortType::Date,
                                          SortType::Provider, SortType::Size, SortType::Filename };
     QStringList m_columnNames = { "Enable", "Name", "Last Modified", "Provider", "Size", "File Name" };
@@ -261,10 +185,8 @@ class ResourceFolderModel : public QAbstractListModel {
 
     QList<Resource::Ptr> m_resources;
 
-    // Represents the relationship between a resource's internal ID and it's row position on the model.
     QMap<QString, int> m_resourcesIndex;
 
-    // Runs off-thread
     ConcurrentTask m_resourceResolver;
     bool m_resourceResolverRunning = false;
 

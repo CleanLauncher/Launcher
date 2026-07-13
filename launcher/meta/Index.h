@@ -41,7 +41,6 @@ class Index : public QAbstractListModel, public BaseEntity {
 
     QString localFilename() const override { return "index.json"; }
 
-    // queries
     VersionList::Ptr get(const QString& uid);
     Version::Ptr get(const QString& uid, const QString& version);
     bool hasUid(const QString& uid) const;
@@ -50,10 +49,10 @@ class Index : public QAbstractListModel, public BaseEntity {
 
     Task::Ptr loadVersion(const QString& uid, const QString& version = {}, Net::Mode mode = Net::Mode::Online, bool force = false);
 
-    // this blocks until the version is loaded
     Version::Ptr getLoadedVersion(const QString& uid, const QString& version);
 
-   public:  // for usage by parsers only
+   public:
+
     void merge(const std::shared_ptr<Index>& other);
 
    protected:
@@ -65,4 +64,4 @@ class Index : public QAbstractListModel, public BaseEntity {
 
     void connectVersionList(int row, const VersionList::Ptr& list);
 };
-}  // namespace Meta
+}

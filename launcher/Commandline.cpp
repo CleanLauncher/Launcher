@@ -37,13 +37,8 @@
 
 #include "Commandline.h"
 
-/**
- * @file libutil/src/cmdutils.cpp
- */
-
 namespace Commandline {
 
-// commandline splitter
 QStringList splitArgs(QString args)
 {
     QStringList argv;
@@ -53,11 +48,10 @@ QStringList splitArgs(QString args)
     for (int i = 0; i < args.length(); i++) {
         QChar cchar = args.at(i);
 
-        // \ escaped
         if (escape) {
             current += cchar;
             escape = false;
-            // in "quotes"
+
         } else if (!inquotes.isNull()) {
             if (cchar == '\\')
                 escape = true;
@@ -65,7 +59,7 @@ QStringList splitArgs(QString args)
                 inquotes = QChar::Null;
             else
                 current += cchar;
-            // otherwise
+
         } else {
             if (cchar == ' ') {
                 if (!current.isEmpty()) {
@@ -82,4 +76,4 @@ QStringList splitArgs(QString args)
         argv << current;
     return argv;
 }
-}  // namespace Commandline
+}

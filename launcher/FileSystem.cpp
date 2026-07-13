@@ -68,7 +68,7 @@
 #include <windows.h>
 #include <winnls.h>
 #include <string>
-// for ShellExecute
+
 #include <Shellapi.h>
 #include <objbase.h>
 #include <shlobj.h>
@@ -79,10 +79,9 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-// clone
 #if defined(Q_OS_LINUX)
 #include <errno.h>
-#include <fcntl.h> /* Definition of FICLONE* constants */
+#include <fcntl.h>
 #include <linux/fs.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -90,12 +89,12 @@ namespace fs = std::filesystem;
 #include <sys/attr.h>
 #include <sys/clonefile.h>
 #elif defined(Q_OS_WIN)
-// winbtrfs clone vs rundll32 shellbtrfs.dll,ReflinkCopy
+
 #include <fileapi.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <windows.h>
-// refs
+
 #include <winioctl.h>
 #if defined(__MINGW32__)
 #include <crtdbg.h>
@@ -106,8 +105,6 @@ namespace fs = std::filesystem;
 
 #if defined(__MINGW32__)
 
-// Avoid re-defining structs retroactively added to MinGW
-// https://github.com/mingw-w64/mingw-w64/issues/90#issuecomment-2829284729
 #if __MINGW64_VERSION_MAJOR < 13
 
 struct _DUPLICATE_EXTENTS_DATA {
@@ -122,9 +119,12 @@ using PDUPLICATE_EXTENTS_DATA = _DUPLICATE_EXTENTS_DATA*;
 #endif
 
 struct _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER {
-    WORD ChecksumAlgorithm;  // Checksum algorithm. e.g. CHECKSUM_TYPE_UNCHANGED, CHECKSUM_TYPE_NONE, CHECKSUM_TYPE_CRC32
-    WORD Reserved;           // Must be 0
-    DWORD Flags;             // FSCTL_INTEGRITY_FLAG_xxx
+    WORD ChecksumAlgorithm;
+
+    WORD Reserved;
+
+    DWORD Flags;
+
     DWORD ChecksumChunkSizeInBytes;
     DWORD ClusterSizeInBytes;
 };
@@ -133,9 +133,12 @@ using FSCTL_GET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_GET_INTEGRITY_INFORMATION_
 using PFSCTL_GET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER*;
 
 struct _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER {
-    WORD ChecksumAlgorithm;  // Checksum algorithm. e.g. CHECKSUM_TYPE_UNCHANGED, CHECKSUM_TYPE_NONE, CHECKSUM_TYPE_CRC32
-    WORD Reserved;           // Must be 0
-    DWORD Flags;             // FSCTL_INTEGRITY_FLAG_xxx
+    WORD ChecksumAlgorithm;
+
+    WORD Reserved;
+
+    DWORD Flags;
+
 };
 
 using FSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER;
@@ -149,12 +152,14 @@ using PFSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION
 
 #ifndef FSCTL_GET_INTEGRITY_INFORMATION
 #define FSCTL_GET_INTEGRITY_INFORMATION \
-    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 159, METHOD_BUFFERED, FILE_ANY_ACCESS)  // FSCTL_GET_INTEGRITY_INFORMATION_BUFFER
+    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 159, METHOD_BUFFERED, FILE_ANY_ACCESS)
+
 #endif
 
 #ifndef FSCTL_SET_INTEGRITY_INFORMATION
 #define FSCTL_SET_INTEGRITY_INFORMATION \
-    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 160, METHOD_BUFFERED, FILE_READ_DATA | FILE_WRITE_DATA)  // FSCTL_SET_INTEGRITY_INFORMATION_BUFFER
+    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 160, METHOD_BUFFERED, FILE_READ_DATA | FILE_WRITE_DATA)
+
 #endif
 
 #ifndef ERROR_NOT_CAPABLE
@@ -290,7 +295,6 @@ bool copyFileAttributes(QString src, QString dst)
     return true;
 }
 
-// needs folders to exists
 void copyFolderAttributes(QString src, QString dst, QString relative)
 {
     auto path = PathCombine(src, relative);
@@ -301,18 +305,13 @@ void copyFolderAttributes(QString src, QString dst, QString relative)
     }
 }
 
-/**
- * @brief Copies a directory and it's contents from src to dest
- * @param offset subdirectory form src to copy to dest
- * @return if there was an error during the filecopy
- */
 bool copy::operator()(const QString& offset, bool dryRun)
 {
     using copy_opts = fs::copy_options;
-    m_copied = 0;  // reset counter
+    m_copied = 0;
+
     m_failedPaths.clear();
 
-// NOTE always deep copy on windows. the alternatives are too messy.
 #if defined Q_OS_WIN32
     m_followSymlinks = true;
 #endif
@@ -324,14 +323,12 @@ bool copy::operator()(const QString& offset, bool dryRun)
 
     fs::copy_options opt = copy_opts::none;
 
-    // The default behavior is to follow symlinks
     if (!m_followSymlinks)
         opt |= copy_opts::copy_symlinks;
 
     if (m_overwrite)
         opt |= copy_opts::overwrite_existing;
 
-    // Function that'll do the actual copying
     auto copy_file = [this, dryRun, src, dst, opt, &err](QString src_path, QString relative_dst_path) {
         if (m_matcher && (m_matcher(relative_dst_path) != m_whitelist))
             return;
@@ -356,9 +353,6 @@ bool copy::operator()(const QString& offset, bool dryRun)
         emit fileCopied(relative_dst_path);
     };
 
-    // We can't use copy_opts::recursive because we need to take into account the
-    // blacklisted paths, so we iterate over the source directory, and if there's no blacklist
-    // match, we copy the file.
     QDir src_dir(src);
     QDirIterator source_it(src, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::Subdirectories);
 
@@ -369,14 +363,12 @@ bool copy::operator()(const QString& offset, bool dryRun)
         copy_file(src_path, relative_path);
     }
 
-    // If the root src is not a directory, the previous iterator won't run.
     if (!fs::is_directory(StringUtils::toStdString(src)))
         copy_file(src, "");
 
     return err.value() == 0;
 }
 
-/// qDebug print support for the LinkPair struct
 QDebug operator<<(QDebug debug, const LinkPair& lp)
 {
     QDebugStateSaver saver(debug);
@@ -387,7 +379,8 @@ QDebug operator<<(QDebug debug, const LinkPair& lp)
 
 bool create_link::operator()(const QString& offset, bool dryRun)
 {
-    m_linked = 0;  // reset counter
+    m_linked = 0;
+
     m_path_results.clear();
     m_links_to_make.clear();
 
@@ -401,10 +394,6 @@ bool create_link::operator()(const QString& offset, bool dryRun)
     return true;
 }
 
-/**
- * @brief Make a list of all the links to make
- * @param offset subdirectory of src to link to dest
- */
 void create_link::make_link_list(const QString& offset)
 {
     for (auto pair : m_path_pairs) {
@@ -414,11 +403,9 @@ void create_link::make_link_list(const QString& offset)
         auto src = PathCombine(QDir(srcPath).absolutePath(), offset);
         auto dst = PathCombine(QDir(dstPath).absolutePath(), offset);
 
-        // you can't hard link a directory so make sure if we deal with a directory we do so recursively
         if (m_useHardLinks)
             m_recursive = true;
 
-        // Function that'll do the actual linking
         auto link_file = [this, dst](QString src_path, QString relative_dst_path) {
             if (m_matcher && (m_matcher(relative_dst_path) != m_whitelist)) {
                 qDebug() << "path" << relative_dst_path << "in black list or not in whitelist";
@@ -504,7 +491,8 @@ bool create_link::make_links()
 
 void create_link::runPrivileged(const QString& offset)
 {
-    m_linked = 0;  // reset counter
+    m_linked = 0;
+
     m_path_results.clear();
     m_links_to_make.clear();
 
@@ -516,7 +504,7 @@ void create_link::runPrivileged(const QString& offset)
 
     connect(&m_linkServer, &QLocalServer::newConnection, this, [this, &gotResults]() {
         qDebug() << "Client connected, sending out pairs";
-        // construct block of data to send
+
         QByteArray block;
         QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -545,8 +533,6 @@ void create_link::runPrivileged(const QString& offset)
             qDebug() << "Reading path results from client";
             qDebug() << "bytes available" << clientConnection->bytesAvailable();
 
-            // Relies on the fact that QDataStream serializes a quint32 into
-            // sizeof(quint32) bytes
             if (clientConnection->bytesAvailable() < (int)sizeof(quint32))
                 return;
             qDebug() << "reading block size";
@@ -620,12 +606,12 @@ void ExternalLinkFileProcess::runLinkFile()
     LPCWSTR programNameWin = (const wchar_t*)fileLinkExe.utf16();
     LPCWSTR paramsWin = (const wchar_t*)params.utf16();
 
-    // https://learn.microsoft.com/en-us/windows/win32/api/shellapi/ns-shellapi-shellexecuteinfoa
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
     ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-    ShExecInfo.hwnd = NULL;  // Optional. A handle to the owner window, used to display and position any UI that the system might produce
-                             // while executing this function.
-    ShExecInfo.lpVerb = L"runas";  // elevate to admin, show UAC
+    ShExecInfo.hwnd = NULL;
+
+    ShExecInfo.lpVerb = L"runas";
+
     ShExecInfo.lpFile = programNameWin;
     ShExecInfo.lpParameters = paramsWin;
     ShExecInfo.lpDirectory = NULL;
@@ -643,11 +629,13 @@ void ExternalLinkFileProcess::runLinkFile()
 
 bool moveByCopy(const QString& source, const QString& dest)
 {
-    if (!copy(source, dest)()) {  // copy
+    if (!copy(source, dest)()) {
+
         qDebug() << "Copy of" << source << "to" << dest << "failed!";
         return false;
     }
-    if (!deletePath(source)) {  // remove original
+    if (!deletePath(source)) {
+
         qDebug() << "Deletion of" << source << "failed!";
         return false;
     };
@@ -712,7 +700,7 @@ bool deleteContents(const QString& path)
 
 bool trash(QString path, QString* pathInTrash)
 {
-    // FIXME: Figure out trash in Flatpak. Qt seemingly doesn't use the Trash portal
+
     if (DesktopServices::isFlatpak())
         return false;
 #if defined Q_OS_WIN32
@@ -802,12 +790,6 @@ QString ResolveExecutable(QString path)
     return pathInfo.absoluteFilePath();
 }
 
-/**
- * Normalize path
- *
- * Any paths inside the current folder will be normalized to relative paths (to current)
- * Other paths will be made absolute
- */
 QString NormalizePath(QString path)
 {
     QDir a = QDir::currentPath();
@@ -840,7 +822,7 @@ QString removeChars(QString source, QChar replace, const QString& extraChars = "
 
     return source;
 }
-}  // namespace
+}
 
 QString RemoveInvalidFilenameChars(QString string, QChar replaceWith)
 {
@@ -864,7 +846,6 @@ QString DirNameFromString(QString string, QString inDir)
             dirName = baseName + "(" + QString::number(num) + ")";
         }
 
-        // If it's over 9000
         if (num > 9000)
             return "";
         num++;
@@ -872,8 +853,6 @@ QString DirNameFromString(QString string, QString inDir)
     return dirName;
 }
 
-// Does the folder path contain any '!'? If yes, return true, otherwise false.
-// (This is a problem for Java)
 bool checkProblemticPathJava(QDir folder)
 {
     QString pathfoldername = folder.absolutePath();
@@ -913,7 +892,6 @@ QString quoteArgs(const QStringList& args, const QString& wrap, const QString& e
     return result;
 }
 
-// Cross-platform Shortcut creation
 QString createShortcut(QString destination, QString target, QStringList args, QString name, QString icon)
 {
     if (destination.isEmpty()) {
@@ -952,7 +930,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
     QFile(icon).rename(resources.path() + "/Icon.icns");
 
-    // Create the Command file
     QString exec = binaryDir.path() + "/Run.command";
 
     QFile f(exec);
@@ -972,7 +949,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
     f.setPermissions(f.permissions() | QFileDevice::ExeOwner | QFileDevice::ExeGroup | QFileDevice::ExeOther);
 
-    // Generate the Info.plist
     QTextStream infoStream(&info);
     infoStream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
                   "<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" "
@@ -980,13 +956,15 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
                   "<plist version=\"1.0\">\n"
                   "<dict>\n"
                   "    <key>CFBundleExecutable</key>\n"
-                  "    <string>Run.command</string>\n"  // The path to the executable
+                  "    <string>Run.command</string>\n"
+
                   "    <key>CFBundleIconFile</key>\n"
                   "    <string>Icon.icns</string>\n"
                   "    <key>CFBundleName</key>\n"
                   "    <string>"
                << name
-               << "</string>\n"  // Name of the application
+               << "</string>\n"
+
                   "    <key>CFBundlePackageType</key>\n"
                   "    <string>APPL</string>\n"
                   "    <key>CFBundleShortVersionString</key>\n"
@@ -998,7 +976,8 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
     return application.path();
 #elif defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
-    if (!destination.endsWith(".desktop"))  // in case of isFlatpak destination is already populated
+    if (!destination.endsWith(".desktop"))
+
         destination += ".desktop";
     QFile f(destination);
     if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -1059,7 +1038,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
     HRESULT hres;
 
-    // ...yes, you need to initialize the entire COM stack just to make a shortcut
     hres = CoInitialize(nullptr);
     if (FAILED(hres)) {
         qWarning() << "Failed to initialize COM!";
@@ -1070,7 +1048,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
     IShellLink* psl;
 
-    // create an IShellLink instance - this stores the shortcut's attributes
     hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink, (LPVOID*)&psl);
     if (SUCCEEDED(hres)) {
         wmemset(wsz, 0, MAX_PATH);
@@ -1083,7 +1060,7 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
 
         wmemset(wsz, 0, MAX_PATH);
         targetInfo.absolutePath().toWCharArray(wsz);
-        psl->SetWorkingDirectory(wsz);  // "Starts in" attribute
+        psl->SetWorkingDirectory(wsz);
 
         if (!icon.isEmpty()) {
             wmemset(wsz, 0, MAX_PATH);
@@ -1091,8 +1068,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
             psl->SetIconLocation(wsz, 0);
         }
 
-        // query an IPersistFile interface from our IShellLink instance
-        // this is the interface that will actually let us save the shortcut to disk!
         IPersistFile* ppf;
         hres = psl->QueryInterface(IID_IPersistFile, (LPVOID*)&ppf);
         if (SUCCEEDED(hres)) {
@@ -1114,7 +1089,6 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
         qWarning() << "hres =" << hres;
     }
 
-    // go away COM, nobody likes you
     CoUninitialize();
 
     if (SUCCEEDED(hres))
@@ -1136,7 +1110,6 @@ bool overrideFolder(QString overwritten_path, QString override_path)
     std::error_code err;
     fs::copy_options opt = copy_opts::recursive | copy_opts::overwrite_existing;
 
-    // FIXME: hello traveller! Apparently std::copy does NOT overwrite existing files on GNU libstdc++ on Windows?
     fs::copy(StringUtils::toStdString(override_path), StringUtils::toStdString(overwritten_path), opt, err);
 
     if (err) {
@@ -1178,10 +1151,6 @@ FilesystemType getFilesystemType(const QString& name)
     return FilesystemType::UNKNOWN;
 }
 
-/**
- * @brief path to the near ancestor that exists
- *
- */
 QString nearestExistentAncestor(const QString& path)
 {
     if (QFileInfo::exists(path))
@@ -1197,10 +1166,6 @@ QString nearestExistentAncestor(const QString& path)
     return dir.exists() ? dir.path() : QString();
 }
 
-/**
- * @brief colect information about the filesystem under a file
- *
- */
 FilesystemInfo statFS(const QString& path)
 {
     FilesystemInfo info;
@@ -1222,10 +1187,6 @@ FilesystemInfo statFS(const QString& path)
     return info;
 }
 
-/**
- * @brief if the Filesystem is reflink/clone capable
- *
- */
 bool canCloneOnFS(const QString& path)
 {
     FilesystemInfo info = statFS(path);
@@ -1240,10 +1201,6 @@ bool canCloneOnFS(FilesystemType type)
     return s_clone_filesystems.contains(type);
 }
 
-/**
- * @brief if the Filesystem is reflink/clone capable and both paths are on the same device
- *
- */
 bool canClone(const QString& src, const QString& dst)
 {
     auto srcVInfo = statFS(src);
@@ -1254,11 +1211,6 @@ bool canClone(const QString& src, const QString& dst)
     return sameDevice && canCloneOnFS(srcVInfo) && canCloneOnFS(dstVInfo);
 }
 
-/**
- * @brief reflink/clones a directory and it's contents from src to dest
- * @param offset subdirectory form src to copy to dest
- * @return if there was an error during the filecopy
- */
 bool clone::operator()(const QString& offset, bool dryRun)
 {
     if (!canClone(m_src.absolutePath(), m_dst.absolutePath())) {
@@ -1269,7 +1221,8 @@ bool clone::operator()(const QString& offset, bool dryRun)
         return false;
     }
 
-    m_cloned = 0;  // reset counter
+    m_cloned = 0;
+
     m_failedClones.clear();
 
     auto src = PathCombine(m_src.absolutePath(), offset);
@@ -1277,7 +1230,6 @@ bool clone::operator()(const QString& offset, bool dryRun)
 
     std::error_code err;
 
-    // Function that'll do the actual cloneing
     auto cloneFile = [this, dryRun, dst, &err](QString src_path, QString relative_dst_path) {
         if (m_matcher && (m_matcher(relative_dst_path) != m_whitelist))
             return;
@@ -1299,9 +1251,6 @@ bool clone::operator()(const QString& offset, bool dryRun)
         emit fileCloned(src_path, dst_path);
     };
 
-    // We can't use copy_opts::recursive because we need to take into account the
-    // blacklisted paths, so we iterate over the source directory, and if there's no blacklist
-    // match, we copy the file.
     QDir src_dir(src);
     QDirIterator source_it(src, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::Subdirectories);
 
@@ -1312,17 +1261,12 @@ bool clone::operator()(const QString& offset, bool dryRun)
         cloneFile(src_path, relative_path);
     }
 
-    // If the root src is not a directory, the previous iterator won't run.
     if (!fs::is_directory(StringUtils::toStdString(src)))
         cloneFile(src, "");
 
     return err.value() == 0;
 }
 
-/**
- * @brief clone/reflink file from src to dst
- *
- */
 bool clone_file(const QString& src, const QString& dst, std::error_code& ec)
 {
     auto src_path = StringUtils::toStdString(QDir::toNativeSeparators(QFileInfo(src).absoluteFilePath()));
@@ -1545,7 +1489,6 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
 
 bool linux_ficlone(const std::string& src_path, const std::string& dst_path, std::error_code& ec)
 {
-    // https://man7.org/linux/man-pages/man2/ioctl_ficlone.2.html
 
     int src_fd = open(src_path.c_str(), O_RDONLY);
     if (src_fd == -1) {
@@ -1562,7 +1505,7 @@ bool linux_ficlone(const std::string& src_path, const std::string& dst_path, std
         close(src_fd);
         return false;
     }
-    // attempt to clone
+
     if (ioctl(dst_fd, FICLONE, src_fd) == -1) {
         qDebug() << "Failed to clone file:" << src_path.c_str() << "to" << dst_path.c_str();
         qDebug() << "Error:" << strerror(errno);
@@ -1586,8 +1529,6 @@ bool linux_ficlone(const std::string& src_path, const std::string& dst_path, std
 
 bool macos_bsd_clonefile(const std::string& src_path, const std::string& dst_path, std::error_code& ec)
 {
-    // clonefile(const char * src, const char * dst, int flags);
-    // https://www.manpagez.com/man/2/clonefile/
 
     qDebug() << "attempting file clone via clonefile" << src_path.c_str() << "to" << dst_path.c_str();
     if (clonefile(src_path.c_str(), dst_path.c_str(), 0) == -1) {
@@ -1600,10 +1541,6 @@ bool macos_bsd_clonefile(const std::string& src_path, const std::string& dst_pat
 }
 #endif
 
-/**
- * @brief if the Filesystem is symlink capable
- *
- */
 bool canLinkOnFS(const QString& path)
 {
     FilesystemInfo info = statFS(path);
@@ -1617,10 +1554,7 @@ bool canLinkOnFS(FilesystemType type)
 {
     return !s_non_link_filesystems.contains(type);
 }
-/**
- * @brief if the Filesystem is symlink capable on both ends
- *
- */
+
 bool canLink(const QString& src, const QString& dst)
 {
     return canLinkOnFS(src) && canLinkOnFS(dst);
@@ -1638,7 +1572,7 @@ uintmax_t hardLinkCount(const QString& path)
 }
 
 #ifdef Q_OS_WIN
-// returns 8.3 file format from long path
+
 QString shortPathName(const QString& file)
 {
     auto input = file.toStdWString();
@@ -1646,10 +1580,7 @@ QString shortPathName(const QString& file)
     long length = GetShortPathNameW(input.c_str(), NULL, 0);
     if (length == 0)
         return {};
-    // NOTE: this resizing might seem weird...
-    // when GetShortPathNameW fails, it returns length including null character
-    // when it succeeds, it returns length excluding null character
-    // See: https://msdn.microsoft.com/en-us/library/windows/desktop/aa364989(v=vs.85).aspx
+
     output.resize(length);
     if (GetShortPathNameW(input.c_str(), (LPWSTR)output.c_str(), length) == 0)
         return {};
@@ -1658,7 +1589,6 @@ QString shortPathName(const QString& file)
     return ret;
 }
 
-// if the string survives roundtrip through local 8bit encoding...
 bool fitsInLocal8bit(const QString& string)
 {
     return string == QString::fromLocal8Bit(string.toLocal8Bit());
@@ -1671,7 +1601,7 @@ QString getPathNameInLocal8bit(const QString& file)
         if (!path.isEmpty()) {
             return path;
         }
-        // in case shortPathName fails just return the path as is
+
     }
     return file;
 }
@@ -1681,7 +1611,8 @@ QString getUniqueResourceName(const QString& filePath)
 {
     auto newFileName = filePath;
     if (!newFileName.endsWith(".disabled")) {
-        return newFileName;  // prioritize enabled mods
+        return newFileName;
+
     }
     newFileName.chop(9);
     if (!QFile::exists(newFileName)) {
@@ -1706,11 +1637,11 @@ QString getUniqueResourceName(const QString& filePath)
 bool removeFiles(QStringList listFile)
 {
     bool ret = true;
-    // For each file
+
     for (int i = 0; i < listFile.count(); i++) {
-        // Remove
+
         ret = ret && QFile::remove(listFile.at(i));
     }
     return ret;
 }
-}  // namespace FS
+}

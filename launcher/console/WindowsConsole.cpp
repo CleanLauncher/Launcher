@@ -51,17 +51,9 @@ void RedirectHandle(DWORD handle, FILE* stream, const char* mode)
     }
 }
 
-// taken from https://stackoverflow.com/a/25927081
-// getting a proper output to console with redirection support on windows is apparently hell
 void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr)
 {
-    // Re-initialize the C runtime "FILE" handles with clean handles bound to "nul". We do this because it has been
-    // observed that the file number of our standard handle file objects can be assigned internally to a value of -2
-    // when not bound to a valid target, which represents some kind of unknown internal invalid state. In this state our
-    // call to "_dup2" fails, as it specifically tests to ensure that the target file number isn't equal to this value
-    // before allowing the operation to continue. We can resolve this issue by first "re-opening" the target files to
-    // use the "nul" device, which will place them into a valid state, after which we can redirect them to our target
-    // using the "_dup2" function.
+
     if (bindStdIn) {
         FILE* dummyFile;
         freopen_s(&dummyFile, "nul", "r", stdin);
@@ -75,25 +67,18 @@ void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr
         freopen_s(&dummyFile, "nul", "w", stderr);
     }
 
-    // Redirect unbuffered stdin from the current standard input handle
     if (bindStdIn) {
         RedirectHandle(STD_INPUT_HANDLE, stdin, "r");
     }
 
-    // Redirect unbuffered stdout to the current standard output handle
     if (bindStdOut) {
         RedirectHandle(STD_OUTPUT_HANDLE, stdout, "w");
     }
 
-    // Redirect unbuffered stderr to the current standard error handle
     if (bindStdErr) {
         RedirectHandle(STD_ERROR_HANDLE, stderr, "w");
     }
 
-    // Clear the error state for each of the C++ standard stream objects. We need to do this, as attempts to access the
-    // standard streams before they refer to a valid target will cause the iostream objects to enter an error state. In
-    // versions of Visual Studio after 2005, this seems to always occur during startup regardless of whether anything
-    // has been read from or written to the targets or not.
     if (bindStdIn) {
         std::wcin.clear();
         std::cin.clear();
@@ -138,22 +123,19 @@ bool AttachWindowsConsole()
 
 std::error_code EnableAnsiSupport()
 {
-    // ref: https://docs.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew
-    // Using `CreateFileW("CONOUT$", ...)` to retrieve the console handle works correctly even if STDOUT and/or STDERR are redirected
+
     HANDLE console_handle = CreateFileW(L"CONOUT$", FILE_GENERIC_READ | FILE_GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
     if (console_handle == INVALID_HANDLE_VALUE) {
         return std::error_code(GetLastError(), std::system_category());
     }
 
-    // ref: https://docs.microsoft.com/en-us/windows/console/getconsolemode
     DWORD console_mode;
     if (0 == GetConsoleMode(console_handle, &console_mode)) {
         return std::error_code(GetLastError(), std::system_category());
     }
 
-    // VT processing not already enabled?
     if ((console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0) {
-        // https://docs.microsoft.com/en-us/windows/console/setconsolemode
+
         if (0 == SetConsoleMode(console_handle, console_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
             return std::error_code(GetLastError(), std::system_category());
         }
@@ -182,10 +164,10 @@ WindowsConsoleGuard::WindowsConsoleGuard() : m_consoleAttached(false)
 
 WindowsConsoleGuard::~WindowsConsoleGuard()
 {
-    // Detach from Windows console
+
     if (m_consoleAttached) {
         console::FreeWindowsConsole();
     }
 }
 
-}  // namespace console
+}

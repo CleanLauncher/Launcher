@@ -65,7 +65,8 @@ void DataPackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] cons
 void DataPackPage::downloadDataPacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     m_downloadDialog = new ResourceDownload::DataPackDownloadDialog(this, m_model, m_instance);
@@ -118,7 +119,8 @@ void DataPackPage::downloadDialogFinished(int result)
 void DataPackPage::updateDataPacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -222,7 +224,8 @@ void DataPackPage::deleteDataPackMetadata()
 void DataPackPage::changeDataPackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

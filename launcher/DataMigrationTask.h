@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Sefa Eyeoglu <contact@scrumplex.net>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -10,10 +10,6 @@
 
 #include <QFuture>
 #include <QFutureWatcher>
-
-/*
- * Migrate existing data from other MMC-like launchers.
- */
 
 class DataMigrationTask : public Task {
     Q_OBJECT

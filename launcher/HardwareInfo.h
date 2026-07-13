@@ -26,7 +26,7 @@ QString cpuInfo();
 uint64_t totalRamMiB();
 uint64_t availableRamMiB();
 QStringList gpuInfo();
-}  // namespace HardwareInfo
+}
 
 #ifdef Q_OS_MACOS
 namespace MacOSHardwareInfo {
@@ -38,5 +38,6 @@ enum class MemoryPressureLevel : uint8_t {
 
 MemoryPressureLevel memoryPressureLevel();
 QString memoryPressureLevelName();
-}  // namespace MacOSHardwareInfo
+}
+
 #endif

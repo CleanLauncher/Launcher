@@ -90,7 +90,7 @@ void LaunchTask::onReadyForLaunch()
 
 void LaunchTask::onStepFinished()
 {
-    // initial -> just start the first step
+
     if (currentStep == -1) {
         currentStep++;
         m_steps[currentStep]->start();
@@ -99,7 +99,7 @@ void LaunchTask::onStepFinished()
 
     auto step = m_steps[currentStep];
     if (step->wasSuccessful()) {
-        // end?
+
         if (currentStep == m_steps.size() - 1) {
             finalizeSteps(true, QString());
         } else {
@@ -206,7 +206,7 @@ shared_qobject_ptr<LogModel> LaunchTask::getLogModel()
         m_logModel.reset(new LogModel());
         m_logModel->setMaxLines(getConsoleMaxLines(m_instance->settings()));
         m_logModel->setStopOnOverflow(shouldStopOnConsoleOverflow(m_instance->settings()));
-        // FIXME: should this really be here?
+
         m_logModel->setOverflowMessage(tr("Stopped watching the game log because the log length surpassed %1 lines.\n"
                                           "You may have to fix your mods because the game is still logging to files and"
                                           " likely wasting harddrive space at an alarming rate!")
@@ -282,7 +282,6 @@ void LaunchTask::onLogLine(QString line, MessageLevel level)
         return;
     }
 
-    // censor private user info
     line = censorPrivateInfo(line);
 
     getLogModel()->append(level, line);

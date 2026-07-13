@@ -17,7 +17,6 @@
 
 #include <QStringList>
 
-// FIXME: the way this is written, it can't ever do any sort of validation and can accept total junk
 MinecraftTarget MinecraftTarget::parse(const QString& fullAddress, bool useWorld)
 {
     if (useWorld) {
@@ -27,9 +26,6 @@ MinecraftTarget MinecraftTarget::parse(const QString& fullAddress, bool useWorld
     }
     QStringList split = fullAddress.split(":");
 
-    // The logic below replicates the exact logic minecraft uses for parsing server addresses.
-    // While the conversion is not lossless and eats errors, it ensures the same behavior
-    // within Minecraft and Launcher when entering server addresses.
     if (fullAddress.startsWith("[")) {
         int bracket = fullAddress.indexOf("]");
         if (bracket > 0) {

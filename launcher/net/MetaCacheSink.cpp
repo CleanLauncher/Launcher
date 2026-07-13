@@ -43,9 +43,6 @@
 
 namespace Net {
 
-/** Maximum time to hold a cache entry
- *  = 1 week in seconds
- */
 #define MAX_TIME_TO_EXPIRE 1 * 7 * 24 * 60 * 60
 
 MetaCacheSink::MetaCacheSink(MetaEntryPtr entry, ChecksumValidator* md5sum, bool is_eternal)
@@ -60,7 +57,6 @@ Task::State MetaCacheSink::initCache(QNetworkRequest& request)
         return Task::State::Succeeded;
     }
 
-    // check if file exists, if it does, use its information for the request
     QFile current(m_filename);
     if (current.exists() && current.size() != 0) {
         if (m_entry->getRemoteChangedTimestamp().size()) {
@@ -90,7 +86,8 @@ Task::State MetaCacheSink::finalizeCache(QNetworkReply& reply)
 
     m_entry->setLocalChangedTimestamp(output_file_info.lastModified().toUTC().toMSecsSinceEpoch());
 
-    {  // Cache lifetime
+    {
+
         if (m_is_eternal) {
             qCDebug(taskMetaCacheLogC) << "Adding eternal cache entry:" << m_entry->getFullPath();
             m_entry->makeEternal(true);
@@ -134,4 +131,4 @@ bool MetaCacheSink::hasLocalData()
     QFileInfo info(m_filename);
     return info.exists() && info.size() != 0;
 }
-}  // namespace Net
+}

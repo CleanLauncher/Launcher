@@ -61,11 +61,10 @@ EnvironmentVariables::~EnvironmentVariables()
 
 void EnvironmentVariables::initialize(bool instance, bool override, const QMap<QString, QVariant>& value)
 {
-    // update widgets to settings
+
     ui->overrideCheckBox->setVisible(instance);
     ui->overrideCheckBox->setChecked(override);
 
-    // populate
     ui->list->clear();
     for (auto iter = value.begin(); iter != value.end(); iter++) {
         auto item = new QTreeWidgetItem(ui->list);

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022-2023 Sefa Eyeoglu <contact@scrumplex.net>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 
 /*
@@ -99,7 +99,6 @@ class VersionPage : public QMainWindow, public BasePage {
    protected:
     QMenu* createPopupMenu() override;
 
-    /// FIXME: this shouldn't be necessary!
     bool reloadPackProfile();
 
    private:

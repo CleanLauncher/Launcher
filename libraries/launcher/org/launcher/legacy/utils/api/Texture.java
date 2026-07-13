@@ -37,9 +37,6 @@ package org.launcher.legacy.utils.api;
 
 import java.net.URL;
 
-/**
- * Represents a texture from the Mojang API.
- */
 public final class Texture {
     private final URL url;
     private final boolean slim;

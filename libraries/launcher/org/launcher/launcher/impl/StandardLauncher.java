@@ -75,7 +75,7 @@ public final class StandardLauncher extends AbstractLauncher {
 
     @Override
     public void launch() throws Throwable {
-        // window size, title and state
+
         gameArgs.add("--width");
         gameArgs.add(Integer.toString(width));
         gameArgs.add("--height");
@@ -83,7 +83,7 @@ public final class StandardLauncher extends AbstractLauncher {
 
         if (serverAddress != null) {
             if (quickPlayMultiplayerSupported) {
-                // as of 23w14a
+
                 gameArgs.add("--quickPlayMultiplayer");
                 gameArgs.add(serverAddress + ':' + serverPort);
             } else {
@@ -100,17 +100,16 @@ public final class StandardLauncher extends AbstractLauncher {
         StringBuilder joinedGameArgs = new StringBuilder();
         for (String gameArg : gameArgs) {
             if (joinedGameArgs.length() > 0) {
-                joinedGameArgs.append('\u001F'); // unit separator, designed for this purpose
+                joinedGameArgs.append('\u001F');
+
             }
             joinedGameArgs.append(gameArg);
         }
 
-        // pass the real main class and game arguments in so mods can access them
         System.setProperty("org.launcher.launch.mainclass", mainClassName);
-        // unit separator ('\u001F') delimited list of game args
+
         System.setProperty("org.launcher.launch.gameargs", joinedGameArgs.toString());
 
-        // find and invoke the main method
         MethodHandle method = ReflectionUtils.findMainMethod(mainClassName);
         method.invokeExact(gameArgs.toArray(new String[0]));
     }

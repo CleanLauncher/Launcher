@@ -47,7 +47,8 @@ bool Flame::FileResolvingTask::abort()
 
 void Flame::FileResolvingTask::executeTask()
 {
-    if (m_manifest.files.isEmpty()) {  // no file to resolve so leave it empty and emit success immediately
+    if (m_manifest.files.isEmpty()) {
+
         emitSucceeded();
         return;
     }
@@ -89,22 +90,22 @@ void Flame::FileResolvingTask::executeTask()
 ModPlatform::ResourceType getResourceType(int classId)
 {
     switch (classId) {
-        case 17:  // Worlds
+        case 17:
+
             return ModPlatform::ResourceType::World;
-        case 6:  // Mods
+        case 6:
+
             return ModPlatform::ResourceType::Mod;
-        case 12:  // Resource Packs
-                  // return ModPlatform::ResourceType::ResourcePack; // not really a resourcepack
-            /* fallthrough */
-        case 4546:  // Customization
-                    // return ModPlatform::ResourceType::ShaderPack; // not really a shaderPack
-            /* fallthrough */
-        case 4471:  // Modpacks
-            /* fallthrough */
-        case 5:  // Bukkit Plugins
-            /* fallthrough */
-        case 4559:  // Addons
-            /* fallthrough */
+        case 12:
+
+        case 4546:
+
+        case 4471:
+
+        case 5:
+
+        case 4559:
+
         default:
             return ModPlatform::ResourceType::Unknown;
     }
@@ -113,7 +114,7 @@ ModPlatform::ResourceType getResourceType(int classId)
 void Flame::FileResolvingTask::netJobFinished(QByteArray* response)
 {
     setProgress(1, 3);
-    // job to check modrinth for blocked projects
+
     QJsonDocument doc;
     QJsonArray array;
 
@@ -172,7 +173,7 @@ void Flame::FileResolvingTask::netJobFinished(QByteArray* response)
             getFlameProjects();
             return;
             }
-        if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool()){ 
+        if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool()){
             try {
                 auto entries = Json::requireObject(doc);
                 for (auto& out : m_manifest.files) {

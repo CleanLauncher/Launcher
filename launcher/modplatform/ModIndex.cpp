@@ -86,7 +86,7 @@ QStringList ProviderCapabilities::hashType(ResourceProvider p)
         case ResourceProvider::MODRINTH:
             return { "sha512", "sha1" };
         case ResourceProvider::FLAME:
-            // Try newer formats first, fall back to old format
+
             return { "sha1", "md5", "murmur2" };
     }
     return {};
@@ -219,4 +219,4 @@ DependencyType DependencyTypeUtils::fromString(const QString& str)
 
     return map.value(str.toUpper(), DependencyType::UNKNOWN);
 }
-}  // namespace ModPlatform
+}

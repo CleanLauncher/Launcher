@@ -47,7 +47,7 @@
 #include <memory>
 
 namespace MMCZip {
-// ours
+
 using FilterFunction = std::function<bool(const QString&)>;
 #if defined(LAUNCHER_APPLICATION)
 bool mergeZipFiles(ArchiveWriter& into, QFileInfo from, QSet<QString>& contained, const FilterFunction& filter = nullptr)
@@ -90,7 +90,6 @@ bool compressDirFiles(ArchiveWriter& zip, QString dir, QFileInfoList files)
     return true;
 }
 
-// ours
 bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<Mod*>& mods)
 {
     ArchiveWriter zipOut(targetJarPath);
@@ -99,15 +98,12 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
         qCritical() << "Failed to open the minecraft.jar for modding";
         return false;
     }
-    // Files already added to the jar.
-    // These files will be skipped.
+
     QSet<QString> addedFiles;
 
-    // Modify the jar
-    // This needs to be done in reverse-order to ensure we respect the loading order of components
     for (auto i = mods.crbegin(); i != mods.crend(); i++) {
         const auto* mod = *i;
-        // do not merge disabled mods.
+
         if (!mod->enabled())
             continue;
         if (mod->type() == ResourceType::ZIPFILE) {
@@ -118,7 +114,7 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
                 return false;
             }
         } else if (mod->type() == ResourceType::SINGLEFILE) {
-            // FIXME: buggy - does not work with addedFiles
+
             auto filename = mod->fileinfo();
             if (!zipOut.addFile(filename.absoluteFilePath(), filename.fileName())) {
                 zipOut.close();
@@ -128,8 +124,7 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
             }
             addedFiles.insert(filename.fileName());
         } else if (mod->type() == ResourceType::FOLDER) {
-            // untested, but seems to be unused / not possible to reach
-            // FIXME: buggy - does not work with addedFiles
+
             auto filename = mod->fileinfo();
             QString what_to_zip = filename.absoluteFilePath();
             QDir dir(what_to_zip);
@@ -151,7 +146,7 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
             }
             qDebug() << "Adding folder" << filename.fileName() << "from" << filename.absoluteFilePath();
         } else {
-            // Make sure we do not continue launching when something is missing or undefined...
+
             zipOut.close();
             FS::deletePath(targetJarPath);
             qCritical() << "Failed to add unknown mod type" << mod->fileinfo().fileName() << "to the jar.";
@@ -166,7 +161,6 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
         return false;
     }
 
-    // Recompress the jar
     if (!zipOut.close()) {
         FS::deletePath(targetJarPath);
         qCritical() << "Failed to finalize minecraft.jar!";
@@ -176,7 +170,6 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
 }
 #endif
 
-// ours
 std::optional<QStringList> extractSubDir(ArchiveReader* zip, const QString& subdir, const QString& target)
 {
     auto target_top_dir = QUrl::fromLocalFile(target);
@@ -207,11 +200,9 @@ std::optional<QStringList> extractSubDir(ArchiveReader* zip, const QString& subd
             auto relative_file_name = QDir::fromNativeSeparators(file_name.mid(subdir.size()));
             auto original_name = relative_file_name;
 
-            // Fix subdirs/files ending with a / getting transformed into absolute paths
             if (relative_file_name.startsWith('/'))
                 relative_file_name = relative_file_name.mid(1);
 
-            // Fix weird "folders with a single file get squashed" thing
             QString sub_path;
             if (relative_file_name.contains('/') && !relative_file_name.endsWith('/')) {
                 sub_path = relative_file_name.section('/', 0, -2) + '/';
@@ -251,10 +242,9 @@ std::optional<QStringList> extractSubDir(ArchiveReader* zip, const QString& subd
     return extracted;
 }
 
-// ours
 std::optional<QStringList> extractDir(QString fileCompressed, QString dir)
 {
-    // check if this is a minimum size empty zip file...
+
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return QStringList();
@@ -263,10 +253,9 @@ std::optional<QStringList> extractDir(QString fileCompressed, QString dir)
     return extractSubDir(&zip, "", dir);
 }
 
-// ours
 std::optional<QStringList> extractDir(QString fileCompressed, QString subdir, QString dir)
 {
-    // check if this is a minimum size empty zip file...
+
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return QStringList();
@@ -275,10 +264,9 @@ std::optional<QStringList> extractDir(QString fileCompressed, QString subdir, QS
     return extractSubDir(&zip, subdir, dir);
 }
 
-// ours
 bool extractFile(QString fileCompressed, QString file, QString target)
 {
-    // check if this is a minimum size empty zip file...
+
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return true;
@@ -307,16 +295,14 @@ bool collectFileListRecursively(const QString& rootDir, const QString& subDir, Q
         directory = QDir(subDir);
 
     if (!directory.exists())
-        return false;  // shouldn't ever happen
+        return false;
 
-    // recurse directories
     QFileInfoList entries = directory.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot | QDir::Hidden);
     for (const auto& e : entries) {
         if (!collectFileListRecursively(rootDir, e.filePath(), files, excludeFilter))
             return false;
     }
 
-    // collect files
     entries = directory.entryInfoList(QDir::Files);
     for (const auto& e : entries) {
         if (excludeFilter && excludeFilter(e)) {
@@ -325,8 +311,9 @@ bool collectFileListRecursively(const QString& rootDir, const QString& subDir, Q
             continue;
         }
 
-        files->append(e);  // we want the original paths for compressDirFiles
+        files->append(e);
+
     }
     return true;
 }
-}  // namespace MMCZip
+}

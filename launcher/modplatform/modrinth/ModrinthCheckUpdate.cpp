@@ -22,7 +22,8 @@ ModrinthCheckUpdate::ModrinthCheckUpdate(QList<Resource*>& resources,
     : CheckUpdateTask(resources, mcVersions, std::move(loadersList), resourceModel)
     , m_hashType(ModPlatform::ProviderCapabilities::hashType(ModPlatform::ResourceProvider::MODRINTH).first())
 {
-    if (!m_loadersList.isEmpty()) {  // this is for mods so append all the other posible loaders to the initial list
+    if (!m_loadersList.isEmpty()) {
+
         m_initialSize = m_loadersList.length();
         ModPlatform::ModLoaderTypes modLoaders;
         for (auto* m : resources) {
@@ -43,11 +44,6 @@ bool ModrinthCheckUpdate::abort()
     return true;
 }
 
-/* Check for update:
- * - Get latest version available
- * - Compare hash of the latest version with the current hash
- * - If equal, no updates, else, there's updates, so add to the list
- * */
 void ModrinthCheckUpdate::executeTask()
 {
     setStatus(tr("Preparing resources for Modrinth..."));
@@ -59,9 +55,6 @@ void ModrinthCheckUpdate::executeTask()
     for (auto* resource : m_resources) {
         auto hash = resource->metadata()->hash;
 
-        // Sadly the API can only handle one hash type per call, se we
-        // need to generate a new hash if the current one is innadequate
-        // (though it will rarely happen, if at all)
         if (resource->metadata()->hash_format != m_hashType) {
             auto hashTask = Hashing::createHasher(resource->fileinfo().absoluteFilePath(), ModPlatform::ResourceProvider::MODRINTH);
             connect(hashTask.get(), &Hashing::Hasher::resultsReady,
@@ -141,16 +134,12 @@ void ModrinthCheckUpdate::checkVersionsResponse(QByteArray* response, std::optio
 
             auto projectObj = doc[hash].toObject();
 
-            // If the returned project is empty, but we have Modrinth metadata,
-            // it means this specific version is not available
             if (projectObj.isEmpty()) {
                 qDebug() << "Mod" << m_mappings.find(hash).value()->name() << "got an empty response. Hash:" << hash;
                 ++iter;
                 continue;
             }
 
-            // Sometimes a version may have multiple files, one with "forge" and one with "fabric",
-            // so we may want to filter it
             QString loaderFilter;
             if (loader.has_value() && loader != 0) {
                 auto modLoaders = ModPlatform::modLoaderTypesToList(*loader);
@@ -159,12 +148,6 @@ void ModrinthCheckUpdate::checkVersionsResponse(QByteArray* response, std::optio
                 }
             }
 
-            // Currently, we rely on a couple heuristics to determine whether an update is actually available or not:
-            // - The file needs to be preferred: It is either the primary file, or the one found via (explicit) usage of the
-            // loader_filter
-            // - The version reported by the JAR is different from the version reported by the indexed version (it's usually the case)
-            // Such is the pain of having arbitrary files for a given version .-.
-
             auto projectVer = Modrinth::loadIndexedPackVersion(projectObj, m_hashType, loaderFilter);
             if (projectVer.downloadUrl.isEmpty()) {
                 qCritical() << "Modrinth mod without download url!" << projectVer.fileName;
@@ -172,7 +155,6 @@ void ModrinthCheckUpdate::checkVersionsResponse(QByteArray* response, std::optio
                 continue;
             }
 
-            // Fake pack with the necessary info to pass to the download task :)
             auto pack = std::make_shared<ModPlatform::IndexedPack>();
             pack->name = resource->name();
             pack->slug = resource->metadata()->slug;
@@ -210,11 +192,13 @@ void ModrinthCheckUpdate::checkNextLoader()
         emitSucceeded();
         return;
     }
-    if (m_loaderIdx < m_loadersList.size()) {  // this are mods so check with loades
+    if (m_loaderIdx < m_loadersList.size()) {
+
         getUpdateModsForLoader(m_loadersList.at(m_loaderIdx), m_loaderIdx > m_initialSize);
         return;
     }
-    if (m_loadersList.isEmpty() && m_loaderIdx == 0) {  // this are other resources no need to check more than once with empty loader
+    if (m_loadersList.isEmpty() && m_loaderIdx == 0) {
+
         getUpdateModsForLoader();
         return;
     }

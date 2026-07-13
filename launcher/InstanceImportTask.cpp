@@ -124,14 +124,11 @@ void InstanceImportTask::processZipPack()
     QDir extractDir(m_stagingPath);
     qDebug() << "Attempting to create instance from" << m_archivePath;
 
-    // open the zip and find relevant files in it
     MMCZip::ArchiveReader packZip(m_archivePath);
     qDebug() << "Attempting to determine instance type";
 
     QString root;
-    // NOTE: Prioritize modpack platforms that aren't searched for recursively.
-    // Especially Flame has a very common filename for its manifest, which may appear inside overrides for example
-    // https://docs.modrinth.com/docs/modpacks/format_definition/#storage
+
     auto detectInstance = [this, &extractDir, &root](MMCZip::ArchiveReader::File* f, bool& stop) {
         if (!isRunning()) {
             stop = true;
@@ -139,12 +136,12 @@ void InstanceImportTask::processZipPack()
         }
         auto fileName = f->filename();
         if (fileName == "modrinth.index.json") {
-            // process as Modrinth pack
+
             qDebug() << "Modrinth:" << true;
             m_modpackType = ModpackType::Modrinth;
             stop = true;
         } else if (fileName == "bin/modpack.jar" || fileName == "bin/version.json") {
-            // process as Technic pack
+
             qDebug() << "Technic:" << true;
             extractDir.mkpath("minecraft");
             extractDir.cd("minecraft");
@@ -173,7 +170,6 @@ void InstanceImportTask::processZipPack()
     }
     setStatus(tr("Extracting modpack"));
 
-    // make sure we extract just the pack
     auto zipTask = makeShared<MMCZip::ExtractZipTask>(m_archivePath, extractDir, root);
 
     auto progressStep = std::make_shared<TaskStepProgress>();
@@ -217,10 +213,10 @@ void InstanceImportTask::extractFinished()
         auto permissions = QFile::permissions(filepath);
         auto origPermissions = permissions;
         if (file.isDir()) {
-            // Folder +rwx for current user
+
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {
-            // File +rw for current user
+
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser;
         }
         if (origPermissions != permissions) {
@@ -259,7 +255,7 @@ bool installIcon(QString root, QString instIconKey)
     if (importIconPath.isNull() || !QFile::exists(importIconPath))
         importIconPath = IconUtils::findBestIconIn(FS::PathCombine(root, "overrides"), "icon.png");
     if (!importIconPath.isNull() && QFile::exists(importIconPath)) {
-        // import icon
+
         auto iconList = APPLICATION->icons();
         if (iconList->iconFileExists(instIconKey)) {
             iconList->deleteIcon(instIconKey);
@@ -290,12 +286,12 @@ void InstanceImportTask::processFlame()
         inst_creation_task =
             makeShared<FlameCreationTask>(m_stagingPath, m_globalSettings, m_parent, pack_id, pack_version_id, original_instance_id);
     } else {
-        // FIXME: Find a way to get IDs in directly imported ZIPs
+
         inst_creation_task = makeShared<FlameCreationTask>(m_stagingPath, m_globalSettings, m_parent, QString(), QString());
     }
 
     inst_creation_task->setName(*this);
-    // if the icon was specified by user, use that. otherwise pull icon from the pack
+
     if (m_instIcon == "default") {
         auto iconKey = QString("Flame_%1_Icon").arg(name());
 
@@ -346,13 +342,10 @@ void InstanceImportTask::processMultiMC()
 
     NullInstance instance(m_globalSettings, std::move(instanceSettings), m_stagingPath);
 
-    // reset time played on import... because packs.
     instance.resetTimePlayed();
 
-    // set a new nice name
     instance.setName(name());
 
-    // if the icon was specified by user, use that. otherwise pull icon from the pack
     if (m_instIcon != "default") {
         instance.setIconKey(m_instIcon);
     } else {
@@ -390,12 +383,11 @@ void InstanceImportTask::processModrinth()
             pack_id = s_regex.match(m_sourceUrl.toString()).captured(1);
         }
 
-        // FIXME: Find a way to get the ID in directly imported ZIPs
         inst_creation_task = makeShared<ModrinthCreationTask>(m_stagingPath, m_globalSettings, m_parent, pack_id);
     }
 
     inst_creation_task->setName(*this);
-    // if the icon was specified by user, use that. otherwise pull icon from the pack
+
     if (m_instIcon == "default") {
         auto iconKey = QString("Modrinth_%1_Icon").arg(name());
 

@@ -105,7 +105,7 @@ void Index::parse(const QJsonObject& obj)
 void Index::merge(const std::shared_ptr<Index>& other)
 {
     const QList<VersionList::Ptr> lists = other->m_lists;
-    // initial load, no need to merge
+
     if (m_lists.isEmpty()) {
         beginResetModel();
         m_lists = lists;
@@ -160,4 +160,4 @@ Version::Ptr Index::getLoadedVersion(const QString& uid, const QString& version)
     ev.exec();
     return get(uid, version);
 }
-}  // namespace Meta
+}

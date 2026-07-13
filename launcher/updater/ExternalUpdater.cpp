@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -62,7 +62,7 @@ ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const Q
     priv->allowBeta = priv->settings->value("allow_beta", false).toBool();
     priv->autoCheck = priv->settings->value("auto_check", true).toBool();
     bool intervalOk = false;
-    // default once per day
+
     priv->updateInterval = priv->settings->value("update_interval", 86400).toInt(&intervalOk);
     if (!intervalOk) {
         priv->updateInterval = 86400;
@@ -73,7 +73,8 @@ ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const Q
     priv->parent = parent;
     connectTimer();
     resetAutoCheckTimer();
-    if (priv->updateInterval == 0) {  // "On Launch"
+    if (priv->updateInterval == 0) {
+
         checkForUpdates(false);
     }
 }
@@ -96,7 +97,8 @@ void ExternalUpdater::checkForUpdates()
 void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
 {
     QProgressDialog progress(tr("Checking for updates..."), "", 0, 0, priv->parent);
-    progress.setMinimumDuration(0); // Appear immediately without waiting
+    progress.setMinimumDuration(0);
+
     progress.setCancelButton(nullptr);
     progress.adjustSize();
     if (triggeredByUser) {
@@ -170,7 +172,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
 
     switch (exitCode) {
         case 0:
-            // no update available
+
             if (triggeredByUser) {
                 qDebug() << "No update available";
                 auto msgBox = QMessageBox(QMessageBox::Information, tr("No Update Available"), tr("You are running the latest version."),
@@ -181,7 +183,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
             }
             break;
         case 1:
-            // there was an error
+
             {
                 qDebug() << "Updater subprocess error" << qPrintable(stdError);
                 auto msgBox = QMessageBox(QMessageBox::Warning, tr("Update Check Error"),
@@ -193,7 +195,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
             }
             break;
         case 100:
-            // update available
+
             {
                 auto [firstLine, remainder1] = StringUtils::splitFirst(stdOutput, '\n');
                 auto [secondLine, remainder2] = StringUtils::splitFirst(remainder1, '\n');
@@ -208,7 +210,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
             }
             break;
         default:
-            // unknown error code
+
             {
                 qDebug() << "Updater exited with unknown code" << exitCode;
                 auto msgBox = QMessageBox(QMessageBox::Information, tr("Unknown Update Error"),

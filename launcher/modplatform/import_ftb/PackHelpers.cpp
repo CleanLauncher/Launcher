@@ -30,7 +30,7 @@ namespace FTBImportAPP {
 
 QIcon loadFTBIcon(const QString& imagePath)
 {
-    // Map of type byte to image type string
+
     static const QHash<char, QByteArray> imageTypeMap = { { 0x00, "png" }, { 0x01, "jpg" }, { 0x02, "gif" }, { 0x03, "webp" } };
     QFile file(imagePath);
     if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
@@ -47,7 +47,7 @@ QIcon loadFTBIcon(const QString& imagePath)
     }
 
     auto imageType = imageTypeMap[type];
-    // Extract actual image data beyond the first byte
+
     QImageReader reader(&file, imageType);
     auto pixmap = QPixmap::fromImageReader(&reader);
     if (pixmap.isNull()) {
@@ -103,7 +103,8 @@ Modpack parseDirectory(QString path)
     auto iconFile = QFileInfo(FS::PathCombine(path, "folder.jpg"));
     if (iconFile.exists() && iconFile.isFile()) {
         modpack.icon = QIcon(iconFile.absoluteFilePath());
-    } else {  // the logo is a file that the first bit denotes the image tipe followed by the actual image data
+    } else {
+
         modpack.icon = loadFTBIcon(FS::PathCombine(path, ".ftbapp", "logo"));
     }
     return modpack;
@@ -151,4 +152,4 @@ void legacyInstanceParsing(QString path, std::optional<ModPlatform::ModLoaderTyp
         return;
     }
 }
-}  // namespace FTBImportAPP
+}

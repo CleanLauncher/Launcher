@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -34,13 +34,12 @@ class TexturePackResourcePage : public ResourcePackResourcePage {
         return page;
     }
 
-    //: The plural version of 'texture pack'
     inline QString resourcesString() const override { return tr("texture packs"); }
-    //: The singular version of 'texture packs'
+
     inline QString resourceString() const override { return tr("texture pack"); }
 
    protected:
     TexturePackResourcePage(TexturePackDownloadDialog* dialog, BaseInstance& instance) : ResourcePackResourcePage(dialog, instance) {}
 };
 
-}  // namespace ResourceDownload
+}

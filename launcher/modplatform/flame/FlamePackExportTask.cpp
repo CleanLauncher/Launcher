@@ -90,14 +90,15 @@ void FlamePackExportTask::collectHashes()
     task.reset(hashingTask);
     for (const QFileInfo& file : m_files) {
         const QString relative = m_gameRoot.relativeFilePath(file.absoluteFilePath());
-        // require sensible file types
+
         if (!std::any_of(FILE_EXTENSIONS.begin(), FILE_EXTENSIONS.end(), [&relative](const QString& extension) {
                 return relative.endsWith('.' + extension) || relative.endsWith('.' + extension + ".disabled");
             }))
             continue;
 
         if (relative.startsWith("resourcepacks/") &&
-            (relative.endsWith(".zip") || relative.endsWith(".zip.disabled"))) {  // is resourcepack
+            (relative.endsWith(".zip") || relative.endsWith(".zip.disabled"))) {
+
             auto hashTask = Hashing::createHasher(file.absoluteFilePath(), ModPlatform::ResourceProvider::FLAME);
             connect(hashTask.get(), &Hashing::Hasher::resultsReady, [this, relative, file](QString hash) {
                 if (m_state == Task::State::Running) {
@@ -368,14 +369,13 @@ QByteArray FlamePackExportTask::generateIndex()
     QJsonObject version;
 
     auto profile = m_options.instance->getPackProfile();
-    // collect all supported components
+
     const ComponentPtr minecraft = profile->getComponent("net.minecraft");
     const ComponentPtr quilt = profile->getComponent("org.quiltmc.quilt-loader");
     const ComponentPtr fabric = profile->getComponent("net.fabricmc.fabric-loader");
     const ComponentPtr forge = profile->getComponent("net.minecraftforge");
     const ComponentPtr neoforge = profile->getComponent("net.neoforged");
 
-    // convert all available components to mrpack dependencies
     if (minecraft != nullptr)
         version["version"] = minecraft->m_version;
     QString id;

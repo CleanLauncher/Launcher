@@ -46,10 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A lightweight portable JSON parser used instead of GSON since it is not
- * available in a lot of versions.
- */
 public final class JsonParser {
     private final Reader in;
     private char[] buffer;
@@ -144,7 +140,7 @@ public final class JsonParser {
 
             case 't':
             case 'f':
-                // probably boolean
+
                 Boolean bool = readBoolean();
                 if (bool != null)
                     return bool;
@@ -152,7 +148,7 @@ public final class JsonParser {
                 break;
 
             case 'n':
-                // probably null
+
                 if (readNull())
                     return null;
 
@@ -160,7 +156,7 @@ public final class JsonParser {
         }
 
         if (character == '-' || isDigit())
-            // probably a number
+
             return readNumber();
 
         throw new JsonParseException("Expected a JSON value but got '" + (char) character + "'");
@@ -286,7 +282,7 @@ public final class JsonParser {
                             break;
 
                         case 'u':
-                            // char array to allow allocation in advance.
+
                             char[] digits = new char[4];
 
                             for (int index = 0; index < digits.length; index++) {

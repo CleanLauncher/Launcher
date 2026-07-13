@@ -29,7 +29,6 @@ namespace FTBImportAPP {
 struct Modpack {
     QString path;
 
-    // json data
     QString uuid;
     int id;
     int versionId;
@@ -37,7 +36,7 @@ struct Modpack {
     QString version;
     QString mcVersion;
     int totalPlayTime;
-    // not needed for instance creation
+
     QVariant jvmArgs;
 
     std::optional<ModPlatform::ModLoaderType> loaderType;
@@ -50,7 +49,6 @@ using ModpackList = QList<Modpack>;
 
 Modpack parseDirectory(QString path);
 void legacyInstanceParsing(QString path, std::optional<ModPlatform::ModLoaderType>* loaderType, QString* loaderVersion);
-}  // namespace FTBImportAPP
+}
 
-// We need it for the proxy model
 Q_DECLARE_METATYPE(FTBImportAPP::Modpack)

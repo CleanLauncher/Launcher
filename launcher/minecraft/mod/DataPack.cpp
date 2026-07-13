@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -30,8 +30,6 @@
 #include "Version.h"
 #include "minecraft/mod/tasks/LocalDataPackParseTask.h"
 
-// Values taken from:
-// https://minecraft.wiki/w/Pack_format#List_of_data_pack_formats
 static const QMap<std::pair<int, int>, std::pair<Version, Version>> s_pack_format_versions = {
     { { 4, 0 }, { Version("1.13"), Version("1.14.4") } },
     { { 5, 0 }, { Version("1.15"), Version("1.16.1") } },
@@ -165,14 +163,12 @@ void DataPack::setImage(QImage new_image) const
     if (m_pack_image_cache_key.key.isValid())
         PixmapCache::instance().remove(m_pack_image_cache_key.key);
 
-    // scale the image to avoid flooding the pixmapcache
     auto pixmap =
         QPixmap::fromImage(new_image.scaled({ 64, 64 }, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
     m_pack_image_cache_key.key = PixmapCache::instance().insert(pixmap);
     m_pack_image_cache_key.was_ever_used = true;
 
-    // This can happen if the pixmap is too big to fit in the cache :c
     if (!m_pack_image_cache_key.key.isValid()) {
         qWarning() << "Could not insert a image cache entry! Ignoring it.";
         m_pack_image_cache_key.was_ever_used = false;
@@ -188,7 +184,6 @@ QPixmap DataPack::image(QSize size, Qt::AspectRatioMode mode) const
         return cached_image.scaled(size, mode, Qt::SmoothTransformation);
     }
 
-    // No valid image we can get
     if (!m_pack_image_cache_key.was_ever_used) {
         return {};
     } else {
@@ -196,7 +191,6 @@ QPixmap DataPack::image(QSize size, Qt::AspectRatioMode mode) const
         PixmapCache::markCacheMissByEviciton();
     }
 
-    // Imaged got evicted from the cache. Re-process it and retry.
     DataPackUtils::processPackPNG(this);
     return image(size);
 }

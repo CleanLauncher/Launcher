@@ -110,7 +110,7 @@ void Task::start()
             return;
         }
     }
-    // NOTE: only fall through to here in end states
+
     m_state = State::Running;
     emit started();
     executeTask();
@@ -118,7 +118,7 @@ void Task::start()
 
 void Task::emitFailed(QString reason)
 {
-    // Don't fail twice.
+
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "failed while not running!!!!:" << reason;
         return;
@@ -132,7 +132,7 @@ void Task::emitFailed(QString reason)
 
 void Task::emitAborted()
 {
-    // Don't abort twice.
+
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "aborted while not running!!!!";
         return;
@@ -147,7 +147,7 @@ void Task::emitAborted()
 
 void Task::emitSucceeded()
 {
-    // Don't succeed twice.
+
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "succeeded while not running!!!!";
         return;

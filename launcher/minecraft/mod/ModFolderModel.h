@@ -51,10 +51,6 @@
 class BaseInstance;
 class QFileSystemWatcher;
 
-/**
- * A legacy mod list.
- * Backed by a folder.
- */
 class ModFolderModel : public ResourceFolderModel {
     Q_OBJECT
    public:
@@ -85,7 +81,7 @@ class ModFolderModel : public ResourceFolderModel {
     int columnCount(const QModelIndex& parent) const override;
 
     [[nodiscard]] Resource* createResource(const QFileInfo& file) override { return new Mod(file); }
-    [[nodiscard]] Task* createParseTask(Resource& /*unused*/) override;
+    [[nodiscard]] Task* createParseTask(Resource& ) override;
 
     bool isValid();
 

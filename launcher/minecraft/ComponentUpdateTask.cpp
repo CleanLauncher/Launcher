@@ -20,27 +20,6 @@
 
 #include "minecraft/Logging.h"
 
-/*
- * This is responsible for loading the components of a component list AND resolving dependency issues between them
- */
-
-/*
- * FIXME: the 'one shot async task' nature of this does not fit the intended usage
- * Really, it should be a reactor/state machine that receives input from the application
- * and dynamically adapts to changing requirements...
- *
- * The reactor should be the only entry into manipulating the PackProfile.
- * See: https://en.wikipedia.org/wiki/Reactor_pattern
- */
-
-/*
- * Or make this operate on a snapshot of the PackProfile state, then merge results in as long as the snapshot and PackProfile didn't change?
- * If the component list changes, start over.
- */
-
-/*
- * TODO: This task launches multiple other tasks. As such it should be converted to a ConcurrentTask
- */
 ComponentUpdateTask::ComponentUpdateTask(Mode mode, Net::Mode netmode, PackProfile* list) : Task()
 {
     d.reset(new ComponentUpdateTaskData);
@@ -107,9 +86,7 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
     LoadResult result = LoadResult::Failed;
     auto customPatchFilename = component->getFilename();
     if (QFile::exists(customPatchFilename)) {
-        // if local file exists...
 
-        // check for uid problems inside...
         bool fileChanged = false;
         auto file = ProfileUtils::parseJsonFile(QFileInfo(customPatchFilename), false);
         if (file->uid != component->m_uid) {
@@ -117,7 +94,7 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
             fileChanged = true;
         }
         if (fileChanged) {
-            // FIXME: @QUALITY do not ignore return value
+
             ProfileUtils::saveJsonFile(OneSixVersionFormat::versionFileToJson(file), customPatchFilename);
         }
 
@@ -144,34 +121,7 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
     return result;
 }
 
-// FIXME: dead code. determine if this can still be useful?
-/*
-static LoadResult loadPackProfile(ComponentPtr component, Task::Ptr& loadTask, Net::Mode netmode)
-{
-    if(component->m_loaded)
-    {
-        qDebug() << component->getName() << "is already loaded";
-        return LoadResult::LoadedLocal;
-    }
-
-    LoadResult result = LoadResult::Failed;
-    auto metaList = APPLICATION->metadataIndex()->get(component->m_uid);
-    if(metaList->isLoaded())
-    {
-        component->m_loaded = true;
-        result = LoadResult::LoadedLocal;
-    }
-    else
-    {
-        metaList->load(netmode);
-        loadTask = metaList->getCurrentTask();
-        result = LoadResult::RequiresRemote;
-    }
-    return result;
 }
-*/
-
-}  // namespace
 
 void ComponentUpdateTask::loadComponents()
 {
@@ -180,14 +130,12 @@ void ComponentUpdateTask::loadComponents()
     size_t componentIndex = 0;
     d->remoteLoadSuccessful = true;
 
-    // load all the components OR their lists...
     for (auto component : d->m_profile->d->components) {
         Task::Ptr loadTask;
         LoadResult singleResult;
         RemoteLoadStatus::Type loadType;
         component->resetComponentProblems();
-        // FIXME: to do this right, we need to load the lists and decide on which versions to use during dependency resolution. For now,
-        // ignore all that...
+
 #if 0
         switch(d->mode)
         {
@@ -231,13 +179,13 @@ void ComponentUpdateTask::loadComponents()
     m_progressTotal = static_cast<int>(taskIndex);
     switch (result) {
         case LoadResult::LoadedLocal: {
-            // Everything got loaded. Advance to dependency resolution.
+
             performUpdateActions();
             resolveDependencies(d->mode == Mode::Launch || d->netmode == Net::Mode::Offline);
             return;
         }
         case LoadResult::RequiresRemote: {
-            // we wait for signals.
+
             break;
         }
         case LoadResult::Failed: {
@@ -258,7 +206,7 @@ struct RequireCompositionResult {
     RequireEx outcome;
 };
 using RequireExSet = std::set<RequireEx>;
-}  // namespace
+}
 
 static RequireCompositionResult composeRequirement(const RequireEx& a, const RequireEx& b)
 {
@@ -273,7 +221,7 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
     } else if (a.equalsVersion == b.equalsVersion) {
         out.equalsVersion = a.equalsVersion;
     } else {
-        // FIXME: mark error as explicit version conflict
+
         return { false, out };
     }
 
@@ -289,7 +237,6 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
     return { true, out };
 }
 
-// gather the requirements from all components, finding any obvious conflicts
 static bool gatherRequirementsFromComponents(const ComponentContainer& input, RequireExSet& output)
 {
     bool succeeded = true;
@@ -307,7 +254,7 @@ static bool gatherRequirementsFromComponents(const ComponentContainer& input, Re
             componenRequireEx.indexOfFirstDependee = componentNum;
 
             if (found != output.cend()) {
-                // found... process it further
+
                 auto result = composeRequirement(componenRequireEx, *found);
                 if (result.ok) {
                     output.erase(componenRequireEx);
@@ -318,7 +265,7 @@ static bool gatherRequirementsFromComponents(const ComponentContainer& input, Re
                 }
                 succeeded &= result.ok;
             } else {
-                // not found, accumulate
+
                 output.insert(componenRequireEx);
             }
         }
@@ -327,7 +274,6 @@ static bool gatherRequirementsFromComponents(const ComponentContainer& input, Re
     return succeeded;
 }
 
-/// Get list of uids that can be trivially removed because nothing is depending on them anymore (and they are installed as deps)
 static void getTrivialRemovals(const ComponentContainer& components, const RequireExSet& reqs, QStringList& toRemove)
 {
     for (const auto& component : components) {
@@ -344,21 +290,13 @@ static void getTrivialRemovals(const ComponentContainer& components, const Requi
     }
 }
 
-/**
- * handles:
- * - trivial addition (there is an unmet requirement and it can be trivially met by adding something)
- * - trivial version conflict of dependencies == explicit version required and installed is different
- *
- * toAdd - set of requirements than mean adding a new component
- * toChange - set of requirements that mean changing version of an existing component
- */
 static bool getTrivialComponentChanges(const ComponentIndex& index, const RequireExSet& input, RequireExSet& toAdd, RequireExSet& toChange)
 {
     enum class Decision { Undetermined, Met, Missing, VersionNotSame, LockedVersionNotSame } decision = Decision::Undetermined;
 
     QString reqStr;
     bool succeeded = true;
-    // list the composed requirements and say if they are met or unmet
+
     for (auto& req : input) {
         do {
             if (req.equalsVersion.isEmpty()) {
@@ -455,23 +393,10 @@ ComponentContainer ComponentUpdateTask::collectTreeLinked(const QString& uid)
     return linked;
 }
 
-// FIXME, TODO: decouple dependency resolution from loading
-// FIXME: This works directly with the PackProfile internals. It shouldn't! It needs richer data types than PackProfile uses.
-// FIXME: throw all this away and use a graph
 void ComponentUpdateTask::resolveDependencies(bool checkOnly)
 {
     qCDebug(instanceProfileResolveC) << "Resolving dependencies";
-    /*
-     * this is a naive dependency resolving algorithm. all it does is check for following conditions and react in simple ways:
-     * 1. There are conflicting dependencies on the same uid with different exact version numbers
-     *    -> hard error
-     * 2. A dependency has non-matching exact version number
-     *    -> hard error
-     * 3. A dependency is entirely missing and needs to be injected before the dependee(s)
-     *    -> requirements are injected
-     *
-     * NOTE: this is a placeholder and should eventually be replaced with something 'serious'
-     */
+
     auto& components = d->m_profile->d->components;
     auto& componentIndex = d->m_profile->d->componentIndex;
 
@@ -514,19 +439,18 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
 
     bool recursionNeeded = false;
     if (toAdd.size()) {
-        // add stuff...
+
         for (auto& add : toAdd) {
             auto component = makeShared<Component>(d->m_profile, add.uid);
             if (!add.equalsVersion.isEmpty()) {
-                // exact version
+
                 qCDebug(instanceProfileResolveC)
                     << "Adding" << add.uid << "version" << add.equalsVersion << "at position" << add.indexOfFirstDependee;
                 component->m_version = add.equalsVersion;
             } else {
-                // version needs to be decided
+
                 qCDebug(instanceProfileResolveC) << "Adding" << add.uid << "at position" << add.indexOfFirstDependee;
-                // ############################################################################################################
-                // HACK HACK HACK HACK FIXME: this is a placeholder for deciding what version to use. For now, it is hardcoded.
+
                 if (!add.suggests.isEmpty()) {
                     component->m_version = add.suggests;
                 } else {
@@ -542,20 +466,19 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
                         }
                     }
                 }
-                // HACK HACK HACK HACK FIXME: this is a placeholder for deciding what version to use. For now, it is hardcoded.
-                // ############################################################################################################
+
             }
             component->m_dependencyOnly = true;
-            // FIXME: this should not work directly with the component list
+
             d->m_profile->insertComponent(add.indexOfFirstDependee, component);
             componentIndex[add.uid] = component;
         }
         recursionNeeded = true;
     }
     if (toChange.size()) {
-        // change a version of something that exists
+
         for (auto& change : toChange) {
-            // FIXME: this should not work directly with the component list
+
             qCDebug(instanceProfileResolveC) << "Setting version of" << change.uid << "to" << change.equalsVersion;
             auto component = componentIndex[change.uid];
             component->setVersion(change.equalsVersion);
@@ -571,7 +494,6 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
     }
 }
 
-// Variant visitation via lambda
 template <class... Ts>
 struct overload : Ts... {
     using Ts::operator()...;
@@ -596,7 +518,7 @@ void ComponentUpdateTask::performUpdateActions()
             auto action = component->getUpdateAction();
             auto visitor =
                 overload{ [](const UpdateActionNone&) {
-                             // noop
+
                          },
                           [&component, &instance](const UpdateActionChangeVersion& cv) {
                               qCDebug(instanceProfileResolveC) << instance->name() << "|"
@@ -756,7 +678,7 @@ void ComponentUpdateTask::remoteLoadSucceeded(size_t taskIndex)
     taskSlot.succeeded = false;
     taskSlot.finished = true;
     d->remoteTasksInProgress--;
-    // update the cached data of the component from the downloaded version file.
+
     if (taskSlot.type == RemoteLoadStatus::Type::Version) {
         auto component = d->m_profile->getComponent(taskSlot.PackProfileIndex);
         component->m_loaded = true;
@@ -791,16 +713,16 @@ void ComponentUpdateTask::checkIfAllFinished()
 {
     setProgress(m_progress + 1, m_progressTotal);
     if (d->remoteTasksInProgress) {
-        // not yet...
+
         return;
     }
     if (d->remoteLoadSuccessful) {
-        // nothing bad happened... clear the temp load status and proceed with looking at dependencies
+
         d->remoteLoadStatusList.clear();
         performUpdateActions();
         resolveDependencies(d->mode == Mode::Launch);
     } else {
-        // remote load failed... report error and bail
+
         QStringList allErrorsList;
         for (auto& item : d->remoteLoadStatusList) {
             if (!item.succeeded) {

@@ -15,7 +15,6 @@
 
 #include "JsonFormat.h"
 
-// FIXME: remove this from here... somehow
 #include "Json.h"
 #include "minecraft/OneSixVersionFormat.h"
 
@@ -32,7 +31,6 @@ MetadataVersion currentFormatVersion()
     return MetadataVersion::InitialRelease;
 }
 
-// Index
 static std::shared_ptr<Index> parseIndexInternal(const QJsonObject& obj)
 {
     const QList<QJsonObject> objects = requireIsArrayOf<QJsonObject>(obj, "packages");
@@ -47,7 +45,6 @@ static std::shared_ptr<Index> parseIndexInternal(const QJsonObject& obj)
     return std::make_shared<Index>(lists);
 }
 
-// Version
 static Version::Ptr parseCommonVersion(const QString& uid, const QJsonObject& obj)
 {
     Version::Ptr version = std::make_shared<Version>(uid, requireString(obj, "version"));
@@ -74,7 +71,6 @@ static Version::Ptr parseVersionInternal(const QJsonObject& obj)
     return version;
 }
 
-// Version list / package
 static VersionList::Ptr parseVersionListInternal(const QJsonObject& obj)
 {
     const QString uid = requireString(obj, "uid");
@@ -158,11 +154,6 @@ void parseVersion(const QJsonObject& obj, Version* ptr)
     }
 }
 
-/*
-[
-{"uid":"foo", "equals":"version"}
-]
-*/
 void parseRequires(const QJsonObject& obj, RequireSet* ptr, const char* keyName)
 {
     if (obj.contains(keyName)) {
@@ -198,4 +189,4 @@ void serializeRequires(QJsonObject& obj, RequireSet* ptr, const char* keyName)
     obj.insert(keyName, arrOut);
 }
 
-}  // namespace Meta
+}

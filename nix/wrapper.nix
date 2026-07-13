@@ -80,17 +80,14 @@ symlinkJoin {
     let
       runtimeLibs = [
         (lib.getLib stdenv.cc.cc)
-        ## native versions
         glfw3-minecraft
         openal
 
-        ## openal
         alsa-lib
         libjack2
         libpulseaudio
         pipewire
 
-        ## glfw
         libGL
         libX11
         libXcursor
@@ -98,9 +95,9 @@ symlinkJoin {
         libXrandr
         libXxf86vm
 
-        udev # oshi
+        udev
 
-        vulkan-loader # VulkanMod's lwjgl
+        vulkan-loader
       ]
       ++ lib.optional textToSpeechSupport flite
       ++ lib.optional gamemodeSupport gamemode.lib
@@ -109,8 +106,8 @@ symlinkJoin {
 
       runtimePrograms = [
         mesa-demos
-        pciutils # need lspci
-        xrandr # needed for LWJGL [2.9.2, 3) https://github.com/LWJGL/lwjgl/issues/128
+        pciutils
+        xrandr
       ]
       ++ additionalPrograms;
 

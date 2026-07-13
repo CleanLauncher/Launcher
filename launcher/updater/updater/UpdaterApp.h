@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -137,7 +137,7 @@ class UpdaterApp : public QApplication {
     bool logToConsole = false;
 
 #if defined Q_OS_WIN32
-    // used on Windows to attach the standard IO streams
+
     bool consoleAttached = false;
 #endif
 };

@@ -3,19 +3,15 @@
 
 class QWidget;
 
-/**
- * Common UI bits for the java pages to use.
- */
 namespace JavaCommon {
 bool checkJVMArgs(QString args, QWidget* parent);
 
-// Show a dialog saying that the Java binary was usable
 void javaWasOk(QWidget* parent, const JavaChecker::Result& result);
-// Show a dialog saying that the Java binary was not usable because of bad options
+
 void javaArgsWereBad(QWidget* parent, const JavaChecker::Result& result);
-// Show a dialog saying that the Java binary was not usable
+
 void javaBinaryWasBad(QWidget* parent, const JavaChecker::Result& result);
-// Show a dialog if we couldn't find Java Checker
+
 void javaCheckNotFound(QWidget* parent);
 
 class TestCheck : public QObject {
@@ -44,4 +40,4 @@ class TestCheck : public QObject {
     int m_maxMem = 0;
     int m_permGen = 64;
 };
-}  // namespace JavaCommon
+}

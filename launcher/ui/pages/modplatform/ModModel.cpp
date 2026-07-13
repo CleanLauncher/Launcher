@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ModModel.h"
@@ -18,8 +18,6 @@ ModModel::ModModel(BaseInstance& base_inst, ResourceAPI* api, QString debugName,
     : ResourceModel(api), m_base_instance(base_inst), m_debugName(debugName + " (Model)"), m_metaEntryBase(metaEntryBase)
 {}
 
-/******** Make data requests ********/
-
 ResourceAPI::SearchArgs ModModel::createSearchArguments()
 {
     auto profile = static_cast<MinecraftInstance const&>(m_base_instance).getPackProfile();
@@ -31,7 +29,6 @@ ResourceAPI::SearchArgs ModModel::createSearchArguments()
     std::optional<QStringList> categories{};
     auto loaders = profile->getSupportedModLoaders();
 
-    // Version filter
     if (!m_filter->versions.empty())
         versions = m_filter->versions;
     if (m_filter->loaders)
@@ -124,12 +121,17 @@ bool ModModel::checkVersionFilters(const ModPlatform::IndexedVersion& v)
     auto loaders = static_cast<MinecraftInstance&>(m_base_instance).getPackProfile()->getSupportedModLoaders();
     if (m_filter->loaders)
         loaders = m_filter->loaders;
-    return (!optedOut(v) &&                                                         // is opted out(aka curseforge download link)
-            (!loaders.has_value() || !v.loaders || loaders.value() & v.loaders) &&  // loaders
-            checkSide(m_filter->side, v.side) &&                                    // side
-            (m_filter->releases.empty() ||                                          // releases
+    return (!optedOut(v) &&
+
+            (!loaders.has_value() || !v.loaders || loaders.value() & v.loaders) &&
+
+            checkSide(m_filter->side, v.side) &&
+
+            (m_filter->releases.empty() ||
+
              std::find(m_filter->releases.cbegin(), m_filter->releases.cend(), v.version_type) != m_filter->releases.cend()) &&
-            m_filter->checkMcVersions(v.mcVersion));  // mcVersions
+            m_filter->checkMcVersions(v.mcVersion));
+
 }
 
-}  // namespace ResourceDownload
+}

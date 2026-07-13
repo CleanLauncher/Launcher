@@ -41,8 +41,8 @@ class FileResolvingTask : public Task {
    private:
     void getFlameProjects();
 
-   private: /* data */
+   private:
     Flame::Manifest m_manifest;
     Task::Ptr m_task;
 };
-}  // namespace Flame
+}

@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -53,8 +53,6 @@ ModrinthModPage::ModrinthModPage(ModDownloadDialog* dialog, BaseInstance& instan
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &ModrinthModPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ModrinthModPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &ModrinthModPage::onVersionSelectionChanged);
@@ -71,8 +69,6 @@ ModrinthResourcePackPage::ModrinthResourcePackPage(ResourcePackDownloadDialog* d
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &ModrinthResourcePackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ModrinthResourcePackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &ModrinthResourcePackPage::onVersionSelectionChanged);
@@ -89,8 +85,6 @@ ModrinthTexturePackPage::ModrinthTexturePackPage(TexturePackDownloadDialog* dial
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &ModrinthTexturePackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ModrinthTexturePackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &ModrinthTexturePackPage::onVersionSelectionChanged);
@@ -107,8 +101,6 @@ ModrinthShaderPackPage::ModrinthShaderPackPage(ShaderPackDownloadDialog* dialog,
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &ModrinthShaderPackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ModrinthShaderPackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &ModrinthShaderPackPage::onVersionSelectionChanged);
@@ -124,8 +116,6 @@ ModrinthDataPackPage::ModrinthDataPackPage(DataPackDownloadDialog* dialog, BaseI
 
     addSortings();
 
-    // sometimes Qt just ignores virtual slots and doesn't work as intended it seems,
-    // so it's best not to connect them in the parent's constructor...
     connect(m_ui->sortByBox, &QComboBox::currentIndexChanged, this, &ModrinthDataPackPage::triggerSearch);
     connect(m_ui->packView->selectionModel(), &QItemSelectionModel::currentChanged, this, &ModrinthDataPackPage::onSelectionChanged);
     connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, &ModrinthDataPackPage::onVersionSelectionChanged);
@@ -134,9 +124,6 @@ ModrinthDataPackPage::ModrinthDataPackPage(DataPackDownloadDialog* dialog, BaseI
     m_ui->packDescription->setMetaEntry(metaEntryBase());
 }
 
-// I don't know why, but doing this on the parent class makes it so that
-// other mod providers start loading before being selected, at least with
-// my Qt, so we need to implement this in every derived class...
 auto ModrinthModPage::shouldDisplay() const -> bool
 {
     return true;
@@ -173,4 +160,4 @@ void ModrinthModPage::prepareProviderCategories()
     });
     m_categoriesTask->start();
 };
-}  // namespace ResourceDownload
+}

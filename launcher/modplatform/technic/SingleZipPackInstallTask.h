@@ -58,4 +58,4 @@ class SingleZipPackInstallTask : public InstanceTask {
     QFutureWatcher<std::optional<QStringList>> m_extractFutureWatcher;
 };
 
-}  // namespace Technic
+}

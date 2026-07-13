@@ -43,7 +43,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-// Sectionless INI parser (for instance config files)
 class INIFile : public QMap<QString, QVariant> {
    public:
     explicit INIFile();

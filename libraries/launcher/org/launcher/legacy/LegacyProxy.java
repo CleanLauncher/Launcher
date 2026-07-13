@@ -56,7 +56,6 @@ import org.launcher.launcher.Launcher;
 import org.launcher.legacy.fix.online.OnlineFixes;
 import org.launcher.utils.Parameters;
 
-// implementation of LegacyProxy
 public final class LegacyProxy {
     public static Launcher createLauncher(Parameters params) {
         return new LegacyLauncher(params);

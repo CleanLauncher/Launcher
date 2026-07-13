@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -39,7 +39,7 @@ bool processFolder(WorldSave& pack, ProcessingLevel level = ProcessingLevel::Ful
 
 bool validate(QFileInfo file);
 
-}  // namespace WorldSaveUtils
+}
 
 class LocalWorldSaveParseTask : public Task {
     Q_OBJECT

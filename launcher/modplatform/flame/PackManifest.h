@@ -47,13 +47,12 @@ namespace Flame {
 struct File {
     int projectId = 0;
     int fileId = 0;
-    // NOTE: the opposite to 'optional'
+
     bool required = true;
 
     ModPlatform::IndexedPack pack;
     ModPlatform::IndexedVersion version;
 
-    // our
     QString targetFolder = QStringLiteral("mods");
     ModPlatform::ResourceType resourceType;
 };
@@ -77,7 +76,7 @@ struct Manifest {
     QString name;
     QString version;
     QString author;
-    // File id -> File
+
     QMap<int, Flame::File> files;
     QString overrides;
 
@@ -85,4 +84,4 @@ struct Manifest {
 };
 
 void loadManifest(Flame::Manifest& m, const QString& filepath);
-}  // namespace Flame
+}

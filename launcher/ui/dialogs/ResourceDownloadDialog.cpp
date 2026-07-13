@@ -63,12 +63,10 @@ ResourceDownloadDialog::ResourceDownloadDialog(QWidget* parent, ResourceFolderMo
 
     setWindowIcon(QIcon::fromTheme("new"));
 
-// small margins look ugly on macOS on modal windows
 #ifndef Q_OS_MACOS
     m_buttons.setContentsMargins(0, 0, 6, 6);
 #endif
-    // Bonk Qt over its stupid head and make sure it understands which button is the default one...
-    // See: https://stackoverflow.com/questions/24556831/qbuttonbox-set-default-button
+
     auto* okButton = m_buttons.button(QDialogButtonBox::Ok);
     okButton->setEnabled(false);
     okButton->setDefault(true);
@@ -118,11 +116,9 @@ void ResourceDownloadDialog::reject()
     QDialog::reject();
 }
 
-// NOTE: We can't have this in the ctor because PageContainer calls a virtual function, and so
-// won't work with subclasses if we put it in this ctor.
 void ResourceDownloadDialog::initializeContainer()
 {
-// small margins look ugly on macOS on modal windows
+
 #ifndef Q_OS_MACOS
     layout()->setContentsMargins(0, 0, 0, 0);
 #endif
@@ -173,13 +169,11 @@ void ResourceDownloadDialog::confirm()
             }
         });
 
-        // Check for updates
         ProgressDialog progressDialog(this);
         progressDialog.setSkipButton(true, tr("Abort"));
         progressDialog.setWindowTitle(tr("Checking for dependencies..."));
         auto ret = progressDialog.execWithTask(task.get());
 
-        // If the dialog was skipped / some download error happened
         if (ret == QDialog::DialogCode::Rejected) {
             QMetaObject::invokeMethod(this, "reject", Qt::QueuedConnection);
             return;
@@ -271,7 +265,7 @@ QList<ResourceDownloadDialog::DownloadTaskPtr> ResourceDownloadDialog::getTasks(
 
 void ResourceDownloadDialog::selectedPageChanged(BasePage* previous, BasePage* selected)
 {
-    // If previous is null (first selection), nothing to sync
+
     if (!previous) {
         return;
     }
@@ -282,7 +276,6 @@ void ResourceDownloadDialog::selectedPageChanged(BasePage* previous, BasePage* s
         return;
     }
 
-    // Same effect as having a global search bar
     auto* result = dynamic_cast<ResourcePage*>(selected);
     Q_ASSERT(result != nullptr);
     result->setSearchTerm(prevPage->getSearchTerm());
@@ -323,7 +316,8 @@ QList<BasePage*> ModDownloadDialog::getPages()
 
 GetModDependenciesTask::Ptr ModDownloadDialog::getModDependenciesTask()
 {
-    if (!APPLICATION->settings()->get("ModDependenciesDisabled").toBool()) {  // dependencies
+    if (!APPLICATION->settings()->get("ModDependenciesDisabled").toBool()) {
+
         if (auto* model = dynamic_cast<ModFolderModel*>(getBaseModel()); model) {
             QList<std::shared_ptr<GetModDependenciesTask::PackDependency>> selectedVers;
             for (const auto& selected : getTasks()) {
@@ -478,4 +472,4 @@ QList<BasePage*> DataPackDownloadDialog::getPages()
     return pages;
 }
 
-}  // namespace ResourceDownload
+}

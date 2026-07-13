@@ -64,12 +64,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * WARNING: This class is reflectively accessed by legacy Forge versions.
- * <p>
- * Changing field and method declarations without further testing is not
- * recommended.
- */
 public final class Launcher extends Applet implements AppletStub {
     private static final long serialVersionUID = 1L;
 
@@ -93,7 +87,7 @@ public final class Launcher extends Applet implements AppletStub {
         try {
             if (documentBase == null) {
                 if (applet.getClass().getPackage().getName().startsWith("com.mojang"))
-                    // Special case only for Classic versions
+
                     documentBase = new URL("http://www.minecraft.net:80/game/");
                 else
                     documentBase = new URL("http://www.minecraft.net/game/");

@@ -66,7 +66,7 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                 QByteArray fmlVersionData = file->readAll();
                 INIFile iniFile;
                 iniFile.loadFile(fmlVersionData);
-                // If not present, this evaluates to a null string
+
                 fmlMinecraftVersion = iniFile["fmlbuild.mcversion"].toString();
             }
             auto file = zipFile.goToFile("version.json");
@@ -83,13 +83,10 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
             components->setComponentVersion("net.minecraft", minecraftVersion, true);
             components->installJarMods({ modpackJar });
 
-            // Forge for 1.4.7 and for 1.5.2 require extra libraries.
-            // Figure out the forge version and add it as a component
-            // (the code still comes from the jar mod installed above)
             if (zipFile.exists("/forgeversion.properties")) {
                 auto file = zipFile.goToFile("forgeversion.properties");
                 if (!file) {
-                    // Really shouldn't happen, but error handling shall not be forgotten
+
                     emit failed(tr("Unable to open \"forgeversion.properties\""));
                     return;
                 }
@@ -123,7 +120,7 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
         data = file.readAll();
         file.close();
     } else {
-        // This is the "Vanilla" modpack, excluded by the search code
+
         components->setComponentVersion("net.minecraft", minecraftVersion, true);
         components->saveNow();
         emit succeeded();
@@ -150,8 +147,8 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
             auto libraryObject = library.toObject();
             auto libraryName = libraryObject["name"].toString();
 
-            if (libraryName.startsWith("net.neoforged.fancymodloader:")) {  // it is neoforge
-                // no easy way to get the version from the libs so use the arguments
+            if (libraryName.startsWith("net.neoforged.fancymodloader:")) {
+
                 auto arguments = root["arguments"].toObject();
                 bool isVersionArg = false;
                 QString neoforgeVersion;
@@ -174,12 +171,12 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                 if (!libraryVersion.startsWith("1.7.10-")) {
                     components->setComponentVersion("net.minecraftforge", libraryName.section('-', 1));
                 } else {
-                    // 1.7.10 versions sometimes look like 1.7.10-10.13.4.1614-1.7.10, this filters out the 10.13.4.1614 part
+
                     components->setComponentVersion("net.minecraftforge", libraryName.section('-', 1, 1));
                 }
                 break;
             } else {
-                // <Technic library name prefix> -> <our component name>
+
                 static QMap<QString, QString> loaderMap{ { "net.minecraftforge:minecraftforge:", "net.minecraftforge" },
                                                          { "net.fabricmc:fabric-loader:", "net.fabricmc.fabric-loader" },
                                                          { "org.quiltmc:quilt-loader:", "org.quiltmc.quilt-loader" } };

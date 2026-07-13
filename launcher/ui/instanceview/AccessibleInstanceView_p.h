@@ -6,7 +6,6 @@
 #include "QtCore/qpointer.h"
 #ifndef QT_NO_ACCESSIBILITY
 #include "InstanceView.h"
-// #include <QHeaderView>
 
 class QAccessibleTableCell;
 class QAccessibleTableHeaderCell;
@@ -30,7 +29,6 @@ class AccessibleInstanceView : public QAccessibleTableInterface, public QAccessi
 
     void* interface_cast(QAccessible::InterfaceType t) override;
 
-    // table interface
     QAccessibleInterface* cellAt(int row, int column) const override;
     QAccessibleInterface* caption() const override;
     QAccessibleInterface* summary() const override;
@@ -39,7 +37,6 @@ class AccessibleInstanceView : public QAccessibleTableInterface, public QAccessi
     int columnCount() const override;
     int rowCount() const override;
 
-    // selection
     int selectedCellCount() const override;
     int selectedColumnCount() const override;
     int selectedRowCount() const override;
@@ -58,7 +55,7 @@ class AccessibleInstanceView : public QAccessibleTableInterface, public QAccessi
     void modelChange(QAccessibleTableModelChangeEvent* event) override;
 
    protected:
-    // maybe vector
+
     using ChildCache = QHash<int, QAccessible::Id>;
     mutable ChildCache childToId;
 
@@ -89,7 +86,6 @@ class AccessibleInstanceViewItem : public QAccessibleInterface, public QAccessib
     QAccessibleInterface* parent() const override;
     QAccessibleInterface* child(int) const override;
 
-    // cell interface
     int columnExtent() const override;
     QList<QAccessibleInterface*> columnHeaderCells() const override;
     int columnIndex() const override;
@@ -99,7 +95,6 @@ class AccessibleInstanceViewItem : public QAccessibleInterface, public QAccessib
     bool isSelected() const override;
     QAccessibleInterface* table() const override;
 
-    // action interface
     QStringList actionNames() const override;
     void doAction(const QString& actionName) override;
     QStringList keyBindingsForAction(const QString& actionName) const override;
@@ -113,4 +108,4 @@ class AccessibleInstanceViewItem : public QAccessibleInterface, public QAccessib
 
     friend class AccessibleInstanceView;
 };
-#endif /* !QT_NO_ACCESSIBILITY */
+#endif

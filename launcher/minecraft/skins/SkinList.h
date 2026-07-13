@@ -61,9 +61,9 @@ class SkinList : public QAbstractListModel {
     void updateSkin(SkinModel* s);
 
    private:
-    // hide copy constructor
+
     SkinList(const SkinList&) = delete;
-    // hide assign op
+
     SkinList& operator=(const SkinList&) = delete;
 
    protected slots:

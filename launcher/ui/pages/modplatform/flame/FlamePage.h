@@ -72,9 +72,8 @@ class FlamePage : public QWidget, public ModpackProviderBasePage {
 
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    /** Programatically set the term in the search bar. */
     virtual void setSearchTerm(QString) override;
-    /** Get the current term in the search bar. */
+
     virtual QString getSerachTerm() const override;
 
    private:
@@ -96,7 +95,6 @@ class FlamePage : public QWidget, public ModpackProviderBasePage {
 
     ProgressWidget m_fetch_progress;
 
-    // Used to do instant searching with a delay to cache quick changes
     QTimer m_search_timer;
 
     std::unique_ptr<ModFilterWidget> m_filterWidget;

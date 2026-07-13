@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022-2023 Sefa Eyeoglu <contact@scrumplex.net>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 
 /*
@@ -86,14 +86,12 @@ PackProfile::~PackProfile()
     saveNow();
 }
 
-// BEGIN: component file format
-
 static const int currentComponentsFileVersion = 1;
 
 static QJsonObject componentToJsonV1(ComponentPtr component)
 {
     QJsonObject obj;
-    // critical
+
     obj.insert("uid", component->m_uid);
     if (!component->m_version.isEmpty()) {
         obj.insert("version", component->m_version);
@@ -108,7 +106,6 @@ static QJsonObject componentToJsonV1(ComponentPtr component)
         obj.insert("disabled", true);
     }
 
-    // cached
     if (!component->m_cachedVersion.isEmpty()) {
         obj.insert("cachedVersion", component->m_cachedVersion);
     }
@@ -125,7 +122,7 @@ static QJsonObject componentToJsonV1(ComponentPtr component)
 
 static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& componentJsonPattern, const QJsonObject& obj)
 {
-    // critical
+
     auto uid = Json::requireString(obj.value("uid"));
     auto filePath = componentJsonPattern.arg(uid);
     auto component = makeShared<Component>(parent, uid);
@@ -133,8 +130,6 @@ static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& comp
     component->m_dependencyOnly = obj.value("dependencyOnly").toBool();
     component->m_important = obj.value("important").toBool();
 
-    // cached
-    // TODO @RESILIENCE: ignore invalid values/structure here?
     component->m_cachedVersion = obj.value("cachedVersion").toString();
     component->m_cachedName = obj.value("cachedName").toString();
     Meta::parseRequires(obj, &component->m_cachedRequires, "cachedRequires");
@@ -145,7 +140,6 @@ static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& comp
     return component;
 }
 
-// Save the given component container data to a file
 static bool savePackProfile(const QString& filename, const ComponentContainer& container)
 {
     QJsonObject obj;
@@ -172,7 +166,6 @@ static bool savePackProfile(const QString& filename, const ComponentContainer& c
     return true;
 }
 
-// Read the given file into component containers
 static PackProfile::Result loadPackProfile(PackProfile* parent,
                                            const QString& filename,
                                            const QString& componentJsonPattern,
@@ -191,7 +184,6 @@ static PackProfile::Result loadPackProfile(PackProfile* parent,
         return PackProfile::Result::Error(message);
     }
 
-    // and it's valid JSON
     QJsonParseError error;
     QJsonDocument doc = QJsonDocument::fromJson(componentsFile.readAll(), &error);
     if (error.error != QJsonParseError::NoError) {
@@ -201,10 +193,9 @@ static PackProfile::Result loadPackProfile(PackProfile* parent,
         return PackProfile::Result::Error(message);
     }
 
-    // and then read it and process it if all above is true.
     try {
         auto obj = Json::requireObject(doc);
-        // check order file version.
+
         auto version = Json::requireInteger(obj.value("formatVersion"));
         if (version != currentComponentsFileVersion) {
             throw JSONValidationError(QObject::tr("Invalid component file version, expected %1").arg(currentComponentsFileVersion));
@@ -223,10 +214,6 @@ static PackProfile::Result loadPackProfile(PackProfile* parent,
     }
     return PackProfile::Result::Success();
 }
-
-// END: component file format
-
-// BEGIN: save/load logic
 
 void PackProfile::saveNow()
 {
@@ -294,15 +281,14 @@ PackProfile::Result PackProfile::load()
 {
     auto filename = componentsFilePath();
 
-    // load the new component list and swap it with the current one...
     ComponentContainer newComponents;
     if (auto result = loadPackProfile(this, filename, patchesPattern(), newComponents); !result) {
         qCritical() << d->m_instance->name() << "|" << "Failed to load the component config";
         return result;
     }
-    // FIXME: actually use fine-grained updates, not this...
+
     beginResetModel();
-    // disconnect all the old components
+
     for (auto component : d->components) {
         disconnect(component.get(), &Component::dataChanged, this, &PackProfile::componentDataChanged);
     }
@@ -324,23 +310,19 @@ PackProfile::Result PackProfile::load()
 
 PackProfile::Result PackProfile::reload(Net::Mode netmode)
 {
-    // Do not reload when the update/resolve task is running. It is in control.
+
     if (d->m_updateTask) {
         if (d->m_updateTask->netMode() == netmode) {
             return Result::Success();
         }
 
-        // https://github.com/CleanLauncher/Launcher/issues/5209
-        // FIXME: HACK HACK HACK
         disconnect(d->m_updateTask.get(), &ComponentUpdateTask::aborted, nullptr, nullptr);
         d->m_updateTask->abort();
         d->m_updateTask.reset();
     }
 
-    // flush any scheduled saves to not lose state
     saveNow();
 
-    // FIXME: differentiate when a reapply is required by propagating state from components
     invalidateLaunchProfile();
 
     if (auto result = load(); !result) {
@@ -379,8 +361,6 @@ void PackProfile::updateFailed(const QString& error)
     invalidateLaunchProfile();
 }
 
-// END: save/load
-
 void PackProfile::appendComponent(ComponentPtr component)
 {
     insertComponent(d->components.size(), component);
@@ -415,7 +395,7 @@ void PackProfile::componentDataChanged()
     if (objPtr->getID() == "net.minecraft") {
         emit minecraftChanged();
     }
-    // figure out which one is it... in a seriously dumb way.
+
     int index = 0;
     for (auto component : d->components) {
         if (component.get() == objPtr) {
@@ -596,7 +576,6 @@ QVariant PackProfile::headerData(int section, Qt::Orientation orientation, int r
     return QVariant();
 }
 
-// FIXME: zero precision mess
 Qt::ItemFlags PackProfile::flags(const QModelIndex& index) const
 {
     if (!index.isValid()) {
@@ -612,7 +591,7 @@ Qt::ItemFlags PackProfile::flags(const QModelIndex& index) const
     }
 
     auto patch = d->components.at(row);
-    // TODO: this will need fine-tuning later...
+
     if (patch->canBeDisabled() && !d->interactionDisabled) {
         outFlags |= Qt::ItemIsUserCheckable;
     }
@@ -668,13 +647,13 @@ void PackProfile::invalidateLaunchProfile()
 
 void PackProfile::installJarMods(QStringList selectedFiles)
 {
-    // FIXME: get rid of _internal
+
     installJarMods_internal(selectedFiles);
 }
 
 void PackProfile::installCustomJar(QString selectedFile)
 {
-    // FIXME: get rid of _internal
+
     installCustomJar_internal(selectedFile);
 }
 
@@ -709,7 +688,7 @@ bool PackProfile::installComponents(QStringList selectedFiles)
 
 void PackProfile::installAgents(QStringList selectedFiles)
 {
-    // FIXME: get rid of _internal
+
     installAgents_internal(selectedFiles);
 }
 
@@ -742,7 +721,7 @@ bool PackProfile::installEmpty(const QString& uid, const QString& name)
 bool PackProfile::removeComponent_internal(ComponentPtr patch)
 {
     bool ok = true;
-    // first, remove the patch file. this ensures it's not used anymore
+
     auto fileName = patch->getFilename();
     if (fileName.size()) {
         QFile patchFile(fileName);
@@ -753,7 +732,6 @@ bool PackProfile::removeComponent_internal(ComponentPtr patch)
         }
     }
 
-    // FIXME: we need a generic way of removing local resources, not just jar mods...
     auto preRemoveJarMod = [this](LibraryPtr jarMod) -> bool {
         if (!jarMod->isLocal()) {
             return true;
@@ -893,7 +871,7 @@ bool PackProfile::installCustomJar_internal(QString filepath)
 
 bool PackProfile::installAgents_internal(QStringList filepaths)
 {
-    // FIXME code duplication
+
     const QString patchDir = FS::PathCombine(d->m_instance->instanceRoot(), "patches");
     if (!FS::ensureFolderPathExists(patchDir))
         return false;
@@ -973,9 +951,9 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
     auto iter = d->componentIndex.find(uid);
     if (iter != d->componentIndex.end()) {
         ComponentPtr component = *iter;
-        // set existing
+
         if (component->revert()) {
-            // set new version
+
             auto oldVersion = component->getVersion();
             component->setVersion(version);
             component->setImportant(important);
@@ -989,7 +967,7 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
         }
         return false;
     } else {
-        // add new
+
         auto component = makeShared<Component>(this, uid);
         component->m_version = version;
         component->m_important = important;
@@ -1044,7 +1022,7 @@ std::optional<ModPlatform::ModLoaderTypes> PackProfile::getSupportedModLoaders()
     if (!loadersOpt.has_value())
         return loadersOpt;
     auto loaders = loadersOpt.value();
-    // TODO: remove this or add version condition once Quilt drops official Fabric support
+
     if (loaders & ModPlatform::Quilt)
         loaders |= ModPlatform::Fabric;
     if (getComponentVersion("net.minecraft") == "1.20.1" && (loaders & ModPlatform::NeoForge))
@@ -1061,7 +1039,6 @@ QList<ModPlatform::ModLoaderType> PackProfile::getModLoadersList()
         }
     }
 
-    // TODO: remove this or add version condition once Quilt drops official Fabric support
     if (result.contains(ModPlatform::Quilt) && !result.contains(ModPlatform::Fabric)) {
         result.append(ModPlatform::Fabric);
     }

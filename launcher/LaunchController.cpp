@@ -85,7 +85,6 @@ void LaunchController::decideAccount()
         return;
     }
 
-    // Select the account to use. If the instance has a specific account set, that will be used. Otherwise, the default account will be used
     auto* accounts = APPLICATION->accounts();
     const auto instanceAccountId = m_instance->settings()->get("InstanceAccountId").toString();
     const auto instanceAccountIndex = accounts->findAccountByProfileId(instanceAccountId);
@@ -96,7 +95,7 @@ void LaunchController::decideAccount()
     }
 
     if (accounts->isEmpty()) {
-        // Tell the user they need to log in at least one account in order to play.
+
         auto reply = CustomMessageBox::selectable(m_parentWidget, tr("No Accounts"),
                                                   tr("In order to play Minecraft, you must have at least one account added. "
                                                      "Would you like to open the account manager to add an account now?"),
@@ -104,25 +103,23 @@ void LaunchController::decideAccount()
                          ->exec();
 
         if (reply == QMessageBox::Yes) {
-            // Open the account manager.
+
             APPLICATION->ShowGlobalSettings(m_parentWidget, "accounts");
         } else if (reply == QMessageBox::No) {
-            // Do not open "profile select" dialog.
+
             return;
         }
     }
 
     if (!m_accountToUse && !accounts->isEmpty()) {
-        // If no default account is set, ask the user which one to use.
+
         ProfileSelectDialog selectDialog(tr("Which account would you like to use?"), ProfileSelectDialog::GlobalDefaultCheckbox,
                                          m_parentWidget);
 
         selectDialog.exec();
 
-        // Launch the instance with the selected account.
         m_accountToUse = selectDialog.selectedAccount();
 
-        // If the user said to use the account as default, do that.
         if (selectDialog.useAsGlobalDefault() && m_accountToUse) {
             accounts->setDefaultAccount(m_accountToUse);
         }
@@ -171,13 +168,10 @@ LaunchDecision LaunchController::decideLaunchMode()
     }
 
     if (state == AccountState::Working) {
-        // refresh is in progress, we need to wait for it to finish to proceed.
+
         ProgressDialog progDialog(m_parentWidget);
         progDialog.setSkipButton(true, tr("Abort"));
 
-        // TODO: this relies on tasks' synchronous signal dispatching nature
-        // TODO: meaning currentTask can't complete and become null while this code is running
-        // TODO: this code will produce a race condition when tasks become fully async
         auto task = accountToCheck->currentTask();
         progDialog.execWithTask(task.get());
 
@@ -205,7 +199,8 @@ LaunchDecision LaunchController::decideLaunchMode()
         default:
             m_actualLaunchMode =
                 state == AccountState::Online && m_wantedLaunchMode == LaunchMode::Normal ? LaunchMode::Normal : LaunchMode::Offline;
-            return LaunchDecision::Continue;  // All good to go
+            return LaunchDecision::Continue;
+
     }
 
     if (reauthenticateAccount(accountToCheck, reauthReason)) {
@@ -317,7 +312,7 @@ void LaunchController::login()
 
     if (m_accountToUse->accountType() != AccountType::Offline) {
         if (m_actualLaunchMode == LaunchMode::Normal && !m_accountToUse->hasProfile()) {
-            // Now handle setting up a profile name here...
+
             if (ProfileSetupDialog dialog(m_accountToUse, m_parentWidget); dialog.exec() != QDialog::Accepted) {
                 emitAborted();
                 return;
@@ -399,12 +394,10 @@ void LaunchController::launchInstance()
     connect(m_launcher, &LaunchTask::failed, this, &LaunchController::onFailed);
     connect(m_launcher, &LaunchTask::requestProgress, this, &LaunchController::onProgressRequested);
 
-    // Prepend Online and Auth Status
     QString online_mode;
     if (m_actualLaunchMode == LaunchMode::Normal) {
         online_mode = "online";
 
-        // Prepend Server Status
         QStringList servers;
         if (m_session->wantsElyPatch) {
             servers = { "ely.by", "account.ely.by", "skinsystem.ely.by" };
@@ -424,7 +417,6 @@ void LaunchController::launchInstance()
 
     m_launcher->prependStep(makeShared<TextPrint>(m_launcher, "Launched instance in " + online_mode + " mode\n", MessageLevel::Launcher));
 
-    // Prepend Version
     {
         auto versionString = QString("%1 version: %2 (%3)")
                                  .arg(BuildConfig.LAUNCHER_DISPLAYNAME, BuildConfig.printableVersionString(), BuildConfig.BUILD_PLATFORM);

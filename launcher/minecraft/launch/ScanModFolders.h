@@ -34,7 +34,8 @@ class ScanModFolders : public LaunchStep {
    private:
     void checkDone();
 
-   private:  // DATA
+   private:
+
     bool m_modsDone = false;
     bool m_nilModsDone = false;
     bool m_coreModsDone = false;

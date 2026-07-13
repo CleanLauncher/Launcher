@@ -43,7 +43,7 @@
 #include "LockedFile.h"
 
 #define MUTEX_PREFIX "QtLockedFile mutex "
-// Maximum number of concurrent read locks. Must not be greater than MAXIMUM_WAIT_OBJECTS
+
 #define MAX_READERS MAXIMUM_WAIT_OBJECTS
 
 Qt::HANDLE LockedFile::getMutexHandle(int idx, bool doCreate)
@@ -150,7 +150,8 @@ bool LockedFile::lock(LockMode mode, bool block)
             if (res != WAIT_OBJECT_0 && res != WAIT_ABANDONED) {
                 if (res != WAIT_TIMEOUT)
                     qErrnoWarning("QtLockedFile::lock(): WaitForMultipleObjects failed");
-                m_lock_mode = WriteLock;  // trick unlock() to clean up - semiyucky
+                m_lock_mode = WriteLock;
+
                 unlock();
                 return false;
             }

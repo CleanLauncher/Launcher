@@ -50,7 +50,6 @@ void PrintServers::resolveServer(const QHostInfo& host_info)
 
     m_server_to_address.insert(server, addresses);
 
-    // print server info in order once all servers are resolved
     if (m_server_to_address.size() >= m_servers.size()) {
         for (QString serv : m_servers) {
             emit logLine(m_server_to_address.value(serv), MessageLevel::Launcher);

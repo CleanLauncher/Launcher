@@ -40,9 +40,6 @@
 
 namespace Net {
 
-/*
- * Sink object for downloads that uses an owned QByteArray as a target.
- */
 class ByteArraySink : public Sink {
    public:
     virtual ~ByteArraySink() = default;
@@ -88,4 +85,4 @@ class ByteArraySink : public Sink {
    protected:
     QByteArray m_output;
 };
-}  // namespace Net
+}

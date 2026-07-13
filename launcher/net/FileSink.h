@@ -61,4 +61,4 @@ class FileSink : public Sink {
     bool m_wroteAnyData = false;
     std::unique_ptr<PSaveFile> m_output_file;
 };
-}  // namespace Net
+}

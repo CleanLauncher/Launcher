@@ -142,7 +142,7 @@ bool processPackPNG(const TexturePack& pack)
             if (image_file_info.exists() && image_file_info.isFile()) {
                 QFile pack_png_file(image_file_info.filePath());
                 if (!pack_png_file.open(QIODevice::ReadOnly))
-                    return png_invalid();  // can't open pack.png file
+                    return png_invalid();
 
                 auto data = pack_png_file.readAll();
 
@@ -150,10 +150,12 @@ bool processPackPNG(const TexturePack& pack)
 
                 pack_png_file.close();
                 if (!pack_png_result) {
-                    return png_invalid();  // pack.png invalid
+                    return png_invalid();
+
                 }
             } else {
-                return png_invalid();  // pack.png does not exists or is not a valid file.
+                return png_invalid();
+
             }
             return false;
         }
@@ -167,10 +169,12 @@ bool processPackPNG(const TexturePack& pack)
                 bool pack_png_result = TexturePackUtils::processPackPNG(pack, std::move(data));
 
                 if (!pack_png_result) {
-                    return png_invalid();  // pack.png invalid
+                    return png_invalid();
+
                 }
             }
-            return png_invalid();  // could not set pack.mcmeta as current file.
+            return png_invalid();
+
         }
         default:
             qWarning() << "Invalid type for resource pack parse task!";
@@ -184,7 +188,7 @@ bool validate(QFileInfo file)
     return TexturePackUtils::process(rp, ProcessingLevel::BasicInfoOnly) && rp.valid();
 }
 
-}  // namespace TexturePackUtils
+}
 
 LocalTexturePackParseTask::LocalTexturePackParseTask(int token, TexturePack& rp) : Task(false), m_token(token), m_texture_pack(rp) {}
 

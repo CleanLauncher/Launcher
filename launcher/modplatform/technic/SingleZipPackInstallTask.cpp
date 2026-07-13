@@ -65,7 +65,6 @@ void Technic::SingleZipPackInstallTask::downloadSucceeded()
     QDir extractDir(FS::PathCombine(m_stagingPath, "minecraft"));
     qDebug() << "Attempting to create instance from" << m_archivePath;
 
-    // open the zip and find relevant files in it
     m_packZip.reset(new MMCZip::ArchiveReader(m_archivePath));
     m_extractFuture =
         QtConcurrent::run(QThreadPool::globalInstance(), MMCZip::extractSubDir, m_packZip.get(), QString(""), extractDir.absolutePath());
@@ -105,10 +104,10 @@ void Technic::SingleZipPackInstallTask::extractFinished()
         auto permissions = QFile::permissions(filepath);
         auto origPermissions = permissions;
         if (file.isDir()) {
-            // Folder +rwx for current user
+
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {
-            // File +rw for current user
+
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser;
         }
         if (origPermissions != permissions) {

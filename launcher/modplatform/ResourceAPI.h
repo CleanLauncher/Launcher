@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -52,19 +52,16 @@
 #include "modplatform/ResourceType.h"
 #include "tasks/Task.h"
 
-/* Simple class with a common interface for interacting with APIs */
 class ResourceAPI {
    public:
     virtual ~ResourceAPI() = default;
 
     struct SortingMethod {
-        // The index of the sorting method. Used to allow for arbitrary ordering in the list of methods.
-        // Used by Flame in the API request.
+
         unsigned int index;
-        // The real name of the sorting, as used in the respective API specification.
-        // Used by Modrinth in the API request.
+
         QString name;
-        // The human-readable name of the sorting, used for display in the UI.
+
         QString readable_name;
     };
 
@@ -109,7 +106,7 @@ class ResourceAPI {
     };
 
    public:
-    /** Gets a list of available sorting methods for this API. */
+
     virtual auto getSortingMethods() const -> QList<SortingMethod> = 0;
 
    public slots:
@@ -135,25 +132,10 @@ class ResourceAPI {
     virtual auto getVersionsURL(const VersionSearchArgs& args) const -> std::optional<QString> = 0;
     virtual auto getDependencyURL(const DependencySearchArgs& args) const -> std::optional<QString> = 0;
 
-    /** Functions to load data into a pack.
-     *
-     *  Those are needed for the same reason as documentToArray, and NEED to be re-implemented in the same way.
-     */
-
     virtual void loadIndexedPack(ModPlatform::IndexedPack&, QJsonObject&) const = 0;
     virtual ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType) const = 0;
 
-    /** Converts a JSON document to a common array format.
-     *
-     *  This is needed so that different providers, with different JSON structures, can be parsed
-     *  uniformally. You NEED to re-implement this if you intend on using the default callbacks.
-     */
     virtual QJsonArray documentToArray(QJsonDocument& obj) const = 0;
-
-    /** Functions to load data into a pack.
-     *
-     *  Those are needed for the same reason as documentToArray, and NEED to be re-implemented in the same way.
-     */
 
     virtual void loadExtraPackInfo(ModPlatform::IndexedPack&, QJsonObject&) const = 0;
 };

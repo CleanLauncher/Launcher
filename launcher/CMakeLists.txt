@@ -1,11 +1,6 @@
 project(application)
 
-################################ FILES ################################
-
-######## Sources and headers ########
-
 set(CORE_SOURCES
-    # LOGIC - Base classes and infrastructure
     BaseInstaller.h
     BaseInstaller.cpp
     BaseVersionList.h
@@ -40,7 +35,6 @@ set(CORE_SOURCES
     RuntimeContext.h
     PSaveFile.h
 
-    # Basic instance manipulation tasks (derived from InstanceTask)
     InstanceCreationTask.h
     InstanceCreationTask.cpp
     InstanceCopyPrefs.h
@@ -50,20 +44,15 @@ set(CORE_SOURCES
     InstanceImportTask.h
     InstanceImportTask.cpp
 
-    # Resource downloading task
     ResourceDownloadTask.h
     ResourceDownloadTask.cpp
 
-    # Use tracking separate from memory management
     Usable.h
 
-    # Prefix tree where node names are strings between separators
     SeparatorPrefixTree.h
 
-    # String filters
     Filter.h
 
-    # JSON parsing helpers
     Json.h
     Json.cpp
 
@@ -72,49 +61,39 @@ set(CORE_SOURCES
 
     Exception.h
 
-    # RW lock protected map
     RWStorage.h
 
-    # a smart pointer wrapper intended for safer use with Qt signal/slot mechanisms
     QObjectPtr.h
 
-    # Compression support
     GZip.h
     GZip.cpp
 
-    # Command line parameter parsing
     Commandline.h
     Commandline.cpp
 
-    # Version number string support
     Version.h
     Version.cpp
 
-    # A Recursive file system watcher
     RecursiveFileSystemWatcher.h
     RecursiveFileSystemWatcher.cpp
 
-    # Time
     MMCTime.h
     MMCTime.cpp
 
     MTPixmapCache.h
 
-    # Assertion helper
     AssertHelpers.h
 )
 if (UNIX AND NOT CYGWIN AND NOT APPLE)
     set(CORE_SOURCES
     ${CORE_SOURCES}
 
-    # LibraryUtils
     LibraryUtils.h
     LibraryUtils.cpp
     )
 endif()
 
 set(NET_SOURCES
-    # network stuffs
     net/ByteArraySink.h
     net/ChecksumValidator.h
     net/Download.cpp
@@ -153,7 +132,6 @@ set(NET_SOURCES
     net/flame/FetchFlameAPIKey.h
 )
 
-# Game launch logic
 set(LAUNCH_SOURCES
     launch/steps/CheckJava.cpp
     launch/steps/CheckJava.h
@@ -181,7 +159,6 @@ set(LAUNCH_SOURCES
     logs/LogParser.h
 )
 
-# Old update system
 set(UPDATE_SOURCES
     updater/ExternalUpdater.h
 )
@@ -196,30 +173,23 @@ set(LAUNCHER_UPDATE_SOURCES
     updater/ExternalUpdater.cpp
 )
 
-# Backend for the news bar... there's usually no news.
 set(NEWS_SOURCES
-    # News System
     news/NewsChecker.h
     news/NewsChecker.cpp
     news/NewsEntry.h
     news/NewsEntry.cpp
 )
 
-# Icon interface
 set(ICONS_SOURCES
-    # Icons System and related code
     icons/IconUtils.h
     icons/IconUtils.cpp
 )
 
-# Support for Minecraft instances and launch
 set(MINECRAFT_SOURCES
 
-    # Logging
     minecraft/Logging.h
     minecraft/Logging.cpp
 
-    # Minecraft support
     minecraft/auth/AccountData.cpp
     minecraft/auth/AccountData.h
     minecraft/auth/AccountList.cpp
@@ -384,11 +354,9 @@ set(MINECRAFT_SOURCES
     minecraft/mod/tasks/GetModDependenciesTask.h
     minecraft/mod/tasks/GetModDependenciesTask.cpp
 
-    # Assets
     minecraft/AssetsUtils.h
     minecraft/AssetsUtils.cpp
 
-    # Minecraft skins
     minecraft/skins/CapeChange.cpp
     minecraft/skins/CapeChange.h
     minecraft/skins/SkinUpload.cpp
@@ -402,7 +370,6 @@ set(MINECRAFT_SOURCES
 
     minecraft/Agent.h)
 
-# the screenshots feature
 set(SCREENSHOTS_SOURCES
     screenshots/Screenshot.h
     screenshots/ImgurUpload.h
@@ -412,7 +379,6 @@ set(SCREENSHOTS_SOURCES
 )
 
 set(TASKS_SOURCES
-    # Tasks
     tasks/Task.h
     tasks/Task.cpp
     tasks/ConcurrentTask.h
@@ -424,7 +390,6 @@ set(TASKS_SOURCES
 )
 
 set(SETTINGS_SOURCES
-    # Settings
     settings/INIFile.cpp
     settings/INIFile.h
     settings/INISettingsObject.cpp
@@ -476,7 +441,6 @@ set(TRANSLATIONS_SOURCES
 )
 
 set(TOOLS_SOURCES
-    # Tools
     tools/BaseExternalTool.cpp
     tools/BaseExternalTool.h
     tools/BaseProfiler.cpp
@@ -492,7 +456,6 @@ set(TOOLS_SOURCES
 )
 
 set(META_SOURCES
-    # Metadata sources
     meta/JsonFormat.cpp
     meta/JsonFormat.h
     meta/BaseEntity.cpp
@@ -554,7 +517,6 @@ set(FTB_SOURCES
 )
 
 set(FLAME_SOURCES
-    # Flame
     modplatform/flame/FlameModIndex.cpp
     modplatform/flame/FlameModIndex.h
     modplatform/flame/PackManifest.h
@@ -584,7 +546,6 @@ set(PACKWIZ_SOURCES
     modplatform/packwiz/Packwiz.h
     modplatform/packwiz/Packwiz.cpp
 )
-
 
 set(TECHNIC_SOURCES
     modplatform/technic/SingleZipPackInstallTask.h
@@ -644,7 +605,6 @@ set(LAUNCHER_UPDATER_SOURCES
     Markdown.h
     Markdown.cpp
 
-    # Zip
     MMCZip.h
     MMCZip.cpp
     archive/ArchiveReader.cpp
@@ -652,7 +612,6 @@ set(LAUNCHER_UPDATER_SOURCES
     archive/ArchiveWriter.cpp
     archive/ArchiveWriter.h
 
-    # Time
     MMCTime.h
     MMCTime.cpp
 
@@ -690,8 +649,6 @@ if(WIN32)
         ${LAUNCHER_UPDATER_SOURCES}
     )
 endif()
-
-######## Logging categories ########
 
 ecm_qt_declare_logging_category(CORE_SOURCES
     HEADER Logging.h
@@ -765,16 +722,12 @@ ecm_qt_export_logging_category(
     EXPORT "${Launcher_Name}"
 )
 
-
-
-if(KDE_INSTALL_LOGGINGCATEGORIESDIR)  # only install if there is a standard path for this
+if(KDE_INSTALL_LOGGINGCATEGORIESDIR)
     ecm_qt_install_logging_categories(
         EXPORT "${Launcher_Name}"
         DESTINATION "${KDE_INSTALL_LOGGINGCATEGORIESDIR}"
     )
 endif()
-
-################################ COMPILE ################################
 
 set(LOGIC_SOURCES
     ${CORE_SOURCES}
@@ -807,7 +760,6 @@ else()
 endif()
 
 SET(LAUNCHER_SOURCES
-    # Application base
     Application.h
     Application.cpp
     DataMigrationTask.h
@@ -819,10 +771,8 @@ SET(LAUNCHER_SOURCES
     HardwareInfo.cpp
     HardwareInfo.h
 
-    # console utils
     console/Console.h
 
-    # GUI - general utilities
     DesktopServices.h
     DesktopServices.cpp
     VersionProxyModel.h
@@ -830,21 +780,17 @@ SET(LAUNCHER_SOURCES
     Markdown.h
     Markdown.cpp
 
-    # Super secret!
     KonamiCode.h
     KonamiCode.cpp
 
-    # Icons
     icons/MMCIcon.h
     icons/MMCIcon.cpp
     icons/IconList.h
     icons/IconList.cpp
 
-    # log utils
     logs/AnonymizeLog.cpp
     logs/AnonymizeLog.h
 
-    # GUI - windows
     ui/GuiUtil.h
     ui/GuiUtil.cpp
     ui/MainWindow.h
@@ -856,13 +802,11 @@ SET(LAUNCHER_SOURCES
     ui/ToolTipFilter.h
     ui/ToolTipFilter.cpp
 
-    # FIXME: maybe find a better home for this.
     FileIgnoreProxy.cpp
     FileIgnoreProxy.h
     FastFileIconProvider.cpp
     FastFileIconProvider.h
 
-    # GUI - setup wizard
     ui/setupwizard/SetupWizard.h
     ui/setupwizard/SetupWizard.cpp
     ui/setupwizard/BaseWizardPage.h
@@ -878,7 +822,6 @@ SET(LAUNCHER_SOURCES
     ui/setupwizard/LoginWizardPage.cpp
     ui/setupwizard/LoginWizardPage.h
 
-    # GUI - themes
     ui/themes/FusionTheme.cpp
     ui/themes/FusionTheme.h
     ui/themes/BrightTheme.cpp
@@ -898,24 +841,19 @@ SET(LAUNCHER_SOURCES
     ui/themes/ThemeManager.cpp
     ui/themes/ThemeManager.h
 
-    # Processes
     LaunchMode.h
     LaunchController.h
     LaunchController.cpp
 
-    # page provider for instances
     InstancePageProvider.h
 
-    # Common java checking UI
     JavaCommon.h
     JavaCommon.cpp
 
-    # GUI - paged dialog base
     ui/pages/BasePage.h
     ui/pages/BasePageContainer.h
     ui/pages/BasePageProvider.h
 
-    # GUI - instance pages
     ui/pages/instance/ExternalResourcesPage.cpp
     ui/pages/instance/ExternalResourcesPage.h
     ui/pages/instance/VersionPage.cpp
@@ -952,7 +890,6 @@ SET(LAUNCHER_SOURCES
     ui/pages/instance/ServerPingTask.cpp
     ui/pages/instance/ServerPingTask.h
 
-    # GUI - global settings pages
     ui/pages/global/AccountListPage.cpp
     ui/pages/global/AccountListPage.h
     ui/pages/global/ExternalToolsPage.cpp
@@ -970,7 +907,6 @@ SET(LAUNCHER_SOURCES
     ui/pages/global/APIPage.cpp
     ui/pages/global/APIPage.h
 
-    # GUI - platform pages
     ui/pages/modplatform/CustomPage.cpp
     ui/pages/modplatform/CustomPage.h
 
@@ -987,7 +923,6 @@ SET(LAUNCHER_SOURCES
     ui/pages/modplatform/ResourcePackPage.cpp
     ui/pages/modplatform/ResourcePackModel.cpp
 
-    # Needed for MOC to find them without a corresponding .cpp
     ui/pages/modplatform/TexturePackPage.h
     ui/pages/modplatform/TexturePackModel.cpp
 
@@ -1055,7 +990,6 @@ SET(LAUNCHER_SOURCES
     ui/pages/modplatform/modrinth/ModrinthResourcePages.cpp
     ui/pages/modplatform/modrinth/ModrinthResourcePages.h
 
-    # GUI - dialogs
     ui/dialogs/AboutDialog.cpp
     ui/dialogs/AboutDialog.h
     ui/dialogs/ProfileSelectDialog.cpp
@@ -1123,7 +1057,6 @@ SET(LAUNCHER_SOURCES
     ui/dialogs/skins/draw/BoxGeometry.h
     ui/dialogs/skins/draw/BoxGeometry.cpp
 
-    # GUI - widgets
     ui/widgets/CheckComboBox.cpp
     ui/widgets/CheckComboBox.h
     ui/widgets/Common.cpp
@@ -1174,7 +1107,6 @@ SET(LAUNCHER_SOURCES
     ui/widgets/JavaSettingsWidget.h
     ui/widgets/JavaSettingsWidget.cpp
 
-    # GUI - instance group view
     ui/instanceview/InstanceProxyModel.cpp
     ui/instanceview/InstanceProxyModel.h
     ui/instanceview/AccessibleInstanceView.cpp
@@ -1231,12 +1163,9 @@ qt_add_resources(LAUNCHER_RESOURCES
     "${CMAKE_CURRENT_BINARY_DIR}/../${Launcher_Branding_LogoQRC}"
 )
 
-######## Windows resource files ########
 if(WIN32)
     set(LAUNCHER_RCS ${CMAKE_CURRENT_BINARY_DIR}/../${Launcher_Branding_WindowsRC})
 endif()
-
-######## Precompiled Headers ###########
 
 if(${Launcher_USE_PCH})
     message(STATUS "Using precompiled headers for applicable launcher targets")
@@ -1247,9 +1176,6 @@ if(${Launcher_USE_PCH})
     )
 endif()
 
-####### Targets ########
-
-# Add executable
 add_library(Launcher_logic STATIC ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${LAUNCHER_RESOURCES})
 target_include_directories(Launcher_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(Launcher_logic PUBLIC LAUNCHER_APPLICATION)
@@ -1363,13 +1289,11 @@ install(TARGETS ${Launcher_Name}
     FRAMEWORK DESTINATION ${FRAMEWORK_DEST_DIR} COMPONENT Runtime
 )
 
-# Deploy PDBs
 if(CMAKE_CXX_LINKER_SUPPORTS_PDB)
     install(FILES $<TARGET_PDB_FILE:${Launcher_Name}> DESTINATION ${BINARY_DEST_DIR} OPTIONAL)
 endif()
 
 if(Launcher_BUILD_UPDATER)
-    # Updater
     add_library(launcher_updater_logic STATIC ${LAUNCHER_UPDATER_SOURCES} ${TASKS_SOURCES})
     target_include_directories(launcher_updater_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -1414,14 +1338,12 @@ if(Launcher_BUILD_UPDATER)
         FRAMEWORK DESTINATION ${FRAMEWORK_DEST_DIR} COMPONENT Runtime
     )
 
-    # Deploy PDBs
     if(CMAKE_CXX_LINKER_SUPPORTS_PDB)
         install(FILES $<TARGET_PDB_FILE:${Launcher_Name}_updater> DESTINATION ${BINARY_DEST_DIR} OPTIONAL)
     endif()
 endif()
 
 if(WIN32 OR (DEFINED Launcher_BUILD_FILELINKER AND Launcher_BUILD_FILELINKER))
-    # File link
     add_library(filelink_logic STATIC ${LINKEXE_SOURCES})
 
     target_include_directories(filelink_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
@@ -1435,7 +1357,6 @@ if(WIN32 OR (DEFINED Launcher_BUILD_FILELINKER AND Launcher_BUILD_FILELINKER))
         Qt${QT_VERSION_MAJOR}::Widgets
         Qt${QT_VERSION_MAJOR}::Core
         Qt${QT_VERSION_MAJOR}::Network
-        # Qt${QT_VERSION_MAJOR}::Concurrent
         ${Launcher_QT_LIBS}
     )
 
@@ -1446,9 +1367,6 @@ if(WIN32 OR (DEFINED Launcher_BUILD_FILELINKER AND Launcher_BUILD_FILELINKER))
         target_precompile_headers("${Launcher_Name}_filelink" REUSE_FROM filelink_logic)
     endif()
 
-    # HACK: Fix manifest issues with Ninja in release mode (and only release mode) and MSVC
-    # I have no idea why this works or why it's needed. UPDATE THIS IF YOU EDIT THE MANIFEST!!! -@getchoo
-    # Thank you 2018 CMake mailing list thread https://cmake.cmake.narkive.com/LnotZXus/conflicting-msvc-manifests
     if(MSVC)
         set_property(TARGET "${Launcher_Name}_filelink" PROPERTY LINK_FLAGS "/MANIFESTUAC:level='requireAdministrator'")
     endif()
@@ -1469,20 +1387,15 @@ if(WIN32 OR (DEFINED Launcher_BUILD_FILELINKER AND Launcher_BUILD_FILELINKER))
         FRAMEWORK DESTINATION ${FRAMEWORK_DEST_DIR} COMPONENT Runtime
     )
 
-    # Deploy PDBs
     if(CMAKE_CXX_LINKER_SUPPORTS_PDB)
         install(FILES $<TARGET_PDB_FILE:${Launcher_Name}_filelink> DESTINATION ${BINARY_DEST_DIR} OPTIONAL)
     endif()
 endif()
 
 if (UNIX AND APPLE AND Launcher_ENABLE_UPDATER)
-    # Add Sparkle updater
-    # It has to be copied here instead of just allowing fixup_bundle to install it, otherwise essential parts of
-    # the framework aren't installed
     install(DIRECTORY ${MACOSX_SPARKLE_DIR}/Sparkle.framework DESTINATION ${FRAMEWORK_DEST_DIR} USE_SOURCE_PERMISSIONS)
 endif()
 
-# Set basic compiler warning/error flags for all targets
 get_property(Launcher_TARGETS DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
 foreach(target ${Launcher_TARGETS})
     message(STATUS "Enabling all warnings as errors for target '${target}'")
@@ -1493,20 +1406,14 @@ foreach(target ${Launcher_TARGETS})
     endif()
 endforeach()
 
-# Disable some warnings in main launcher target due to being present in a lot of places. TODO: Fix them.
 if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-    target_compile_options(Launcher_logic PRIVATE /wd4100) # C4100 - unused parameter
-    target_compile_options(${Launcher_Name} PRIVATE /wd4100) # C4100 - unused parameter
+    target_compile_options(Launcher_logic PRIVATE /wd4100)
+    target_compile_options(${Launcher_Name} PRIVATE /wd4100)
 else()
-    # sfinae-incomplete is a new GCC warning and triggers in Qt headers
-    # no-unknown-warning-option so that compilers that don't have sfinae-incomplete don't error
     target_compile_options(Launcher_logic PRIVATE -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-sfinae-incomplete)
     target_compile_options(${Launcher_Name} PRIVATE -Wno-unused-parameter -Wno-missing-field-initializers -Wno-unknown-warning-option -Wno-sfinae-incomplete)
 endif()
 
-#### The bundle mess! ####
-# Bundle utilities are used to complete packages for different platforms - they add all the libraries that would otherwise be missing on the target system.
-# NOTE: it seems that this absolutely has to be here, and nowhere else.
 if(WIN32 OR (UNIX AND APPLE))
     if(WIN32)
         set(QT_DEPLOY_TOOL_OPTIONS "--no-opengl-sw --no-quick-import --no-system-d3d-compiler --no-system-dxc-compiler --skip-plugin-types generic,networkinformation")
@@ -1529,7 +1436,6 @@ if(WIN32 OR (UNIX AND APPLE))
         )"
     )
 
-    # Bundle our linked dependencies
     install(
         RUNTIME_DEPENDENCY_SET LAUNCHER_DEPENDENCY_SET
         COMPONENT bundle
@@ -1539,7 +1445,6 @@ if(WIN32 OR (UNIX AND APPLE))
             ${QT_LIBEXECS_DIR}
         PRE_EXCLUDE_REGEXES
             "^(api-ms-win|ext-ms)-.*\\.dll$"
-            # FIXME: Why aren't these caught by the below regex???
             "^azure.*\\.dll$"
             "^vcruntime.*\\.dll$"
         POST_EXCLUDE_REGEXES
@@ -1548,15 +1453,11 @@ if(WIN32 OR (UNIX AND APPLE))
         RUNTIME DESTINATION ${BINARY_DEST_DIR}
         FRAMEWORK DESTINATION ${FRAMEWORK_DEST_DIR}
     )
-    # Deploy Qt plugins
     install(
         SCRIPT ${QT_DEPLOY_SCRIPT}
         COMPONENT bundle
     )
-    # FIXME: remove this crap once we stop using msys2
     if(MINGW)
-        # i've not found a solution better than injecting the config vars like this...
-        # with install(CODE" for everything everything just breaks
         install(CODE "
             set(QT_PLUGINS_DIR \"${QT_PLUGINS_DIR}\")
             set(QT_LIBS_DIR \"${QT_LIBS_DIR}\")
@@ -1597,12 +1498,10 @@ if(WIN32 OR (UNIX AND APPLE))
         COMPONENT bundle)
     endif()
 
-    # Add qt.conf - this makes Qt stop looking for things outside the bundle
     install(
         CODE "file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${RESOURCES_DEST_DIR}/qt.conf\" \" \")"
         COMPONENT bundle
     )
-    # Add qtlogging.ini as a config file
     install(
         FILES "qtlogging.ini"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/${RESOURCES_DEST_DIR}

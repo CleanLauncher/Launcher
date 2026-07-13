@@ -124,8 +124,6 @@ Page::Page(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &Page::onTabChanged);
 
-    // ui->modpackInfo->setOpenExternalLinks(true);
-
     ui->publicPackList->selectionModel()->reset();
     ui->thirdPartyPackList->selectionModel()->reset();
     ui->privatePackList->selectionModel()->reset();
@@ -387,4 +385,4 @@ QString Page::getSerachTerm() const
 {
     return ui->searchEdit->text();
 }
-}  // namespace LegacyFTB
+}

@@ -111,18 +111,15 @@ QStringList AccountList::profileNames() const
 
 void AccountList::addAccount(const MinecraftAccountPtr account)
 {
-    // NOTE: Do not allow adding something that's already there. We shouldn't let it continue
-    // because of the signal / slot connections after this.
+
     if (m_accounts.contains(account)) {
         qDebug() << "Tried to add account that's already on the accounts list!";
         return;
     }
 
-    // hook up notifications for changes in the account
     connect(account.get(), &MinecraftAccount::changed, this, &AccountList::accountChanged);
     connect(account.get(), &MinecraftAccount::activityChanged, this, &AccountList::accountActivityChanged);
 
-    // override/replace existing account with the same profileId
     auto profileId = account->profileId();
     if (profileId.size()) {
         auto existingAccount = findAccountByProfileId(profileId);
@@ -134,7 +131,7 @@ void AccountList::addAccount(const MinecraftAccountPtr account)
             if (m_defaultAccount == existingAccountPtr) {
                 m_defaultAccount = account;
             }
-            // disconnect notifications for changes in the account being replaced
+
             existingAccountPtr->disconnect(this);
             emit dataChanged(index(existingAccount), index(existingAccount, columnCount(QModelIndex()) - 1));
             onListChanged();
@@ -142,7 +139,6 @@ void AccountList::addAccount(const MinecraftAccountPtr account)
         }
     }
 
-    // if we don't have this profileId yet, add the account to the end
     int row = m_accounts.count();
     qDebug() << "Inserting account at index" << row;
 
@@ -176,7 +172,7 @@ void AccountList::moveAccount(QModelIndex index, int delta)
     const int row = index.row();
     const int newRow = row + delta;
     if (index.isValid() && row < m_accounts.size() && newRow >= 0 && newRow < m_accounts.size()) {
-        // Qt is stupid, https://doc.qt.io/qt-6/qabstractitemmodel.html#beginMoveRows
+
         const int modelDestinationRow = (newRow > row) ? newRow + 1 : newRow;
 
         if (beginMoveRows(QModelIndex(), row, row, QModelIndex(), modelDestinationRow)) {
@@ -236,7 +232,7 @@ void AccountList::setDefaultAccount(MinecraftAccountPtr newAccount)
 
 void AccountList::accountChanged()
 {
-    // the list changed. there is no doubt.
+
     onListChanged();
 }
 
@@ -264,7 +260,7 @@ void AccountList::accountActivityChanged(bool active)
 void AccountList::onListChanged()
 {
     if (m_autosave)
-        // TODO: Alert the user if this fails.
+
         saveList();
 
     emit listChanged();
@@ -407,7 +403,7 @@ QVariant AccountList::headerData(int section, [[maybe_unused]] Qt::Orientation o
 
 int AccountList::rowCount(const QModelIndex& parent) const
 {
-    // Return count
+
     return parent.isValid() ? 0 : count();
 }
 
@@ -452,21 +448,17 @@ bool AccountList::loadList()
 
     QFile file(m_listFilePath);
 
-    // Try to open the file and fail if we can't.
-    // TODO: We should probably report this error to the user.
     if (!file.open(QIODevice::ReadOnly)) {
         qCritical() << QString("Failed to read the account list file %1 (%2).").arg(m_listFilePath).arg(file.errorString()).toUtf8();
         return false;
     }
 
-    // Read the file and close it.
     QByteArray jsonData = file.readAll();
     file.close();
 
     QJsonParseError parseError;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
 
-    // Fail if the JSON is invalid.
     if (parseError.error != QJsonParseError::NoError) {
         qCritical() << QString("Failed to parse account list file: %1 at offset %2")
                            .arg(parseError.errorString(), QString::number(parseError.offset))
@@ -474,7 +466,6 @@ bool AccountList::loadList()
         return false;
     }
 
-    // Make sure the root is an object.
     if (!jsonDoc.isObject()) {
         qCritical() << "Invalid account list JSON: Root should be an array.";
         return false;
@@ -482,14 +473,13 @@ bool AccountList::loadList()
 
     QJsonObject root = jsonDoc.object();
 
-    // Make sure the format version matches.
     auto listVersion = root.value("formatVersion").toVariant().toInt();
     if (listVersion == AccountListVersion::MojangMSA)
         return loadV3(root);
 
     QString newName = "accounts-old.json";
     qWarning() << "Unknown format version when loading account list. Existing one will be renamed to" << newName;
-    // Attempt to rename the old version.
+
     file.rename(newName);
     return false;
 }
@@ -529,11 +519,9 @@ bool AccountList::saveList()
         return false;
     }
 
-    // make sure the parent folder exists
     if (!FS::ensureFilePathExists(m_listFilePath))
         return false;
 
-    // make sure the file wasn't overwritten with a folder before (fixes a bug)
     QFileInfo finfo(m_listFilePath);
     if (finfo.isDir()) {
         QDir badDir(m_listFilePath);
@@ -543,12 +531,11 @@ bool AccountList::saveList()
     qDebug() << "Writing account list to" << m_listFilePath;
 
     qDebug() << "Building JSON data structure.";
-    // Build the JSON document to write to the list file.
+
     QJsonObject root;
 
     root.insert("formatVersion", AccountListVersion::MojangMSA);
 
-    // Build a list of accounts.
     qDebug() << "Building account array.";
     QJsonArray accounts;
     for (MinecraftAccountPtr account : m_accounts) {
@@ -559,24 +546,18 @@ bool AccountList::saveList()
         accounts.append(accountObj);
     }
 
-    // Insert the account list into the root object.
     root.insert("accounts", accounts);
 
-    // Create a JSON document object to convert our JSON to bytes.
     QJsonDocument doc(root);
 
-    // Now that we're done building the JSON object, we can write it to the file.
     qDebug() << "Writing account list to file.";
     QSaveFile file(m_listFilePath);
 
-    // Try to open the file and fail if we can't.
-    // TODO: We should probably report this error to the user.
     if (!file.open(QIODevice::WriteOnly)) {
         qCritical() << QString("Failed to save the account list file %1 (%2).").arg(m_listFilePath).arg(file.errorString()).toUtf8();
         return false;
     }
 
-    // Write the JSON to the file.
     file.write(doc.toJson());
     file.setPermissions(QFile::ReadOwner | QFile::WriteOwner | QFile::ReadUser | QFile::WriteUser);
     if (file.commit()) {
@@ -659,7 +640,7 @@ void AccountList::tryNext()
             if (account->internalId() == accountId) {
                 found = true;
                 if (!account->shouldRefresh()) {
-                    // Account no longer needs refreshing, skip it.
+
                     qDebug() << "RefreshSchedule: Skipping account" << account->profileName() << "with internal ID"
                              << accountId << "(no longer needs refresh)";
                     break;
@@ -680,7 +661,7 @@ void AccountList::tryNext()
             qDebug() << "RefreshSchedule: Account with internal ID" << accountId << "not found.";
         }
     }
-    // if we get here, no account needed refreshing. Schedule refresh in an hour.
+
     m_refreshTimer->start(1000 * 3600);
 }
 

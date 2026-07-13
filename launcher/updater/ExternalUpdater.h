@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -22,10 +22,6 @@
 
 #pragma once
 
-/*!
- * An implementation for the updater on Windows and linux that uses out external updater.
- */
-
 class ExternalUpdater : public QObject {
     Q_OBJECT
 
@@ -33,46 +29,19 @@ class ExternalUpdater : public QObject {
     ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir);
     ~ExternalUpdater() override;
 
-    /*!
-     * Check for updates manually, showing the user a progress bar and an alert if no updates are found.
-     */
     void checkForUpdates() override;
     void checkForUpdates(bool triggeredByUser) const;
 
-    /*!
-     * Indicates whether or not to check for updates automatically.
-     */
     bool getAutomaticallyChecksForUpdates() override;
 
-    /*!
-     * Indicates the current automatic update check interval in seconds.
-     */
     double getUpdateCheckInterval() override;
 
-    /*!
-     * Indicates whether or not beta updates should be checked for in addition to regular releases.
-     */
     bool getBetaAllowed() override;
 
-    /*!
-     * Set whether or not to check for updates automatically.
-     *
-     * The update schedule cycle will be reset in a short delay after the property’s new value is set. This is to allow
-     * reverting this property without kicking off a schedule change immediately.
-     */
     void setAutomaticallyChecksForUpdates(bool check) override;
 
-    /*!
-     * Set the current automatic update check interval in seconds.
-     *
-     * The update schedule cycle will be reset in a short delay after the property’s new value is set. This is to allow
-     * reverting this property without kicking off a schedule change immediately.
-     */
     void setUpdateCheckInterval(double seconds) override;
 
-    /*!
-     * Set whether or not beta updates should be checked for in addition to regular releases.
-     */
     void setBetaAllowed(bool allowed) override;
 
     void resetAutoCheckTimer() const;

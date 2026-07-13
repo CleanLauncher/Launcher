@@ -24,7 +24,6 @@ ReviewMessageBox::ReviewMessageBox(QWidget* parent, [[maybe_unused]] QString con
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
 
-    // Overwrite Ctrl+C functionality to exclude the label when copying text from tree
     auto shortcut = new QShortcut(QKeySequence::Copy, ui->modTreeWidget);
     connect(shortcut, &QShortcut::activated, [this]() {
         auto currentItem = this->ui->modTreeWidget->currentItem();

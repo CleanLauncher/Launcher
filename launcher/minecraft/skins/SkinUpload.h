@@ -25,7 +25,6 @@ class SkinUpload : public Net::NetRequest {
    public:
     using Ptr = shared_qobject_ptr<SkinUpload>;
 
-    // Note this class takes ownership of the file.
     SkinUpload(QString path, QString variant);
     virtual ~SkinUpload() = default;
 

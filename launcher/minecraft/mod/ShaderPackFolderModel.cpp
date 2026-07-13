@@ -30,7 +30,7 @@ class ShaderPackIndexMigrateTask : public Task {
         }
 
         if (!movedAll) {
-            // FIXME: not shown in the UI
+
             emitFailed(tr("Failed to migrate shaderpack metadata from .index"));
             return;
         }
@@ -46,7 +46,7 @@ class ShaderPackIndexMigrateTask : public Task {
    private:
     QDir m_resourceDir, m_indexDir;
 };
-}  // namespace
+}
 
 Task* ShaderPackFolderModel::createPreUpdateTask()
 {

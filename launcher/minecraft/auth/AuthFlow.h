@@ -34,7 +34,7 @@ class AuthFlow : public Task {
     void nextStep();
 
    private slots:
-    // NOTE: true -> non-terminal state, false -> terminal state
+
     bool changeState(AccountTaskState newState, QString reason = QString());
     void stepFinished(AccountTaskState resultingState, QString message);
 

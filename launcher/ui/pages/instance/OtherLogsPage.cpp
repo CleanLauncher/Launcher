@@ -70,7 +70,6 @@ OtherLogsPage::OtherLogsPage(QString id, QString displayName, QString helpPage, 
         m_model = APPLICATION->logModel.get();
     }
 
-    // set up fonts in the log proxy
     {
         QString fontFamily = APPLICATION->settings()->get("ConsoleFont").toString();
         bool conversionOk = false;
@@ -193,7 +192,7 @@ void OtherLogsPage::populateSelectLogBox()
             ui->selectLogBox->setCurrentIndex(index);
             ui->selectLogBox->blockSignals(false);
             setControlsEnabled(true);
-            // don't refresh file
+
             return;
         } else {
             setControlsEnabled(false);
@@ -256,7 +255,8 @@ void OtherLogsPage::reload()
     QFile file(FS::PathCombine(m_basePath, m_currentFile));
     if (!file.open(QFile::ReadOnly)) {
         setControlsEnabled(false);
-        ui->btnReload->setEnabled(true);  // allow reload
+        ui->btnReload->setEnabled(true);
+
         m_currentFile = QString();
         QMessageBox::critical(this, tr("Error"), tr("Unable to open %1 for reading: %2").arg(m_currentFile, file.errorString()));
     } else {
@@ -288,7 +288,8 @@ void OtherLogsPage::reload()
             }
             MessageLevel level = MessageLevel::Unknown;
 
-            QString lineTemp = line;  // don't edit out the time and level for clarity
+            QString lineTemp = line;
+
             if (!m_instance) {
                 level = MessageLevel::takeFromLauncherLine(lineTemp);
             } else {
@@ -300,7 +301,6 @@ void OtherLogsPage::reload()
             return m_model->isOverFlow();
         };
 
-        // Try to determine a level for each line
         ui->text->clear();
         ui->text->setModel(nullptr);
         if (!m_instance) {
@@ -538,7 +538,7 @@ void OtherLogsPage::findPreviousActivated()
 
 void OtherLogsPage::findActivated()
 {
-    // focus the search bar if it doesn't have focus
+
     if (!ui->searchBar->hasFocus()) {
         ui->searchBar->setFocus();
         ui->searchBar->selectAll();

@@ -79,4 +79,4 @@ class ListModel : public QAbstractListModel {
     QList<int> m_remainingPacks;
 };
 
-}  // namespace Ftb
+}

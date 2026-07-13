@@ -61,15 +61,13 @@ ExternalResourcesPage::ExternalResourcesPage(BaseInstance* instance, ResourceFol
     m_filterModel->setSourceModel(m_model);
     m_filterModel->setFilterKeyColumn(-1);
     ui->treeView->setModel(m_filterModel);
-    // must come after setModel
+
     ui->treeView->setResizeModes(m_model->columnResizeModes());
 
     ui->treeView->installEventFilter(this);
     ui->treeView->sortByColumn(1, Qt::AscendingOrder);
     ui->treeView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    // The default function names by Qt are pretty ugly, so let's just connect the actions manually,
-    // to make it easier to read :)
     connect(ui->actionAddItem, &QAction::triggered, this, &ExternalResourcesPage::addItem);
     connect(ui->actionRemoveItem, &QAction::triggered, this, &ExternalResourcesPage::removeItem);
     connect(ui->actionEnableItem, &QAction::triggered, this, &ExternalResourcesPage::enableItem);
@@ -231,7 +229,6 @@ void ExternalResourcesPage::removeItem()
         if (i.column() == 0) {
             count++;
 
-            // if a folder is selected, show the confirmation dialog
             if (m_model->at(i.row()).fileinfo().isDir())
                 folder = true;
         }

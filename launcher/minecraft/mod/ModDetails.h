@@ -49,8 +49,7 @@ struct ModLicense {
 
     ModLicense(const QString license)
     {
-        // FIXME: come up with a better license parsing.
-        // handle SPDX identifiers? https://spdx.org/licenses/
+
         auto parts = license.split(' ');
         QStringList notNameParts = {};
         for (auto part : parts) {
@@ -108,41 +107,32 @@ struct ModLicense {
 };
 
 struct ModDetails {
-    /* Mod ID as defined in the ModLoader-specific metadata */
+
     QString mod_id = {};
 
-    /* Human-readable name */
     QString name = {};
 
-    /* Human-readable mod version */
     QString version = {};
 
-    /* Human-readable minecraft version */
     QString mcversion = {};
 
-    /* URL for mod's home page */
     QString homeurl = {};
 
-    /* Human-readable description */
     QString description = {};
 
-    /* List of the author's names */
     QStringList authors = {};
 
-    /* Issue Tracker URL */
     QString issue_tracker = {};
 
     /* License */
     QList<ModLicense> licenses = {};
 
-    /* Path of mod logo */
     QString icon_file = {};
 
     QStringList dependencies = {};
 
     ModDetails() = default;
 
-    /** Metadata should be handled manually to properly set the mod status. */
     ModDetails(const ModDetails& other)
         : mod_id(other.mod_id)
         , name(other.name)

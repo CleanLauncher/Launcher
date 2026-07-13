@@ -61,7 +61,7 @@ QVariant Technic::ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack.description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack.description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -85,7 +85,7 @@ QVariant Technic::ListModel::data(const QModelIndex& index, int role) const
             return pack.name;
         case Qt::SizeHintRole:
             return QSize(0, 58);
-        // Custom data
+
         case UserDataTypes::TITLE:
             return pack.name;
         case UserDataTypes::DESCRIPTION:
@@ -167,7 +167,7 @@ void Technic::ListModel::performSearch()
 
 void Technic::ListModel::searchRequestFinished(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
+
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 
@@ -209,7 +209,7 @@ void Technic::ListModel::searchRequestFinished(QByteArray* responsePtr)
             }
             case Single: {
                 if (root.contains("error")) {
-                    // Invalid API url
+
                     break;
                 }
 
@@ -239,7 +239,6 @@ void Technic::ListModel::searchRequestFinished(QByteArray* responsePtr)
     }
     searchState = Finished;
 
-    // When you have a Qt build with assertions turned on, proceeding here will abort the application
     if (newList.size() == 0)
         return;
 

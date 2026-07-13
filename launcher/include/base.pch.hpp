@@ -14,4 +14,4 @@
 #include <Json.h>
 #include <Version.h>
 
-#endif  // LAUNCHER_PRECOMPILED_BASE_HEADERS_H
+#endif

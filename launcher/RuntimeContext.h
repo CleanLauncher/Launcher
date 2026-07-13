@@ -49,7 +49,6 @@ struct RuntimeContext {
 
     QString getClassifier() const { return system + "-" + mappedJavaRealArchitecture(); }
 
-    // "Legacy" refers to the fact that Mojang assumed that these are the only two architectures
     bool isLegacyArch() const
     {
         const QString mapped = mappedJavaRealArchitecture();
@@ -58,9 +57,9 @@ struct RuntimeContext {
 
     bool classifierMatches(QString target) const
     {
-        // try to match precise classifier "[os]-[arch]"
+
         bool x = target == getClassifier();
-        // try to match imprecise classifier on legacy architectures "[os]"
+
         if (!x && isLegacyArch())
             x = target == system;
 

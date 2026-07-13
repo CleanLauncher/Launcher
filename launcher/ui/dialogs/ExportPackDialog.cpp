@@ -69,7 +69,6 @@ ExportPackDialog::ExportPackDialog(MinecraftInstance* instance, QWidget* parent,
         } else {
             m_ui->recommendedMemoryCheckBox->setChecked(false);
 
-            // recommend based on setting - limited to 12 GiB (CurseForge warns above this amount)
             const int defaultRecommendation = qMin(m_instance->settings()->get("MaxMemAlloc").toInt(), 1024 * 12);
             m_ui->recommendedMemory->setValue(defaultRecommendation);
         }
@@ -77,17 +76,14 @@ ExportPackDialog::ExportPackDialog(MinecraftInstance* instance, QWidget* parent,
         m_ui->author->setText(instance->settings()->get("ExportAuthor").toString());
     }
 
-    // ensure a valid pack is generated
-    // the name and version fields mustn't be empty
     connect(m_ui->name, &QLineEdit::textEdited, this, &ExportPackDialog::validate);
     connect(m_ui->version, &QLineEdit::textEdited, this, &ExportPackDialog::validate);
-    // the instance name can technically be empty
+
     validate();
 
     QFileSystemModel* model = new QFileSystemModel(this);
     model->setIconProvider(&m_icons);
 
-    // use the game root - everything outside cannot be exported
     const QDir instanceRoot(instance->instanceRoot());
     m_proxy = new FileIgnoreProxy(instance->instanceRoot(), this);
     auto prefix = QDir(instance->instanceRoot()).relativeFilePath(instance->gameRoot());

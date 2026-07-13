@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
 // SPDX-FileCopyrightText: 2023 TheKodeToad <TheKodeToad@proton.me>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "DataPackModel.h"
@@ -12,8 +12,6 @@ namespace ResourceDownload {
 DataPackResourceModel::DataPackResourceModel(BaseInstance const& base_inst, ResourceAPI* api, QString debugName, QString metaEntryBase)
     : ResourceModel(api), m_base_instance(base_inst), m_debugName(debugName + " (Model)"), m_metaEntryBase(metaEntryBase)
 {}
-
-/******** Make data requests ********/
 
 ResourceAPI::SearchArgs DataPackResourceModel::createSearchArguments()
 {
@@ -45,4 +43,4 @@ void DataPackResourceModel::searchWithTerm(const QString& term, unsigned int sor
     refresh();
 }
 
-}  // namespace ResourceDownload
+}

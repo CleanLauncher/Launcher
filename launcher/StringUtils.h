@@ -69,12 +69,6 @@ inline QString fromStdString(string s)
 
 int naturalCompare(const QString& s1, const QString& s2, Qt::CaseSensitivity cs);
 
-/**
- * @brief Truncate a url while keeping its readability py placing the `...` in the middle of the path
- * @param url Url to truncate
- * @param max_len max length of url in characters
- * @param hard_limit if truncating the path can't get the url short enough, truncate it normally.
- */
 QString truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_limit = false);
 
 QString humanReadableFileSize(double bytes, bool use_si = false, int decimal_points = 1);
@@ -87,4 +81,4 @@ QPair<QString, QString> splitFirst(const QString& s, const QRegularExpression& r
 
 QString htmlListPatch(QString htmlStr);
 
-}  // namespace StringUtils
+}

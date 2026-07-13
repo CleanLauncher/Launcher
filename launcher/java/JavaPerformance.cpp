@@ -24,8 +24,6 @@ QStringList JavaPerformance::getBaseOptimizationArgs(const JavaVersion& version,
 {
     QStringList args;
 
-    // Mojang default
-    // JEPs: https://openjdk.org/jeps/450, https://openjdk.org/jeps/519
     if (version.major() >= 24) {
         if (version.major() == 24) {
             args << "-XX:+UnlockExperimentalVMOptions";
@@ -33,27 +31,16 @@ QStringList JavaPerformance::getBaseOptimizationArgs(const JavaVersion& version,
         args << "-XX:+UseCompactObjectHeaders";
     }
 
-    // Mojang default
-    // Since Java 8 for G1GC
-    // Since Java 18 for ZGC
     if ((version.major() >= 8 && preset != GarbageCollectorPreset::ZGC) || version.major() >= 18) {
         args << "-XX:+UseStringDeduplication";
     }
 
-    // Enables parallel GC reference processing
-    // https://bugs.openjdk.org/browse/JDK-8359925
-    // Since Java 6
     if (version.major() <= 25) {
         args << "-XX:+ParallelRefProcEnabled";
     }
 
-    // Mojang default
-    // Since Java 6 (minimum supported by us is Java 7)
     args << "-XX:+AlwaysPreTouch";
 
-    // Prevents GC from doing writing performance data to filesystem
-    // https://www.evanjones.ca/jvm-mmap-pause.html
-    // Since Java 6
     args << "-XX:+PerfDisableSharedMem";
 
     return args;
@@ -65,19 +52,18 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
         case GarbageCollectorPreset::None:
             return {};
         case GarbageCollectorPreset::G1GC: {
-            // Mojang defaults
+
             QStringList args{ "-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC",
                               "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20",
                               "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M",
-                              // From Aikar's flags
+
                               "-XX:SurvivorRatio=32", "-XX:MaxTenuringThreshold=1" };
             return args;
         }
         case GarbageCollectorPreset::Shenandoah: {
             QStringList args{ "-XX:+UseShenandoahGC" };
             if (version.major() >= 24) {
-                // https://bugs.openjdk.org/browse/JDK-8337511
-                // https://openjdk.org/jeps/521
+
                 if (version.major() == 24) {
                     args << "-XX:+UnlockExperimentalVMOptions";
                 }
@@ -86,14 +72,13 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
             return args;
         }
         case GarbageCollectorPreset::ZGC: {
-            // Mojang defaults
+
             QStringList args{ "-XX:+UseZGC" };
-            // Support for generations was added in Java 21 and became default in Java 23
+
             if (version.major() >= 21 && version.major() < 23) {
                 args << "-XX:+ZGenerational";
             }
-            // https://docs.oracle.com/en/java/javase/21/gctuning/z-garbage-collector.html
-            // Prevent ZGC from returning memory to the OS, as this might have a negative impact on the latency of Java threads.
+
             args << "-XX:-ZUncommit";
             return args;
         }

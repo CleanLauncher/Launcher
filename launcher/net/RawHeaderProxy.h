@@ -43,4 +43,4 @@ class RawHeaderProxy : public HeaderProxy {
     QList<HeaderPair> m_headers;
 };
 
-}  // namespace Net
+}

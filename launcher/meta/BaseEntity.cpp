@@ -33,11 +33,11 @@
 namespace Meta {
 
 class ParsingValidator : public Net::Validator {
-   public: /* con/des */
+   public:
     ParsingValidator(BaseEntity* entity) : m_entity(entity) {};
     virtual ~ParsingValidator() = default;
 
-   public: /* methods */
+   public:
     bool init(QNetworkRequest&) override
     {
         m_data.clear();
@@ -67,7 +67,7 @@ class ParsingValidator : public Net::Validator {
         }
     }
 
-   private: /* data */
+   private:
     QByteArray m_data;
     BaseEntity* m_entity;
 };
@@ -93,7 +93,7 @@ Task::Ptr BaseEntity::loadTask(Net::Mode mode, bool forceReload)
 
 bool BaseEntity::isLoaded() const
 {
-    // consider it loaded only if the main hash is either empty and was remote loadded or the hashes match and was loaded
+
     return m_sha256.isEmpty() ? m_load_status == LoadStatus::Remote : m_load_status != LoadStatus::NotLoaded && m_sha256 == m_file_sha256;
 }
 
@@ -115,18 +115,17 @@ void BaseEntityLoadTask::executeTask()
 {
     const QString fname = QDir("meta").absoluteFilePath(m_entity->localFilename());
     auto hashMatches = false;
-    // the file exists on disk try to load it
+
     if (QFile::exists(fname)) {
         try {
             QByteArray fileData;
-            // read local file if nothing is loaded yet
+
             if (m_entity->m_load_status == BaseEntity::LoadStatus::NotLoaded || m_entity->m_file_sha256.isEmpty()) {
                 setStatus(tr("Loading local file"));
                 fileData = FS::read(fname);
                 m_entity->m_file_sha256 = Hashing::hash(fileData, Hashing::Algorithm::Sha256);
             }
 
-            // on online the hash needs to match
             const auto& expected = m_entity->m_sha256;
             const auto& actual = m_entity->m_file_sha256;
             hashMatches = expected == actual;
@@ -134,7 +133,6 @@ void BaseEntityLoadTask::executeTask()
                 throw Exception(QString("Checksum mismatch, expected sha256: %1, got: %2").arg(expected, actual));
             }
 
-            // load local file
             if (m_entity->m_load_status == BaseEntity::LoadStatus::NotLoaded) {
                 auto doc = Json::requireDocument(fileData, fname);
                 auto obj = Json::requireObject(doc, fname);
@@ -144,14 +142,14 @@ void BaseEntityLoadTask::executeTask()
 
         } catch (const Exception& e) {
             qDebug() << QString("Unable to parse file %1: %2").arg(fname, e.cause());
-            // just make sure it's gone and we never consider it again.
+
             FS::deletePath(fname);
             m_entity->m_load_status = BaseEntity::LoadStatus::NotLoaded;
         }
     }
-    // if we need remote update, run the update task
+
     auto wasLoadedOffline = m_entity->m_load_status != BaseEntity::LoadStatus::NotLoaded && m_mode == Net::Mode::Offline;
-    // if has is not present allways fetch from remote(e.g. the main index file), else only fetch if hash doesn't match
+
     auto wasLoadedRemote = m_entity->m_sha256.isEmpty() ? m_entity->m_load_status == BaseEntity::LoadStatus::Remote : hashMatches;
     if (wasLoadedOffline || (wasLoadedRemote && !m_force_reload)) {
         emitSucceeded();
@@ -161,16 +159,13 @@ void BaseEntityLoadTask::executeTask()
     auto url = m_entity->url();
     auto entry = APPLICATION->metacache()->resolveEntry("meta", m_entity->localFilename());
     if (m_force_reload) {
-        // clear validators so manual refreshes fetch a fresh body
+
         entry->setETag({});
         entry->setRemoteChangedTimestamp({});
     }
     entry->setStale(true);
     auto dl = Net::ApiDownload::makeCached(url, entry);
-    /*
-     * The validator parses the file and loads it into the object.
-     * If that fails, the file is not written to storage.
-     */
+
     if (!m_entity->m_sha256.isEmpty())
         dl->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha256, m_entity->m_sha256));
     dl->addValidator(new ParsingValidator(m_entity));
@@ -205,4 +200,4 @@ bool BaseEntityLoadTask::abort()
     return Task::abort();
 }
 
-}  // namespace Meta
+}

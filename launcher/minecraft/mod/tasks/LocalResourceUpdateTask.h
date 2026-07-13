@@ -34,7 +34,7 @@ class LocalResourceUpdateTask : public Task {
     auto abort() -> bool override;
 
    protected slots:
-    //! Entry point for tasks.
+
     void executeTask() override;
 
    signals:

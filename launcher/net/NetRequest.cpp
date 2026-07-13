@@ -108,11 +108,10 @@ void NetRequest::executeTask()
     auto user_agent = BuildConfig.USER_AGENT;
 #endif
 
-
     for (auto& header_proxy : m_headerProxies) {
         header_proxy->writeHeaders(request);
     }
-    // We don't want to share our user agent in case the official launcher key is used.
+
     if (!request.headers().contains("x-api-key")) {
         request.setHeader(QNetworkRequest::UserAgentHeader, user_agent.toUtf8());
     }
@@ -129,7 +128,8 @@ void NetRequest::executeTask()
     m_last_progress_bytes = 0;
 
     auto rep = getReply(request);
-    if (rep == nullptr)  // it failed
+    if (rep == nullptr)
+
         return;
     m_reply.reset(rep);
     connect(rep, &QNetworkReply::uploadProgress, this, &NetRequest::onProgress);
@@ -145,23 +145,21 @@ void NetRequest::onProgress(qint64 bytesReceived, qint64 bytesTotal)
     auto now = m_clock.now();
     auto elapsed = now - m_last_progress_time;
 
-    // use milliseconds for speed precision
     auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
     auto bytes_received_since = bytesReceived - m_last_progress_bytes;
     auto dl_speed_bps = (double)bytes_received_since / elapsed_ms.count() * 1000;
     auto remaining_time_s = (bytesTotal - bytesReceived) / dl_speed_bps;
 
-    //: Current amount of bytes downloaded, out of the total amount of bytes in the download
     QString dl_progress =
         tr("%1 / %2").arg(StringUtils::humanReadableFileSize(bytesReceived)).arg(StringUtils::humanReadableFileSize(bytesTotal));
 
     QString dl_speed_str;
     if (elapsed_ms.count() > 0) {
         auto str_eta = bytesTotal > 0 ? Time::humanReadableDuration(remaining_time_s) : tr("unknown");
-        //: Download speed, in bytes per second (remaining download time in parenthesis)
+
         dl_speed_str = tr("%1 /s (%2)").arg(StringUtils::humanReadableFileSize(dl_speed_bps)).arg(str_eta);
     } else {
-        //: Download speed at 0 bytes per second
+
         dl_speed_str = tr("0 B/s");
     }
 
@@ -175,12 +173,12 @@ void NetRequest::downloadError(QNetworkReply::NetworkError error)
     if (error == QNetworkReply::OperationCanceledError) {
         qCCritical(logCat) << getUid().toString() << "Aborted" << m_url.toString();
         m_state = State::Failed;
-    } else if (replyStatusCode() == 429 /* HTTP Too Many Requests*/ && m_options & Option::AutoRetry) {
+    } else if (replyStatusCode() == 429  && m_options & Option::AutoRetry) {
         qCDebug(logCat) << getUid().toString() << "Rate Limited!";
         int64_t delay = 10 * std::pow(2, m_retryCount);
         if (m_reply->hasRawHeader("Retry-After")) {
             auto retryAfter = m_reply->rawHeader("Retry-After");
-            if (retryAfter.trimmed().endsWith("GMT")) /* HTTP Date format */ {
+            if (retryAfter.trimmed().endsWith("GMT"))  {
                 auto afterTimestamp = QDateTime::fromString(QString::fromUtf8(retryAfter.trimmed()), "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
                 auto now = QDateTime::currentDateTime();
                 delay = now.secsTo(afterTimestamp);
@@ -196,7 +194,7 @@ void NetRequest::downloadError(QNetworkReply::NetworkError error)
                 return;
             }
         }
-        // error happened during download.
+
         qCCritical(logCat) << getUid().toString() << "Failed" << m_url.toString() << "with error" << error;
         if (m_reply)
             qCCritical(logCat) << getUid().toString() << "HTTP status:" << replyStatusCode() << errorString();
@@ -223,37 +221,27 @@ auto NetRequest::handleRedirect() -> bool
     QUrl redirect = m_reply->header(QNetworkRequest::LocationHeader).toUrl();
     if (!redirect.isValid()) {
         if (!m_reply->hasRawHeader("Location")) {
-            // no redirect -> it's fine to continue
+
             return false;
         }
-        // there is a Location header, but it's not correct. we need to apply some workarounds...
+
         QByteArray redirectBA = m_reply->rawHeader("Location");
         if (redirectBA.size() == 0) {
-            // empty, yet present redirect header? WTF?
+
             return false;
         }
         QString redirectStr = QString::fromUtf8(redirectBA);
 
         if (redirectStr.startsWith("//")) {
-            /*
-             * IF the URL begins with //, we need to insert the URL scheme.
-             * See: https://bugreports.qt.io/browse/QTBUG-41061
-             * See: http://tools.ietf.org/html/rfc3986#section-4.2
-             */
+
             redirectStr = m_reply->url().scheme() + ":" + redirectStr;
         } else if (redirectStr.startsWith("/")) {
-            /*
-             * IF the URL begins with /, we need to process it as a relative URL
-             */
+
             auto url = m_reply->url();
             url.setPath(redirectStr, QUrl::TolerantMode);
             redirectStr = url.toString();
         }
 
-        /*
-         * Next, make sure the URL is parsed in tolerant mode. Qt doesn't parse the location header in tolerant mode, which causes issues.
-         * FIXME: report Qt bug for this
-         */
         redirect = QUrl(redirectStr, QUrl::TolerantMode);
         if (!redirect.isValid()) {
             qCWarning(logCat) << getUid().toString() << "Failed to parse redirect URL:" << redirectStr;
@@ -276,7 +264,7 @@ void NetRequest::handleAutoRetry(int64_t delay)
 {
     m_retryCount++;
     if (delay > 60 || m_retryCount > 4) {
-        /* 1 minute is too long to wait for retry, fail for now */
+
         m_state = State::Failed;
         auto retryAfter = QDateTime::currentDateTime().addSecs(delay);
         emitFailed(tr("Request Rate Limited for %n second(s): Retry After %1", "seconds", delay)
@@ -294,19 +282,18 @@ void NetRequest::handleAutoRetry(int64_t delay)
 
 void NetRequest::downloadFinished()
 {
-    // currently waiting for retry
+
     if (m_retryTimer.isActive()) {
         return;
     }
 
-    // handle HTTP redirection first
     if (handleRedirect()) {
         qCDebug(logCat) << getUid().toString() << "Request redirected:" << m_url.toString();
         return;
     }
 
-    // if the download failed before this point ...
-    if (m_state == State::Succeeded)  // pretend to succeed so we continue processing :)
+    if (m_state == State::Succeeded)
+
     {
         qCDebug(logCat) << getUid().toString() << "Request failed but we are allowed to proceed:" << m_url.toString();
         m_sink->abort();
@@ -328,7 +315,6 @@ void NetRequest::downloadFinished()
         return;
     }
 
-    // make sure we got all the remaining data, if any
     auto data = m_reply->readAll();
     if (data.size()) {
         qCDebug(logCat) << getUid().toString() << "Writing extra" << data.size() << "bytes";
@@ -343,7 +329,6 @@ void NetRequest::downloadFinished()
         }
     }
 
-    // otherwise, finalize the whole graph
     m_state = m_sink->finalize(*m_reply.get());
     if (m_state != State::Succeeded) {
         qCDebug(logCat) << getUid().toString() << "Request failed to finalize:" << m_url.toString();
@@ -370,7 +355,7 @@ void NetRequest::downloadReadyRead()
         if (m_state == State::Failed) {
             qCCritical(logCat) << getUid().toString() << "Failed to process response chunk:" << m_sink->failReason();
         }
-        // qDebug() << "Request" << m_url.toString() << "gained" << data.size() << "bytes";
+
     } else {
         qCCritical(logCat) << getUid().toString() << "Cannot write download data! illegal status" << m_status;
     }
@@ -415,4 +400,4 @@ void NetRequest::enableAutoRetry(bool enable)
     }
 }
 
-}  // namespace Net
+}

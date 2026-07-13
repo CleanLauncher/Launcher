@@ -20,12 +20,6 @@
 
 #include "Setting.h"
 
-/*!
- * \brief A setting that 'overrides another.'
- * This means that the setting's default value will be the value of another setting.
- * The other setting can be (and usually is) a part of a different SettingsObject
- * than this one.
- */
 class OverrideSetting : public Setting {
     Q_OBJECT
    public:

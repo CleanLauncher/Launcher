@@ -84,10 +84,13 @@ class ModFilterWidget : public QTabWidget {
 
         bool checkModpackFilters(const ModPlatform::IndexedVersion& v)
         {
-            return ((!loaders || !v.loaders || loaders & v.loaders) &&  // loaders
-                    (releases.empty() ||                                // releases
+            return ((!loaders || !v.loaders || loaders & v.loaders) &&
+
+                    (releases.empty() ||
+
                      std::find(releases.cbegin(), releases.cend(), v.version_type) != releases.cend()) &&
-                    checkMcVersions({ v.mcVersion }));  // gameVersion}
+                    checkMcVersions({ v.mcVersion }));
+
         }
     };
 

@@ -62,9 +62,8 @@ class MinecraftInstance : public BaseInstance {
 
     void loadSpecificSettings() override;
 
-    // FIXME: remove
     QString typeName() const override;
-    // FIXME: remove
+
     QSet<QString> traits() const override;
 
     bool canEdit() const override { return true; }
@@ -73,7 +72,6 @@ class MinecraftInstance : public BaseInstance {
 
     void populateLaunchMenu(QMenu* menu) override;
 
-    ////// Directories and files //////
     QString jarModsDir() const;
     QString resourcePacksDir() const;
     QString texturePacksDir() const;
@@ -91,27 +89,20 @@ class MinecraftInstance : public BaseInstance {
     QDir versionsPath() const;
     QString instanceConfigFolder() const override;
 
-    // Path to the instance's minecraft directory.
     QString gameRoot() const override;
 
-    // Path to the instance's minecraft bin directory.
     QString binRoot() const;
 
-    // where to put the natives during/before launch
     QString getNativePath() const;
 
-    // where the instance-local libraries should be
     QString getLocalLibraryPath() const;
 
-    /** Returns whether the instance, with its version, has support for demo mode. */
     bool supportsDemo() const;
 
     void updateRuntimeContext() override;
 
-    //////  Profile management //////
     PackProfile* getPackProfile() const;
 
-    //////  Mod Lists  //////
     ModFolderModel* loaderModList();
     ModFolderModel* coreModList();
     ModFolderModel* nilModList();
@@ -122,22 +113,19 @@ class MinecraftInstance : public BaseInstance {
     QList<ResourceFolderModel*> resourceLists();
     WorldList* worldList();
 
-    //////  Launch stuff //////
     QList<Task::Ptr> createUpdateTask() override;
     LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) override;
     QStringList extraArguments() override;
     QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
     QList<Mod*> getJarMods() const;
     QString createLaunchScript(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin);
-    /// get arguments passed to java
+
     QStringList javaArguments();
     QString getLauncher();
     bool shouldApplyOnlineFixes();
 
-    /// get variables for launch command variable substitution/environment
     QMap<QString, QString> getVariables() override;
 
-    /// create an environment for launching processes
     QProcessEnvironment createEnvironment() override;
     QProcessEnvironment createLaunchEnvironment() override;
 
@@ -145,14 +133,12 @@ class MinecraftInstance : public BaseInstance {
 
     QString getStatusbarDescription() override;
 
-    // FIXME: remove
     virtual QStringList getClassPath();
-    // FIXME: remove
+
     virtual QStringList getNativeJars();
-    // FIXME: remove
+
     virtual QString getMainClass() const;
 
-    // FIXME: remove
     virtual QStringList processMinecraftArgs(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) const;
 
     virtual JavaVersion getJavaVersion();
@@ -161,7 +147,8 @@ class MinecraftInstance : public BaseInstance {
     QMap<QString, QString> createCensorFilterFromSession(AuthSessionPtr session);
     QMap<QString, QString> makeProfileVarMapping(std::shared_ptr<LaunchProfile> profile) const;
 
-   protected:  // data
+   protected:
+
     std::unique_ptr<PackProfile> m_components;
     std::unique_ptr<ModFolderModel> m_loader_mod_list;
     std::unique_ptr<ModFolderModel> m_core_mod_list;

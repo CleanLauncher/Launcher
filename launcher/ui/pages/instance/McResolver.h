@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QString>
 
-// resolve the IP and port of a Minecraft server
 class McResolver : public QObject {
     Q_OBJECT
 

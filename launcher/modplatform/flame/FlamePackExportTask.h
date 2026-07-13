@@ -48,8 +48,6 @@ class FlamePackExportTask : public Task {
     static const QString TEMPLATE;
     static const QStringList FILE_EXTENSIONS;
 
-    // inputs
-
     struct ResolvedFile {
         int addonId;
         int version;

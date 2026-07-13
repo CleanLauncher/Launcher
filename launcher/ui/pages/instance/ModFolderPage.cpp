@@ -163,7 +163,8 @@ void ModFolderPage::removeItems(const QItemSelection& selection)
 void ModFolderPage::downloadMods()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -223,7 +224,8 @@ void ModFolderPage::downloadDialogFinished(int result)
 void ModFolderPage::updateMods(bool includeDeps)
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -333,7 +335,8 @@ void ModFolderPage::deleteModMetadata()
 void ModFolderPage::changeModVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -423,7 +426,6 @@ bool NilModFolderPage::shouldDisplay() const
     return m_model->dir().exists();
 }
 
-// Helper function so this doesn't need to be duplicated 3 times
 inline bool ModFolderPage::handleNoModLoader()
 {
     int resp = QMessageBox::question(
@@ -431,17 +433,14 @@ inline bool ModFolderPage::handleNoModLoader()
         ModFolderPage::tr("You need to install a compatible mod loader before installing mods. Would you like to do so?"),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     if (resp == QMessageBox::Yes) {
-        // Should be safe
+
         auto* profile = static_cast<MinecraftInstance*>(this->m_instance)->getPackProfile();
         InstallLoaderDialog dialog(profile, QString(), this);
         bool ret = dialog.exec() != 0;
         this->m_container->refreshContainer();
 
-        // returning negation of dialog.exec which'll be true if the install loader dialog got canceled/closed
-        // and false if the user went through and installed a loader
         return !ret;
     }
-    // Nothing happens the dialog is already closing
-    // returning true so the caller doesn't go and continue with opening it's dialog without a mod loader
+
     return true;
 }

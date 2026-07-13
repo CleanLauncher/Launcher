@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -32,16 +32,15 @@ class ShaderPackResourcePage : public ResourcePage {
         return page;
     }
 
-    //: The plural version of 'shader pack'
     QString resourcesString() const override { return tr("shader packs"); }
-    //: The singular version of 'shader packs'
+
     QString resourceString() const override { return tr("shader pack"); }
 
     bool supportsFiltering() const override { return false; };
 
-    void addResourceToPage(ModPlatform::IndexedPack::Ptr /*unused*/,
-                           ModPlatform::IndexedVersion& /*unused*/,
-                           ResourceFolderModel* /*unused*/,
+    void addResourceToPage(ModPlatform::IndexedPack::Ptr ,
+                           ModPlatform::IndexedVersion& ,
+                           ResourceFolderModel* ,
                            QString downloadReason = "standalone") override;
 
     QMap<QString, QString> urlHandlers() const override;
@@ -55,4 +54,4 @@ class ShaderPackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}  // namespace ResourceDownload
+}

@@ -120,7 +120,7 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
             return pack.name;
         case Qt::SizeHintRole:
             return QSize(0, 58);
-        // Custom data
+
         case UserDataTypes::TITLE:
             return pack.name;
         case UserDataTypes::DESCRIPTION:
@@ -159,7 +159,6 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
         return StringUtils::naturalCompare(leftPack.name, rightPack.name, Qt::CaseSensitive) >= 0;
     }
 
-    // UHM, some inavlid value set?!
     qWarning() << "Invalid sorting set!";
     return true;
 }
@@ -215,4 +214,4 @@ QString ListModel::getUserPath()
         path = m_instances_path;
     return path;
 }
-}  // namespace FTBImportAPP
+}

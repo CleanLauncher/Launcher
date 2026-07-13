@@ -68,4 +68,4 @@ bool isIconSuffix(QString suffix)
     return validIconExtensions.contains(suffix);
 }
 
-}  // namespace IconUtils
+}

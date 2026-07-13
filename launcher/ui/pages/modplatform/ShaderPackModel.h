@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -22,7 +22,6 @@ class ShaderPackResourceModel : public ResourceModel {
    public:
     ShaderPackResourceModel(const BaseInstance&, ResourceAPI*, const QString& debugName, QString metaEntryBase);
 
-    /* Ask the API for more information */
     void searchWithTerm(const QString& term, unsigned int sort);
 
     [[nodiscard]] QString debugName() const override { return m_debugName; }
@@ -41,4 +40,4 @@ class ShaderPackResourceModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}  // namespace ResourceDownload
+}

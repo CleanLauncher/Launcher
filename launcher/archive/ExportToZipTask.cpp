@@ -91,10 +91,9 @@ bool ExportToZipTask::abort()
 {
     if (m_buildZipFuture.isRunning()) {
         m_buildZipFuture.cancel();
-        // NOTE: Here we don't do `emitAborted()` because it will be done when `m_build_zip_future` actually cancels, which may not occur
-        // immediately.
+
         return true;
     }
     return false;
 }
-}  // namespace MMCZip
+}

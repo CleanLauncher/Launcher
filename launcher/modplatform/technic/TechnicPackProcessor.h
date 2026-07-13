@@ -19,7 +19,7 @@
 #include "settings/SettingsObject.h"
 
 namespace Technic {
-// not exporting it, only used in SingleZipPackInstallTask, InstanceImportTask and SolderPackInstallTask
+
 class TechnicPackProcessor : public QObject {
     Q_OBJECT
 
@@ -35,4 +35,4 @@ class TechnicPackProcessor : public QObject {
              const QString& minecraftVersion = QString(),
              bool isSolder = false);
 };
-}  // namespace Technic
+}

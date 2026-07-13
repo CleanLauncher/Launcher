@@ -169,7 +169,7 @@ void TechnicPage::suggestCurrent()
         QString("%1modpack/%2?build=%3").arg(BuildConfig.TECHNIC_API_BASE_URL, slug, BuildConfig.TECHNIC_API_BUILD));
     netJob->addNetAction(action);
     connect(netJob.get(), &NetJob::succeeded, this, [this, responsePtr, slug] {
-        // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
+
         QByteArray response = std::move(*responsePtr);
         jobPtr.reset();
 
@@ -224,7 +224,6 @@ void TechnicPage::suggestCurrent()
     jobPtr->start();
 }
 
-// expects current.metadataLoaded to be true
 void TechnicPage::metadataLoaded()
 {
     QString text = "";
@@ -243,25 +242,22 @@ void TechnicPage::metadataLoaded()
 
     ui->packDescription->setHtml(StringUtils::htmlListPatch(text + current.description));
 
-    // Strip trailing forward-slashes from Solder URL's
     if (current.isSolder) {
         while (current.url.endsWith('/'))
             current.url.chop(1);
     }
 
-    // Display versions from Solder
     if (!current.isSolder) {
-        // If the pack isn't a Solder pack, it only has the single version
+
         ui->versionSelectionBox->addItem(current.currentVersion);
     } else if (current.versionsLoaded) {
-        // reverse foreach, so that the newest versions are first
+
         for (auto i = current.versions.size(); i--;) {
             ui->versionSelectionBox->addItem(current.versions.at(i));
         }
         ui->versionSelectionBox->setCurrentText(current.recommended);
     } else {
-        // For now, until the versions are pulled from the Solder instance, display the current
-        // version so we can display something quicker
+
         ui->versionSelectionBox->addItem(current.currentVersion);
 
         auto netJob = makeShared<NetJob>(QString("Technic::SolderMeta(%1)").arg(current.name), APPLICATION->network());
@@ -302,7 +298,7 @@ void TechnicPage::selectVersion()
 
 void TechnicPage::onSolderLoaded(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
+
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 
@@ -338,7 +334,6 @@ void TechnicPage::onSolderLoaded(QByteArray* responsePtr)
     current.recommended = pack.recommended;
     current.versions.append(pack.builds);
 
-    // Finally, let's reload :)
     ui->versionSelectionBox->clear();
     metadataLoaded();
 }

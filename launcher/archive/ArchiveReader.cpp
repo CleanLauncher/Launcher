@@ -265,7 +265,7 @@ bool ArchiveReader::exists(const QString& filePath) const
     if (filePath == QLatin1String("/") || filePath.isEmpty()) {
         return true;
     }
-    // Normalize input path (remove trailing slash, if any)
+
     QString normalizedPath = QDir::cleanPath(filePath);
     if (normalizedPath.startsWith('/')) {
         normalizedPath.remove(0, 1);
@@ -274,15 +274,14 @@ bool ArchiveReader::exists(const QString& filePath) const
         return true;
     }
     if (normalizedPath == QLatin1String("..")) {
-        return false;  // root only
+        return false;
+
     }
 
-    // Check for exact file match
     if (m_fileNames.contains(normalizedPath, Qt::CaseInsensitive)) {
         return true;
     }
 
-    // Check for directory existence by seeing if any file starts with that path
     QString dirPath = normalizedPath + QLatin1Char('/');
     for (const QString& f : m_fileNames) {
         if (f.startsWith(dirPath, Qt::CaseInsensitive)) {
@@ -294,4 +293,4 @@ bool ArchiveReader::exists(const QString& filePath) const
 }
 
 ArchiveReader::File::File() : m_archive(ArchivePtr(archive_read_new(), archive_read_free)) {}
-}  // namespace MMCZip
+}

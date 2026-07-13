@@ -200,7 +200,7 @@ void JavaListLoadTask::javaCheckerFinished()
 
     QList<BaseVersion::Ptr> javas_bvp;
     for (auto java : candidates) {
-        // qDebug() << java->id << java->arch << " at " << java->path;
+
         BaseVersion::Ptr bp_java = std::dynamic_pointer_cast<BaseVersion>(java);
 
         if (bp_java) {

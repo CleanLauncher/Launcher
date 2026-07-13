@@ -220,4 +220,4 @@ QString exportToModList(QList<Mod*> mods, QString lineTemplate)
     }
     return lines.join("\n");
 }
-}  // namespace ExportToModList
+}

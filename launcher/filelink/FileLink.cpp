@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2022 Rachel Powers <508861+Ryex@users.noreply.github.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 /*
@@ -44,7 +44,6 @@ FileLinkApp::FileLinkApp(int& argc, char** argv) : QCoreApplication(argc, argv),
     setApplicationName(BuildConfig.LAUNCHER_NAME + "FileLink");
     setApplicationVersion(BuildConfig.printableVersionString() + "\n" + BuildConfig.GIT_COMMIT);
 
-    // Commandline parsing
     QCommandLineParser parser;
     parser.setApplicationDescription(QObject::tr("a batch MKLINK program for windows to be used with launcher"));
 
@@ -156,7 +155,7 @@ void FileLinkApp::runLink()
 
 void FileLinkApp::sendResults()
 {
-    // construct block of data to send
+
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -189,8 +188,7 @@ void FileLinkApp::readPathPairs()
     qDebug() << "Reading path pairs from server";
     qDebug() << "bytes available" << socket.bytesAvailable();
     if (blockSize == 0) {
-        // Relies on the fact that QDataStream serializes a quint32 into
-        // sizeof(quint32) bytes
+
         if (socket.bytesAvailable() < (int)sizeof(quint32))
             return;
         qDebug() << "reading block size";
@@ -219,6 +217,6 @@ void FileLinkApp::readPathPairs()
 FileLinkApp::~FileLinkApp()
 {
     qDebug() << "link program shutting down";
-    // Shut down logger by setting the logger function to nothing
+
     qInstallMessageHandler(nullptr);
 }

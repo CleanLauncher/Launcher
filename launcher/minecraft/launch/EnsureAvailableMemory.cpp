@@ -70,7 +70,7 @@ void EnsureAvailableMemory::executeTask()
 #else
     const uint64_t available = HardwareInfo::availableRamMiB();
     if (available == 0) {
-        // could not read
+
         emitSucceeded();
         return;
     }

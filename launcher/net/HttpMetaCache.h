@@ -64,7 +64,6 @@ class MetaEntry {
     auto getMD5Sum() -> QString { return m_md5sum; }
     void setMD5Sum(QString md5sum) { m_md5sum = md5sum; }
 
-    /* Whether the entry expires after some time (false) or not (true). */
     void makeEternal(bool eternal) { m_is_eternal = eternal; }
     bool isEternal() const { return m_is_eternal; }
 
@@ -84,7 +83,8 @@ class MetaEntry {
     QString m_etag;
 
     qint64 m_local_changed_timestamp = 0;
-    QString m_remote_changed_timestamp;  // QString for now, RFC 2822 encoded time
+    QString m_remote_changed_timestamp;
+
     qint64 m_current_age = 0;
     qint64 m_max_age = 0;
     bool m_is_eternal = false;
@@ -97,30 +97,23 @@ using MetaEntryPtr = std::shared_ptr<MetaEntry>;
 class HttpMetaCache : public QObject {
     Q_OBJECT
    public:
-    // supply path to the cache index file
+
     HttpMetaCache(QString path = QString());
     ~HttpMetaCache() override;
 
-    // get the entry solely from the cache
-    // you probably don't want this, unless you have some specific caching needs.
     auto getEntry(QString base, QString resource_path) -> MetaEntryPtr;
 
-    // get the entry from cache and verify that it isn't stale (within reason)
     auto resolveEntry(QString base, QString resource_path, QString expected_etag = QString()) -> MetaEntryPtr;
 
-    // add a previously resolved stale entry
     auto updateEntry(MetaEntryPtr stale_entry) -> bool;
 
-    // evict selected entry from cache
     auto evictEntry(MetaEntryPtr entry) -> bool;
     bool evictAll();
 
-    // evict meta only
     bool softEvict();
 
     void addBase(QString base, QString base_root);
 
-    // (re)start a timer that calls SaveNow later.
     void SaveEventually();
     void Load();
 
@@ -130,7 +123,7 @@ class HttpMetaCache : public QObject {
     void SaveNow();
 
    private:
-    // create a new stale entry, given the parameters
+
     auto staleEntry(QString base, QString resource_path) -> MetaEntryPtr;
 
     struct EntryMap {

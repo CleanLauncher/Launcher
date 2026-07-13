@@ -101,7 +101,7 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         if (root.contains("order")) {
             out->order = requireInteger(root.value("order"));
         } else {
-            // FIXME: evaluate if we don't want to throw exceptions here instead
+
             qCritical() << filename << "doesn't contain an order field";
         }
     }
@@ -126,7 +126,6 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
 
     MojangVersionFormat::readVersionProperties(root, out.get());
 
-    // added for legacy Minecraft window embedding, TODO: remove
     readString(root, "appletClass", out->appletClass);
 
     if (root.contains("+tweakers")) {
@@ -150,18 +149,19 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
     if (root.contains("jarMods")) {
         for (auto libVal : requireArray(root.value("jarMods"))) {
             QJsonObject libObj = requireObject(libVal);
-            // parse the jarmod
+
             auto lib = OneSixVersionFormat::jarModFromJson(*out, libObj, filename);
-            // and add to jar mods
+
             out->jarMods.append(lib);
         }
-    } else if (root.contains("+jarMods"))  // DEPRECATED: old style '+jarMods' are only here for backwards compatibility
+    } else if (root.contains("+jarMods"))
+
     {
         for (auto libVal : requireArray(root.value("+jarMods"))) {
             QJsonObject libObj = requireObject(libVal);
-            // parse the jarmod
+
             auto lib = OneSixVersionFormat::plusJarModFromJson(*out, libObj, filename, out->name);
-            // and add to jar mods
+
             out->jarMods.append(lib);
         }
     }
@@ -169,9 +169,9 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
     if (root.contains("mods")) {
         for (auto libVal : requireArray(root.value("mods"))) {
             QJsonObject libObj = requireObject(libVal);
-            // parse the jarmod
+
             auto lib = OneSixVersionFormat::modFromJson(*out, libObj, filename);
-            // and add to jar mods
+
             out->mods.append(lib);
         }
     }
@@ -179,7 +179,7 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
     auto readLibs = [&root, &out, &filename](const char* which, QList<LibraryPtr>& outList) {
         for (auto libVal : requireArray(root.value(which))) {
             QJsonObject libObj = requireObject(libVal);
-            // parse the library
+
             auto lib = libraryFromJson(*out, libObj, filename);
             outList.append(lib);
         }
@@ -213,22 +213,21 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         }
     }
 
-    // if we have mainJar, just use it
     if (root.contains("mainJar")) {
         QJsonObject libObj = requireObject(root, "mainJar");
         out->mainJar = libraryFromJson(*out, libObj, filename);
     }
-    // else reconstruct it from downloads and id ... if that's available
+
     else if (!out->minecraftVersion.isEmpty()) {
         auto lib = std::make_shared<Library>();
         lib->setRawName(GradleSpecifier(QString("com.mojang:minecraft:%1:client").arg(out->minecraftVersion)));
-        // we have a reliable client download, use it.
+
         if (out->mojangDownloads.contains("client")) {
             auto LibDLInfo = std::make_shared<MojangLibraryDownloadInfo>();
             LibDLInfo->artifact = out->mojangDownloads["client"];
             lib->setMojangDownloadInfo(LibDLInfo);
         }
-        // we got nothing...
+
         else {
             out->addProblem(
                 ProblemSeverity::Error,
@@ -263,7 +262,6 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         }
     }
 
-    /* removed features that shouldn't be used */
     if (root.contains("tweakers")) {
         out->addProblem(ProblemSeverity::Error, QObject::tr("Version file contains unsupported element 'tweakers'"));
     }
@@ -350,7 +348,7 @@ QJsonDocument OneSixVersionFormat::versionFileToJson(const VersionFilePtr& patch
     if (patch->m_volatile) {
         root.insert("volatile", true);
     }
-    // write the contents to a json document.
+
     {
         QJsonDocument out;
         out.setObject(root);
@@ -368,18 +366,13 @@ LibraryPtr OneSixVersionFormat::plusJarModFromJson([[maybe_unused]] ProblemConta
         throw JSONValidationError(filename + "contains a jarmod that doesn't have a 'name' field");
     }
 
-    // just make up something unique on the spot for the library name.
     QString id = QUuid::createUuid().toString(QUuid::WithoutBraces);
     out->setRawName(GradleSpecifier("org.multimc.jarmods:" + id + ":1"));
 
-    // filename override is the old name
     out->setFilename(libObj.value("name").toString());
 
-    // it needs to be local, it is stored in the instance jarmods folder
     out->setHint("local");
 
-    // read the original name if present - some versions did not set it
-    // it is the original jar mod filename before it got renamed at the point of addition
     auto displayName = libObj.value("originalName").toString();
     if (displayName.isEmpty()) {
         auto fixed = originalName;

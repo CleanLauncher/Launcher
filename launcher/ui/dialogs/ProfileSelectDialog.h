@@ -31,43 +31,18 @@ class ProfileSelectDialog : public QDialog {
     enum Flags {
         NoFlags = 0,
 
-        /*!
-         * Shows a check box on the dialog that allows the user to specify that the account
-         * they've selected should be used as the global default for all instances.
-         */
         GlobalDefaultCheckbox,
 
-        /*!
-         * Shows a check box on the dialog that allows the user to specify that the account
-         * they've selected should be used as the default for the instance they are currently launching.
-         * This is not currently implemented.
-         */
         InstanceDefaultCheckbox,
     };
 
-    /*!
-     * Constructs a new account select dialog with the given parent and message.
-     * The message will be shown at the top of the dialog. It is an empty string by default.
-     */
     explicit ProfileSelectDialog(const QString& message = "", int flags = 0, QWidget* parent = 0);
     ~ProfileSelectDialog();
 
-    /*!
-     * Gets a pointer to the account that the user selected.
-     * This is null if the user clicked cancel or hasn't clicked OK yet.
-     */
     MinecraftAccountPtr selectedAccount() const;
 
-    /*!
-     * Returns true if the user checked the "use as global default" checkbox.
-     * If the checkbox wasn't shown, this function returns false.
-     */
     bool useAsGlobalDefault() const;
 
-    /*!
-     * Returns true if the user checked the "use as instance default" checkbox.
-     * If the checkbox wasn't shown, this function returns false.
-     */
     bool useAsInstDefaullt() const;
 
    public slots:
@@ -78,7 +53,6 @@ class ProfileSelectDialog : public QDialog {
    protected:
     AccountList* m_accounts;
 
-    //! The account that was selected when the user clicked OK.
     MinecraftAccountPtr m_selected;
 
    private:

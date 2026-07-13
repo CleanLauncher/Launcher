@@ -48,9 +48,8 @@ class ImportFTBPage : public QWidget, public ModpackProviderBasePage {
     void openedImpl() override;
     void retranslate() override;
 
-    /** Programatically set the term in the search bar. */
     virtual void setSearchTerm(QString) override;
-    /** Get the current term in the search bar. */
+
     virtual QString getSerachTerm() const override;
 
    private:
@@ -71,4 +70,4 @@ class ImportFTBPage : public QWidget, public ModpackProviderBasePage {
     Ui::ImportFTBPage* ui = nullptr;
 };
 
-}  // namespace FTBImportAPP
+}

@@ -16,20 +16,21 @@ class LaunchProfile;
 namespace Meta {
 class Version;
 class VersionList;
-}  // namespace Meta
+}
+
 class VersionFile;
 
 struct UpdateActionChangeVersion {
-    /// version to change to
+
     QString targetVersion;
 };
 struct UpdateActionLatestRecommendedCompatible {
-    /// Parent uid
+
     QString parentUid;
     QString parentName;
-    /// Parent version
+
     QString version;
-    ///
+
 };
 struct UpdateActionRemove {};
 struct UpdateActionImportantChanged {
@@ -54,7 +55,6 @@ class Component : public QObject, public ProblemProvider {
    public:
     Component(PackProfile* parent, const QString& uid);
 
-    // DEPRECATED: remove these constructors?
     Component(PackProfile* parent, const QString& uid, std::shared_ptr<VersionFile> file);
 
     virtual ~Component() {}
@@ -76,7 +76,6 @@ class Component : public QObject, public ProblemProvider {
     bool isKnownModloader();
     QStringList knownConflictingComponents();
 
-    // DEPRECATED: explicit numeric order values, used for loading old non-component config. TODO: refactor and move to migration code
     void setOrder(int order);
     int getOrder();
 
@@ -113,37 +112,31 @@ class Component : public QObject, public ProblemProvider {
    signals:
     void dataChanged();
 
-   public: /* data */
+   public:
     PackProfile* m_parent;
 
-    // BEGIN: persistent component list properties
-    /// ID of the component
     QString m_uid;
-    /// version of the component - when there's a custom json override, this is also the version the component reverts to
+
     QString m_version;
-    /// if true, this has been added automatically to satisfy dependencies and may be automatically removed
+
     bool m_dependencyOnly = false;
-    /// if true, the component is either the main component of the instance, or otherwise important and cannot be removed.
+
     bool m_important = false;
-    /// if true, the component is disabled
+
     bool m_disabled = false;
 
-    /// cached name for display purposes, taken from the version file (meta or local override)
     QString m_cachedName;
-    /// cached version for display AND other purposes, taken from the version file (meta or local override)
+
     QString m_cachedVersion;
-    /// cached set of requirements, taken from the version file (meta or local override)
+
     Meta::RequireSet m_cachedRequires;
     Meta::RequireSet m_cachedConflicts;
-    /// if true, the component is volatile and may be automatically removed when no longer needed
-    bool m_cachedVolatile = false;
-    // END: persistent component list properties
 
-    // DEPRECATED: explicit numeric order values, used for loading old non-component config. TODO: refactor and move to migration code
+    bool m_cachedVolatile = false;
+
     bool m_orderOverride = false;
     int m_order = 0;
 
-    // load state
     std::shared_ptr<Meta::Version> m_metaVersion;
     std::shared_ptr<VersionFile> m_file;
     bool m_loaded = false;

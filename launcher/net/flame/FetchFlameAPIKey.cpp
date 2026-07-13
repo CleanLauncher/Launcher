@@ -21,21 +21,8 @@
 
 #include "Application.h"
 
-// Here, we fetch the official CurseForge API key from the files of the
-// CurseForge app. We range-request the specific ~84KiB zlib block inside the
-// AppImage's SquashFS that contains the API key and extract only that.
-
-// Note: We need a direct link to the AppImage for this to work. The download
-// link for the Linux app on CurseForge's website is to a zipped AppImage,
-// which will not work here since (I think?) ZIP files typically have one
-// non-chunked DEFLATE stream for each file, and there's no way to fetch a
-// single, independent chunk to extract.
-
-// See also https://git.sakamoto.pl/domi/curseme/src/commit/388ac991eb57dedd5d1aca45f418deb221d757d1/getToken.sh
-
 const QUrl CURSEFORGE_APP_URL{ "https://curseforge.overwolf.com/electron/linux/CurseForge-0.198.1-21.AppImage" };
 
-// Use https://github.com/unmojang/appimage-token-finder to find these offsets
 constexpr uint32_t IN_ADDR{ 82926761 };
 constexpr uint32_t IN_SIZE{ 84196 };
 constexpr uint32_t OUT_SIZE{ 131072 };
@@ -43,7 +30,7 @@ constexpr uint32_t OUT_SIZE{ 131072 };
 void FetchFlameAPIKey::executeTask()
 {
     QNetworkRequest req{ CURSEFORGE_APP_URL };
-    // Request only a single zlib block from inside the AppImage file
+
     const auto& rangeHeader = QString("bytes=%1-%2").arg(IN_ADDR).arg(IN_ADDR + IN_SIZE);
     req.setRawHeader("Range", rangeHeader.toUtf8());
 
@@ -71,7 +58,6 @@ void FetchFlameAPIKey::downloadFinished()
 {
     auto res = m_reply->readAll();
 
-    // Prepend expected size header. See https://doc.qt.io/qt-6/qbytearray.html#qUncompress-1
     QByteArray expectedSizeHeader;
     QDataStream expectedSizeHeaderStream{ &expectedSizeHeader, QIODevice::WriteOnly };
     expectedSizeHeaderStream.setByteOrder(QDataStream::BigEndian);

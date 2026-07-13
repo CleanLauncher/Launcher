@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -88,7 +88,8 @@ void TexturePackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] c
 void TexturePackPage::downloadTexturePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     m_downloadDialog = new ResourceDownload::TexturePackDownloadDialog(this, m_model, m_instance);
@@ -140,7 +141,8 @@ void TexturePackPage::downloadDialogFinished(int result)
 void TexturePackPage::updateTexturePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -244,7 +246,8 @@ void TexturePackPage::deleteTexturePackMetadata()
 void TexturePackPage::changeTexturePackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
-        return;  // this is a null instance or a legacy instance
+        return;
+
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

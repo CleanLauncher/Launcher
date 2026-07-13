@@ -31,7 +31,6 @@ bool shouldDownloadOnSide(const QString& side)
     return side == "required" || side == "optional";
 }
 
-// https://docs.modrinth.com/api/operations/getproject/
 void Modrinth::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
 {
     pack.addonId = obj["project_id"].toString();
@@ -72,7 +71,6 @@ void Modrinth::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
         pack.side = ModPlatform::Side::ClientSide;
     }
 
-    // Modrinth can have more data than what's provided by the basic search :)
     pack.extraDataLoaded = false;
 }
 
@@ -130,7 +128,8 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
     }
     for (auto mcVer : versionArray) {
         file.mcVersion.append({ ModrinthAPI::mapMCVersionFromModrinth(mcVer.toString()),
-                                mcVer.toString() });  // double this so we can check both strings when filtering
+                                mcVer.toString() });
+
     }
     auto loaders = Json::requireArray(obj, "loaders");
     for (auto loader : loaders) {
@@ -183,15 +182,11 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
     int i = 0;
 
     if (files.empty()) {
-        // This should not happen normally, but check just in case
+
         qWarning() << "Modrinth returned an unexpected empty list of files:" << obj;
         return {};
     }
 
-    // Find correct file (needed in cases where one version may have multiple files)
-    // Will default to the last one if there's no primary (though I think Modrinth requires that
-    // at least one file is primary, idk)
-    // NOTE: files.count() is 1-indexed, so we need to subtract 1 to become 0-indexed
     while (i < files.count() - 1) {
         auto parent = files[i].toObject();
         auto fileName = Json::requireString(parent, "filename");
@@ -201,7 +196,6 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
             break;
         }
 
-        // Grab the primary file, if available
         if (Json::requireBoolean(parent, "primary")) {
             break;
         }

@@ -113,7 +113,7 @@ void ListModel::abortRequest()
 
 void ListModel::requestFinished(QByteArray* responsePtr)
 {
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by m_jobPtr.reset()
+
     QByteArray response = std::move(*responsePtr);
     m_jobPtr.reset();
     m_remainingPacks.clear();
@@ -162,7 +162,6 @@ void ListModel::packRequestFinished(QByteArray* responsePtr)
     if (!m_jobPtr || m_aborted)
         return;
 
-    // NOTE(TheKodeToad): moving the response out to avoid it from being destroyed by jobPtr.reset()
     QByteArray response = std::move(*responsePtr);
 
     m_jobPtr.reset();
@@ -188,8 +187,6 @@ void ListModel::packRequestFinished(QByteArray* responsePtr)
         return;
     }
 
-    // Since there is no guarantee that packs have a version, this will just
-    // ignore those "dud" packs.
     if (pack.versions.empty()) {
         qWarning() << "FTB Pack " << pack.id << " ignored. reason: lacking any versions";
     } else {
@@ -251,4 +248,4 @@ void ListModel::requestLogo(QString logo, QString url)
     job->start();
 }
 
-}  // namespace Ftb
+}

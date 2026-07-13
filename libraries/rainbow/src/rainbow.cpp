@@ -25,11 +25,9 @@
 
 #include <QColor>
 #include <QImage>
-#include <QtNumeric>  // qIsNaN
+#include <QtNumeric>
 
 #include <math.h>
-
-// BEGIN internal helper functions
 
 static inline qreal wrap(qreal a, qreal d = 1.0)
 {
@@ -37,22 +35,19 @@ static inline qreal wrap(qreal a, qreal d = 1.0)
     return (r < 0.0 ? d + r : (r > 0.0 ? r : 0.0));
 }
 
-// normalize: like qBound(a, 0.0, 1.0) but without needing the args and with
-// "safer" behavior on NaN (isnan(a) -> return 0.0)
 static inline qreal normalize(qreal a)
 {
     return (a < 1.0 ? (a > 0.0 ? a : 0.0) : 1.0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// HCY color space
+#define HCY_REC 709
 
-#define HCY_REC 709  // use 709 for now
 #if HCY_REC == 601
 static const qreal yc[3] = { 0.299, 0.587, 0.114 };
 #elif HCY_REC == 709
 static const qreal yc[3] = { 0.2126, 0.7152, 0.0722 };
-#else  // use Qt values
+#else
+
 static const qreal yc[3] = { 0.34375, 0.5, 0.15625 };
 #endif
 
@@ -65,10 +60,8 @@ class KHCY {
         qreal b = gamma(color.blueF());
         a = color.alphaF();
 
-        // luma component
         y = lumag(r, g, b);
 
-        // hue component
         qreal p = qMax(qMax(r, g), b);
         qreal n = qMin(qMin(r, g), b);
         qreal d = 6.0 * (p - n);
@@ -82,7 +75,6 @@ class KHCY {
             h = ((r - g) / d) + (2.0 / 3.0);
         }
 
-        // chroma component
         if (r == g && g == b) {
             c = 0.0;
         } else {
@@ -99,12 +91,11 @@ class KHCY {
 
     QColor qColor() const
     {
-        // start with sane component values
+
         qreal _h = wrap(h);
         qreal _c = normalize(c);
         qreal _y = normalize(y);
 
-        // calculate some needed variables
         qreal _hs = _h * 6.0, th, tm;
         if (_hs < 1.0) {
             th = _hs;
@@ -126,7 +117,6 @@ class KHCY {
             tm = yc[0] + yc[2] * th;
         }
 
-        // calculate RGB channels in sorted order
         qreal tn, to, tp;
         if (tm >= _y) {
             tp = _y + _y * _c * (1.0 - tm) / tm;
@@ -138,7 +128,6 @@ class KHCY {
             tn = _y - (1.0 - _y) * _c * tm / (1.0 - tm);
         }
 
-        // return RGB channels in appropriate order
         if (_hs < 1.0) {
             return QColor::fromRgbF(igamma(tp), igamma(to), igamma(tn), a);
         } else if (_hs < 2.0) {
@@ -167,7 +156,6 @@ static inline qreal mixQreal(qreal a, qreal b, qreal bias)
 {
     return a + (b - a) * bias;
 }
-// END internal helper functions
 
 qreal Rainbow::luma(const QColor& color)
 {
@@ -246,7 +234,8 @@ QColor Rainbow::tint(const QColor& base, const QColor& color, qreal amount)
         return base;
     }
 
-    qreal baseLuma = luma(base);  // cache value because luma call is expensive
+    qreal baseLuma = luma(base);
+
     double ri = contrastRatioForLuma(baseLuma, luma(color));
     double rg = 1.0 + ((ri + 1.0) * amount * amount * amount);
     double u = 1.0, l = 0.0;
@@ -286,12 +275,12 @@ QColor Rainbow::mix(const QColor& c1, const QColor& c2, qreal bias)
 
 QColor Rainbow::overlayColors(const QColor& base, const QColor& paint, QPainter::CompositionMode comp)
 {
-    // This isn't the fastest way, but should be "fast enough".
-    // It's also the only safe way to use QPainter::CompositionMode
+
     QImage img(1, 1, QImage::Format_ARGB32_Premultiplied);
     QPainter p(&img);
     QColor start = base;
-    start.setAlpha(255);  // opaque
+    start.setAlpha(255);
+
     p.fillRect(0, 0, 1, 1, start);
     p.setCompositionMode(comp);
     p.fillRect(0, 0, 1, 1, paint);

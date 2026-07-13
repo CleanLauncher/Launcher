@@ -43,7 +43,8 @@ ResourceFolderModel::ResourceFolderModel(const QDir& dir, BaseInstance* instance
         m_resourceResolver.clear();
         m_resourceResolverRunning = false;
     });
-    if (APPLICATION_DYN) {  // in tests the application macro doesn't work
+    if (APPLICATION_DYN) {
+
         m_resourceResolver.setMaxConcurrent(APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
     }
 }
@@ -57,7 +58,7 @@ ResourceFolderModel::~ResourceFolderModel()
 
 bool ResourceFolderModel::startWatching(const QStringList& paths)
 {
-    // Remove orphaned metadata next time
+
     m_firstFolderLoad = true;
 
     if (m_isWatching) {
@@ -100,7 +101,7 @@ bool ResourceFolderModel::stopWatching(const QStringList& paths)
 
 bool ResourceFolderModel::installResource(QString originalPath)
 {
-    // NOTE: fix for GH-1178: remove trailing slash to avoid issues with using the empty result of QFileInfo::fileName
+
     originalPath = FS::NormalizePath(originalPath);
     QFileInfo fileInfo(originalPath);
 
@@ -302,7 +303,6 @@ bool ResourceFolderModel::setResourceEnabled(const QModelIndexList& indexes, Ena
 
         auto& resource = m_resources[row];
 
-        // Preserve the row, but change its ID
         auto oldId = resource->internalId();
         if (!resource->enable(action)) {
             succeeded = false;
@@ -323,10 +323,9 @@ bool ResourceFolderModel::setResourceEnabled(const QModelIndexList& indexes, Ena
 static QMutex s_update_task_mutex;
 bool ResourceFolderModel::update()
 {
-    // We hold a lock here to prevent race conditions on the m_current_update_task reset.
+
     QMutexLocker lock(&s_update_task_mutex);
 
-    // Already updating, so we schedule a future update and return.
     if (m_currentUpdateTask) {
         m_scheduledUpdate = true;
         return false;
@@ -449,14 +448,14 @@ bool ResourceFolderModel::hasPendingParseTasks() const
     return !m_activeParseTasks.isEmpty();
 }
 
-void ResourceFolderModel::directoryChanged(const QString& /*path*/)
+void ResourceFolderModel::directoryChanged(const QString& )
 {
     update();
 }
 
 Qt::DropActions ResourceFolderModel::supportedDropActions() const
 {
-    // copy from outside, move from within and other resource lists
+
     return Qt::CopyAction | Qt::MoveAction;
 }
 
@@ -479,29 +478,26 @@ QStringList ResourceFolderModel::mimeTypes() const
 
 bool ResourceFolderModel::dropMimeData(const QMimeData* data,
                                        Qt::DropAction action,
-                                       int /*row*/,
-                                       int /*column*/,
-                                       const QModelIndex& /*parent*/)
+                                       int ,
+                                       int ,
+                                       const QModelIndex& )
 {
     if (action == Qt::IgnoreAction) {
         return true;
     }
 
-    // check if the action is supported
     if ((data == nullptr) || !(action & supportedDropActions())) {
         return false;
     }
 
-    // files dropped from outside?
     if (data->hasUrls()) {
         auto urls = data->urls();
         for (const auto& url : urls) {
-            // only local files may be dropped...
+
             if (!url.isLocalFile()) {
                 continue;
             }
-            // TODO: implement not only copy, but also move
-            // FIXME: handle errors here
+
             installResource(url.toLocalFile());
         }
         return true;
@@ -519,8 +515,6 @@ bool ResourceFolderModel::validateIndex(const QModelIndex& index) const
     return row >= 0 && row < m_resources.size();
 }
 
-// HACK: all subclasses need to call this to have the whole row painted
-// and they only delegate to the superclass for compatible columns
 QBrush ResourceFolderModel::rowBackground(int row) const
 {
     if (APPLICATION->settings()->get("ShowModIncompat").toBool() && m_resources[row]->hasIssues()) {
@@ -633,7 +627,7 @@ QVariant ResourceFolderModel::headerData(int section, [[maybe_unused]] Qt::Orien
                     return {};
             }
         case Qt::ToolTipRole: {
-            //: Here, resource is a generic term for external resources, like Mods, Resource Packs, Shader Packs, etc.
+
             switch (section) {
                 case ActiveColumn:
                     return tr("Is the resource enabled?");
@@ -674,7 +668,6 @@ void ResourceFolderModel::saveColumns(QTreeView* tree)
     auto stateSetting = m_instance->settings()->getSetting(stateSettingName);
     stateSetting->set(QString::fromUtf8(tree->header()->saveState().toBase64()));
 
-    // neither passthrough nor override settings works for this usecase as I need to only set the global when the gate is false
     auto* settings = m_instance->settings();
     if (!settings->get(overrideSettingName).toBool()) {
         settings = APPLICATION->settings();
@@ -715,7 +708,7 @@ void ResourceFolderModel::loadColumns(QTreeView* tree)
         { "Provider", true },
         { "Pack Format", true },
     });
-    // neither passthrough nor override settings works for this usecase as I need to only set the global when the gate is false
+
     auto* settings = m_instance->settings();
     if (!settings->getOrRegisterSetting(overrideSettingName, false)->get().toBool()) {
         settings = APPLICATION->settings();
@@ -723,7 +716,6 @@ void ResourceFolderModel::loadColumns(QTreeView* tree)
     auto visibility = settings->getOrRegisterSetting(visibilitySettingName, defaultValue);
     setVisible(visibility->get());
 
-    // allways connect the signal in case the setting is toggled on and off
     auto gSetting = APPLICATION->settings()->getOrRegisterSetting(visibilitySettingName, defaultValue);
     connect(gSetting.get(), &Setting::SettingChanged, tree, [this, setVisible, overrideSettingName](const Setting&, const QVariant& value) {
         if (!m_instance->settings()->get(overrideSettingName).toBool()) {
@@ -736,7 +728,8 @@ QMenu* ResourceFolderModel::createHeaderContextMenu(QTreeView* tree)
 {
     auto* menu = new QMenu(tree);
 
-    {  // action to decide if the visibility is per instance or not
+    {
+
         auto* act = new QAction(tr("Override Columns Visibility"), menu);
         const auto overrideSettingName = QString("UI/%1_Page/ColumnsOverride").arg(id());
 
@@ -753,7 +746,7 @@ QMenu* ResourceFolderModel::createHeaderContextMenu(QTreeView* tree)
     menu->addSeparator()->setText(tr("Show / Hide Columns"));
 
     for (int col = 0; col < columnCount(); ++col) {
-        // Skip creating actions for columns that should not be hidden
+
         if (!m_columnsHideable.at(col)) {
             continue;
         }
@@ -790,7 +783,6 @@ SortType ResourceFolderModel::columnToSortKey(size_t column) const
     return m_columnSortKeys.at(column);
 }
 
-/* Standard Proxy Model for createFilterProxyModel */
 bool ResourceFolderModel::ProxyModel::filterAcceptsRow(int sourceRow, [[maybe_unused]] const QModelIndex& sourceParent) const
 {
     auto* model = qobject_cast<ResourceFolderModel*>(sourceModel());
@@ -809,9 +801,6 @@ bool ResourceFolderModel::ProxyModel::lessThan(const QModelIndex& sourceLeft, co
     if (!model || !sourceLeft.isValid() || !sourceRight.isValid() || sourceLeft.column() != sourceRight.column()) {
         return QSortFilterProxyModel::lessThan(sourceLeft, sourceRight);
     }
-
-    // we are now guaranteed to have two valid indexes in the same column... we love the provided invariants unconditionally and
-    // proceed.
 
     auto columnSortKey = model->columnToSortKey(sourceLeft.column());
     const auto& resourceLeft = model->at(sourceLeft.row());
@@ -844,7 +833,6 @@ void ResourceFolderModel::onParseFailed(int ticket, const QString& resourceId)
     beginRemoveRows(QModelIndex(), removedIndex, removedIndex);
     m_resources.erase(removedIt);
 
-    // update index
     m_resourcesIndex.clear();
     int idx = 0;
     for (const auto& mod : qAsConst(m_resources)) {
@@ -856,7 +844,7 @@ void ResourceFolderModel::onParseFailed(int ticket, const QString& resourceId)
 
 void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>& newSet, QMap<QString, Resource::Ptr>& newResources)
 {
-    // see if the kept resources changed in some way
+
     {
         QSet<QString> keptSet = currentSet;
         keptSet.intersect(newSet);
@@ -870,7 +858,7 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
             const auto& currentResource = m_resources.at(row);
 
             if (newResource->dateTimeChanged() == currentResource->dateTimeChanged()) {
-                // no significant change
+
                 bool hadIssues = !currentResource->hasIssues();
                 currentResource->updateIssues(m_instance);
 
@@ -880,8 +868,6 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
                 continue;
             }
 
-            // If the resource is resolving, but something about it changed, we don't want to
-            // continue the resolving.
             if (currentResource->isResolving()) {
                 auto ticket = currentResource->resolutionTicket();
                 if (m_activeParseTasks.contains(ticket)) {
@@ -898,7 +884,6 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
         }
     }
 
-    // remove resources no longer present
     {
         QSet<QString> removedSet = currentSet;
         removedSet.subtract(newSet);
@@ -929,12 +914,10 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
         }
     }
 
-    // add new resources to the end
     {
         QSet<QString> addedSet = newSet;
         addedSet.subtract(currentSet);
 
-        // When you have a Qt build with assertions turned on, proceeding here will abort the application
         if (addedSet.size() > 0) {
             beginInsertRows(QModelIndex(), static_cast<int>(m_resources.size()),
                             static_cast<int>(m_resources.size() + addedSet.size() - 1));
@@ -950,7 +933,6 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
         }
     }
 
-    // update index
     {
         m_resourcesIndex.clear();
         int idx = 0;

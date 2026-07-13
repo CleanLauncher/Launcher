@@ -144,7 +144,7 @@ QString profileInUseFilter(const QString& profile, bool used)
         return profile;
     }
 }
-}  // namespace
+}
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -156,15 +156,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     setAccessibleName(BuildConfig.LAUNCHER_DISPLAYNAME);
 #endif
 
-    // instance toolbar stuff
     {
-        // Qt doesn't like vertical moving toolbars, so we have to force them...
-        // See https://github.com/PolyMC/PolyMC/issues/493
+
         connect(ui->instanceToolBar, &QToolBar::orientationChanged,
                 [this](Qt::Orientation) { ui->instanceToolBar->setOrientation(Qt::Vertical); });
 
-        // if you try to add a widget to a toolbar in a .ui file
-        // qt designer will delete it when you save the file >:(
         changeIconButton = new LabeledToolButton(this);
         changeIconButton->setObjectName(QStringLiteral("changeIconButton"));
         changeIconButton->setIcon(QIcon::fromTheme("news"));
@@ -180,7 +176,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         ui->instanceToolBar->insertSeparator(ui->actionLaunchInstance);
 
-        // restore the instance toolbar settings
         const auto setting_name = QString("WideBarVisibility_%1").arg(ui->instanceToolBar->objectName());
         instanceToolbarSetting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
@@ -192,7 +187,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->instanceToolBar->addContextMenuAction(ui->actionLockToolbars);
     }
 
-    // set the menu for the folders help, accounts, and export tool buttons
     {
         auto foldersMenuButton = dynamic_cast<QToolButton*>(ui->mainToolBar->widgetForAction(ui->actionFoldersButton));
         ui->actionFoldersButton->setMenu(ui->foldersMenu);
@@ -214,7 +208,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionExportInstance->setMenu(exportInstanceMenu);
     }
 
-    // hide, disable and show stuff
     {
         ui->actionReportBug->setVisible(!BuildConfig.BUG_TRACKER_URL.isEmpty());
 
@@ -224,13 +217,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionAddToPATH->setVisible(false);
 #endif
 
-        // disabled until we have an instance selected
         ui->instanceToolBar->setEnabled(false);
         setInstanceActionsEnabled(false);
 
-        // add a close button at the end of the main toolbar when running on gamescope / steam deck
-        // this is only needed on gamescope because it defaults to an X11/XWayland session and
-        // does not implement decorations
         if (qgetenv("XDG_CURRENT_DESKTOP") == "gamescope") {
             ui->mainToolBar->addAction(ui->actionCloseWindow);
         }
@@ -238,22 +227,21 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionViewJavaFolder->setEnabled(BuildConfig.JAVA_DOWNLOADER_ENABLED);
     }
 
-    {  // logs viewing
+    {
+
         connect(ui->actionViewLog, &QAction::triggered, this, [] { APPLICATION->showLogWindow(); });
     }
 
-    // add the toolbar toggles to the view menu
     ui->viewMenu->addAction(ui->instanceToolBar->toggleViewAction());
     ui->viewMenu->addAction(ui->newsToolBar->toggleViewAction());
 
     updateThemeMenu();
     updateMainToolBar();
-    // OSX magic.
+
     setUnifiedTitleAndToolBarOnMac(true);
 
-    // Global shortcuts
     {
-        // you can't set QKeySequence::StandardKey shortcuts in qt designer >:(
+
         ui->actionAddInstance->setShortcut(QKeySequence::New);
         ui->actionSettings->setShortcut(QKeySequence::Preferences);
         ui->actionUndoTrashInstance->setShortcut(QKeySequence::Undo);
@@ -261,18 +249,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionCloseWindow->setShortcut(QKeySequence::Close);
         connect(ui->actionCloseWindow, &QAction::triggered, APPLICATION, &Application::closeCurrentWindow);
 
-        // FIXME: This is kinda weird. and bad. We need some kind of managed shutdown.
         auto q = new QShortcut(QKeySequence::Quit, this);
         connect(q, &QShortcut::activated, APPLICATION, &Application::quit);
     }
 
-    // Konami Code
     {
         secretEventFilter = new KonamiCode(this);
         connect(secretEventFilter, &KonamiCode::triggered, this, &MainWindow::konamiTriggered);
     }
 
-    // Add the news label to the news toolbar.
     {
         m_newsChecker.reset(new NewsChecker(APPLICATION->network(), BuildConfig.NEWS_RSS_URL));
         newsLabel = new QToolButton();
@@ -288,16 +273,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         updateNewsLabel();
     }
 
-    // Create the instance list widget
     {
         view = new InstanceView(ui->centralWidget);
 
         view->setSelectionMode(QAbstractItemView::SingleSelection);
-        // FIXME: leaks ListViewDelegate
+
         auto delegate = new ListViewDelegate(this);
         view->setItemDelegate(delegate);
         view->setFrameShape(QFrame::NoFrame);
-        // do not show ugly blue border on the mac
+
         view->setAttribute(Qt::WA_MacShowFocusRect, false);
         connect(delegate, &ListViewDelegate::textChanged, this, [this](QString before, QString after) {
             if (auto newRoot = askToUpdateInstanceDirName(m_selectedInstance, before, after, this); !newRoot.isEmpty()) {
@@ -332,7 +316,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         connect(view, &InstanceView::groupStateChanged, APPLICATION->instances(), &InstanceList::on_GroupStateChanged);
         ui->horizontalLayout->addWidget(view);
     }
-    // Togglable status bar
+
     {
         bool statusBarVisible = APPLICATION->settings()->get("StatusBarVisible").toBool();
         ui->actionToggleStatusBar->setChecked(statusBarVisible);
@@ -340,29 +324,23 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         setStatusBarVisibility(statusBarVisible);
     }
 
-    // Lock toolbars
     {
         bool toolbarsLocked = APPLICATION->settings()->get("ToolbarsLocked").toBool();
         ui->actionLockToolbars->setChecked(toolbarsLocked);
         connect(ui->actionLockToolbars, &QAction::toggled, this, &MainWindow::lockToolbars);
         lockToolbars(toolbarsLocked);
     }
-    // start instance when double-clicked
+
     connect(view, &InstanceView::activated, this, &MainWindow::instanceActivated);
 
-    // track the selection -- update the instance toolbar
     connect(view->selectionModel(), &QItemSelectionModel::currentChanged, this, &MainWindow::instanceChanged);
 
-    // track icon changes and update the toolbar!
     connect(APPLICATION->icons(), &IconList::iconUpdated, this, &MainWindow::iconUpdated);
 
-    // model reset -> selection is invalid. All the instance pointers are wrong.
     connect(APPLICATION->instances(), &InstanceList::dataIsInvalid, this, &MainWindow::selectionBad);
 
-    // handle newly added instances
     connect(APPLICATION->instances(), &InstanceList::instanceSelectRequest, this, &MainWindow::instanceSelectRequest);
 
-    // When the global settings page closes, we want to know about it and update our state
     connect(APPLICATION, &Application::globalSettingsApplied, this, &MainWindow::globalSettingsClosed);
 
     m_statusLeft = new QLabel(tr("No instance selected"), this);
@@ -370,32 +348,22 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     statusBar()->addPermanentWidget(m_statusLeft, 1);
     statusBar()->addPermanentWidget(m_statusCenter, 0);
 
-    // Add "manage accounts" button, right align
     QWidget* spacer = new QWidget();
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->mainToolBar->insertWidget(ui->actionAccountsButton, spacer);
 
-    // Use undocumented property... https://stackoverflow.com/questions/7121718/create-a-scrollbar-in-a-submenu-qt
     ui->accountsMenu->setStyleSheet("QMenu { menu-scrollable: 1; }");
 
     repopulateAccountsMenu();
 
-    // Update the menu when the active account changes.
-    // Shouldn't have to use lambdas here like this, but if I don't, the compiler throws a fit.
-    // Template hell sucks...
     connect(APPLICATION->accounts(), &AccountList::defaultAccountChanged, [this] { defaultAccountChanged(); });
     connect(APPLICATION->accounts(), &AccountList::listActivityChanged, [this] { defaultAccountChanged(); });
     connect(APPLICATION->accounts(), &AccountList::listChanged, [this] { defaultAccountChanged(); });
 
-    // Show initial account
     defaultAccountChanged();
 
-    // TODO: refresh accounts here?
-    // auto accounts = APPLICATION->accounts();
-
-    // load the news
     {
-        //m_newsChecker->reloadNews();
+
         updateNewsLabel();
     }
 
@@ -405,7 +373,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
         connect(ui->actionCheckUpdate, &QAction::triggered, this, &MainWindow::checkForUpdates);
 
-        // set up the updater object.
         auto updater = APPLICATION->updater();
 
         if (updater) {
@@ -417,14 +384,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     setSelectedInstanceById(APPLICATION->settings()->get("SelectedInstance").toString());
 
-    // removing this looks stupid
     view->setFocus();
 
     retranslateUi();
 }
 
-// macOS always has a native menu bar, so these fixes are not applicable
-// Other systems may or may not have a native menu bar (most do not - it seems like only Ubuntu Unity does)
 #ifndef Q_OS_MAC
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
@@ -454,7 +418,6 @@ void MainWindow::retranslateUi()
     changeIconButton->setToolTip(ui->actionChangeInstIcon->toolTip());
     renameButton->setToolTip(ui->actionRenameInstance->toolTip());
 
-    // replace the %1 with the launcher display name in some actions
     if (helpMenuButton->toolTip().contains("%1"))
         helpMenuButton->setToolTip(helpMenuButton->toolTip().arg(BuildConfig.LAUNCHER_DISPLAYNAME));
 
@@ -523,10 +486,9 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
 
     bool onInstance = view->indexAt(pos).isValid();
     if (onInstance) {
-        // reuse the file menu actions
+
         actions = ui->fileMenu->actions();
 
-        // remove the add instance action, launcher settings action and close action
         actions.removeFirst();
         actions.removeLast();
         actions.removeLast();
@@ -534,7 +496,6 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
         actions.prepend(ui->actionChangeInstIcon);
         actions.prepend(ui->actionRenameInstance);
 
-        // add header
         actions.prepend(actionSep);
         QAction* actionVoid = new QAction(m_selectedInstance->name(), this);
         actionVoid->setEnabled(false);
@@ -570,10 +531,7 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
     }
     QMenu myMenu;
     myMenu.addActions(actions);
-    /*
-    if (onInstance)
-        myMenu.setEnabled(m_selectedInstance->canLaunch());
-    */
+
     myMenu.exec(view->mapToGlobal(pos));
 }
 
@@ -631,7 +589,6 @@ void MainWindow::repopulateAccountsMenu()
 {
     ui->accountsMenu->clear();
 
-    // NOTE: this is done so the accounts button text is not set to the accounts menu title
     QMenu* accountsButtonMenu = ui->actionAccountsButton->menu();
     if (accountsButtonMenu) {
         accountsButtonMenu->clear();
@@ -642,13 +599,13 @@ void MainWindow::repopulateAccountsMenu()
 
     auto accounts = APPLICATION->accounts();
     MinecraftAccountPtr defaultAccount = accounts->defaultAccount();
-    
+
     bool canChangeSkin = defaultAccount && (defaultAccount->accountType() == AccountType::MSA) && !defaultAccount->isActive();
     ui->actionManageSkins->setEnabled(canChangeSkin);
 
     QString active_profileId = "";
     if (defaultAccount) {
-        // this can be called before accountMenuButton exists
+
         if (ui->actionAccountsButton) {
             auto profileLabel = profileInUseFilter(defaultAccount->displayName(), defaultAccount->isInUse());
             ui->actionAccountsButton->setText(profileLabel);
@@ -661,7 +618,7 @@ void MainWindow::repopulateAccountsMenu()
         ui->actionNoAccountsAdded->setEnabled(false);
         ui->accountsMenu->addAction(ui->actionNoAccountsAdded);
     } else {
-        // TODO: Nicer way to iterate?
+
         for (int i = 0; i < accounts->count(); i++) {
             MinecraftAccountPtr account = accounts->at(i);
             auto profileLabel = profileInUseFilter(account->displayName(), account->isInUse());
@@ -715,14 +672,10 @@ void MainWindow::updatesAllowedChanged(bool allowed)
     ui->actionCheckUpdate->setEnabled(allowed);
 }
 
-/*
- * Assumes the sender is a QAction
- */
 void MainWindow::changeActiveAccount()
 {
     QAction* sAction = (QAction*)sender();
 
-    // Profile's associated Mojang username
     if (sAction->data().typeId() != QMetaType::Int)
         return;
 
@@ -743,7 +696,6 @@ void MainWindow::defaultAccountChanged()
 
     MinecraftAccountPtr account = APPLICATION->accounts()->defaultAccount();
 
-    // FIXME: this needs adjustment for MSA
     if (account && account->profileName() != "") {
         auto profileLabel = profileInUseFilter(account->displayName(), account->isInUse());
         ui->actionAccountsButton->setText(profileLabel);
@@ -756,7 +708,6 @@ void MainWindow::defaultAccountChanged()
         return;
     }
 
-    // Set the icon to the "no account" icon.
     ui->actionAccountsButton->setIcon(QIcon::fromTheme("noaccount"));
     ui->actionAccountsButton->setText(tr("Accounts"));
 }
@@ -768,12 +719,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev)
             secretEventFilter->input(ev);
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
             switch (keyEvent->key()) {
-                    /*
-                case Qt::Key_Enter:
-                case Qt::Key_Return:
-                    activateInstance(m_selectedInstance);
-                    return true;
-                    */
+
                 case Qt::Key_Delete:
                     on_actionDeleteInstance_triggered();
                     return true;
@@ -910,34 +856,30 @@ void MainWindow::on_actionAddInstance_triggered()
 
 void MainWindow::processURLs(QList<QUrl> urls)
 {
-    // NOTE: This loop only processes one dropped file!
+
     for (auto& url : urls) {
         if (url.isEmpty() || url.toString().trimmed().isEmpty())
             continue;
 
         qDebug() << "Processing" << url;
 
-        // The isLocalFile() check below doesn't work as intended without an explicit scheme.
         if (url.scheme().isEmpty())
             url.setScheme("file");
 
         ModPlatform::IndexedVersion version;
         QMap<QString, QString> extra_info;
         QUrl local_url;
-        if (!url.isLocalFile()) {  // download the remote resource and identify
+        if (!url.isLocalFile()) {
 
             const bool isExternalURLImport = (url.host().toLower() == "import") || (url.path().startsWith("/import", Qt::CaseInsensitive));
 
             QUrl dl_url;
             if (url.scheme() == "curseforge" || (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && url.host() == "install")) {
-                // need to find the download link for the modpack / resource
-                // format of url curseforge://install?addonId=IDHERE&fileId=IDHERE
-                // format of url binaryname://install?platform=curseforge&addonId=IDHERE&fileId=IDHERE
+
                 QUrlQuery query(url);
 
-                // check if this is a binaryname:// url
                 if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) {
-                    // check this is an curseforge platform request
+
                     if (query.queryItemValue("platform").toLower() != "curseforge") {
                         qDebug() << "Invalid mod distribution platform:" << query.queryItemValue("platform");
                         continue;
@@ -964,12 +906,10 @@ void MainWindow::processURLs(QList<QUrl> urls)
                     qDebug() << "Returned CFURL Json:\n" << array->toStdString().c_str();
                     auto doc = Json::requireDocument(*array);
                     auto data = doc.object()["data"].toObject();
-                    // No way to find out if it's a mod or a modpack before here
-                    // And also we need to check if it ends with .zip, instead of any better way
+
                     version = FlameMod::loadIndexedPackVersion(data);
                     auto fileName = version.fileName;
 
-                    // Have to use ensureString then use QUrl to get proper url encoding
                     dl_url = QUrl(version.downloadUrl);
                     if (!dl_url.isValid()) {
                         CustomMessageBox::selectable(
@@ -983,7 +923,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
                     QFileInfo dl_file(dl_url.fileName());
                 });
 
-                {  // drop stack
+                {
+
                     ProgressDialog dlUrlDialod(this);
                     dlUrlDialod.setSkipButton(true, tr("Abort"));
                     dlUrlDialod.execWithTask(job.get());
@@ -998,9 +939,7 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 emit APPLICATION->oauthReplyRecieved(receivedData);
                 continue;
             } else if ((url.scheme() == "launcher" || url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) && isExternalURLImport) {
-                // Launcher URL protocol modpack import
-                // works for any fork
-                // preferred import format: launcher://import?url=ENCODED
+
                 const auto host = url.host().toLower();
                 const auto path = url.path();
 
@@ -1014,7 +953,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
                     }
                 }
 
-                // alternative import format: launcher://import/ENCODED
                 if (encodedTarget.isEmpty()) {
                     QString p = path;
 
@@ -1040,7 +978,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
 
                 QUrl target = QUrl::fromUserInput(decodedStr);
 
-                // Validate: only allow http(s)
                 if (!target.isValid() || (target.scheme() != "https" && target.scheme() != "http")) {
                     CustomMessageBox::selectable(this, tr("Error"), tr("Invalid import link: URL must be http(s)."), QMessageBox::Critical)
                         ->show();
@@ -1061,7 +998,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
             }
 
             if (!dl_url.isValid()) {
-                continue;  // no valid url to download this resource
+                continue;
+
             }
 
             const QString path = dl_url.host() + '/' + dl_url.path();
@@ -1076,14 +1014,16 @@ void MainWindow::processURLs(QList<QUrl> urls)
                     [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
             connect(dl_job.get(), &Task::succeeded, this, [&dl_success] { dl_success = true; });
 
-            {  // drop stack
+            {
+
                 ProgressDialog dlUrlDialod(this);
                 dlUrlDialod.setSkipButton(true, tr("Abort"));
                 dlUrlDialod.execWithTask(dl_job.get());
             }
 
             if (!dl_success) {
-                continue;  // no local file to identify
+                continue;
+
             }
             local_url = QUrl::fromLocalFile(archivePath);
 
@@ -1101,7 +1041,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
 
         auto type = ResourceUtils::identify(localFileInfo);
 
-        if (ModPlatform::ResourceTypeUtils::VALID_RESOURCES.count(type) == 0) {  // probably instance/modpack
+        if (ModPlatform::ResourceTypeUtils::VALID_RESOURCES.count(type) == 0) {
+
             addInstance(localFileName, extra_info);
             continue;
         }
@@ -1321,7 +1262,7 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::globalSettingsClosed()
 {
-    // FIXME: quick HACK to make this work. improve, optimize.
+
     APPLICATION->instances()->loadList();
     proxymodel->invalidate();
     proxymodel->sort(0);
@@ -1329,8 +1270,7 @@ void MainWindow::globalSettingsClosed()
     updateLaunchButton();
     updateThemeMenu();
     updateStatusCenter();
-    // This needs to be done to prevent UI elements disappearing in the event the config is changed
-    // but Launcher exits abnormally, causing the window state to never be saved:
+
     APPLICATION->settings()->set("MainWindowState", QString::fromUtf8(saveState().toBase64()));
     update();
 }
@@ -1372,7 +1312,7 @@ void MainWindow::on_actionReportBug_triggered()
 
 void MainWindow::on_actionClearMetadata_triggered()
 {
-    // This if contains side effects!
+
     if (!APPLICATION->metacache()->evictAll()) {
         CustomMessageBox::selectable(this, tr("Error"),
                                      tr("Metadata cache clear Failed!\nTo clear the metadata cache manually, press Folders -> View "
@@ -1530,7 +1470,7 @@ void MainWindow::on_actionViewSelectedInstFolder_triggered()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-    // Save the window state and geometry.
+
     APPLICATION->settings()->set("MainWindowState", QString::fromUtf8(saveState().toBase64()));
     APPLICATION->settings()->set("MainWindowGeometry", QString::fromUtf8(saveGeometry().toBase64()));
     instanceToolbarSetting->set(QString::fromUtf8(ui->instanceToolBar->getVisibilityState().toBase64()));
@@ -1658,7 +1598,7 @@ void MainWindow::instanceDataChanged(const QModelIndex& topLeft, const QModelInd
 
 void MainWindow::selectionBad()
 {
-    // start by reseting everything...
+
     m_selectedInstance = nullptr;
     m_statusLeft->setText(tr("No instance selected"));
 
@@ -1669,7 +1609,6 @@ void MainWindow::selectionBad()
     renameButton->setText(tr("Rename Instance"));
     updateInstanceToolIcon("grass");
 
-    // ...and then see if we can enable the previously selected instance
     setSelectedInstanceById(APPLICATION->settings()->get("SelectedInstance").toString());
 }
 
@@ -1717,8 +1656,7 @@ void MainWindow::updateStatusCenter()
                 .arg(Time::prettifyDuration(timePlayed, APPLICATION->settings()->get("ShowGameTimeWithoutDays").toBool())));
     }
 }
-// "Instance actions" are actions that require an instance to be selected (i.e. "new instance" is not here)
-// Actions that also require other conditions (e.g. a running instance) won't be changed.
+
 void MainWindow::setInstanceActionsEnabled(bool enabled)
 {
     ui->actionEditInstance->setEnabled(enabled);

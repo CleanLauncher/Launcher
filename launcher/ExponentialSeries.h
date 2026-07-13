@@ -11,8 +11,6 @@ inline void clamp(T& current, T min, T max)
     }
 }
 
-// List of numbers from min to max. Next is exponent times bigger than previous.
-
 class ExponentialSeries {
    public:
     ExponentialSeries(unsigned min, unsigned max, unsigned exponent = 2)

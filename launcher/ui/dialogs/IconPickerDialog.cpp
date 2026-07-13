@@ -140,7 +140,6 @@ IconPickerDialog::IconPickerDialog(QWidget* parent) : QDialog(parent), ui(new Ui
     contentsWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     contentsWidget->setItemDelegate(new ListViewDelegate(contentsWidget));
 
-    // contentsWidget->setAcceptDrops(true);
     contentsWidget->setDropIndicatorShown(true);
     contentsWidget->viewport()->setAcceptDrops(true);
     contentsWidget->setDragDropMode(QAbstractItemView::DropOnly);
@@ -150,7 +149,6 @@ IconPickerDialog::IconPickerDialog(QWidget* parent) : QDialog(parent), ui(new Ui
 
     contentsWidget->setModel(proxyModel);
 
-    // NOTE: ResetRole forces the button to be on the left, while the OK/Cancel ones are on the right. We win.
     auto buttonAdd = ui->buttonBox->addButton(tr("Add Icon"), QDialogButtonBox::ResetRole);
     buttonRemove = ui->buttonBox->addButton(tr("Remove Icon"), QDialogButtonBox::ResetRole);
 
@@ -171,7 +169,7 @@ IconPickerDialog::IconPickerDialog(QWidget* parent) : QDialog(parent), ui(new Ui
         IconPickerCategory category = static_cast<IconPickerCategory>(ui->contextCombo->itemData(index).toInt());
         filterIconsByCategory(category);
     });
-    // Prevent incorrect indices from e.g. filesystem changes
+
     connect(APPLICATION->icons(), &IconList::iconUpdated, this, [this]() { proxyModel->invalidate(); });
 }
 
@@ -198,9 +196,9 @@ bool IconPickerDialog::eventFilter(QObject* obj, QEvent* evt)
 
 void IconPickerDialog::addNewIcon()
 {
-    //: The title of the select icons open file dialog
+
     QString selectIcons = tr("Select Icons");
-    //: The type of icon files
+
     auto filter = IconUtils::getIconFilter();
     QStringList fileNames = QFileDialog::getOpenFileNames(this, selectIcons, QString(), tr("Icons %1").arg(filter));
     APPLICATION->icons()->installIcons(fileNames);

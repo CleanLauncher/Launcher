@@ -50,7 +50,7 @@ void LookupServerAddress::executeTask()
 void LookupServerAddress::on_dnsLookupFinished()
 {
     if (isFinished()) {
-        // Aborted
+
         return;
     }
 
@@ -58,8 +58,8 @@ void LookupServerAddress::on_dnsLookupFinished()
         emit logLine(QString("Failed to resolve server address (this is NOT an error!) %1: %2\n")
                          .arg(m_dnsLookup->name(), m_dnsLookup->errorString()),
                      MessageLevel::Launcher);
-        resolve(m_lookupAddress, 25565);  // Technically the task failed, however, we don't abort the launch
-                                          // and leave it up to minecraft to fail (or maybe not) when connecting
+        resolve(m_lookupAddress, 25565);
+
         return;
     }
 
@@ -68,8 +68,8 @@ void LookupServerAddress::on_dnsLookupFinished()
         emit logLine(QString("Failed to resolve server address %1: the DNS lookup succeeded, but no records were returned.\n")
                          .arg(m_dnsLookup->name()),
                      MessageLevel::Warning);
-        resolve(m_lookupAddress, 25565);  // Technically the task failed, however, we don't abort the launch
-                                          // and leave it up to minecraft to fail (or maybe not) when connecting
+        resolve(m_lookupAddress, 25565);
+
         return;
     }
 

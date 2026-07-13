@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ModrinthAPI.h"
@@ -115,7 +115,7 @@ std::pair<Task::Ptr, QByteArray*> ModrinthAPI::getProjects(QStringList addonIds)
 
 QList<ResourceAPI::SortingMethod> ModrinthAPI::getSortingMethods() const
 {
-    // https://docs.modrinth.com/api-spec/#tag/projects/operation/searchProjects
+
     return { { .index = 1, .name = "relevance", .readable_name = QObject::tr("Sort by Relevance") },
              { .index = 2, .name = "downloads", .readable_name = QObject::tr("Sort by Downloads") },
              { .index = 3, .name = "follows", .readable_name = QObject::tr("Sort by Follows") },

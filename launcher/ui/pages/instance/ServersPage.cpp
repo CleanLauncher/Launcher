@@ -55,13 +55,12 @@
 #include <QMenu>
 #include <QTimer>
 
-static const int COLUMN_COUNT = 3;  // 3 , TBD: latency and other nice things.
+static const int COLUMN_COUNT = 3;
 
 struct Server {
-    // Types
+
     enum class AcceptsTextures : int { ASK = 0, ALWAYS = 1, NEVER = 2 };
 
-    // Methods
     Server() { m_name = QObject::tr("Minecraft Server"); }
     Server(const QString& name, const QString& address)
     {
@@ -103,16 +102,14 @@ struct Server {
         }
     }
 
-    // Data - persistent and user changeable
     QString m_name;
     QString m_address;
     AcceptsTextures m_acceptsTextures = AcceptsTextures::ASK;
 
-    // Data - persistent and automatically updated
     QByteArray m_icon;
 
-    // Data - temporary
-    std::optional<int> m_currentPlayers;  // nullopt if not calculated/calculating
+    std::optional<int> m_currentPlayers;
+
 };
 
 static std::unique_ptr<nbt::tag_compound> parseServersDat(const QString& filename)
@@ -238,7 +235,8 @@ class ServersModel : public QAbstractListModel {
         }
         beginRemoveRows(QModelIndex(), row, row);
         m_servers.removeAt(row);
-        endRemoveRows();  // does absolutely nothing, the selected server stays as the next line...
+        endRemoveRows();
+
         scheduleSave();
         return true;
     }
@@ -426,7 +424,7 @@ class ServersModel : public QAbstractListModel {
 
     void queryServersStatus()
     {
-        // Abort the currently running task if present
+
         if (m_currentQueryTask != nullptr) {
             m_currentQueryTask->abort();
             qDebug() << "Aborted previous server query task";
@@ -436,16 +434,14 @@ class ServersModel : public QAbstractListModel {
             new ConcurrentTask("Query servers status", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt()));
         int row = 0;
         for (Server& server : m_servers) {
-            // reset current players
+
             server.m_currentPlayers = {};
             emit dataChanged(index(row, 0), index(row, COLUMN_COUNT - 1));
 
-            // Start task to query server status
             auto target = MinecraftTarget::parse(server.m_address, false);
             auto* task = new ServerPingTask(target.address, target.port);
             m_currentQueryTask->addTask(Task::Ptr(task));
 
-            // Update the model when the task is done
             connect(task, &Task::finished, this, [this, task, row]() {
                 if (m_servers.size() < row)
                     return;
@@ -633,17 +629,16 @@ void ServersPage::currentChanged(const QModelIndex& current, [[maybe_unused]] co
     updateState();
 }
 
-// WARNING: this is here because currentChanged is not accurate when removing rows. the current item needs to be fixed up after removal.
 void ServersPage::rowsRemoved([[maybe_unused]] const QModelIndex& parent, int first, int last)
 {
     if (currentServer < first) {
-        // current was before the removal
+
         return;
     } else if (currentServer >= first && currentServer <= last) {
-        // current got removed...
+
         return;
     } else {
-        // current was past the removal
+
         int count = last - first + 1;
         currentServer -= count;
     }
@@ -700,7 +695,6 @@ void ServersPage::openedImpl()
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 
-    // ping servers
     m_model->queryServersStatus();
 }
 
@@ -717,7 +711,7 @@ void ServersPage::on_actionAdd_triggered()
     if (position < 0) {
         return;
     }
-    // select the new row
+
     ui->serversView->selectionModel()->setCurrentIndex(
         m_model->index(position), QItemSelectionModel::SelectCurrent | QItemSelectionModel::Clear | QItemSelectionModel::Rows);
     currentServer = position;

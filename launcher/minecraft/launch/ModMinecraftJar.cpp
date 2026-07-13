@@ -48,7 +48,7 @@ void ModMinecraftJar::executeTask()
         emitSucceeded();
         return;
     }
-    // nuke obsolete stripped jar(s) if needed
+
     if (!FS::ensureFolderPathExists(m_inst->binRoot())) {
         emitFailed(tr("Couldn't create the bin folder for Minecraft.jar"));
         return;
@@ -60,7 +60,6 @@ void ModMinecraftJar::executeTask()
         return;
     }
 
-    // create temporary modded jar, if needed
     auto components = m_inst->getPackProfile();
     auto profile = components->getProfile();
     auto jarMods = m_inst->getJarMods();

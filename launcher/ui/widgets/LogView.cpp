@@ -166,7 +166,7 @@ void LogView::rowsInserted(const QModelIndex& parent, int first, int last)
 
 void LogView::rowsRemoved(const QModelIndex& parent, int first, int last)
 {
-    // TODO: some day... maybe
+
     Q_UNUSED(parent)
     Q_UNUSED(first)
     Q_UNUSED(last)

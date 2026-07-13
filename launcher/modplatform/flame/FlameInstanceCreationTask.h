@@ -83,7 +83,6 @@ class FlameCreationTask final : public InstanceCreationTask {
     shared_qobject_ptr<Flame::FileResolvingTask> m_modIdResolver;
     Flame::Manifest m_pack;
 
-    // Handle to allow aborting
     Task::Ptr m_processUpdateFileInfoJob = nullptr;
     NetJob::Ptr m_filesJob = nullptr;
 

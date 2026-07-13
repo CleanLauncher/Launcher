@@ -53,32 +53,6 @@ bool getBool(QJsonValue value, bool& out)
     return true;
 }
 
-/*
-{
-   "IssueInstant":"2020-12-07T19:52:08.4463796Z",
-   "NotAfter":"2020-12-21T19:52:08.4463796Z",
-   "Token":"token",
-   "DisplayClaims":{
-      "xui":[
-         {
-            "uhs":"userhash"
-         }
-      ]
-   }
- }
-*/
-// TODO: handle error responses ...
-/*
-{
-    "Identity":"0",
-    "XErr":2148916238,
-    "Message":"",
-    "Redirect":"https://start.ui.xboxlive.com/AddChildToFamily"
-}
-// 2148916233 = missing Xbox account
-// 2148916238 = child account not linked to a family
-*/
-
 bool parseXTokenResponse(QByteArray& data, Token& output, QString name)
 {
     qDebug() << "Parsing" << name << ":";
@@ -119,7 +93,7 @@ bool parseXTokenResponse(QByteArray& data, Token& output, QString name)
         } else {
             continue;
         }
-        // consume all 'display claims' ... whatever that means
+
         for (auto iter = obj_.begin(); iter != obj_.end(); iter++) {
             QString claim;
             if (!getString(obj_.value(iter.key()), claim)) {
@@ -184,7 +158,7 @@ bool parseMinecraftProfile(QByteArray& data, MinecraftProfile& output)
         if (!getString(skinObj.value("variant"), skinOut.variant)) {
             continue;
         }
-        // we deal with only the active skin
+
         output.skin = skinOut;
         break;
     }
@@ -220,8 +194,7 @@ bool parseMinecraftProfile(QByteArray& data, MinecraftProfile& output)
 }
 
 namespace {
-// these skin URLs are for the MHF_Steve and MHF_Alex accounts (made by a Mojang employee)
-// they are needed because the session server doesn't return skin urls for default skins
+
 static const QString SKIN_URL_STEVE =
     "https://textures.minecraft.net/texture/1a4af718455d4aab528e7a61f86fa25e6a369d1768dcb13f7df319a713eb810b";
 static const QString SKIN_URL_ALEX =
@@ -229,58 +202,19 @@ static const QString SKIN_URL_ALEX =
 
 bool isDefaultModelSteve(QString uuid)
 {
-    // need to calculate *Java* hashCode of UUID
-    // if number is even, skin/model is steve, otherwise it is alex
 
-    // just in case dashes are in the id
     uuid.remove('-');
 
     if (uuid.size() != 32) {
         return true;
     }
 
-    // qulonglong is guaranteed to be 64 bits
-    // we need to use unsigned numbers to guarantee truncation below
     qulonglong most = uuid.left(16).toULongLong(nullptr, 16);
     qulonglong least = uuid.right(16).toULongLong(nullptr, 16);
     qulonglong xored = most ^ least;
     return ((static_cast<quint32>(xored >> 32)) ^ static_cast<quint32>(xored)) % 2 == 0;
 }
-}  // namespace
-
-/**
-Uses session server for skin/cape lookup instead of profile,
-because locked Mojang accounts cannot access profile endpoint
-(https://api.minecraftservices.com/minecraft/profile/)
-
-ref: https://wiki.vg/Mojang_API#UUID_to_Profile_and_Skin.2FCape
-
-{
-    "id": "<profile identifier>",
-    "name": "<player name>",
-    "properties": [
-        {
-            "name": "textures",
-            "value": "<base64 string>"
-        }
-    ]
 }
-
-decoded base64 "value":
-{
-    "timestamp": <java time in ms>,
-    "profileId": "<profile uuid>",
-    "profileName": "<player name>",
-    "textures": {
-        "SKIN": {
-            "url": "<player skin URL>"
-        },
-        "CAPE": {
-            "url": "<player cape URL>"
-        }
-    }
-}
-*/
 
 bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
 {
@@ -343,11 +277,11 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
     }
 
     Skin skinOut;
-    // fill in default skin info ourselves, as this endpoint doesn't provide it
+
     bool steve = isDefaultModelSteve(output.id);
     skinOut.variant = steve ? "CLASSIC" : "SLIM";
     skinOut.url = steve ? SKIN_URL_STEVE : SKIN_URL_ALEX;
-    // sadly we can't figure this out, but I don't think it really matters...
+
     skinOut.id = "00000000-0000-0000-0000-000000000000";
     Cape capeOut;
     auto tObj = textures.toObject();
@@ -364,7 +298,7 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
                 auto maybeMeta = skin.find("metadata");
                 if (maybeMeta != skin.end() && maybeMeta->isObject()) {
                     auto meta = maybeMeta->toObject();
-                    // might not be present
+
                     getString(meta.value("model"), skinOut.variant);
                 }
             } else if (idx.key() == "CAPE") {
@@ -375,8 +309,6 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
                 }
                 capeOut.url.replace("http://textures.minecraft.net", "https://textures.minecraft.net");
 
-                // we don't know the cape ID as it is not returned from the session server
-                // so just fake it - changing capes is probably locked anyway :(
                 capeOut.alias = "cape";
             }
         }
@@ -483,7 +415,6 @@ bool parseMojangResponse(QByteArray& data, Token& output)
         return false;
     }
 
-    // TODO: it's a JWT... validate it?
     if (!getString(obj.value("access_token"), output.token)) {
         qWarning() << "access_token is not valid";
         return false;
@@ -493,4 +424,4 @@ bool parseMojangResponse(QByteArray& data, Token& output)
     return true;
 }
 
-}  // namespace Parsers
+}

@@ -6,17 +6,9 @@
 #include <functional>
 #include <memory>
 
-/**
- * A unique pointer class with unique pointer semantics intended for derivates of QObject
- * Calls deleteLater() instead of destroying the contained object immediately
- */
 template <typename T>
 using unique_qobject_ptr = QScopedPointer<T, QScopedPointerDeleteLater>;
 
-/**
- * A shared pointer class with shared pointer semantics intended for derivates of QObject
- * Calls deleteLater() instead of destroying the contained object immediately
- */
 template <typename T>
 class shared_qobject_ptr : public QSharedPointer<T> {
    public:

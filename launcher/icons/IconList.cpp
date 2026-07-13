@@ -51,7 +51,6 @@ IconList::IconList(const QStringList& builtinPaths, const QString& path, QObject
 {
     QSet<QString> builtinNames;
 
-    // add builtin icons
     for (const auto& builtinPath : builtinPaths) {
         QDir instanceIcons(builtinPath);
         auto fileInfoList = instanceIcons.entryInfoList(QDir::Files, QDir::Name);
@@ -70,7 +69,6 @@ IconList::IconList(const QStringList& builtinPaths, const QString& path, QObject
 
     directoryChanged(path);
 
-    // Forces the UI to update, so that lengthy icon names are shown properly from the start
     emit iconUpdated({});
 }
 
@@ -81,24 +79,22 @@ void IconList::sortIconList()
         bool aIsSubdir = a.m_key.contains(QDir::separator());
         bool bIsSubdir = b.m_key.contains(QDir::separator());
         if (aIsSubdir != bIsSubdir) {
-            return !aIsSubdir;  // root-level icons come first
+            return !aIsSubdir;
+
         }
         return a.m_key.localeAwareCompare(b.m_key) < 0;
     });
     reindex();
 }
 
-// Helper function to add directories recursively
 bool IconList::addPathRecursively(const QString& path)
 {
     QDir dir(path);
     if (!dir.exists())
         return false;
 
-    // Add the directory itself
     bool watching = m_watcher->addPath(path);
 
-    // Add all subdirectories
     QFileInfoList entries = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QFileInfo& entry : entries) {
         if (addPathRecursively(entry.absoluteFilePath())) {
@@ -136,7 +132,6 @@ QString formatName(const QDir& iconsDir, const QFileInfo& iconFile)
     return relativePathWithoutExtension.replace(QDir::separator(), delimiter);
 }
 
-/// Split into a separate function because the preprocessing impedes readability
 QSet<QString> toStringSet(const QList<QString>& list)
 {
     QSet<QString> set(list.begin(), list.end());
@@ -218,7 +213,7 @@ void IconList::fileChanged(const QString& path)
     if (idx == -1)
         return;
     QIcon icon;
-    // special handling for jpg and jpeg to go through pixmap to keep the size constant
+
     if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
         icon.addPixmap(QPixmap(path));
     } else {
@@ -278,16 +273,15 @@ bool IconList::dropMimeData(const QMimeData* data,
 {
     if (action == Qt::IgnoreAction)
         return true;
-    // check if the action is supported
+
     if (!data || !(action & supportedDropActions()))
         return false;
 
-    // files dropped from outside?
     if (data->hasUrls()) {
         auto urls = data->urls();
         QStringList iconFiles;
         for (const auto& url : urls) {
-            // only local files may be dropped...
+
             if (!url.isLocalFile())
                 continue;
             iconFiles += url.toLocalFile();
@@ -356,7 +350,6 @@ bool IconList::iconFileExists(const QString& key) const
     return iconEntry && iconEntry->has(IconType::FileBased);
 }
 
-/// Returns the icon with the given key or nullptr if it doesn't exist.
 const MMCIcon* IconList::icon(const QString& key) const
 {
     int iconIdx = getIconIndex(key);
@@ -384,7 +377,7 @@ bool IconList::addThemeIcon(const QString& key)
         dataChanged(index(*iter), index(*iter));
         return true;
     }
-    // add a new icon
+
     beginInsertRows(QModelIndex(), m_icons.size(), m_icons.size());
     {
         MMCIcon mmc_icon;
@@ -400,9 +393,9 @@ bool IconList::addThemeIcon(const QString& key)
 
 bool IconList::addIcon(const QString& key, const QString& name, const QString& path, const IconType type)
 {
-    // replace the icon even? is the input valid?
+
     QIcon icon;
-    // special handling for jpg and jpeg to go through pixmap to keep the size constant
+
     if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
         icon.addPixmap(QPixmap(path));
     } else {
@@ -418,7 +411,7 @@ bool IconList::addIcon(const QString& key, const QString& name, const QString& p
         dataChanged(index(*iter), index(*iter));
         return true;
     }
-    // add a new icon
+
     beginInsertRows(QModelIndex(), m_icons.size(), m_icons.size());
     {
         MMCIcon mmc_icon;
@@ -444,7 +437,8 @@ void IconList::reindex()
     m_nameIndex.clear();
     for (int i = 0; i < m_icons.size(); i++) {
         m_nameIndex[m_icons[i].m_key] = i;
-        emit iconUpdated(m_icons[i].m_key);  // prevents incorrect indices with proxy model
+        emit iconUpdated(m_icons[i].m_key);
+
     }
 }
 
@@ -455,7 +449,6 @@ QIcon IconList::getIcon(const QString& key) const
     if (iconIndex != -1)
         return m_icons[iconIndex].icon();
 
-    // Fallback for icons that don't exist.b
     iconIndex = getIconIndex("grass");
 
     if (iconIndex != -1)
@@ -477,7 +470,6 @@ QString IconList::getDirectory() const
     return m_dir.absolutePath();
 }
 
-/// Returns the directory of the icon with the given key or the default directory if it's a builtin icon.
 QString IconList::iconDirectory(const QString& key) const
 {
     for (const auto& mmcIcon : m_icons) {

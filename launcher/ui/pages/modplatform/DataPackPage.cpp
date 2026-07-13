@@ -1,6 +1,6 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
 // SPDX-FileCopyrightText: 2023 TheKodeToad <TheKodeToad@proton.me>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "DataPackPage.h"
@@ -15,8 +15,6 @@
 namespace ResourceDownload {
 
 DataPackResourcePage::DataPackResourcePage(DataPackDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance) {}
-
-/******** Callbacks to events in the UI (set up in the derived classes) ********/
 
 void DataPackResourcePage::triggerSearch()
 {
@@ -40,4 +38,4 @@ QMap<QString, QString> DataPackResourcePage::urlHandlers() const
     return map;
 }
 
-}  // namespace ResourceDownload
+}

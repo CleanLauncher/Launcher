@@ -44,4 +44,4 @@ struct ShareCodeResponse {
 
 void loadShareCodeResponse(ShareCodeResponse& r, QJsonObject& obj);
 
-}  // namespace ATLauncher
+}

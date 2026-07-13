@@ -57,7 +57,7 @@ class LibraryTest : public QObject {
         ProblemContainer problems;
         return MojangVersionFormat::libraryFromJson(problems, QJsonDocument::fromJson(data).object(), path);
     }
-    // get absolute path to expected storage, assuming default cache prefix
+
     QStringList getStorage(QString relative) { return { FS::PathCombine(cache->getBasePath("libraries"), relative) }; }
 
     RuntimeContext dummyContext(QString system = "linux", QString arch = "64", QString realArch = "amd64")

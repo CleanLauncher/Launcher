@@ -45,7 +45,7 @@ class FileIgnoreProxy : public QSortFilterProxyModel {
 
    public:
     FileIgnoreProxy(QString root, QObject* parent);
-    // NOTE: Sadly, we have to do sorting ourselves.
+
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
 
     virtual Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -64,10 +64,9 @@ class FileIgnoreProxy : public QSortFilterProxyModel {
     inline const SeparatorPrefixTree<'/'>& blockedPaths() const { return m_blocked; }
     inline SeparatorPrefixTree<'/'>& blockedPaths() { return m_blocked; }
 
-    // list of file names that need to be removed completely from model
     inline QStringList& ignoreFilesWithName() { return m_ignoreFiles; }
     inline QStringList& ignoreFilesWithSuffix() { return m_ignoreFilesSuffixes; }
-    // list of relative paths that need to be removed completely from model
+
     inline SeparatorPrefixTree<'/'>& ignoreFilesWithPath() { return m_ignoreFilePaths; }
 
     bool filterFile(const QFileInfo& fileName) const;

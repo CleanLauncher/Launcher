@@ -90,23 +90,18 @@ BaseInstance::BaseInstance(SettingsObject* globalSettings, std::unique_ptr<Setti
     m_settings->registerSetting("linkedInstances", "[]");
     m_settings->registerSetting("shortcuts", QString());
 
-    // Game time override
     auto gameTimeOverride = m_settings->registerSetting("OverrideGameTime", false);
     m_settings->registerOverride(globalSettings->getSetting("ShowGameTime"), gameTimeOverride);
     m_settings->registerOverride(globalSettings->getSetting("RecordGameTime"), gameTimeOverride);
 
-    // NOTE: Sometimees InstanceType is already registered, as it was used to identify the type of
-    // a locally stored instance
     if (!m_settings->getSetting("InstanceType"))
         m_settings->registerSetting("InstanceType", "");
 
-    // Custom Commands
     auto commandSetting = m_settings->registerSetting({ "OverrideCommands", "OverrideLaunchCmd" }, false);
     m_settings->registerOverride(globalSettings->getSetting("PreLaunchCommand"), commandSetting);
     m_settings->registerOverride(globalSettings->getSetting("WrapperCommand"), commandSetting);
     m_settings->registerOverride(globalSettings->getSetting("PostExitCommand"), commandSetting);
 
-    // Console
     auto consoleSetting = m_settings->registerSetting("OverrideConsole", false);
     m_settings->registerOverride(globalSettings->getSetting("ShowConsole"), consoleSetting);
     m_settings->registerOverride(globalSettings->getSetting("AutoCloseConsole"), consoleSetting);
@@ -116,7 +111,6 @@ BaseInstance::BaseInstance(SettingsObject* globalSettings, std::unique_ptr<Setti
     m_settings->registerPassthrough(globalSettings->getSetting("ConsoleMaxLines"), nullptr);
     m_settings->registerPassthrough(globalSettings->getSetting("ConsoleOverflowStop"), nullptr);
 
-    // Managed Packs
     m_settings->registerSetting("ManagedPack", false);
     m_settings->registerSetting("ManagedPackType", "");
     m_settings->registerSetting("ManagedPackID", "");
@@ -363,14 +357,14 @@ qint64 BaseInstance::lastLaunch() const
 
 void BaseInstance::setLastLaunch(qint64 val)
 {
-    // FIXME: if no change, do not set. setting involves saving a file.
+
     m_settings->set("lastLaunchTime", val);
     emit propertiesChanged(this);
 }
 
 void BaseInstance::setNotes(QString val)
 {
-    // FIXME: if no change, do not set. setting involves saving a file.
+
     m_settings->set("notes", val);
 }
 
@@ -381,7 +375,7 @@ QString BaseInstance::notes() const
 
 void BaseInstance::setIconKey(QString val)
 {
-    // FIXME: if no change, do not set. setting involves saving a file.
+
     m_settings->set("iconKey", val);
     emit propertiesChanged(this);
 }
@@ -393,7 +387,7 @@ QString BaseInstance::iconKey() const
 
 void BaseInstance::setName(QString val)
 {
-    // FIXME: if no change, do not set. setting involves saving a file.
+
     m_settings->set("name", val);
     emit propertiesChanged(this);
 }
@@ -414,7 +408,7 @@ void BaseInstance::registerShortcut(const ShortcutData& data)
 
 void BaseInstance::setShortcuts(const QList<ShortcutData>& shortcuts)
 {
-    // FIXME: if no change, do not set. setting involves saving a file.
+
     QJsonArray array;
     for (const auto& elem : shortcuts) {
         array.append(QJsonObject{ { "name", elem.name }, { "filePath", elem.filePath }, { "target", static_cast<int>(elem.target) } });
@@ -465,7 +459,6 @@ QString BaseInstance::windowTitle() const
     return BuildConfig.LAUNCHER_DISPLAYNAME + ": " + name();
 }
 
-// FIXME: why is this here? move it to MinecraftInstance!!!
 QStringList BaseInstance::extraArguments()
 {
     return Commandline::splitArgs(settings()->get("JvmArgs").toString());
@@ -478,7 +471,7 @@ LaunchTask* BaseInstance::getLaunchTask()
 
 void BaseInstance::updateRuntimeContext()
 {
-    // NOOP
+
 }
 
 bool BaseInstance::isLegacy()

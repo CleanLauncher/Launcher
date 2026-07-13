@@ -35,7 +35,7 @@ void XboxAuthorizationStep::perform()
 }
 )XXX";
     const auto xboxAuthData = xboxAuthTemplate.arg(m_data->userToken.token, m_relyingParty);
-    // http://xboxlive.com
+
     const QUrl url("https://xsts.auth.xboxlive.com/xsts/authorize");
     auto headers = QList<Net::HeaderPair>{ { .headerName = "Content-Type", .headerValue = "application/json" },
                                            { .headerName = "Accept", .headerValue = "application/json" },
@@ -119,7 +119,7 @@ bool XboxAuthorizationStep::processSTSError(const QByteArray& response)
                 return true;
             }
             case 2148916235: {
-                // NOTE: this is the Grulovia error
+
                 emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("Xbox Live is not available in your country. You've been blocked."));
                 return true;
             }
@@ -130,7 +130,7 @@ bool XboxAuthorizationStep::processSTSError(const QByteArray& response)
                         .arg("<a href=\"https://help.minecraft.net/hc/en-us/articles/4408968616077\">help.minecraft.net</a>"));
                 return true;
             }
-            // the following codes where copied from: https://github.com/PrismarineJS/prismarine-auth/pull/44
+
             case 2148916236: {
                 emit finished(AccountTaskState::STATE_FAILED_SOFT,
                               tr("This Microsoft account requires proof of age to play. Please login to %1 to provide proof of age.")

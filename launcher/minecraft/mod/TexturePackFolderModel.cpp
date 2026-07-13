@@ -82,7 +82,6 @@ QVariant TexturePackFolderModel::data(const QModelIndex& index, int role) const
             break;
     }
 
-    // map the columns to the base equivilents
     QModelIndex mappedIndex;
     switch (column) {
         case ActiveColumn:

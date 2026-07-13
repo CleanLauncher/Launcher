@@ -119,7 +119,6 @@ struct VersionMod {
 
     bool client;
 
-    // computed
     bool effectively_hidden;
 };
 
@@ -185,4 +184,4 @@ struct PackVersion {
 
 void loadVersion(PackVersion& v, QJsonObject& obj);
 
-}  // namespace ATLauncher
+}

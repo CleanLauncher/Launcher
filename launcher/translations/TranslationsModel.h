@@ -27,9 +27,8 @@ class TranslationsModel : public QAbstractListModel {
     explicit TranslationsModel(const QString& path, QObject* parent = nullptr);
     ~TranslationsModel() override;
 
-    // hide copy constructor
     TranslationsModel(const TranslationsModel&) = delete;
-    // hide assign op
+
     TranslationsModel& operator=(const TranslationsModel&) = delete;
 
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;  // NOLINT(*-default-arguments)
@@ -59,7 +58,7 @@ class TranslationsModel : public QAbstractListModel {
     void dlGood();
     void translationDirChanged(const QString& path);
 
-   private: /* data */
+   private:
     struct Private;
     std::unique_ptr<Private> d;
 };

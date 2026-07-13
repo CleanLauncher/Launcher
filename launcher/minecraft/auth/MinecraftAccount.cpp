@@ -157,10 +157,10 @@ void MinecraftAccount::authFailed(QString reason)
     switch (m_currentTask->taskState()) {
         case AccountTaskState::STATE_OFFLINE:
         case AccountTaskState::STATE_DISABLED: {
-            // NOTE: user will need to fix this themselves.
+
         }
         case AccountTaskState::STATE_FAILED_SOFT: {
-            // NOTE: this doesn't do much. There was an error of some sort.
+
         } break;
         case AccountTaskState::STATE_FAILED_HARD: {
             if (accountType() == AccountType::MSA || accountType() == AccountType::Ely) {
@@ -184,7 +184,7 @@ void MinecraftAccount::authFailed(QString reason)
         } break;
         case AccountTaskState::STATE_CREATED:
         case AccountTaskState::STATE_SUCCEEDED: {
-            // Not reachable here, as they are not failures.
+
         }
     }
     m_currentTask.reset();
@@ -219,12 +219,7 @@ bool MinecraftAccount::isActive() const
 
 bool MinecraftAccount::shouldRefresh() const
 {
-    /*
-     * Never refresh accounts that are being used by the game, it breaks the game session.
-     * Always refresh accounts that have not been refreshed yet during this session.
-     * Don't refresh broken accounts.
-     * Refresh accounts that would expire in the next 12 hours (fresh token validity is 24 hours).
-     */
+
     if (isInUse()) {
         return false;
     }
@@ -254,15 +249,15 @@ bool MinecraftAccount::shouldRefresh() const
 
 void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreference)
 {
-    // volatile auth token
+
     session->access_token = data.accessToken();
-    // profile name
+
     session->player_name = data.profileName();
-    // profile ID
+
     session->uuid = data.profileId();
     if (session->uuid.isEmpty())
         session->uuid = uuidFromUsername(session->player_name).toString(QUuid::Id128);
-    // 'legacy' or 'mojang', depending on account type
+
     session->user_type = typeString();
     if (!session->access_token.isEmpty()) {
         session->session = "token:" + data.accessToken() + ":" + data.profileId();
@@ -270,16 +265,20 @@ void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreferenc
         session->session = "-";
     }
     switch (elyPatchPreference) {
-        case 0: { // Always
+        case 0: {
+
             session->wantsElyPatch = true;
         } break;
-        case 1: { // When using Ely and Offline accounts
+        case 1: {
+
             session->wantsElyPatch = data.type == AccountType::Ely || data.type == AccountType::Offline;
         } break;
-        case 2: { // When using Ely accounts
+        case 2: {
+
             session->wantsElyPatch = data.type == AccountType::Ely;
         } break;
-        default: { // Never/unknown
+        default: {
+
             session->wantsElyPatch = false;
         }
     }
@@ -290,7 +289,7 @@ void MinecraftAccount::decrementUses()
     Usable::decrementUses();
     if (!isInUse()) {
         emit changed();
-        // FIXME: we now need a better way to identify accounts...
+
         qWarning() << "Profile" << data.profileId() << "is no longer in use.";
     }
 }
@@ -301,7 +300,7 @@ void MinecraftAccount::incrementUses()
     Usable::incrementUses();
     if (!wasInUse) {
         emit changed();
-        // FIXME: we now need a better way to identify accounts...
+
         qWarning() << "Profile" << data.profileId() << "is now in use.";
     }
 }
@@ -310,15 +309,17 @@ QUuid MinecraftAccount::uuidFromUsername(QString username)
 {
     auto input = QString("OfflinePlayer:%1").arg(username).toUtf8();
 
-    // basically a reimplementation of Java's UUID#nameUUIDFromBytes
     QByteArray digest = QCryptographicHash::hash(input, QCryptographicHash::Md5);
 
     auto bOr = [](QByteArray& array, qsizetype index, uint8_t value) { array[index] |= value; };
     auto bAnd = [](QByteArray& array, qsizetype index, uint8_t value) { array[index] &= value; };
-    bAnd(digest, 6, 0x0f);  // clear version
-    bOr(digest, 6, 0x30);   // set to version 3
-    bAnd(digest, 8, 0x3f);  // clear variant
-    bOr(digest, 8, 0x80);   // set to IETF variant
+    bAnd(digest, 6, 0x0f);
+
+    bOr(digest, 6, 0x30);
+
+    bAnd(digest, 8, 0x3f);
+
+    bOr(digest, 8, 0x80);
 
     return QUuid::fromRfc4122(digest);
 }

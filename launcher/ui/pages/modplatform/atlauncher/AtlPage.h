@@ -64,9 +64,8 @@ class AtlPage : public QWidget, public ModpackProviderBasePage {
 
     void openedImpl() override;
 
-    /** Programatically set the term in the search bar. */
     virtual void setSearchTerm(QString) override;
-    /** Get the current term in the search bar. */
+
     virtual QString getSerachTerm() const override;
 
    private:

@@ -76,7 +76,6 @@ FlamePage::FlamePage(NewInstanceDialog* dialog, QWidget* parent)
 
     m_ui->verticalLayout->insertWidget(2, &m_fetch_progress);
 
-    // index is used to set the sorting with the curseforge api
     m_ui->sortByBox->addItem(tr("Sort by Featured"));
     m_ui->sortByBox->addItem(tr("Sort by Popularity"));
     m_ui->sortByBox->addItem(tr("Sort by Last Updated"));
@@ -162,10 +161,11 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
         ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion> > callbacks{};
 
         auto addonId = m_current->addonId;
-        // Use default if no callbacks are set
+
         callbacks.on_succeed = [this, curr, addonId](auto& doc) {
             if (addonId != m_current->addonId) {
-                return;  // wrong request
+                return;
+
             }
 
             m_current->versions = doc;
@@ -194,7 +194,6 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
             if (!m_listModel->setData(curr, current_updated, Qt::UserRole))
                 qWarning() << "Failed to cache versions for the current pack!";
 
-            // TODO: Check whether it's a connection issue or the project disabled 3rd-party distribution.
             if (m_current->versionsLoaded && m_ui->versionSelectionBox->count() < 1) {
                 m_ui->versionSelectionBox->addItem(tr("No version is available!"), -1);
             }
@@ -216,7 +215,6 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
         suggestCurrent();
     }
 
-    // TODO: Check whether it's a connection issue or the project disabled 3rd-party distribution.
     if (m_current->versionsLoaded && m_ui->versionSelectionBox->count() < 1) {
         m_ui->versionSelectionBox->addItem(tr("No version is available!"), -1);
     }
@@ -322,7 +320,7 @@ void FlamePage::createFilterWidget()
     auto widget = ModFilterWidget::create(nullptr, false);
     m_filterWidget.swap(widget);
     auto old = m_ui->splitter->replaceWidget(0, m_filterWidget.get());
-    // because we replaced the widget we also need to delete it
+
     if (old) {
         delete old;
     }

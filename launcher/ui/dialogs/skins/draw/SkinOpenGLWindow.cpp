@@ -42,11 +42,9 @@ SkinOpenGLWindow::SkinOpenGLWindow(SkinProvider* parent, QColor color)
 
 SkinOpenGLWindow::~SkinOpenGLWindow()
 {
-    // Make sure the context is current when deleting the texture
-    // and the buffers.
+
     makeCurrent();
-    // double check if resources were initialized because they are not
-    // initialized together with the object
+
     if (m_scene) {
         delete m_scene;
     }
@@ -78,14 +76,14 @@ SkinOpenGLWindow::~SkinOpenGLWindow()
 
 void SkinOpenGLWindow::mousePressEvent(QMouseEvent* e)
 {
-    // Save mouse press position
+
     m_mousePosition = QVector2D(e->pos());
     m_isMousePressed = true;
 }
 
 void SkinOpenGLWindow::mouseMoveEvent(QMouseEvent* event)
 {
-    // Prevents mouse sticking on Wayland compositors
+
     if (!(event->buttons() & Qt::MouseButton::LeftButton)) {
         m_isMousePressed = false;
         return;
@@ -98,14 +96,14 @@ void SkinOpenGLWindow::mouseMoveEvent(QMouseEvent* event)
         m_yaw += dx * 0.5f;
         m_pitch += dy * 0.5f;
 
-        // Normalize yaw to keep it manageable
         if (m_yaw > 360.0f)
             m_yaw -= 360.0f;
         else if (m_yaw < 0.0f)
             m_yaw += 360.0f;
 
         m_mousePosition = QVector2D(event->pos());
-        update();  // Trigger a repaint
+        update();
+
     }
 }
 
@@ -141,54 +139,45 @@ void SkinOpenGLWindow::initializeGL()
 
 void SkinOpenGLWindow::initShaders()
 {
-    // Skin model shaders
+
     m_modelProgram = new QOpenGLShaderProgram(this);
-    // Compile vertex shader
+
     if (!m_modelProgram->addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vshader_skin_model.glsl"))
         close();
 
-    // Compile fragment shader
     if (!m_modelProgram->addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fshader.glsl"))
         close();
 
-    // Link shader pipeline
     if (!m_modelProgram->link())
         close();
 
-    // Bind shader pipeline for use
     if (!m_modelProgram->bind())
         close();
 
-    // Background shaders
     m_backgroundProgram = new QOpenGLShaderProgram(this);
-    // Compile vertex shader
+
     if (!m_backgroundProgram->addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vshader_skin_background.glsl"))
         close();
 
-    // Compile fragment shader
     if (!m_backgroundProgram->addCacheableShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/fshader.glsl"))
         close();
 
-    // Link shader pipeline
     if (!m_backgroundProgram->link())
         close();
 
-    // Bind shader pipeline for use (verification)
     if (!m_backgroundProgram->bind())
         close();
 }
 
 void SkinOpenGLWindow::resizeGL(int w, int h)
 {
-    // Calculate aspect ratio
+
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     const qreal zNear = 15., fov = 45;
 
-    // Reset projection
     m_projection.setToIdentity();
 
-    // Build the reverse z perspective projection matrix
     double radians = qDegreesToRadians(fov / 2.);
     double sine = std::sin(radians);
     if (sine == 0)
@@ -205,17 +194,15 @@ void SkinOpenGLWindow::resizeGL(int w, int h)
 
 void SkinOpenGLWindow::paintGL()
 {
-    // Adjust the viewport to account for fractional scaling
+
     qreal dpr = devicePixelRatio();
     if (dpr != 1.f) {
         QSize scaledSize = size() * dpr;
         glViewport(0, 0, scaledSize.width(), scaledSize.height());
     }
 
-    // Clear color and depth buffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
@@ -226,25 +213,24 @@ void SkinOpenGLWindow::paintGL()
     renderBackground();
     m_backgroundProgram->release();
 
-    // Calculate model view transformation
     QMatrix4x4 matrix;
     float yawRad = qDegreesToRadians(m_yaw);
     float pitchRad = qDegreesToRadians(m_pitch);
-    matrix.lookAt(QVector3D(                                       //
-                      m_distance * qCos(pitchRad) * qCos(yawRad),  //
-                      m_distance * qSin(pitchRad) - 8,             //
+    matrix.lookAt(QVector3D(
+
+                      m_distance * qCos(pitchRad) * qCos(yawRad),
+
+                      m_distance * qSin(pitchRad) - 8,
+
                       m_distance * qCos(pitchRad) * qSin(yawRad)),
                   QVector3D(0, -8, 0), QVector3D(0, 1, 0));
 
-    // Set modelview-projection matrix
     m_modelProgram->bind();
     m_modelProgram->setUniformValue("mvp_matrix", m_projection * matrix);
 
     m_scene->draw(m_modelProgram);
     m_modelProgram->release();
 
-    // Redraw the first frame; this is necessary because the pixel ratio for Wayland fractional scaling is not negotiated properly on the
-    // first frame
     if (m_isFirstFrame) {
         m_isFirstFrame = false;
         update();
@@ -307,22 +293,28 @@ void SkinOpenGLWindow::generateBackgroundTexture(int width, int height, int tile
 void SkinOpenGLWindow::renderBackground()
 {
     glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);  // Disable depth buffer writing
+    glDepthMask(GL_FALSE);
+
     m_backgroundTexture->bind();
     m_backgroundProgram->setUniformValue("texture", 0);
     m_background->draw(m_backgroundProgram);
     m_backgroundTexture->release();
-    glDepthMask(GL_TRUE);  // Re-enable depth buffer writing
+    glDepthMask(GL_TRUE);
+
     glEnable(GL_DEPTH_TEST);
 }
 
 void SkinOpenGLWindow::wheelEvent(QWheelEvent* event)
 {
-    // Adjust distance based on scroll
-    int delta = event->angleDelta().y();  // Positive for scroll up, negative for scroll down
-    m_distance -= delta * 0.01f;          // Adjust sensitivity factor
-    m_distance = qMax(16.f, m_distance);  // Clamp distance
-    update();                             // Trigger a repaint
+
+    int delta = event->angleDelta().y();
+
+    m_distance -= delta * 0.01f;
+
+    m_distance = qMax(16.f, m_distance);
+
+    update();
+
 }
 void SkinOpenGLWindow::setElytraVisible(bool visible)
 {

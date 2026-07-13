@@ -56,13 +56,11 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
     auto icon = APPLICATION->icons()->getIcon(m_instance->iconKey());
     QString windowTitle = tr("Console window for ") + m_instance->name();
 
-    // Set window properties
     {
         setWindowIcon(icon);
         setWindowTitle(windowTitle);
     }
 
-    // Add page container
     {
         auto provider = std::make_shared<InstancePageProvider>(m_instance);
         m_container = new PageContainer(provider.get(), "console", this);
@@ -71,7 +69,6 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
         setContentsMargins(0, 0, 0, 0);
     }
 
-    // Add custom buttons to the page container layout.
     {
         auto horizontalLayout = new QHBoxLayout(this);
         horizontalLayout->setObjectName(QStringLiteral("horizontalLayout"));
@@ -89,7 +86,8 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
         m_launchButton->setText(tr("&Launch"));
         m_launchButton->setToolTip(tr("Launch the instance"));
         m_launchButton->setPopupMode(QToolButton::MenuButtonPopup);
-        m_launchButton->setMinimumWidth(80);  // HACK!!
+        m_launchButton->setMinimumWidth(80);
+
         horizontalLayout->addWidget(m_launchButton);
         connect(m_launchButton, &QPushButton::clicked, this, [this] { APPLICATION->launch(m_instance); });
 
@@ -113,7 +111,6 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
         connect(APPLICATION, &Application::globalSettingsApplied, this, &InstanceWindow::updateButtons);
     }
 
-    // restore window state
     {
         auto base64State = APPLICATION->settings()->get("ConsoleWindowState").toString().toUtf8();
         restoreState(QByteArray::fromBase64(base64State));
@@ -121,7 +118,6 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
         restoreGeometry(QByteArray::fromBase64(base64Geometry));
     }
 
-    // set up instance and launch process recognition
     {
         auto launchTask = m_instance->getLaunchTask();
         instanceLaunchTaskChanged(launchTask);
@@ -129,12 +125,10 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
         connect(m_instance, &BaseInstance::runningStatusChanged, this, &InstanceWindow::runningStateChanged);
     }
 
-    // set up instance destruction detection
     {
         connect(m_instance, &BaseInstance::statusChanged, this, &InstanceWindow::on_instanceStatusChanged);
     }
 
-    // add ourself as the modpack page's instance window
     {
         static_cast<ManagedPackPage*>(m_container->getPage("managed_pack"))->setInstanceWindow(this);
     }

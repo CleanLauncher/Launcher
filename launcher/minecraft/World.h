@@ -42,13 +42,13 @@ class World {
     bool isValid() const { return m_isValid; }
     bool isOnFS() const { return m_containerFile.isDir(); }
     QFileInfo container() const { return m_containerFile; }
-    // delete all the files of this world
+
     bool destroy();
-    // replace this world with a copy of the other
+
     bool replace(World& with);
-    // change the world's filesystem path (used by world lists for *MAGIC* purposes)
+
     void repath(const QFileInfo& file);
-    // remove the icon file, if any
+
     bool resetIcon();
 
     bool rename(const QString& to);
@@ -56,18 +56,10 @@ class World {
 
     void setSize(int64_t size);
 
-    // WEAK compare operator - used for replacing worlds
     bool operator==(const World& other) const;
 
     auto isSymLink() const -> bool { return m_containerFile.isSymLink(); }
 
-    /**
-     * @brief Take a instance path, checks if the file pointed to by the resource is a symlink or under a symlink in that instance
-     *
-     * @param instPath path to an instance directory
-     * @return true
-     * @return false
-     */
     bool isSymLinkUnder(const QString& instPath) const;
 
     bool isMoreThanOneHardLink() const;

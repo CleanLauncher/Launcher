@@ -58,8 +58,6 @@ auto ModpackListModel::debugName() const -> QString
     return m_parent->debugName();
 }
 
-/******** Make data requests ********/
-
 void ModpackListModel::fetchMore(const QModelIndex& parent)
 {
     if (parent.isValid())
@@ -82,7 +80,7 @@ auto ModpackListModel::data(const QModelIndex& index, int role) const -> QVarian
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-                // some magic to prevent to long tooltips and replace html linebreaks
+
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -104,7 +102,7 @@ auto ModpackListModel::data(const QModelIndex& index, int role) const -> QVarian
         }
         case Qt::SizeHintRole:
             return QSize(0, 58);
-        // Custom data
+
         case UserDataTypes::TITLE:
             return pack->name;
         case UserDataTypes::DESCRIPTION:
@@ -135,7 +133,6 @@ void ModpackListModel::performPaginatedSearch()
         return;
     static const ModrinthAPI api;
 
-    // Modrinth ids are not limited to numbers and can be any length
     if (m_searchState != ResetRequested && m_currentSearchTerm.startsWith("#")) {
         auto projectId = m_currentSearchTerm.mid(1);
         if (!projectId.isEmpty()) {
@@ -160,7 +157,8 @@ void ModpackListModel::performPaginatedSearch()
             }
             return;
         }
-    }  // TODO: Move to standalone API
+    }
+
     ResourceAPI::SortingMethod sort{};
     sort.name = m_currentSort;
 
@@ -274,8 +272,6 @@ void ModpackListModel::requestLogo(QString logo, QString url)
     m_loadingLogos.append(logo);
 }
 
-/******** Request callbacks ********/
-
 void ModpackListModel::logoLoaded(QString logo, QIcon out)
 {
     m_loadingLogos.removeAll(logo);
@@ -304,7 +300,6 @@ void ModpackListModel::searchRequestFinished(QList<ModPlatform::IndexedPack::Ptr
         m_searchState = CanPossiblyFetchMore;
     }
 
-    // When you have a Qt build with assertions turned on, proceeding here will abort the application
     if (newList.size() == 0)
         return;
 
@@ -325,12 +320,12 @@ void ModpackListModel::searchRequestForOneSucceeded(ModPlatform::IndexedPack::Pt
 void ModpackListModel::searchRequestFailed(QString reason, int network_error_code)
 {
     if (network_error_code == -1) {
-        // Unknown error in network stack
+
         QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load modpacks."));
     } else if (network_error_code == 409) {
-        // 409 Gone, notify user to update
+
         QMessageBox::critical(nullptr, tr("Error"),
-                              //: %1 refers to the launcher itself
+
                               QString("%1 %2")
                                   .arg(m_parent->displayName())
                                   .arg(tr("API version too old!\nPlease update %1!").arg(BuildConfig.LAUNCHER_DISPLAYNAME)));
@@ -349,6 +344,4 @@ void ModpackListModel::searchRequestFailed(QString reason, int network_error_cod
     }
 }
 
-}  // namespace Modrinth
-
-/******** Helpers ********/
+}

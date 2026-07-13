@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only
 
 #pragma once
@@ -26,4 +26,4 @@ class FlameTexturePackModel : public TexturePackResourceModel {
     ResourceAPI::VersionSearchArgs createVersionsArguments(const QModelIndex&) override;
 };
 
-}  // namespace ResourceDownload
+}

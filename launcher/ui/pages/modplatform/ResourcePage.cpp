@@ -1,5 +1,5 @@
 // SPDX-FileCopyrightText: 2023 flowln <flowlnlnln@gmail.com>
-//
+
 // SPDX-License-Identifier: GPL-3.0-only AND Apache-2.0
 /*
  *  Prism Launcher - Minecraft Launcher
@@ -73,7 +73,6 @@ ResourcePage::ResourcePage(ResourceDownloadDialog* parent, BaseInstance& baseIns
 
     connect(&m_searchTimer, &QTimer::timeout, this, &ResourcePage::triggerSearch);
 
-    // hide progress bar to prevent weird artifact
     m_fetchProgress.hide();
     m_fetchProgress.hideIfInactive(true);
     m_fetchProgress.setFixedHeight(24);
@@ -110,7 +109,6 @@ void ResourcePage::openedImpl()
         m_ui->filterWidget->hide();
     }
 
-    //: String in the search bar of the mod downloading dialog
     m_ui->searchEdit->setPlaceholderText(tr("Search for %1...").arg(resourcesString()));
     m_ui->resourceSelectionButton->setText(tr("Select %1 for download").arg(resourceString()));
 
@@ -145,7 +143,7 @@ auto ResourcePage::eventFilter(QObject* watched, QEvent* event) -> bool
             m_searchTimer.start(350);
 
         } else if (watched == m_ui->packView) {
-            // stop the event from going to the confirm button
+
             if (keyEvent->key() == Qt::Key_Return) {
                 onResourceToggle(m_ui->packView->currentIndex());
                 keyEvent->accept();
@@ -367,7 +365,6 @@ void ResourcePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         requestLoad = true;
     }
 
-    // we are already requesting this
     if (m_enableQueue.contains(curr.row())) {
         requestLoad = false;
     }
@@ -433,13 +430,11 @@ void ResourcePage::onResourceSelected()
         addResourceToDialog(currentPack, version);
     }
 
-    // Save the modified pack (and prevent warning in release build)
     [[maybe_unused]] bool set = setCurrentPack(currentPack);
     Q_ASSERT(set);
 
     updateSelectionButton();
 
-    /* Force redraw on the resource list when the selection changes */
     m_ui->packView->repaint();
 }
 
@@ -472,16 +467,13 @@ void ResourcePage::onResourceToggle(const QModelIndex& index)
             updateSelectionButton();
         }
 
-        // force update
         QVariant variant;
         variant.setValue(pack);
         m_model->setData(index, variant, Qt::UserRole);
     } else {
-        // the model is just 1 dimensional so this is fine
+
         m_enableQueue.insert(index.row());
 
-        // we can't be sure that this hasn't already been requested...
-        // but this does the job well enough and there's not much point preventing edgecases
         if (!isSelected) {
             m_model->loadEntry(index);
         }
@@ -490,13 +482,11 @@ void ResourcePage::onResourceToggle(const QModelIndex& index)
 
 void ResourcePage::openUrl(const QUrl& url)
 {
-    // do not allow other url schemes for security reasons
+
     if (!(url.scheme() == "http" || url.scheme() == "https")) {
         qWarning() << "Unsupported scheme" << url.scheme();
         return;
     }
-
-    // detect URLs and search instead
 
     const QString address = url.host() + url.path();
     QRegularExpressionMatch match;
@@ -514,7 +504,6 @@ void ResourcePage::openUrl(const QUrl& url)
     if (!page.isNull() && !m_doNotJumpToMod) {
         const QString slug = match.captured(1);
 
-        // ensure the user isn't opening the same mod
         if (auto currentPack = getCurrentPack(); currentPack && slug != currentPack->slug) {
             m_parentDialog->selectPage(page);
 
@@ -535,7 +524,6 @@ void ResourcePage::openUrl(const QUrl& url)
                     }
                 }
 
-                // The final fallback.
                 QDesktopServices::openUrl(url);
             };
 
@@ -552,7 +540,6 @@ void ResourcePage::openUrl(const QUrl& url)
         }
     }
 
-    // open in the user's web browser
     QDesktopServices::openUrl(url);
 }
 
@@ -607,4 +594,4 @@ void ResourcePage::openProject(const QVariant& projectID)
         jump();
     }
 }
-}  // namespace ResourceDownload
+}

@@ -32,9 +32,6 @@ NewsEntry::NewsEntry(const QString& title, const QString& content, const QString
     this->link = link;
 }
 
-/*!
- * Gets the text content of the given child element as a QVariant.
- */
 inline QString childValue(const QDomElement& element, const QString& childName, QString defaultVal = "")
 {
     QDomNodeList nodes = element.elementsByTagName(childName);
