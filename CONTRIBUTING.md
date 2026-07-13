@@ -11,13 +11,13 @@ git clone --recurse-submodules https://github.com/CleanLauncher/Launcher.git
 cd Launcher
 ```
 
-2. Install dependencies and configure:
+1. Install dependencies and configure:
 
 ```sh
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 ```
 
-3. Build:
+1. Build:
 
 ```sh
 cmake --build build

@@ -93,6 +93,7 @@ runs:
         case "$os_name" in
           linux)  HOST_ARCH="linux" ;;
           darwin) HOST_ARCH="mac" ;;
+          *)      HOST_ARCH="windows" ;;
         esac
 
         aqt install-qt "$HOST_ARCH" desktop "${{ inputs.qt-version }}" \
@@ -105,6 +106,12 @@ runs:
         fi
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_64"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/macos"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$(ls -d "$GITHUB_WORKSPACE"/qt/${{ inputs.qt-version }}/* 2>/dev/null | head -1)"
         fi
 
         echo "Qt6_DIR=$QT_ROOT/lib/cmake/Qt6" >> "$GITHUB_ENV"

@@ -80,6 +80,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Run Flake checks
         run: |
           nix flake check --print-build-logs --show-trace

@@ -12,7 +12,7 @@ This directory contains program metadata and branding information for Launcher, 
 ## Files
 
 | File | Purpose |
-|------|---------|
+| ------ | --------- |
 | `CMakeLists.txt` | CMake build configuration that defines branding variables and configures template files |
 | `io.github.launcher.Launcher.desktop.in` | Linux desktop entry template |
 | `io.github.launcher.Launcher.metainfo.xml.in` | AppStream metainfo template |

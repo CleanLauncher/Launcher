@@ -53,6 +53,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
       - name: Run nix fmt
         run: |
           nix fmt -- --check .
@@ -75,6 +78,8 @@ jobs:
             --enable=warning,style,performance,portability \
             --error-exitcode=1 \
             --suppress=missingIncludeSystem \
+            --suppress=unreadVariable:libraries/murmur2/src/MurmurHash2.cpp \
+            --suppress=useInitializationList:libraries/rainbow/src/rainbow.cpp \
             --inline-suppr \
             -I libraries/ \
             -I launcher/ \

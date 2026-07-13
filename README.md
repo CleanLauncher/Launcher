@@ -15,7 +15,7 @@ git clone --recurse-submodules https://github.com/CleanLauncher/Launcher.git
 cd Launcher
 ```
 
-2. Configure and build:
+1. Configure and build:
 
 ```sh
 cmake -B build -G Ninja

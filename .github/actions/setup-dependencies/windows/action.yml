@@ -53,7 +53,10 @@ runs:
       run: |
         echo "C:\msys64\usr\bin" >> "$GITHUB_PATH"
 
-        case "${{ inputs.msystem }}" in
+        MSYS_INPUT="${{ inputs.msystem }}"
+        MSYS_INPUT="$(printf '%s' "$MSYS_INPUT" | tr -d '[:space:]')"
+
+        case "$MSYS_INPUT" in
           CLANG64)    PKG_PREFIX="mingw-w64-clang-x86_64" ;;
           CLANGARM64) PKG_PREFIX="mingw-w64-clang-aarch64" ;;
           MINGW64)    PKG_PREFIX="mingw-w64-x86_64" ;;
