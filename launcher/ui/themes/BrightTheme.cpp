@@ -43,7 +43,7 @@ QString BrightTheme::id()
 
 QString BrightTheme::name()
 {
-    return QObject::tr("Bright");
+    return QObject::tr("Light");
 }
 
 QPalette BrightTheme::colorScheme()
