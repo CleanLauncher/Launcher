@@ -18,6 +18,7 @@ set(SRC
     org/launcher/utils/logging/Level.java
     org/launcher/utils/logging/Log.java
     org/launcher/legacy/LegacyProxy.java
+    legacy/net/minecraft/Launcher.java
 )
 
 set(LEGACY_SRC
