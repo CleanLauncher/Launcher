@@ -51,22 +51,7 @@ runs:
       with:
         msystem: ${{ inputs.msystem }}
         update: true
-        install: >-
-          mingw-w64-${{ inputs.msystem == 'CLANG64' && 'clang-x86_64' || inputs.msystem == 'CLANGARM64' && 'clang-aarch64' || inputs.msystem == 'MINGW64' && 'x86_64' || 'ucrt-x86_64' }}-toolchain
-
-    - name: Set MSYS2 compiler for CMake (MinGW)
-      if: ${{ inputs.msystem != '' }}
-      shell: bash
-      run: |
-        case "${{ inputs.msystem }}" in
-          CLANG64)    SUBDIR="clang64"; CC="clang.exe"; CXX="clang++.exe" ;;
-          CLANGARM64) SUBDIR="clangarm64"; CC="clang.exe"; CXX="clang++.exe" ;;
-          MINGW64)    SUBDIR="mingw64"; CC="gcc.exe"; CXX="g++.exe" ;;
-          UCRT64)     SUBDIR="ucrt64"; CC="gcc.exe"; CXX="g++.exe" ;;
-        esac
-        echo "C:/msys64/$SUBDIR/bin" >> "$GITHUB_PATH"
-        echo "CC=C:/msys64/$SUBDIR/bin/$CC" >> "$GITHUB_ENV"
-        echo "CXX=C:/msys64/$SUBDIR/bin/$CXX" >> "$GITHUB_ENV"
+        install: mingw-w64-x86_64-ccache
 
     - name: Install MSYS2 packages (MinGW)
       if: ${{ inputs.msystem != '' }}
@@ -81,6 +66,7 @@ runs:
         esac
 
         pacman -S --noconfirm \
+          $PKG-toolchain \
           $PKG-cmake \
           $PKG-extra-cmake-modules \
           $PKG-ninja \
@@ -93,6 +79,21 @@ runs:
           $PKG-tomlplusplus \
           $PKG-libarchive \
           $PKG-ccache
+
+    - name: Set MSYS2 compiler for CMake (MinGW)
+      if: ${{ inputs.msystem != '' }}
+      shell: bash
+      run: |
+        case "${{ inputs.msystem }}" in
+          CLANG64)    SUBDIR="clang64"; CC="clang.exe"; CXX="clang++.exe" ;;
+          CLANGARM64) SUBDIR="clangarm64"; CC="clang.exe"; CXX="clang++.exe" ;;
+          MINGW64)    SUBDIR="mingw64"; CC="gcc.exe"; CXX="g++.exe" ;;
+          UCRT64)     SUBDIR="ucrt64"; CC="gcc.exe"; CXX="g++.exe" ;;
+        esac
+        MSYS2_BIN="C:/msys64/$SUBDIR/bin"
+        echo "$MSYS2_BIN" >> "$GITHUB_PATH"
+        echo "CC=$MSYS2_BIN/$CC" >> "$GITHUB_ENV"
+        echo "CXX=$MSYS2_BIN/$CXX" >> "$GITHUB_ENV"
 
     - name: Retrieve ccache cache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
