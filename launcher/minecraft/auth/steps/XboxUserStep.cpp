@@ -31,12 +31,10 @@ void XboxUserStep::perform()
 
     QUrl url("https://user.auth.xboxlive.com/user/authenticate");
 
-    auto headers = QList<Net::HeaderPair>{
-        { "Content-Type", "application/json" },
-        { "Accept", "application/json" },
+    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
+                                           { "Accept", "application/json" },
 
-        { "x-xbl-contract-version", "1" }
-    };
+                                           { "x-xbl-contract-version", "1" } };
     auto [request, response] = Net::Upload::makeByteArray(url, xbox_auth_data.toUtf8());
     m_request = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
@@ -46,8 +44,7 @@ void XboxUserStep::perform()
     m_task->setAskRetry(false);
     m_task->addNetAction(m_request);
 
-    connect(m_task.get(), &Task::finished, this, [this, response] {
-        onRequestDone(response); });
+    connect(m_task.get(), &Task::finished, this, [this, response] { onRequestDone(response); });
 
     m_task->start();
     qDebug() << "First layer of Xbox auth ... commencing.";
