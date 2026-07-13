@@ -66,9 +66,9 @@ runs:
 
         echo "PKG_PREFIX=$PKG_PREFIX" >> "$GITHUB_ENV"
 
-        C:\msys64\usr\bin\bash.exe -lc "pacman -Syu --noconfirm"
+        /c/msys64/usr/bin/bash.exe -lc "pacman -Syu --noconfirm"
 
-        C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm \
+        /c/msys64/usr/bin/bash.exe -lc "pacman -S --noconfirm \
           $PKG_PREFIX-toolchain \
           $PKG_PREFIX-ccache \
           $PKG_PREFIX-cmake \
@@ -87,7 +87,7 @@ runs:
       if: ${{ inputs.msystem != '' }}
       shell: bash
       run: |
-        C:\msys64\usr\bin\bash.exe -lc "pacman -Qe"
+        /c/msys64/usr/bin/bash.exe -lc "pacman -Qe"
 
     - name: Retrieve ccache cache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
@@ -102,7 +102,7 @@ runs:
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
       shell: bash
       run: |
-        C:\msys64\usr\bin\bash.exe -lc "
+        /c/msys64/usr/bin/bash.exe -lc "
           ccache --set-config=cache_dir='${{ github.workspace }}/.ccache'
           ccache --set-config=max_size='500M'
           ccache --set-config=compression=true

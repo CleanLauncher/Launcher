@@ -29,20 +29,20 @@ class ExternalUpdater : public QObject {
     ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir);
     ~ExternalUpdater() override;
 
-    void checkForUpdates() override;
+    virtual void checkForUpdates();
     void checkForUpdates(bool triggeredByUser) const;
 
-    bool getAutomaticallyChecksForUpdates() override;
+    virtual bool getAutomaticallyChecksForUpdates();
 
-    double getUpdateCheckInterval() override;
+    virtual double getUpdateCheckInterval();
 
-    bool getBetaAllowed() override;
+    virtual bool getBetaAllowed();
 
-    void setAutomaticallyChecksForUpdates(bool check) override;
+    virtual void setAutomaticallyChecksForUpdates(bool check);
 
-    void setUpdateCheckInterval(double seconds) override;
+    virtual void setUpdateCheckInterval(double seconds);
 
-    void setBetaAllowed(bool allowed) override;
+    virtual void setBetaAllowed(bool allowed);
 
     void resetAutoCheckTimer() const;
     void disconnectTimer();

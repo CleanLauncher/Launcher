@@ -90,13 +90,32 @@ runs:
         pip install aqtinstall
 
         os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
+        host_machine="$(uname -m)"
         case "$os_name" in
-          linux)  HOST_ARCH="linux" ;;
-          darwin) HOST_ARCH="mac" ;;
-          *)      HOST_ARCH="windows" ;;
+          linux)
+            HOST_ARCH="linux"
+            case "$host_machine" in
+              x86_64)  QT_ARCH="linux_gcc_64" ;;
+              aarch64) QT_ARCH="linux_gcc_arm64" ;;
+              *)       QT_ARCH="linux_gcc_64" ;;
+            esac
+            ;;
+          darwin)
+            HOST_ARCH="mac"
+            case "$host_machine" in
+              x86_64)  QT_ARCH="macos" ;;
+              arm64)   QT_ARCH="macos" ;;
+              *)       QT_ARCH="macos" ;;
+            esac
+            ;;
+          *)
+            HOST_ARCH="windows"
+            QT_ARCH="${{ inputs.vcvars-arch == 'arm64' && 'win64_msvc2019_arm64' || 'win64_msvc2019_64' }}"
+            ;;
         esac
 
         aqt install-qt "$HOST_ARCH" desktop "${{ inputs.qt-version }}" \
+          -a "$QT_ARCH" \
           -O "$GITHUB_WORKSPACE/qt" \
           -m qtimageformats qtnetworkauth
 
