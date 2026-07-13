@@ -243,6 +243,7 @@ bool AccessibleInstanceView::selectColumn(int column)
             if (view()->selectionBehavior() != QAbstractItemView::SelectColumns && rowCount() > 1) {
                 return false;
             }
+            [[fallthrough]];
         }
 
         case QAbstractItemView::ContiguousSelection: {
