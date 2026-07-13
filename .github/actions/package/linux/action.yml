@@ -36,11 +36,14 @@ runs:
     - name: Setup build variables
       shell: bash
       run: |
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
+        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU 2>/dev/null || true)"
+        if [ -z "$dpkg_arch" ]; then
+          dpkg_arch="$(uname -m)"
+        fi
         case "$dpkg_arch" in
-          "amd64") APPIMAGE_ARCH="x86_64" ;;
-          "arm64") APPIMAGE_ARCH="aarch64" ;;
-          *)       echo "::error::Unrecognized Debian architecture: $dpkg_arch"; exit 1 ;;
+          "amd64"|"x86_64")   APPIMAGE_ARCH="x86_64" ;;
+          "arm64"|"aarch64")  APPIMAGE_ARCH="aarch64" ;;
+          *)       echo "::error::Unrecognized architecture: $dpkg_arch"; exit 1 ;;
         esac
         echo "APPIMAGE_ARCH=$APPIMAGE_ARCH" >> "$GITHUB_ENV"
         echo "DEB_HOST_MULTIARCH=$(dpkg-architecture -q DEB_HOST_MULTIARCH)" >> "$GITHUB_ENV"
