@@ -51,6 +51,9 @@ class ExternalUpdater : public QObject {
     void offerUpdate(const QString& versionName, const QString& versionTag, const QString& releaseNotes, bool triggeredByUser) const;
     void performUpdate(const QString& versionTag) const;
 
+   signals:
+    void canCheckForUpdatesChanged(bool canCheck);
+
    public slots:
     void autoCheckTimerFired() const;
 

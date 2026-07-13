@@ -62,6 +62,7 @@ bool JavaWizardPage::validatePage()
         }
         case JavaWizardWidget::ValidationStatus::AllOK: {
             settings->set("JavaPath", m_java_widget->javaPath());
+            [[fallthrough]];
         }
         case JavaWizardWidget::ValidationStatus::JavaBad: {
             auto s = APPLICATION->settings();
