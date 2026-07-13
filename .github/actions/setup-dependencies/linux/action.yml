@@ -23,16 +23,19 @@ runs:
       run: |
         mkdir -p ~/bin
 
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
+        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU 2>/dev/null || true)"
+        if [ -z "$dpkg_arch" ]; then
+          dpkg_arch="$(uname -m)"
+        fi
         case "$dpkg_arch" in
-          "amd64")
+          "amd64"|"x86_64")
             APPIMAGE_ARCH="x86_64"
             ;;
-          "arm64")
+          "arm64"|"aarch64")
             APPIMAGE_ARCH="aarch64"
             ;;
           *)
-            echo "::error::Unrecognized Debian architecture: $dpkg_arch"
+            echo "::error::Unrecognized architecture: $dpkg_arch"
             exit 1
             ;;
         esac

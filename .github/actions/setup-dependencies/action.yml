@@ -132,7 +132,16 @@ runs:
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_64"
         fi
         if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_arm64"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/macos"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_64"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64_cross_compiled"
         fi
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$(ls -d "$GITHUB_WORKSPACE"/qt/${{ inputs.qt-version }}/* 2>/dev/null | head -1)"
