@@ -164,7 +164,6 @@ void ModFolderPage::downloadMods()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -225,7 +224,6 @@ void ModFolderPage::updateMods(bool includeDeps)
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -336,7 +334,6 @@ void ModFolderPage::changeModVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     auto* profile = static_cast<MinecraftInstance*>(m_instance)->getPackProfile();
@@ -433,7 +430,6 @@ inline bool ModFolderPage::handleNoModLoader()
         ModFolderPage::tr("You need to install a compatible mod loader before installing mods. Would you like to do so?"),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     if (resp == QMessageBox::Yes) {
-
         auto* profile = static_cast<MinecraftInstance*>(this->m_instance)->getPackProfile();
         InstallLoaderDialog dialog(profile, QString(), this);
         bool ret = dialog.exec() != 0;

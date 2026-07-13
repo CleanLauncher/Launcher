@@ -64,7 +64,6 @@ bool JavaWizardPage::validatePage()
             settings->set("JavaPath", m_java_widget->javaPath());
         }
         case JavaWizardWidget::ValidationStatus::JavaBad: {
-
             auto s = APPLICATION->settings();
             s->set("MinMemAlloc", m_java_widget->minHeapSize());
             s->set("MaxMemAlloc", m_java_widget->maxHeapSize());
@@ -81,7 +80,6 @@ bool JavaWizardPage::validatePage()
 void JavaWizardPage::retranslate()
 {
     setTitle(tr("Java"));
-    setSubTitle(
-        tr("Please select how much memory to allocate to instances and if Launcher should manage Java automatically or manually."));
+    setSubTitle(tr("Please select how much memory to allocate to instances and if Launcher should manage Java automatically or manually."));
     m_java_widget->retranslate();
 }

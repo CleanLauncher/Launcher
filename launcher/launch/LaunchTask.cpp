@@ -90,7 +90,6 @@ void LaunchTask::onReadyForLaunch()
 
 void LaunchTask::onStepFinished()
 {
-
     if (currentStep == -1) {
         currentStep++;
         m_steps[currentStep]->start();
@@ -99,7 +98,6 @@ void LaunchTask::onStepFinished()
 
     auto step = m_steps[currentStep];
     if (step->wasSuccessful()) {
-
         if (currentStep == m_steps.size() - 1) {
             finalizeSteps(true, QString());
         } else {
@@ -215,7 +213,7 @@ shared_qobject_ptr<LogModel> LaunchTask::getLogModel()
     return m_logModel;
 }
 
-bool LaunchTask::parseXmlLogs(QString const& line, MessageLevel level)
+bool LaunchTask::parseXmlLogs(const QString& line, MessageLevel level)
 {
     LogParser* parser;
     switch (static_cast<MessageLevel::Enum>(level)) {
@@ -241,7 +239,7 @@ bool LaunchTask::parseXmlLogs(QString const& line, MessageLevel level)
         return true;
 
     auto model = getLogModel();
-    for (auto const& item : items) {
+    for (const auto& item : items) {
         if (std::holds_alternative<LogParser::LogEntry>(item)) {
             auto entry = std::get<LogParser::LogEntry>(item);
             auto msg = QString("[%1] [%2/%3] [%4]: %5")

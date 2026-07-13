@@ -94,7 +94,6 @@ VersionSelectDialog::VersionSelectDialog(BaseVersionList* vlist, QString title, 
 
 void VersionSelectDialog::retranslate()
 {
-
     setWindowTitle(tr("Choose Version"));
     m_refreshButton->setToolTip(tr("Reloads the version list."));
     m_refreshButton->setText(tr("&Refresh"));

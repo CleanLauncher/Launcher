@@ -56,4 +56,4 @@ class MetaCacheSink : public FileSink {
     ChecksumValidator* m_md5Node;
     bool m_is_eternal;
 };
-}
+}  // namespace Net

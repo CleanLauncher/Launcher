@@ -106,7 +106,6 @@ void LaunchProfile::applyTraits(const QSet<QString>& traits)
 
 void LaunchProfile::applyTweakers(const QStringList& tweakers)
 {
-
     QStringList newTweakers;
     for (auto& tweaker : m_tweakers) {
         if (tweakers.contains(tweaker)) {
@@ -129,7 +128,6 @@ static int findLibraryByName(QList<LibraryPtr>* haystack, const GradleSpecifier&
     int retval = -1;
     for (int i = 0; i < haystack->size(); ++i) {
         if (haystack->at(i)->rawName().matchName(needle)) {
-
             if (retval != -1)
                 return -1;
             retval = i;
@@ -245,7 +243,6 @@ void LaunchProfile::applyProblemSeverity(ProblemSeverity severity)
 
 const QList<PatchProblem> LaunchProfile::getProblems() const
 {
-
     return {};
 }
 
@@ -357,7 +354,6 @@ void LaunchProfile::getLibraryFiles(const RuntimeContext& runtimeContext,
     }
 
     if (m_mainJar) {
-
         if (m_jarMods.size() && addJarMods) {
             QDir tempDir(tempPath);
             jars.append(tempDir.absoluteFilePath("minecraft.jar"));

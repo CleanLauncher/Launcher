@@ -67,7 +67,6 @@ class VersionList : public BaseVersionList, public BaseEntity {
     void waitToLoad();
 
    public:
-
     void setName(const QString& name);
     void setVersions(const QList<Version::Ptr>& versions);
     void merge(const VersionList::Ptr& other);
@@ -96,6 +95,6 @@ class VersionList : public BaseVersionList, public BaseEntity {
 
     void setupAddedVersion(int row, const Version::Ptr& version);
 };
-}
+}  // namespace Meta
 
 Q_DECLARE_METATYPE(Meta::VersionList::Ptr)

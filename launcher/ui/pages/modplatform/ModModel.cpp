@@ -20,7 +20,7 @@ ModModel::ModModel(BaseInstance& base_inst, ResourceAPI* api, QString debugName,
 
 ResourceAPI::SearchArgs ModModel::createSearchArguments()
 {
-    auto profile = static_cast<MinecraftInstance const&>(m_base_instance).getPackProfile();
+    auto profile = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
 
     Q_ASSERT(profile);
     Q_ASSERT(m_filter);
@@ -47,7 +47,7 @@ ResourceAPI::SearchArgs ModModel::createSearchArguments()
 ResourceAPI::VersionSearchArgs ModModel::createVersionsArguments(const QModelIndex& entry)
 {
     auto pack = m_packs[entry.row()];
-    auto profile = static_cast<MinecraftInstance const&>(m_base_instance).getPackProfile();
+    auto profile = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
 
     Q_ASSERT(profile);
     Q_ASSERT(m_filter);
@@ -131,7 +131,6 @@ bool ModModel::checkVersionFilters(const ModPlatform::IndexedVersion& v)
 
              std::find(m_filter->releases.cbegin(), m_filter->releases.cend(), v.version_type) != m_filter->releases.cend()) &&
             m_filter->checkMcVersions(v.mcVersion));
-
 }
 
-}
+}  // namespace ResourceDownload

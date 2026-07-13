@@ -35,7 +35,6 @@ ModPlatform::ResourceType identify(QFileInfo file)
 {
     if (file.exists() && file.isFile()) {
         if (ModUtils::validate(file)) {
-
             qDebug() << file.fileName() << "is a mod";
             return ModPlatform::ResourceType::Mod;
         } else if (DataPackUtils::validateResourcePack(file)) {
@@ -62,4 +61,4 @@ ModPlatform::ResourceType identify(QFileInfo file)
     return ModPlatform::ResourceType::Unknown;
 }
 
-}
+}  // namespace ResourceUtils

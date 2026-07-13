@@ -313,7 +313,6 @@ void LogPage::findPreviousActivated()
 
 void LogPage::findActivated()
 {
-
     if (!ui->searchBar->hasFocus()) {
         ui->searchBar->setFocus();
         ui->searchBar->selectAll();

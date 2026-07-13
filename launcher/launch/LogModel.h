@@ -35,7 +35,7 @@ class LogModel : public QAbstractListModel {
 
     enum Roles { LevelRole = Qt::UserRole };
 
-   private :
+   private:
     struct entry {
         MessageLevel level = MessageLevel::Unknown;
         QString line;

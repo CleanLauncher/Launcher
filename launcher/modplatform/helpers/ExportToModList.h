@@ -28,4 +28,4 @@ Q_DECLARE_FLAGS(OptionalData, OptionalDataValue)
 
 QString exportToModList(QList<Mod*> mods, Formats format, OptionalData extraData);
 QString exportToModList(QList<Mod*> mods, QString lineTemplate);
-}
+}  // namespace ExportToModList

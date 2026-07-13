@@ -101,7 +101,6 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         if (root.contains("order")) {
             out->order = requireInteger(root.value("order"));
         } else {
-
             qCritical() << filename << "doesn't contain an order field";
         }
     }

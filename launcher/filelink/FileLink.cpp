@@ -155,7 +155,6 @@ void FileLinkApp::runLink()
 
 void FileLinkApp::sendResults()
 {
-
     QByteArray block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
@@ -188,7 +187,6 @@ void FileLinkApp::readPathPairs()
     qDebug() << "Reading path pairs from server";
     qDebug() << "bytes available" << socket.bytesAvailable();
     if (blockSize == 0) {
-
         if (socket.bytesAvailable() < (int)sizeof(quint32))
             return;
         qDebug() << "reading block size";

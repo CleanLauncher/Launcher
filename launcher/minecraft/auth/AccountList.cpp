@@ -39,8 +39,8 @@
 
 #include <QDir>
 #include <QFile>
-#include <QIcon>
 #include <QIODevice>
+#include <QIcon>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -84,7 +84,8 @@ MinecraftAccountPtr AccountList::getAccountByProfileName(const QString& profileN
     for (int i = 0; i < count(); i++) {
         MinecraftAccountPtr account = at(i);
         if (account->profileName() == profileName) {
-            if (toReturn) return nullptr;
+            if (toReturn)
+                return nullptr;
             toReturn = account;
         }
     }
@@ -111,7 +112,6 @@ QStringList AccountList::profileNames() const
 
 void AccountList::addAccount(const MinecraftAccountPtr account)
 {
-
     if (m_accounts.contains(account)) {
         qDebug() << "Tried to add account that's already on the accounts list!";
         return;
@@ -172,7 +172,6 @@ void AccountList::moveAccount(QModelIndex index, int delta)
     const int row = index.row();
     const int newRow = row + delta;
     if (index.isValid() && row < m_accounts.size() && newRow >= 0 && newRow < m_accounts.size()) {
-
         const int modelDestinationRow = (newRow > row) ? newRow + 1 : newRow;
 
         if (beginMoveRows(QModelIndex(), row, row, QModelIndex(), modelDestinationRow)) {
@@ -232,7 +231,6 @@ void AccountList::setDefaultAccount(MinecraftAccountPtr newAccount)
 
 void AccountList::accountChanged()
 {
-
     onListChanged();
 }
 
@@ -403,7 +401,6 @@ QVariant AccountList::headerData(int section, [[maybe_unused]] Qt::Orientation o
 
 int AccountList::rowCount(const QModelIndex& parent) const
 {
-
     return parent.isValid() ? 0 : count();
 }
 
@@ -640,9 +637,8 @@ void AccountList::tryNext()
             if (account->internalId() == accountId) {
                 found = true;
                 if (!account->shouldRefresh()) {
-
-                    qDebug() << "RefreshSchedule: Skipping account" << account->profileName() << "with internal ID"
-                             << accountId << "(no longer needs refresh)";
+                    qDebug() << "RefreshSchedule: Skipping account" << account->profileName() << "with internal ID" << accountId
+                             << "(no longer needs refresh)";
                     break;
                 }
                 m_currentTask = account->refresh();
@@ -650,8 +646,7 @@ void AccountList::tryNext()
                     connect(m_currentTask.get(), &Task::succeeded, this, &AccountList::authSucceeded);
                     connect(m_currentTask.get(), &Task::failed, this, &AccountList::authFailed);
                     m_currentTask->start();
-                    qDebug() << "RefreshSchedule: Processing account" << account->profileName() << "with internal ID"
-                             << accountId;
+                    qDebug() << "RefreshSchedule: Processing account" << account->profileName() << "with internal ID" << accountId;
                     return;
                 }
                 break;

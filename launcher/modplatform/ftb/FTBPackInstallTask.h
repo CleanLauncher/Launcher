@@ -94,4 +94,4 @@ class PackInstallTask final : public InstanceTask {
     QWidget* m_parent;
 };
 
-}
+}  // namespace FTB

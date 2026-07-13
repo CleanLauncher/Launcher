@@ -46,7 +46,6 @@ class CreateShortcutDialog : public QDialog {
     void on_serverAddressBox_textChanged(const QString& text);
 
    private:
-
     Ui::CreateShortcutDialog* ui;
     QString InstIconKey;
     BaseInstance* m_instance;

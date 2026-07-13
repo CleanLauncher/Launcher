@@ -54,7 +54,6 @@ auto ResourceModel::data(const QModelIndex& index, int role) const -> QVariant
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -326,7 +325,6 @@ std::optional<ResourceAPI::SortingMethod> ResourceModel::getCurrentSortingMethod
     std::optional<ResourceAPI::SortingMethod> sort{};
 
     {
-
         auto sortingMethods = getSortingMethods();
         auto method = std::find_if(sortingMethods.constBegin(), sortingMethods.constEnd(),
                                    [this](const auto& e) { return m_current_sort_index == e.index; });
@@ -535,7 +533,6 @@ void ResourceModel::removePack(const QString& rem)
 #endif
     auto pack = std::ranges::find_if(m_packs, [&rem](const ModPlatform::IndexedPack::Ptr& i) { return rem == i->name; });
     if (pack == m_packs.end()) {
-
         return;
     }
     if (!pack->get()->versionsLoaded) {
@@ -550,4 +547,4 @@ bool ResourceModel::checkVersionFilters(const ModPlatform::IndexedVersion& v)
 {
     return (!optedOut(v));
 }
-}
+}  // namespace ResourceDownload

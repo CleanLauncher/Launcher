@@ -349,9 +349,9 @@ void JavaSettingsWidget::updateLauncherArgs()
         }
 
         QString warning;
-        m_ui->launcherArgsTextBox->setText(
-            JavaPerformance::getCompletePerformanceArgs(result.javaVersion, m_ui->optimizedArgsCheckBox->isChecked(), selectedPreset(), &warning)
-                .join(" "));
+        m_ui->launcherArgsTextBox->setText(JavaPerformance::getCompletePerformanceArgs(
+                                               result.javaVersion, m_ui->optimizedArgsCheckBox->isChecked(), selectedPreset(), &warning)
+                                               .join(" "));
         if (!warning.isEmpty()) {
             m_ui->argsNoticeLabel->setText(warningColour.arg(warning));
             m_ui->argsNoticeLabel->show();

@@ -49,4 +49,4 @@ class Scene : protected QOpenGLFunctions {
     bool m_capeVisible = false;
     bool m_elytraVisible = false;
 };
-}
+}  // namespace opengl

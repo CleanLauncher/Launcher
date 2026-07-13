@@ -61,7 +61,6 @@ class SkinList : public QAbstractListModel {
     void updateSkin(SkinModel* s);
 
    private:
-
     SkinList(const SkinList&) = delete;
 
     SkinList& operator=(const SkinList&) = delete;

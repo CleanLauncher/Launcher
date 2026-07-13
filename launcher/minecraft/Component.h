@@ -16,21 +16,18 @@ class LaunchProfile;
 namespace Meta {
 class Version;
 class VersionList;
-}
+}  // namespace Meta
 
 class VersionFile;
 
 struct UpdateActionChangeVersion {
-
     QString targetVersion;
 };
 struct UpdateActionLatestRecommendedCompatible {
-
     QString parentUid;
     QString parentName;
 
     QString version;
-
 };
 struct UpdateActionRemove {};
 struct UpdateActionImportantChanged {

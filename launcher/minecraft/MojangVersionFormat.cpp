@@ -61,7 +61,6 @@ static void readString(const QJsonObject& root, const QString& key, QString& var
 
 static void readDownloadInfo(MojangDownloadInfo::Ptr out, const QJsonObject& obj)
 {
-
     readString(obj, "path", out->path);
 
     out->sha1 = requireString(obj, "sha1");
@@ -73,9 +72,8 @@ static void readAssetIndex(MojangAssetIndexInfo::Ptr out, const QJsonObject& obj
 {
     out->totalSize = requireInteger(obj, "totalSize");
     out->id = requireString(obj, "id");
-
 }
-}
+}  // namespace Bits
 
 MojangDownloadInfo::Ptr downloadInfoFromJson(const QJsonObject& obj)
 {

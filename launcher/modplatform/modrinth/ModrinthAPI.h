@@ -232,7 +232,7 @@ class ModrinthAPI : public ResourceAPI {
 
     QJsonArray documentToArray(QJsonDocument& obj) const override { return obj.object().value("hits").toArray(); }
     void loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { Modrinth::loadIndexedPack(m, obj); }
-    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType ) const override
+    ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType) const override
     {
         return Modrinth::loadIndexedPackVersion(obj);
     };

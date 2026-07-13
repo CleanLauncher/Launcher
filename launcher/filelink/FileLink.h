@@ -62,5 +62,4 @@ class FileLinkApp : public QCoreApplication {
 
     QList<FS::LinkPair> m_links_to_make;
     QList<FS::LinkResult> m_path_results;
-
 };

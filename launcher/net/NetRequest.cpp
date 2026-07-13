@@ -159,7 +159,6 @@ void NetRequest::onProgress(qint64 bytesReceived, qint64 bytesTotal)
 
         dl_speed_str = tr("%1 /s (%2)").arg(StringUtils::humanReadableFileSize(dl_speed_bps)).arg(str_eta);
     } else {
-
         dl_speed_str = tr("0 B/s");
     }
 
@@ -173,12 +172,12 @@ void NetRequest::downloadError(QNetworkReply::NetworkError error)
     if (error == QNetworkReply::OperationCanceledError) {
         qCCritical(logCat) << getUid().toString() << "Aborted" << m_url.toString();
         m_state = State::Failed;
-    } else if (replyStatusCode() == 429  && m_options & Option::AutoRetry) {
+    } else if (replyStatusCode() == 429 && m_options & Option::AutoRetry) {
         qCDebug(logCat) << getUid().toString() << "Rate Limited!";
         int64_t delay = 10 * std::pow(2, m_retryCount);
         if (m_reply->hasRawHeader("Retry-After")) {
             auto retryAfter = m_reply->rawHeader("Retry-After");
-            if (retryAfter.trimmed().endsWith("GMT"))  {
+            if (retryAfter.trimmed().endsWith("GMT")) {
                 auto afterTimestamp = QDateTime::fromString(QString::fromUtf8(retryAfter.trimmed()), "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
                 auto now = QDateTime::currentDateTime();
                 delay = now.secsTo(afterTimestamp);
@@ -221,22 +220,18 @@ auto NetRequest::handleRedirect() -> bool
     QUrl redirect = m_reply->header(QNetworkRequest::LocationHeader).toUrl();
     if (!redirect.isValid()) {
         if (!m_reply->hasRawHeader("Location")) {
-
             return false;
         }
 
         QByteArray redirectBA = m_reply->rawHeader("Location");
         if (redirectBA.size() == 0) {
-
             return false;
         }
         QString redirectStr = QString::fromUtf8(redirectBA);
 
         if (redirectStr.startsWith("//")) {
-
             redirectStr = m_reply->url().scheme() + ":" + redirectStr;
         } else if (redirectStr.startsWith("/")) {
-
             auto url = m_reply->url();
             url.setPath(redirectStr, QUrl::TolerantMode);
             redirectStr = url.toString();
@@ -264,7 +259,6 @@ void NetRequest::handleAutoRetry(int64_t delay)
 {
     m_retryCount++;
     if (delay > 60 || m_retryCount > 4) {
-
         m_state = State::Failed;
         auto retryAfter = QDateTime::currentDateTime().addSecs(delay);
         emitFailed(tr("Request Rate Limited for %n second(s): Retry After %1", "seconds", delay)
@@ -282,7 +276,6 @@ void NetRequest::handleAutoRetry(int64_t delay)
 
 void NetRequest::downloadFinished()
 {
-
     if (m_retryTimer.isActive()) {
         return;
     }
@@ -400,4 +393,4 @@ void NetRequest::enableAutoRetry(bool enable)
     }
 }
 
-}
+}  // namespace Net

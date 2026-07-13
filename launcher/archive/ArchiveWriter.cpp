@@ -111,7 +111,6 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
 
 #if defined Q_OS_WIN32
     {
-
         auto widePath = fileInfo.absoluteFilePath().toStdWString();
         HANDLE file_handle = CreateFileW(widePath.data(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (file_handle == INVALID_HANDLE_VALUE) {
@@ -131,7 +130,6 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
     }
 #else
     {
-
         QByteArray utf8 = fileInfo.absoluteFilePath().toUtf8();
         const char* cpath = utf8.constData();
         struct stat st;
@@ -242,4 +240,4 @@ std::unique_ptr<archive, void (*)(archive*)> ArchiveWriter::createDiskWriter()
 
     return extPtr;
 }
-}
+}  // namespace MMCZip

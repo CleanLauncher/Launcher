@@ -486,7 +486,6 @@ QStringList MinecraftInstance::getNativeJars()
 
 static QString replaceTokensIn(const QString& text, const QMap<QString, QString>& with)
 {
-
     QString result;
     static const QRegularExpression s_token_regexp("\\$\\{(.+)\\}", QRegularExpression::InvertedGreedinessOption);
     QStringList list;
@@ -624,7 +623,6 @@ QStringList MinecraftInstance::javaArguments()
 
 QString MinecraftInstance::getLauncher()
 {
-
     if (isLegacy())
         return "legacy";
 
@@ -658,7 +656,6 @@ QMap<QString, QString> MinecraftInstance::getVariables()
 
 QProcessEnvironment MinecraftInstance::createEnvironment()
 {
-
     QProcessEnvironment env = CleanEnviroment();
 
     auto variables = getVariables();
@@ -681,7 +678,6 @@ QProcessEnvironment MinecraftInstance::createEnvironment()
 
 QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
 {
-
     QProcessEnvironment env = createEnvironment();
 
 #ifdef Q_OS_LINUX
@@ -711,7 +707,6 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
 
     if (settings()->get("UseDiscreteGpu").toBool()) {
         if (!switcherooSetupGPU(env)) {
-
             env.insert("DRI_PRIME", "1");
 
             env.insert("__NV_PRIME_RENDER_OFFLOAD", "1");
@@ -721,7 +716,6 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
     }
 
     if (settings()->get("UseZink").toBool()) {
-
         env.insert("__GLX_VENDOR_LIBRARY_NAME", "mesa");
         env.insert("MESA_LOADER_DRIVER_OVERRIDE", "zink");
         env.insert("GALLIUM_DRIVER", "zink");
@@ -755,7 +749,6 @@ QStringList MinecraftInstance::processMinecraftArgs(AuthSessionPtr session, Mine
     QMap<QString, QString> tokenMapping = makeProfileVarMapping(profile);
 
     if (session) {
-
         tokenMapping["auth_session"] = session->session;
         tokenMapping["auth_access_token"] = session->access_token;
         tokenMapping["auth_player_name"] = session->player_name;
@@ -802,15 +795,13 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
         }
     }
 
-    for (auto param : processMinecraftArgs(session, nullptr
-                                           )) {
+    for (auto param : processMinecraftArgs(session, nullptr)) {
         launchScript += "param " + param + "\n";
     }
 
     {
         QString windowParams;
         if (settings()->get("LaunchMaximized").toBool()) {
-
             if (!isLegacy()) {
                 auto screen = QGuiApplication::primaryScreen();
                 auto screenGeometry = screen->availableSize();
@@ -845,7 +836,6 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
         launchScript += "instanceName " + name() + "\n";
         launchScript += "instanceIconKey " + name() + "\n";
         launchScript += "instanceIconPath icon.png\n";
-
     }
 
     if (session) {
@@ -1051,7 +1041,6 @@ QString MinecraftInstance::getStatusbarDescription()
 
     QString mcVersion = m_components->getComponentVersion("net.minecraft");
     if (mcVersion.isEmpty()) {
-
         m_components->reload(Net::Mode::Offline);
         mcVersion = m_components->getComponentVersion("net.minecraft");
     }
@@ -1122,7 +1111,6 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
     }
 
     if (targetToJoin && targetToJoin->port == 25565) {
-
         auto step = makeShared<LookupServerAddress>(pptr);
         step->setLookupAddress(targetToJoin->address);
         step->setOutputAddressPtr(targetToJoin);
@@ -1185,7 +1173,6 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
     }
 
     {
-
         auto step = makeShared<LauncherPartLaunch>(pptr);
         step->setWorkingDirectory(gameRoot());
         step->setAuthSession(session);

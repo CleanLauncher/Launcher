@@ -39,7 +39,7 @@ std::tuple<QString, qint64> calculateFileSize(const QFileInfo& file)
     }
     return { StringUtils::humanReadableFileSize(file.size(), true), file.size() };
 }
-}
+}  // namespace
 
 void Resource::parseFile()
 {
@@ -94,7 +94,7 @@ void removeThePrefix(QString& string)
     string.remove(s_regex);
     string = string.trimmed();
 }
-}
+}  // namespace
 
 auto Resource::provider() const -> QString
 {
@@ -152,7 +152,6 @@ void Resource::updateIssues(const BaseInstance* inst)
     QString mcVersion = profile->getComponentVersion("net.minecraft");
 
     if (!m_metadata->mcVersions.empty() && !m_metadata->mcVersions.contains(mcVersion)) {
-
         m_issues.append(QT_TR_NOOP("Not marked as compatible with the instance's game version."));
     }
 }
@@ -259,7 +258,6 @@ bool Resource::enable(EnableAction action)
     }
 
     if (enable) {
-
         if (!path.endsWith(".disabled")) {
             return false;
         }

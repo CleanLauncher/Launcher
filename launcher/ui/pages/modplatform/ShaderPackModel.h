@@ -40,4 +40,4 @@ class ShaderPackResourceModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}
+}  // namespace ResourceDownload

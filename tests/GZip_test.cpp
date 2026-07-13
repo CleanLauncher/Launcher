@@ -16,7 +16,6 @@ class GZipTest : public QObject {
 
     void test_Through()
     {
-
         static const int size = 10 * 1024 * 1024;
         QByteArray random;
         QByteArray compressed;

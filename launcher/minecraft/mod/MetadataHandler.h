@@ -49,4 +49,4 @@ inline ModStruct get(const QDir& index_dir, QVariant& mod_id)
     return Packwiz::V1::getIndexForMod(index_dir, mod_id);
 }
 
-};
+};  // namespace Metadata

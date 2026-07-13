@@ -53,7 +53,6 @@ static ATLauncher::DownloadType parseDownloadType(QString rawType)
 
 static ATLauncher::ModType parseModType(QString rawType)
 {
-
     if (rawType == QString("root")) {
         return ATLauncher::ModType::Root;
     } else if (rawType == QString("forge")) {

@@ -65,7 +65,7 @@ QString getSystemLanguage()
 {
     return getSystemLocaleName().split('_').front();
 }
-}
+}  // namespace
 
 struct Language {
     Language() : updated(true) {}
@@ -261,7 +261,7 @@ void readIndex(const QString& path, QMap<QString, Language>& languages)
         qCritical() << "Translations Download Failed: index file could not be parsed as json";
     }
 }
-}
+}  // namespace
 
 void TranslationsModel::reloadLocalFiles()
 {

@@ -48,7 +48,6 @@ bool Flame::FileResolvingTask::abort()
 void Flame::FileResolvingTask::executeTask()
 {
     if (m_manifest.files.isEmpty()) {
-
         emitSucceeded();
         return;
     }
@@ -172,8 +171,8 @@ void Flame::FileResolvingTask::netJobFinished(QByteArray* response)
 
             getFlameProjects();
             return;
-            }
-        if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool()){
+        }
+        if (APPLICATION->settings()->get("FallbackMRBlockedMods").toBool()) {
             try {
                 auto entries = Json::requireObject(doc);
                 for (auto& out : m_manifest.files) {

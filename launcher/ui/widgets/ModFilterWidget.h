@@ -90,7 +90,6 @@ class ModFilterWidget : public QTabWidget {
 
                      std::find(releases.cbegin(), releases.cend(), v.version_type) != releases.cend()) &&
                     checkMcVersions({ v.mcVersion }));
-
         }
     };
 

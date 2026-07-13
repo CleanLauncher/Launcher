@@ -16,7 +16,6 @@ LegacyFMLLibrariesTask::LegacyFMLLibrariesTask(MinecraftInstance* inst)
 }
 void LegacyFMLLibrariesTask::executeTask()
 {
-
     MinecraftInstance* inst = (MinecraftInstance*)m_inst;
     auto components = inst->getPackProfile();
     auto profile = components->getProfile();

@@ -37,7 +37,6 @@ void MinecraftProfileStep::perform()
 void MinecraftProfileStep::onRequestDone(QByteArray* response)
 {
     if (m_request->error() == QNetworkReply::ContentNotFoundError) {
-
         m_data->minecraftProfile = MinecraftProfile();
         emit finished(AccountTaskState::STATE_WORKING, tr("Account has no Minecraft profile."));
         return;

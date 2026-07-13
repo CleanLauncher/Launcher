@@ -29,4 +29,4 @@ std::pair<Upload::Ptr, QByteArray*> ApiUpload::makeByteArray(QUrl url, QByteArra
     return { up, response };
 }
 
-}
+}  // namespace Net

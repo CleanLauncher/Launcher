@@ -53,7 +53,6 @@ struct VisualRow {
 };
 
 struct VisualGroup {
-
     VisualGroup(QString text, InstanceView* view);
     explicit VisualGroup(const VisualGroup* other);
 

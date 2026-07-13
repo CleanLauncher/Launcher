@@ -96,9 +96,7 @@ void FlamePackExportTask::collectHashes()
             }))
             continue;
 
-        if (relative.startsWith("resourcepacks/") &&
-            (relative.endsWith(".zip") || relative.endsWith(".zip.disabled"))) {
-
+        if (relative.startsWith("resourcepacks/") && (relative.endsWith(".zip") || relative.endsWith(".zip.disabled"))) {
             auto hashTask = Hashing::createHasher(file.absoluteFilePath(), ModPlatform::ResourceProvider::FLAME);
             connect(hashTask.get(), &Hashing::Hasher::resultsReady, [this, relative, file](QString hash) {
                 if (m_state == Task::State::Running) {

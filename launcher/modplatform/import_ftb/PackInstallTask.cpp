@@ -101,4 +101,4 @@ void PackInstallTask::copySettings()
     emitSucceeded();
 }
 
-}
+}  // namespace FTBImportAPP

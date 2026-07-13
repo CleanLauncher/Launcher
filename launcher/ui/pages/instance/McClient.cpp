@@ -47,7 +47,6 @@ void McClient::sendRequest()
     writeVarInt(data, 0x00);
 
     writePacketToSocket(data);
-
 }
 
 void McClient::readRawResponse()
@@ -105,12 +104,11 @@ constexpr uint8_t g_varIntContinue = 0x80;
 void McClient::writeVarInt(QByteArray& data, int value)
 {
     while ((value & ~g_varIntValueMask) != 0) {
-
-        data.append(static_cast<uint8_t>((value & ~g_varIntValueMask) | g_varIntContinue)); // NOLINT(*-narrowing-conversions)
+        data.append(static_cast<uint8_t>((value & ~g_varIntValueMask) | g_varIntContinue));  // NOLINT(*-narrowing-conversions)
 
         value >>= 7;
     }
-    data.append(static_cast<uint8_t>(value)); // NOLINT(*-narrowing-conversions)
+    data.append(static_cast<uint8_t>(value));  // NOLINT(*-narrowing-conversions)
 }
 
 int McClient::readVarInt(QByteArray& data)
@@ -164,7 +162,6 @@ void McClient::writeString(QByteArray& data, const QString& value)
 
 void McClient::writePacketToSocket(QByteArray& data)
 {
-
     QByteArray dataWithSize;
     writeVarInt(dataWithSize, static_cast<int32_t>(data.size()));
     dataWithSize.append(data);

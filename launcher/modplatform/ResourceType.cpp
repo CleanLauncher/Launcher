@@ -37,6 +37,6 @@ QString getName(ResourceType type)
     return s_packedTypeNames.constFind(type).value();
 }
 
-}
+}  // namespace ResourceTypeUtils
 
-}
+}  // namespace ModPlatform

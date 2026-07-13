@@ -29,7 +29,6 @@
 LocalResourceUpdateTask::LocalResourceUpdateTask(QDir index_dir, ModPlatform::IndexedPack& project, ModPlatform::IndexedVersion& version)
     : m_index_dir(index_dir), m_project(project), m_version(version)
 {
-
     if (!FS::ensureFolderPathExists(index_dir.path())) {
         emitFailed(QString("Unable to create index directory at %1!").arg(index_dir.absolutePath()));
         return;
@@ -40,7 +39,6 @@ LocalResourceUpdateTask::LocalResourceUpdateTask(QDir index_dir, ModPlatform::In
     if (index_dir.dirName().startsWith('.')) {
         SetFileAttributesW(wpath.c_str(), FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_NOT_CONTENT_INDEXED);
     } else {
-
         SetFileAttributesW(wpath.c_str(), FILE_ATTRIBUTE_NORMAL);
     }
 #endif

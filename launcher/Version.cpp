@@ -46,11 +46,9 @@ QDebug operator<<(QDebug debug, const Version& v)
 
 std::strong_ordering Version::Section::operator<=>(const Section& other) const
 {
-
     if (this->t == Type::Numeric && other.t == Type::Numeric) {
         auto aLen = this->value.size();
         if (aLen != other.value.size()) {
-
             return aLen <=> other.value.size();
         }
 
@@ -82,7 +80,6 @@ std::strong_ordering Version::Section::operator<=>(const Section& other) const
         auto a = this->value.at(i);
         auto b = other.value.at(i);
         if (a != b) {
-
             return a.unicode() <=> b.unicode();
         }
     }
@@ -95,7 +92,7 @@ void removeLeadingZeros(QString& s)
 {
     s.remove(0, std::distance(s.begin(), std::ranges::find_if_not(s, [](QChar c) { return c == '0'; })));
 }
-}
+}  // namespace
 
 void Version::parse()
 {
@@ -105,11 +102,9 @@ void Version::parse()
         auto c = m_string.at(i);
         if (c == '+') {
             break;
-
         }
 
         if (c == '-' || c == ' ') {
-
             cur.value += c;
             i++;
 
@@ -117,7 +112,6 @@ void Version::parse()
                 cur.t = Section::Type::PreRelease;
             }
         } else if (c.isDigit()) {
-
             cur.t = Section::Type::Numeric;
         }
         for (; i < len; i++) {
@@ -129,7 +123,6 @@ void Version::parse()
                 || (r == '-' && cur.t != Section::Type::PreRelease)
 
                 || r == '+') {
-
                 break;
             }
 

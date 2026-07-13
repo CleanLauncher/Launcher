@@ -215,7 +215,6 @@ void AccountListPage::on_actionNoDefault_triggered()
 
 void AccountListPage::updateButtonStates()
 {
-
     QModelIndexList selection = ui->listView->selectionModel()->selectedIndexes();
     bool hasSelection = !selection.empty();
     bool accountIsReady = false;

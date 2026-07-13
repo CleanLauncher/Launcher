@@ -115,7 +115,6 @@ std::pair<Task::Ptr, QByteArray*> ModrinthAPI::getProjects(QStringList addonIds)
 
 QList<ResourceAPI::SortingMethod> ModrinthAPI::getSortingMethods() const
 {
-
     return { { .index = 1, .name = "relevance", .readable_name = QObject::tr("Sort by Relevance") },
              { .index = 2, .name = "downloads", .readable_name = QObject::tr("Sort by Downloads") },
              { .index = 3, .name = "follows", .readable_name = QObject::tr("Sort by Follows") },

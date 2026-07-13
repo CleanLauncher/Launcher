@@ -40,4 +40,4 @@ class PackFetchTask : public QObject {
     void privateFileDownloadFailed(QString reason, QString packCode);
 };
 
-}
+}  // namespace LegacyFTB

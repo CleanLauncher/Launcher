@@ -102,7 +102,6 @@ class PixmapCache final : public QObject {
         if (!m_last_cache_miss_by_eviciton.isNull()) {
             auto diff = m_last_cache_miss_by_eviciton.msecsTo(now);
             if (diff < oneSecond) {
-
                 ++m_consecutive_fast_evicitons;
             } else {
                 m_consecutive_fast_evicitons = 0;
@@ -110,10 +109,8 @@ class PixmapCache final : public QObject {
         }
         m_last_cache_miss_by_eviciton = now;
         if (m_consecutive_fast_evicitons >= m_consecutive_fast_evicitons_threshold) {
-
             uint newSize = _cacheLimit() + step;
             if (newSize >= maxCache) {
-
                 newSize = maxCache;
                 qDebug() << m_consecutive_fast_evicitons
                          << tr("pixmap cache misses by eviction happened too fast, doing nothing as the cache size reached it's limit");

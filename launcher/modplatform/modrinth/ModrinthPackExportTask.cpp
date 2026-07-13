@@ -181,7 +181,6 @@ void ModrinthPackExportTask::parseApiResponse(QByteArray* response)
             if (auto fileIter = std::find_if(files_array.begin(), files_array.end(),
                                              [&iterator](const QJsonValue& file) { return file["hashes"]["sha512"] == iterator.value(); });
                 fileIter != files_array.end()) {
-
                 resolvedFiles[iterator.key()] =
                     ResolvedFile{ fileIter->toObject()["hashes"].toObject()["sha1"].toString(), iterator.value(),
                                   fileIter->toObject()["url"].toString(), fileIter->toObject()["size"].toInt() };
@@ -276,7 +275,6 @@ QByteArray ModrinthPackExportTask::generateIndex()
 
         const QFileInfo pathInfo(path);
         if (optionalFiles && pathInfo.suffix() == "disabled") {
-
             path = pathInfo.dir().filePath(pathInfo.completeBaseName());
             env["client"] = "optional";
             env["server"] = "optional";

@@ -55,4 +55,4 @@ class ModModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}
+}  // namespace ResourceDownload

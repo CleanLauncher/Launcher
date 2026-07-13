@@ -21,12 +21,13 @@
 #include "Application.h"
 
 ElyStep::ElyStep(AccountData* data, bool silent)
-    : MSAStep(data, silent, APPLICATION->getElyClientID(),
+    : MSAStep(data,
+              silent,
+              APPLICATION->getElyClientID(),
               "account_info offline_access minecraft_server_session",
               QUrl("https://account.ely.by/oauth2/v1"),
               QUrl("https://account.ely.by/api/oauth2/v1/token"))
-{
-}
+{}
 
 QString ElyStep::describe()
 {

@@ -51,4 +51,4 @@ inline Filter regexp(QRegularExpression pattern)
 {
     return [pattern = std::move(pattern)](const QString& src) { return pattern.match(src).hasMatch(); };
 }
-}
+}  // namespace Filters

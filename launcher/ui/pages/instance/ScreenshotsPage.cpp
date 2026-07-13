@@ -219,7 +219,7 @@ class FilterModel : public QIdentityProxyModel {
         m_thumbnailingPool.start(runnable);
     }
    private slots:
-    void thumbnailReady(const QString& ) { emit layoutChanged(); }
+    void thumbnailReady(const QString&) { emit layoutChanged(); }
     void thumbnailFailed(const QString& path) { m_failed.insert(path); }
     void fileChanged(const QString& filepath)
     {
@@ -356,7 +356,7 @@ void ScreenshotsPage::onItemActivated(QModelIndex index) const
     DesktopServices::openPath(info);
 }
 
-void ScreenshotsPage::onCurrentSelectionChanged(const QItemSelection& ) const
+void ScreenshotsPage::onCurrentSelectionChanged(const QItemSelection&) const
 {
     const auto selected = ui->listView->selectionModel()->selectedIndexes();
 
@@ -516,7 +516,6 @@ void ScreenshotsPage::on_actionCopy_File_s_triggered() const
 {
     auto selection = ui->listView->selectionModel()->selectedIndexes();
     if (selection.size() < 1) {
-
         return;
     }
 
@@ -571,7 +570,6 @@ void ScreenshotsPage::on_actionRename_triggered() const
         return;
     }
     ui->listView->edit(selection.first());
-
 }
 
 void ScreenshotsPage::openedImpl()

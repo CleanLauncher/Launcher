@@ -46,7 +46,6 @@ bool InstanceProxyModel::lessThan(const QModelIndex& left, const QModelIndex& ri
     if (leftCategory == rightCategory) {
         return subSortLessThan(left, right);
     } else {
-
         auto result = leftCategory.localeAwareCompare(rightCategory);
         if (result == 0) {
             return subSortLessThan(left, right);

@@ -40,7 +40,7 @@ class SelectReleaseDialog : public QDialog {
     ~SelectReleaseDialog();
 
     void loadReleases();
-    void appendRelease(GitHubRelease const& release);
+    void appendRelease(const GitHubRelease& release);
     GitHubRelease selectedRelease() { return m_selectedRelease; }
    private slots:
     GitHubRelease getRelease(QTreeWidgetItem* item);
@@ -61,7 +61,7 @@ class SelectReleaseAssetDialog : public QDialog {
     ~SelectReleaseAssetDialog();
 
     void loadAssets();
-    void appendAsset(GitHubReleaseAsset const& asset);
+    void appendAsset(const GitHubReleaseAsset& asset);
     GitHubReleaseAsset selectedAsset() { return m_selectedAsset; }
    private slots:
     GitHubReleaseAsset getAsset(QTreeWidgetItem* item);

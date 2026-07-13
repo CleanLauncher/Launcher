@@ -69,7 +69,7 @@ static inline QString metaEntryBase()
 {
     return "ModrinthPacks";
 }
-}
+}  // namespace Modrinth
 
 class ModrinthModPage : public ModPage {
     Q_OBJECT
@@ -192,4 +192,4 @@ class ModrinthDataPackPage : public DataPackResourcePage {
     inline auto helpPage() const -> QString override { return ""; }
 };
 
-}
+}  // namespace ResourceDownload

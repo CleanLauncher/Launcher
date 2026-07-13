@@ -345,7 +345,6 @@ class FileSystemTest : public QObject {
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
         auto f = [&folder]() {
-
             QTemporaryDir tempDir("./tmp");
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();

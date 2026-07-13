@@ -31,6 +31,6 @@ Download::Ptr makeFile(QUrl url,
                        QString path,
                        Download::Options options = Download::Option::NoOptions,
                        ModrinthDownloadMeta meta = ModrinthDownloadMeta());
-};
+};  // namespace ApiDownload
 
-}
+}  // namespace Net

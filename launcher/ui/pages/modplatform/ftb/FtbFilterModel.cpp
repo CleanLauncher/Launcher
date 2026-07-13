@@ -87,4 +87,4 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
     return true;
 }
 
-}
+}  // namespace Ftb

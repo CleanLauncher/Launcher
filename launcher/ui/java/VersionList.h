@@ -47,4 +47,4 @@ class VersionList : public BaseVersionList {
     QList<Java::MetadataPtr> m_vlist;
 };
 
-}
+}  // namespace Java

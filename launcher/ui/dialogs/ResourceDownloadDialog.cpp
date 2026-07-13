@@ -118,7 +118,6 @@ void ResourceDownloadDialog::reject()
 
 void ResourceDownloadDialog::initializeContainer()
 {
-
 #ifndef Q_OS_MACOS
     layout()->setContentsMargins(0, 0, 0, 0);
 #endif
@@ -265,7 +264,6 @@ QList<ResourceDownloadDialog::DownloadTaskPtr> ResourceDownloadDialog::getTasks(
 
 void ResourceDownloadDialog::selectedPageChanged(BasePage* previous, BasePage* selected)
 {
-
     if (!previous) {
         return;
     }
@@ -317,7 +315,6 @@ QList<BasePage*> ModDownloadDialog::getPages()
 GetModDependenciesTask::Ptr ModDownloadDialog::getModDependenciesTask()
 {
     if (!APPLICATION->settings()->get("ModDependenciesDisabled").toBool()) {
-
         if (auto* model = dynamic_cast<ModFolderModel*>(getBaseModel()); model) {
             QList<std::shared_ptr<GetModDependenciesTask::PackDependency>> selectedVers;
             for (const auto& selected : getTasks()) {
@@ -472,4 +469,4 @@ QList<BasePage*> DataPackDownloadDialog::getPages()
     return pages;
 }
 
-}
+}  // namespace ResourceDownload

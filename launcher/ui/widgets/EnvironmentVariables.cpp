@@ -61,7 +61,6 @@ EnvironmentVariables::~EnvironmentVariables()
 
 void EnvironmentVariables::initialize(bool instance, bool override, const QMap<QString, QVariant>& value)
 {
-
     ui->overrideCheckBox->setVisible(instance);
     ui->overrideCheckBox->setChecked(override);
 

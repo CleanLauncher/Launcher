@@ -21,7 +21,6 @@ class PackInstallTask : public InstanceTask {
     bool abort() override;
 
    protected:
-
     virtual void executeTask() override;
 
    private:
@@ -46,4 +45,4 @@ class PackInstallTask : public InstanceTask {
     QString m_version;
 };
 
-}
+}  // namespace LegacyFTB

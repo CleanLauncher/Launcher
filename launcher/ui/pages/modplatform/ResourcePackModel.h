@@ -38,4 +38,4 @@ class ResourcePackResourceModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}
+}  // namespace ResourceDownload

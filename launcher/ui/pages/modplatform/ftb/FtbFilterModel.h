@@ -46,4 +46,4 @@ class FilterModel : public QSortFilterProxyModel {
     QString m_searchTerm{ "" };
 };
 
-}
+}  // namespace Ftb

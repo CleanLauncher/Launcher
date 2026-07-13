@@ -251,13 +251,12 @@ struct MojangError {
     QString errorMessage;
 };
 
-}
+}  // namespace
 
 void ProfileSetupDialog::setupProfileFinished(QByteArray* response)
 {
     isWorking = false;
     if (m_profile_task->error() == QNetworkReply::NoError) {
-
         accept();
     } else {
         auto parsedError = MojangError::fromJSON(*response);

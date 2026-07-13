@@ -40,8 +40,8 @@
 #pragma once
 
 #include <QNetworkReply>
-#include <QUrl>
 #include <QTimer>
+#include <QUrl>
 #include <chrono>
 
 #include "HeaderProxy.h"
@@ -115,6 +115,6 @@ class NetRequest : public Task {
     int m_retryCount = 0;
     QTimer m_retryTimer;
 };
-}
+}  // namespace Net
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Net::NetRequest::Options)

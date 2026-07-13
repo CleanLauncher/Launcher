@@ -125,4 +125,4 @@ bool Metadata::operator>(BaseVersion& a) const
     }
 }
 
-}
+}  // namespace Java

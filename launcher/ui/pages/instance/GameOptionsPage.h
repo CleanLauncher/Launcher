@@ -64,7 +64,6 @@ class GameOptionsPage : public QWidget, public BasePage {
     void retranslate() override;
 
    private:
-
     Ui::GameOptionsPage* ui = nullptr;
     std::shared_ptr<GameOptions> m_model;
 };

@@ -84,4 +84,4 @@ bool isSnap()
 #endif
 }
 
-}
+}  // namespace DesktopServices

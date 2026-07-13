@@ -76,7 +76,6 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
         case VersionIdRole:
             return version->version();
         case ParentVersionRole: {
-
             auto& reqs = version->requiredSet();
             auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Require& req) { return req.uid == "net.minecraft"; });
             if (iter != reqs.end()) {
@@ -157,7 +156,7 @@ Version::Ptr VersionList::getVersion(const QString& version)
 bool VersionList::hasVersion(QString version) const
 {
     auto ver = std::find_if(m_versions.constBegin(), m_versions.constEnd(),
-                            [version](Meta::Version::Ptr const& a) { return a->version() == version; });
+                            [version](const Meta::Version::Ptr& a) { return a->version() == version; });
     return (ver != m_versions.constEnd());
 }
 
@@ -206,7 +205,6 @@ static const Meta::Version::Ptr& getBetterVersion(const Meta::Version::Ptr& a, c
     if (!b)
         return a;
     if (a->type() == b->type()) {
-
         return (a->rawTime() > b->rawTime() ? a : b);
     }
 
@@ -237,7 +235,6 @@ void VersionList::merge(const VersionList::Ptr& other)
         qWarning() << "Empty list loaded ...";
     }
     for (auto version : other->m_versions) {
-
         if (m_lookup.contains(version->version())) {
             auto existing = m_lookup.value(version->version());
             existing->mergeFromList(version);
@@ -312,4 +309,4 @@ Version::Ptr VersionList::getLatestForParent(const QString& uid, const QString& 
     return latestCompat;
 }
 
-}
+}  // namespace Meta

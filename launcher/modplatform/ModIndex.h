@@ -63,18 +63,18 @@ enum class Side : std::uint8_t { NoSide = 0, ClientSide = 1U << 0U, ServerSide =
 namespace SideUtils {
 QString toString(Side side);
 Side fromString(QString side);
-}
+}  // namespace SideUtils
 
 namespace DependencyTypeUtils {
 QString toString(DependencyType type);
 DependencyType fromString(const QString& str);
-}
+}  // namespace DependencyTypeUtils
 
 namespace ProviderCapabilities {
 const char* name(ResourceProvider);
 QString readableName(ResourceProvider);
 QStringList hashType(ResourceProvider);
-}
+}  // namespace ProviderCapabilities
 
 struct ModpackAuthor {
     QString name;
@@ -232,7 +232,7 @@ struct Category {
     QString id;
 };
 
-}
+}  // namespace ModPlatform
 
 Q_DECLARE_METATYPE(ModPlatform::IndexedPack)
 Q_DECLARE_METATYPE(ModPlatform::IndexedPack::Ptr)

@@ -58,7 +58,6 @@ enum class InstallMode : std::uint8_t {
 
 class UserInteractionSupport {
    public:
-
     virtual std::optional<QList<QString>> chooseOptionalMods(const PackVersion& version, QList<ATLauncher::VersionMod> mods) = 0;
 
     virtual QString chooseVersion(Meta::VersionList::Ptr vlist, QString minecraftVersion) = 0;
@@ -138,4 +137,4 @@ class PackInstallTask : public InstanceTask {
     QFutureWatcher<bool> m_modExtractFutureWatcher;
 };
 
-}
+}  // namespace ATLauncher

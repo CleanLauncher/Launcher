@@ -26,4 +26,4 @@ namespace LibraryUtils {
 QString findMangoHud();
 
 QString find(QString libName);
-}
+}  // namespace LibraryUtils

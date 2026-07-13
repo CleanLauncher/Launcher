@@ -102,7 +102,6 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                     });
             dep != c_dependencies.end()) {
             continue;
-
         }
 
         if (auto dep = std::find_if(m_selected.begin(), m_selected.end(),
@@ -112,7 +111,6 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                     });
             dep != m_selected.end()) {
             continue;
-
         }
 
         if (auto dep = std::find_if(m_mods.begin(), m_mods.end(),
@@ -122,7 +120,6 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                     });
             dep != m_mods.end()) {
             continue;
-
         }
 
         if (auto dep = std::find_if(m_pack_dependencies.begin(), m_pack_dependencies.end(),
@@ -131,7 +128,6 @@ QList<ModPlatform::Dependency> GetModDependenciesTask::getDependenciesForVersion
                                                                                                    : i->pack->addonId == ver_dep.addonId);
                                     });
             dep != m_pack_dependencies.end()) {
-
             continue;
         }
 
@@ -200,7 +196,6 @@ Task::Ptr GetModDependenciesTask::prepareDependencyTask(const ModPlatform::Depen
         pDep->version = pack;
         if (!pDep->version.addonId.isValid()) {
             if (m_loaderType & ModPlatform::Quilt) {
-
                 auto overide = ModPlatform::getOverrideDeps();
                 auto over = std::find_if(overide.cbegin(), overide.cend(),
                                          [dep, provider](const auto& o) { return o.provider == provider && dep.addonId == o.quilt; });
@@ -290,7 +285,6 @@ auto GetModDependenciesTask::getExtraInfo() -> QHash<QString, PackDependencyExtr
 }
 
 auto laxCompare = [](QString fsfilename, QString metadataFilename, bool excludeDigits = false) {
-
     QList<QChar> allowedSeperators = { '-', '+', '.', '_' };
     if (excludeDigits)
         allowedSeperators.append({ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
@@ -319,14 +313,12 @@ bool GetModDependenciesTask::isLocalyInstalled(std::shared_ptr<PackDependency> p
                         }) != m_selected.end() ||
 
            std::find_if(m_mods_file_names.begin(), m_mods_file_names.end(),
-                        [pDep](QString i) { return !i.isEmpty() && laxCompare(i, pDep->version.fileName); }) !=
-               m_mods_file_names.end() ||
+                        [pDep](QString i) { return !i.isEmpty() && laxCompare(i, pDep->version.fileName); }) != m_mods_file_names.end() ||
 
            std::find_if(m_pack_dependencies.begin(), m_pack_dependencies.end(), [pDep](std::shared_ptr<PackDependency> i) {
                return pDep->pack->addonId != i->pack->addonId && !i->version.fileName.isEmpty() &&
                       laxCompare(pDep->version.fileName, i->version.fileName);
            }) != m_pack_dependencies.end();
-
 }
 
 bool GetModDependenciesTask::maybeInstalled(std::shared_ptr<PackDependency> pDep)
@@ -334,5 +326,4 @@ bool GetModDependenciesTask::maybeInstalled(std::shared_ptr<PackDependency> pDep
     return std::find_if(m_mods_file_names.begin(), m_mods_file_names.end(), [pDep](QString i) {
                return !i.isEmpty() && laxCompare(i, pDep->version.fileName, true);
            }) != m_mods_file_names.end();
-
 }

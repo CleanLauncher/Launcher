@@ -68,4 +68,4 @@ std::optional<QStringList> extractDir(QString fileCompressed, QString subdir, QS
 bool extractFile(QString fileCompressed, QString file, QString dir);
 
 bool collectFileListRecursively(const QString& rootDir, const QString& subDir, QFileInfoList* files, FilterFileFunction excludeFilter);
-}
+}  // namespace MMCZip

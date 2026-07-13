@@ -76,7 +76,7 @@ int compareVersionLists(const QStringList& leftVersions, const QStringList& righ
     return 0;
 }
 
-}
+}  // namespace
 
 Mod::Mod(const QFileInfo& file) : Resource(file), m_local_details()
 {

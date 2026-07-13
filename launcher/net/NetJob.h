@@ -49,7 +49,6 @@ class NetJob : public ConcurrentTask {
     Q_OBJECT
 
    public:
-
     using Ptr = shared_qobject_ptr<NetJob>;
 
     explicit NetJob(QString job_name, QNetworkAccessManager* network, int max_concurrent = -1);

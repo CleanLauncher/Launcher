@@ -81,7 +81,6 @@ QString ThemeManager::addIconTheme(IconTheme theme)
 
 void ThemeManager::initializeThemes()
 {
-
     initializeIcons();
 
     initializeWidgets();
@@ -89,7 +88,6 @@ void ThemeManager::initializeThemes()
 
 void ThemeManager::initializeIcons()
 {
-
     themeDebugLog() << "<> Initializing Icon Themes";
 
     for (const QString& id : builtinIcons) {

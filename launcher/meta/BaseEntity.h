@@ -71,4 +71,4 @@ class BaseEntityLoadTask : public Task {
     bool m_force_reload = false;
     NetJob::Ptr m_task;
 };
-}
+}  // namespace Meta

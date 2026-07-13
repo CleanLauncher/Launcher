@@ -220,7 +220,6 @@ void MinecraftSettingsWidget::loadSettings()
     m_ui->useZink->setChecked(settings->get("UseZink").toBool());
 
     if (m_instance != nullptr) {
-
         m_ui->serverJoinGroupBox->setChecked(true);
 
         if (auto server = settings->get("JoinServerOnLaunchAddress").toString(); !server.isEmpty()) {
@@ -439,7 +438,6 @@ void MinecraftSettingsWidget::saveSettings()
         }
 
         if (m_instance != nullptr) {
-
             bool joinServerOnLaunch = m_ui->serverJoinGroupBox->isChecked();
             settings->set("JoinServerOnLaunch", joinServerOnLaunch);
             if (joinServerOnLaunch) {

@@ -45,14 +45,12 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
     if (!isSelected && !isChecked && isInstalled) {
         painter->setOpacity(0.4);
-
     }
 
     auto icon_width = rect.height();
     int icon_x_margin = (rect.height() - icon_width) / 2;
 
     if (!opt.icon.isNull()) {
-
         auto icon_height = 0;
         {
             auto icon_size = opt.decorationSize;
@@ -60,7 +58,6 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
             icon_height = icon_size.height();
 
             icon_x_margin = (rect.height() - icon_height) / 2;
-
         }
 
         int x = rect.x() + icon_x_margin;
@@ -81,7 +78,6 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     int title_height = 0;
 
     {
-
         auto title = index.data(UserDataTypes::TITLE).toString();
 
         painter->save();
@@ -105,7 +101,6 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     }
 
     {
-
         auto description = index.data(UserDataTypes::DESCRIPTION).toString().simplified();
 
         QTextLayout text_layout(description, opt.font);
@@ -117,9 +112,7 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
         auto num_lines = 1;
 
         if (cut_text.size() > 1) {
-
             if (rect.height() - title_height <= 2.5 * opt.fontMetrics.height()) {
-
                 description = opt.fontMetrics.elidedText(description, opt.textElideMode, cut_text.at(0).first);
             } else {
                 if (cut_text.size() > 2) {

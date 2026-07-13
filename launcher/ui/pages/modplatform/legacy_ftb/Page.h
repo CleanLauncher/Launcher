@@ -126,4 +126,4 @@ class Page : public QWidget, public ModpackProviderBasePage {
     Ui::Page* ui = nullptr;
 };
 
-}
+}  // namespace LegacyFTB

@@ -124,4 +124,4 @@ void VersionList::sortVersions()
     endResetModel();
 }
 
-}
+}  // namespace Java

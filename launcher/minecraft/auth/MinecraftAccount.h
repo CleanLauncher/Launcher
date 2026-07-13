@@ -64,7 +64,6 @@ struct AccountProfile {
 class MinecraftAccount : public QObject, public Usable {
     Q_OBJECT
    public:
-
     explicit MinecraftAccount(const MinecraftAccount& other, QObject* parent) = delete;
 
     explicit MinecraftAccount(QObject* parent = 0);

@@ -11,7 +11,6 @@ QDateTime timeFromS3Time(QString str)
 
 QString timeToS3Time(QDateTime time)
 {
-
     int offsetRaw = time.offsetFromUtc();
     bool negative = offsetRaw < 0;
     int offsetAbs = std::abs(offsetRaw);

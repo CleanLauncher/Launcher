@@ -122,7 +122,6 @@ static QJsonObject componentToJsonV1(ComponentPtr component)
 
 static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& componentJsonPattern, const QJsonObject& obj)
 {
-
     auto uid = Json::requireString(obj.value("uid"));
     auto filePath = componentJsonPattern.arg(uid);
     auto component = makeShared<Component>(parent, uid);
@@ -310,7 +309,6 @@ PackProfile::Result PackProfile::load()
 
 PackProfile::Result PackProfile::reload(Net::Mode netmode)
 {
-
     if (d->m_updateTask) {
         if (d->m_updateTask->netMode() == netmode) {
             return Result::Success();
@@ -647,13 +645,11 @@ void PackProfile::invalidateLaunchProfile()
 
 void PackProfile::installJarMods(QStringList selectedFiles)
 {
-
     installJarMods_internal(selectedFiles);
 }
 
 void PackProfile::installCustomJar(QString selectedFile)
 {
-
     installCustomJar_internal(selectedFile);
 }
 
@@ -688,7 +684,6 @@ bool PackProfile::installComponents(QStringList selectedFiles)
 
 void PackProfile::installAgents(QStringList selectedFiles)
 {
-
     installAgents_internal(selectedFiles);
 }
 
@@ -871,7 +866,6 @@ bool PackProfile::installCustomJar_internal(QString filepath)
 
 bool PackProfile::installAgents_internal(QStringList filepaths)
 {
-
     const QString patchDir = FS::PathCombine(d->m_instance->instanceRoot(), "patches");
     if (!FS::ensureFolderPathExists(patchDir))
         return false;
@@ -903,7 +897,7 @@ bool PackProfile::installAgents_internal(QStringList filepaths)
         agent->setDisplayName(sourceInfo.completeBaseName());
         agent->setHint("local");
 
-        versionFile->agents.append(Agent{agent, QString()});
+        versionFile->agents.append(Agent{ agent, QString() });
 
         versionFile->name = targetName;
         versionFile->uid = targetId;
@@ -953,7 +947,6 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
         ComponentPtr component = *iter;
 
         if (component->revert()) {
-
             auto oldVersion = component->getVersion();
             component->setVersion(version);
             component->setImportant(important);
@@ -967,7 +960,6 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
         }
         return false;
     } else {
-
         auto component = makeShared<Component>(this, uid);
         component->m_version = version;
         component->m_important = important;

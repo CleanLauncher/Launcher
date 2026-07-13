@@ -40,7 +40,6 @@ class SeparatorPrefixTree {
 
     bool covers(QString path) const
     {
-
         if (m_contained) {
             return true;
         }
@@ -63,7 +62,6 @@ class SeparatorPrefixTree {
 
     QString cover(QString path) const
     {
-
         if (m_contained) {
             return QString("");
         }
@@ -167,7 +165,6 @@ class SeparatorPrefixTree {
     {
         if (path.isEmpty()) {
             if (!m_contained) {
-
                 clear();
                 return Succeeded;
             }

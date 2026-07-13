@@ -70,7 +70,6 @@ class ResourcePackParseTest : public QObject {
         QVERIFY(pack.packFormat() == 6);
         QVERIFY(pack.description() == "o quartel pegou fogo, policia deu sinal, acode acode acode a bandeira nacional");
         QVERIFY(valid == true);
-
     }
 };
 

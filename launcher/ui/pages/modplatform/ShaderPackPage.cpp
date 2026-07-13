@@ -48,4 +48,4 @@ void ShaderPackResourcePage::addResourceToPage(ModPlatform::IndexedPack::Ptr pac
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);
 }
 
-}
+}  // namespace ResourceDownload

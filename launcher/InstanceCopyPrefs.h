@@ -38,7 +38,6 @@ struct InstanceCopyPrefs {
     void enableUseClone(bool b);
 
    protected:
-
     bool copySaves = true;
     bool keepPlaytime = true;
     bool copyGameOptions = true;

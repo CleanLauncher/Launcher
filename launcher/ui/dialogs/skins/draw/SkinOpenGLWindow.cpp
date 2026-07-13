@@ -42,7 +42,6 @@ SkinOpenGLWindow::SkinOpenGLWindow(SkinProvider* parent, QColor color)
 
 SkinOpenGLWindow::~SkinOpenGLWindow()
 {
-
     makeCurrent();
 
     if (m_scene) {
@@ -76,14 +75,12 @@ SkinOpenGLWindow::~SkinOpenGLWindow()
 
 void SkinOpenGLWindow::mousePressEvent(QMouseEvent* e)
 {
-
     m_mousePosition = QVector2D(e->pos());
     m_isMousePressed = true;
 }
 
 void SkinOpenGLWindow::mouseMoveEvent(QMouseEvent* event)
 {
-
     if (!(event->buttons() & Qt::MouseButton::LeftButton)) {
         m_isMousePressed = false;
         return;
@@ -103,7 +100,6 @@ void SkinOpenGLWindow::mouseMoveEvent(QMouseEvent* event)
 
         m_mousePosition = QVector2D(event->pos());
         update();
-
     }
 }
 
@@ -139,7 +135,6 @@ void SkinOpenGLWindow::initializeGL()
 
 void SkinOpenGLWindow::initShaders()
 {
-
     m_modelProgram = new QOpenGLShaderProgram(this);
 
     if (!m_modelProgram->addCacheableShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/vshader_skin_model.glsl"))
@@ -171,7 +166,6 @@ void SkinOpenGLWindow::initShaders()
 
 void SkinOpenGLWindow::resizeGL(int w, int h)
 {
-
     qreal aspect = qreal(w) / qreal(h ? h : 1);
 
     const qreal zNear = 15., fov = 45;
@@ -194,7 +188,6 @@ void SkinOpenGLWindow::resizeGL(int w, int h)
 
 void SkinOpenGLWindow::paintGL()
 {
-
     qreal dpr = devicePixelRatio();
     if (dpr != 1.f) {
         QSize scaledSize = size() * dpr;
@@ -306,7 +299,6 @@ void SkinOpenGLWindow::renderBackground()
 
 void SkinOpenGLWindow::wheelEvent(QWheelEvent* event)
 {
-
     int delta = event->angleDelta().y();
 
     m_distance -= delta * 0.01f;
@@ -314,7 +306,6 @@ void SkinOpenGLWindow::wheelEvent(QWheelEvent* event)
     m_distance = qMax(16.f, m_distance);
 
     update();
-
 }
 void SkinOpenGLWindow::setElytraVisible(bool visible)
 {

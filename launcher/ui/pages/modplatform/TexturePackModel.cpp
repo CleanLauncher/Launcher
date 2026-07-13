@@ -62,7 +62,6 @@ ResourceAPI::SearchArgs TexturePackResourceModel::createSearchArguments()
 
     if (s_availableVersions.empty()) {
         for (auto&& version : m_version_list->versions()) {
-
             if (auto ver = version->toComparableVersion(); ver <= maximumTexturePackVersion())
                 s_availableVersions.push_back(ver);
         }
@@ -88,4 +87,4 @@ ResourceAPI::VersionSearchArgs TexturePackResourceModel::createVersionsArguments
     return args;
 }
 
-}
+}  // namespace ResourceDownload

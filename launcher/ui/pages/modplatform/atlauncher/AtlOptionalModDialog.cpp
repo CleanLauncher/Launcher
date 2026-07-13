@@ -50,7 +50,6 @@ AtlOptionalModListModel::AtlOptionalModListModel(QWidget* parent,
                                                  QList<ATLauncher::VersionMod> mods)
     : QAbstractListModel(parent), m_version(version), m_mods(mods)
 {
-
     for (int i = 0; i < m_mods.size(); i++) {
         auto mod = m_mods.at(i);
         m_index[mod.name] = i;
@@ -83,7 +82,6 @@ int AtlOptionalModListModel::rowCount(const QModelIndex& parent) const
 
 int AtlOptionalModListModel::columnCount(const QModelIndex& parent) const
 {
-
     return parent.isValid() ? 0 : 3;
 }
 
@@ -169,7 +167,6 @@ void AtlOptionalModListModel::useShareCode(const QString& code)
 
 void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
 {
-
     QByteArray responseData = *std::move(responsePtr);
     m_jobPtr.reset();
 
@@ -192,7 +189,6 @@ void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
     }
 
     if (response.error) {
-
         qWarning() << "ATLauncher API Response Error" << response.message;
         return;
     }
@@ -211,7 +207,6 @@ void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
 void AtlOptionalModListModel::shareCodeFailure([[maybe_unused]] const QString& reason)
 {
     m_jobPtr.reset();
-
 }
 
 void AtlOptionalModListModel::selectRecommended()
@@ -332,7 +327,6 @@ void AtlOptionalModDialog::useShareCode()
     auto shareCode = QInputDialog::getText(this, tr("Select a share code"), tr("Share code:"), QLineEdit::Normal, "", &ok);
 
     if (!ok) {
-
         return;
     }
 

@@ -44,7 +44,6 @@ FoldersTask::FoldersTask(MinecraftInstance* inst)
 
 void FoldersTask::executeTask()
 {
-
     QDir mcDir(m_inst->gameRoot());
     if (!mcDir.exists() && !mcDir.mkpath(".")) {
         emitFailed(tr("Failed to create folder for Minecraft binaries."));

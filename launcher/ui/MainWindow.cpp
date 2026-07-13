@@ -144,7 +144,7 @@ QString profileInUseFilter(const QString& profile, bool used)
         return profile;
     }
 }
-}
+}  // namespace
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -157,7 +157,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     {
-
         connect(ui->instanceToolBar, &QToolBar::orientationChanged,
                 [this](Qt::Orientation) { ui->instanceToolBar->setOrientation(Qt::Vertical); });
 
@@ -228,7 +227,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     }
 
     {
-
         connect(ui->actionViewLog, &QAction::triggered, this, [] { APPLICATION->showLogWindow(); });
     }
 
@@ -241,7 +239,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     setUnifiedTitleAndToolBarOnMac(true);
 
     {
-
         ui->actionAddInstance->setShortcut(QKeySequence::New);
         ui->actionSettings->setShortcut(QKeySequence::Preferences);
         ui->actionUndoTrashInstance->setShortcut(QKeySequence::Undo);
@@ -363,7 +360,6 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     defaultAccountChanged();
 
     {
-
         updateNewsLabel();
     }
 
@@ -486,7 +482,6 @@ void MainWindow::showInstanceContextMenu(const QPoint& pos)
 
     bool onInstance = view->indexAt(pos).isValid();
     if (onInstance) {
-
         actions = ui->fileMenu->actions();
 
         actions.removeFirst();
@@ -605,7 +600,6 @@ void MainWindow::repopulateAccountsMenu()
 
     QString active_profileId = "";
     if (defaultAccount) {
-
         if (ui->actionAccountsButton) {
             auto profileLabel = profileInUseFilter(defaultAccount->displayName(), defaultAccount->isInUse());
             ui->actionAccountsButton->setText(profileLabel);
@@ -618,7 +612,6 @@ void MainWindow::repopulateAccountsMenu()
         ui->actionNoAccountsAdded->setEnabled(false);
         ui->accountsMenu->addAction(ui->actionNoAccountsAdded);
     } else {
-
         for (int i = 0; i < accounts->count(); i++) {
             MinecraftAccountPtr account = accounts->at(i);
             auto profileLabel = profileInUseFilter(account->displayName(), account->isInUse());
@@ -719,7 +712,6 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev)
             secretEventFilter->input(ev);
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
             switch (keyEvent->key()) {
-
                 case Qt::Key_Delete:
                     on_actionDeleteInstance_triggered();
                     return true;
@@ -856,7 +848,6 @@ void MainWindow::on_actionAddInstance_triggered()
 
 void MainWindow::processURLs(QList<QUrl> urls)
 {
-
     for (auto& url : urls) {
         if (url.isEmpty() || url.toString().trimmed().isEmpty())
             continue;
@@ -870,16 +861,13 @@ void MainWindow::processURLs(QList<QUrl> urls)
         QMap<QString, QString> extra_info;
         QUrl local_url;
         if (!url.isLocalFile()) {
-
             const bool isExternalURLImport = (url.host().toLower() == "import") || (url.path().startsWith("/import", Qt::CaseInsensitive));
 
             QUrl dl_url;
             if (url.scheme() == "curseforge" || (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && url.host() == "install")) {
-
                 QUrlQuery query(url);
 
                 if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) {
-
                     if (query.queryItemValue("platform").toLower() != "curseforge") {
                         qDebug() << "Invalid mod distribution platform:" << query.queryItemValue("platform");
                         continue;
@@ -924,7 +912,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 });
 
                 {
-
                     ProgressDialog dlUrlDialod(this);
                     dlUrlDialod.setSkipButton(true, tr("Abort"));
                     dlUrlDialod.execWithTask(job.get());
@@ -939,7 +926,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 emit APPLICATION->oauthReplyRecieved(receivedData);
                 continue;
             } else if ((url.scheme() == "launcher" || url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME) && isExternalURLImport) {
-
                 const auto host = url.host().toLower();
                 const auto path = url.path();
 
@@ -999,7 +985,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
 
             if (!dl_url.isValid()) {
                 continue;
-
             }
 
             const QString path = dl_url.host() + '/' + dl_url.path();
@@ -1015,7 +1000,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
             connect(dl_job.get(), &Task::succeeded, this, [&dl_success] { dl_success = true; });
 
             {
-
                 ProgressDialog dlUrlDialod(this);
                 dlUrlDialod.setSkipButton(true, tr("Abort"));
                 dlUrlDialod.execWithTask(dl_job.get());
@@ -1023,7 +1007,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
 
             if (!dl_success) {
                 continue;
-
             }
             local_url = QUrl::fromLocalFile(archivePath);
 
@@ -1042,7 +1025,6 @@ void MainWindow::processURLs(QList<QUrl> urls)
         auto type = ResourceUtils::identify(localFileInfo);
 
         if (ModPlatform::ResourceTypeUtils::VALID_RESOURCES.count(type) == 0) {
-
             addInstance(localFileName, extra_info);
             continue;
         }
@@ -1262,7 +1244,6 @@ void MainWindow::on_actionSettings_triggered()
 
 void MainWindow::globalSettingsClosed()
 {
-
     APPLICATION->instances()->loadList();
     proxymodel->invalidate();
     proxymodel->sort(0);
@@ -1312,7 +1293,6 @@ void MainWindow::on_actionReportBug_triggered()
 
 void MainWindow::on_actionClearMetadata_triggered()
 {
-
     if (!APPLICATION->metacache()->evictAll()) {
         CustomMessageBox::selectable(this, tr("Error"),
                                      tr("Metadata cache clear Failed!\nTo clear the metadata cache manually, press Folders -> View "
@@ -1470,7 +1450,6 @@ void MainWindow::on_actionViewSelectedInstFolder_triggered()
 
 void MainWindow::closeEvent(QCloseEvent* event)
 {
-
     APPLICATION->settings()->set("MainWindowState", QString::fromUtf8(saveState().toBase64()));
     APPLICATION->settings()->set("MainWindowGeometry", QString::fromUtf8(saveGeometry().toBase64()));
     instanceToolbarSetting->set(QString::fromUtf8(ui->instanceToolBar->getVisibilityState().toBase64()));
@@ -1598,7 +1577,6 @@ void MainWindow::instanceDataChanged(const QModelIndex& topLeft, const QModelInd
 
 void MainWindow::selectionBad()
 {
-
     m_selectedInstance = nullptr;
     m_statusLeft->setText(tr("No instance selected"));
 

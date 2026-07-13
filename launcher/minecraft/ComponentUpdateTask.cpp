@@ -86,7 +86,6 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
     LoadResult result = LoadResult::Failed;
     auto customPatchFilename = component->getFilename();
     if (QFile::exists(customPatchFilename)) {
-
         bool fileChanged = false;
         auto file = ProfileUtils::parseJsonFile(QFileInfo(customPatchFilename), false);
         if (file->uid != component->m_uid) {
@@ -94,7 +93,6 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
             fileChanged = true;
         }
         if (fileChanged) {
-
             ProfileUtils::saveJsonFile(OneSixVersionFormat::versionFileToJson(file), customPatchFilename);
         }
 
@@ -121,7 +119,7 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
     return result;
 }
 
-}
+}  // namespace
 
 void ComponentUpdateTask::loadComponents()
 {
@@ -179,13 +177,11 @@ void ComponentUpdateTask::loadComponents()
     m_progressTotal = static_cast<int>(taskIndex);
     switch (result) {
         case LoadResult::LoadedLocal: {
-
             performUpdateActions();
             resolveDependencies(d->mode == Mode::Launch || d->netmode == Net::Mode::Offline);
             return;
         }
         case LoadResult::RequiresRemote: {
-
             break;
         }
         case LoadResult::Failed: {
@@ -206,7 +202,7 @@ struct RequireCompositionResult {
     RequireEx outcome;
 };
 using RequireExSet = std::set<RequireEx>;
-}
+}  // namespace
 
 static RequireCompositionResult composeRequirement(const RequireEx& a, const RequireEx& b)
 {
@@ -221,7 +217,6 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
     } else if (a.equalsVersion == b.equalsVersion) {
         out.equalsVersion = a.equalsVersion;
     } else {
-
         return { false, out };
     }
 
@@ -254,7 +249,6 @@ static bool gatherRequirementsFromComponents(const ComponentContainer& input, Re
             componenRequireEx.indexOfFirstDependee = componentNum;
 
             if (found != output.cend()) {
-
                 auto result = composeRequirement(componenRequireEx, *found);
                 if (result.ok) {
                     output.erase(componenRequireEx);
@@ -265,7 +259,6 @@ static bool gatherRequirementsFromComponents(const ComponentContainer& input, Re
                 }
                 succeeded &= result.ok;
             } else {
-
                 output.insert(componenRequireEx);
             }
         }
@@ -439,16 +432,13 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
 
     bool recursionNeeded = false;
     if (toAdd.size()) {
-
         for (auto& add : toAdd) {
             auto component = makeShared<Component>(d->m_profile, add.uid);
             if (!add.equalsVersion.isEmpty()) {
-
                 qCDebug(instanceProfileResolveC)
                     << "Adding" << add.uid << "version" << add.equalsVersion << "at position" << add.indexOfFirstDependee;
                 component->m_version = add.equalsVersion;
             } else {
-
                 qCDebug(instanceProfileResolveC) << "Adding" << add.uid << "at position" << add.indexOfFirstDependee;
 
                 if (!add.suggests.isEmpty()) {
@@ -466,7 +456,6 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
                         }
                     }
                 }
-
             }
             component->m_dependencyOnly = true;
 
@@ -476,9 +465,7 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
         recursionNeeded = true;
     }
     if (toChange.size()) {
-
         for (auto& change : toChange) {
-
             qCDebug(instanceProfileResolveC) << "Setting version of" << change.uid << "to" << change.equalsVersion;
             auto component = componentIndex[change.uid];
             component->setVersion(change.equalsVersion);
@@ -713,16 +700,13 @@ void ComponentUpdateTask::checkIfAllFinished()
 {
     setProgress(m_progress + 1, m_progressTotal);
     if (d->remoteTasksInProgress) {
-
         return;
     }
     if (d->remoteLoadSuccessful) {
-
         d->remoteLoadStatusList.clear();
         performUpdateActions();
         resolveDependencies(d->mode == Mode::Launch);
     } else {
-
         QStringList allErrorsList;
         for (auto& item : d->remoteLoadStatusList) {
             if (!item.succeeded) {

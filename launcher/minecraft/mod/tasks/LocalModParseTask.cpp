@@ -36,7 +36,6 @@ ModDetails ReadMCModInfo(QByteArray contents)
         details.version = firstObj.value("version").toString();
         auto homeurl = firstObj.value("url").toString().trimmed();
         if (!homeurl.isEmpty()) {
-
             if (!homeurl.startsWith("http://") && !homeurl.startsWith("https://") && !homeurl.startsWith("ftp://")) {
                 homeurl.prepend("http://");
             }
@@ -45,7 +44,6 @@ ModDetails ReadMCModInfo(QByteArray contents)
         details.description = firstObj.value("description").toString();
         QJsonArray authors = firstObj.value("authorList").toArray();
         if (authors.size() == 0) {
-
             authors = firstObj.value("authors").toArray();
         }
 
@@ -338,7 +336,6 @@ ModDetails ReadFabricModInfo(QByteArray contents)
                     auto key = QString::number(largest) + "x" + QString::number(largest);
                     details.icon_file = obj.value(key).toString();
                 } else {
-
                     if (auto it = obj.begin(); it != obj.end()) {
                         details.icon_file = it->toString();
                     }
@@ -433,7 +430,6 @@ ModDetails ReadQuiltModInfo(QByteArray contents)
                         auto key = QString::number(largest) + "x" + QString::number(largest);
                         details.icon_file = obj.value(key).toString();
                     } else {
-
                         if (auto it = obj.begin(); it != obj.end()) {
                             details.icon_file = it->toString();
                         }
@@ -585,7 +581,6 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
                 return true;
             }
             if (filePath == "META-INF/MANIFEST.MF") {
-
                 auto manifestLines = QString(file->readAll()).split(s_newlineRegex);
                 manifestVersion = "";
                 for (auto& line : manifestLines) {
@@ -629,7 +624,6 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
                 return true;
             }
             if (filePath == "META-INF/nil/mappings.json") {
-
                 isNilMod = true;
                 stop = !nilFilePath.isEmpty();
                 file->skip();
@@ -656,7 +650,6 @@ bool processZIP(Mod& mod, [[maybe_unused]] ProcessingLevel level)
         return true;
     }
     return false;
-
 }
 
 bool processFolder(Mod& mod, [[maybe_unused]] ProcessingLevel level)
@@ -678,7 +671,6 @@ bool processFolder(Mod& mod, [[maybe_unused]] ProcessingLevel level)
     }
 
     return false;
-
 }
 
 bool processLitemod(Mod& mod, [[maybe_unused]] ProcessingLevel level)
@@ -695,7 +687,6 @@ bool processLitemod(Mod& mod, [[maybe_unused]] ProcessingLevel level)
     }
 
     return false;
-
 }
 
 bool validate(QFileInfo file)
@@ -744,7 +735,6 @@ bool loadIconFile(const Mod& mod, QPixmap* pixmap)
 
                 if (!icon_result) {
                     return png_invalid("invalid png image");
-
                 }
                 return true;
             }
@@ -760,24 +750,20 @@ bool loadIconFile(const Mod& mod, QPixmap* pixmap)
 
                 if (!icon_result) {
                     return png_invalid("invalid png image");
-
                 }
                 return true;
             }
-            return png_invalid("Failed to set '" + mod.iconPath() +
-                               "' as current file in zip archive");
-
+            return png_invalid("Failed to set '" + mod.iconPath() + "' as current file in zip archive");
         }
         case ResourceType::LITEMOD: {
             return png_invalid("litemods do not have icons");
-
         }
         default:
             return png_invalid("Invalid type for mod, can not load icon.");
     }
 }
 
-}
+}  // namespace ModUtils
 
 LocalModParseTask::LocalModParseTask(int token, ResourceType type, const QFileInfo& modFile)
     : Task(false), m_token(token), m_type(type), m_modFile(modFile), m_result(new Result())

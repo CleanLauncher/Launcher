@@ -63,4 +63,4 @@ std::pair<Upload::Ptr, QByteArray*> Upload::makeByteArray(QUrl url, QByteArray m
     up->m_post_data = std::move(m_post_data);
     return { up, response };
 }
-}
+}  // namespace Net

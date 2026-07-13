@@ -68,7 +68,6 @@ class ResourceFolderModelTest : public QObject {
 
     void test_1178()
     {
-
         QString source = QFINDTESTDATA("testdata/Resources/test_folder");
 
         QVERIFY(!source.endsWith('/'));

@@ -106,12 +106,10 @@ Task::State FileSink::finalize(QNetworkReply& reply)
     bool validStatus = false;
     int statusCode = statusCodeV.toInt(&validStatus);
     if (validStatus) {
-
         gotFile = statusCode == 200 || statusCode == 203;
     }
 
     if (gotFile || m_wroteAnyData) {
-
         if (!finalizeAllValidators(reply)) {
             m_fail_reason = "Failed to finalize validators";
             return Task::State::Failed;
@@ -146,4 +144,4 @@ bool FileSink::hasLocalData()
     QFileInfo info(m_filename);
     return info.exists() && info.size() != 0;
 }
-}
+}  // namespace Net

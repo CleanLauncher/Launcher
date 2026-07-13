@@ -71,7 +71,6 @@ QString stripVariableEntries(QString name, QString target, QString remove)
 
 QProcessEnvironment CleanEnviroment()
 {
-
     QProcessEnvironment rawenv = QProcessEnvironment::systemEnvironment();
     QProcessEnvironment env;
 
@@ -185,7 +184,6 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
         HKEY jreKey;
         if (RegOpenKeyExW(baseRegistry, keyName.toStdWString().c_str(), 0, KEY_READ | keyType | KEY_ENUMERATE_SUB_KEYS, &jreKey) ==
             ERROR_SUCCESS) {
-
             WCHAR subKeyName[255];
             DWORD subKeyNameSize, numSubKeys, retCode;
 
@@ -197,13 +195,11 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
                     retCode = RegEnumKeyExW(jreKey, i, subKeyName, &subKeyNameSize, NULL, NULL, NULL, NULL);
                     QString newSubkeyName = QString::fromWCharArray(subKeyName);
                     if (retCode == ERROR_SUCCESS) {
-
                         QString newKeyName = keyName + "\\" + newSubkeyName + subkeySuffix;
 
                         HKEY newKey;
                         if (RegOpenKeyExW(baseRegistry, newKeyName.toStdWString().c_str(), 0, KEY_READ | keyType, &newKey) ==
                             ERROR_SUCCESS) {
-
                             DWORD valueSz = 0;
                             if (RegQueryValueExW(newKey, keyJavaDir.toStdWString().c_str(), NULL, NULL, NULL, &valueSz) == ERROR_SUCCESS) {
                                 WCHAR* value = new WCHAR[valueSz];

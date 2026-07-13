@@ -65,7 +65,6 @@ class VersionFile : public ProblemContainer {
     void applyTo(LaunchProfile* profile, const RuntimeContext& runtimeContext);
 
    public:
-
     int order = 0;
 
     QString name;
@@ -125,7 +124,6 @@ class VersionFile : public ProblemContainer {
     QList<Java::MetadataPtr> runtimes;
 
    public:
-
     QMap<QString, std::shared_ptr<MojangDownloadInfo>> mojangDownloads;
 
     std::shared_ptr<MojangAssetIndexInfo> mojangAssetIndex;

@@ -44,7 +44,6 @@ MessageLevel MessageLevel::fromQtMsgType(const QtMsgType& type)
 
 MessageLevel MessageLevel::takeFromLine(QString& line)
 {
-
     int endmark = line.indexOf("]!");
     if (line.startsWith("!![") && endmark != -1) {
         auto level = MessageLevel::fromName(line.left(endmark).mid(3));
@@ -56,7 +55,6 @@ MessageLevel MessageLevel::takeFromLine(QString& line)
 
 MessageLevel MessageLevel::takeFromLauncherLine(QString& line)
 {
-
     int startMark = 0;
     while (startMark < line.size() && (line[startMark].isDigit() || line[startMark].isSpace() || line[startMark] == '.'))
         ++startMark;

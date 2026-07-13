@@ -57,7 +57,6 @@ struct RuntimeContext {
 
     bool classifierMatches(QString target) const
     {
-
         bool x = target == getClassifier();
 
         if (!x && isLegacyArch())

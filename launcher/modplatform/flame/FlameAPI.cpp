@@ -161,7 +161,6 @@ std::pair<Task::Ptr, QByteArray*> FlameAPI::getFile(const QString& addonId, cons
 
 QList<ResourceAPI::SortingMethod> FlameAPI::getSortingMethods() const
 {
-
     return { { 1, "Featured", QObject::tr("Sort by Featured") },
              { 2, "Popularity", QObject::tr("Sort by Popularity") },
              { 3, "LastUpdated", QObject::tr("Sort by Last Updated") },

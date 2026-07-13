@@ -31,6 +31,6 @@ struct Modpack {
 
 using ModpackList = QList<Modpack>;
 
-}
+}  // namespace LegacyFTB
 
 Q_DECLARE_METATYPE(LegacyFTB::Modpack)

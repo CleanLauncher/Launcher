@@ -52,8 +52,7 @@ class ExternalUpdater::Private {
     QWidget* parent{};
 };
 
-ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir)
-    : priv(new ExternalUpdater::Private())
+ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir) : priv(new ExternalUpdater::Private())
 {
     priv->appDir = QDir(appDir);
     priv->dataDir = QDir(dataDir);
@@ -74,7 +73,6 @@ ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const Q
     connectTimer();
     resetAutoCheckTimer();
     if (priv->updateInterval == 0) {
-
         checkForUpdates(false);
     }
 }
@@ -184,44 +182,42 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
             break;
         case 1:
 
-            {
-                qDebug() << "Updater subprocess error" << qPrintable(stdError);
-                auto msgBox = QMessageBox(QMessageBox::Warning, tr("Update Check Error"),
-                                          tr("There was an error running the update check."), QMessageBox::Ok, priv->parent);
-                msgBox.setDetailedText(QString(stdError));
-                msgBox.setMinimumWidth(460);
-                msgBox.adjustSize();
-                msgBox.exec();
-            }
-            break;
+        {
+            qDebug() << "Updater subprocess error" << qPrintable(stdError);
+            auto msgBox = QMessageBox(QMessageBox::Warning, tr("Update Check Error"), tr("There was an error running the update check."),
+                                      QMessageBox::Ok, priv->parent);
+            msgBox.setDetailedText(QString(stdError));
+            msgBox.setMinimumWidth(460);
+            msgBox.adjustSize();
+            msgBox.exec();
+        } break;
         case 100:
 
-            {
-                auto [firstLine, remainder1] = StringUtils::splitFirst(stdOutput, '\n');
-                auto [secondLine, remainder2] = StringUtils::splitFirst(remainder1, '\n');
-                auto [thirdLine, releaseNotes] = StringUtils::splitFirst(remainder2, '\n');
-                auto versionName = StringUtils::splitFirst(firstLine, ": ").second.trimmed();
-                auto versionTag = StringUtils::splitFirst(secondLine, ": ").second.trimmed();
-                auto releaseTimestamp = QDateTime::fromString(StringUtils::splitFirst(thirdLine, ": ").second.trimmed(), Qt::ISODate);
-                qDebug() << "Update available:" << versionName << versionTag << releaseTimestamp;
-                qDebug() << "Update release notes:" << releaseNotes;
+        {
+            auto [firstLine, remainder1] = StringUtils::splitFirst(stdOutput, '\n');
+            auto [secondLine, remainder2] = StringUtils::splitFirst(remainder1, '\n');
+            auto [thirdLine, releaseNotes] = StringUtils::splitFirst(remainder2, '\n');
+            auto versionName = StringUtils::splitFirst(firstLine, ": ").second.trimmed();
+            auto versionTag = StringUtils::splitFirst(secondLine, ": ").second.trimmed();
+            auto releaseTimestamp = QDateTime::fromString(StringUtils::splitFirst(thirdLine, ": ").second.trimmed(), Qt::ISODate);
+            qDebug() << "Update available:" << versionName << versionTag << releaseTimestamp;
+            qDebug() << "Update release notes:" << releaseNotes;
 
-                offerUpdate(versionName, versionTag, releaseNotes, triggeredByUser);
-            }
-            break;
+            offerUpdate(versionName, versionTag, releaseNotes, triggeredByUser);
+        } break;
         default:
 
-            {
-                qDebug() << "Updater exited with unknown code" << exitCode;
-                auto msgBox = QMessageBox(QMessageBox::Information, tr("Unknown Update Error"),
-                                          tr("The updater exited with an unknown condition.\nExit Code: %1").arg(QString::number(exitCode)),
-                                          QMessageBox::Ok, priv->parent);
-                auto detailTxt = tr("StdOut: %1\nStdErr: %2").arg(QString(stdOutput)).arg(QString(stdError));
-                msgBox.setDetailedText(detailTxt);
-                msgBox.setMinimumWidth(460);
-                msgBox.adjustSize();
-                msgBox.exec();
-            }
+        {
+            qDebug() << "Updater exited with unknown code" << exitCode;
+            auto msgBox = QMessageBox(QMessageBox::Information, tr("Unknown Update Error"),
+                                      tr("The updater exited with an unknown condition.\nExit Code: %1").arg(QString::number(exitCode)),
+                                      QMessageBox::Ok, priv->parent);
+            auto detailTxt = tr("StdOut: %1\nStdErr: %2").arg(QString(stdOutput)).arg(QString(stdError));
+            msgBox.setDetailedText(detailTxt);
+            msgBox.setMinimumWidth(460);
+            msgBox.adjustSize();
+            msgBox.exec();
+        }
     }
     priv->lastCheck = QDateTime::currentDateTime();
     priv->settings->setValue("last_check", priv->lastCheck.toString(Qt::ISODate));
@@ -308,9 +304,9 @@ void ExternalUpdater::autoCheckTimerFired() const
 }
 
 void ExternalUpdater::offerUpdate(const QString& versionName,
-                                       const QString& versionTag,
-                                       const QString& releaseNotes,
-                                       const bool triggeredByUser) const
+                                  const QString& versionTag,
+                                  const QString& releaseNotes,
+                                  const bool triggeredByUser) const
 {
     priv->settings->beginGroup("skip");
     auto shouldSkip = !triggeredByUser && priv->settings->value(versionTag, false).toBool();

@@ -40,4 +40,4 @@ class TestCheck : public QObject {
     int m_maxMem = 0;
     int m_permGen = 64;
 };
-}
+}  // namespace JavaCommon

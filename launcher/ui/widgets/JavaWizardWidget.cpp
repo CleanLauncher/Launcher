@@ -226,7 +226,6 @@ JavaWizardWidget::ValidationStatus JavaWizardWidget::validate()
 
         case JavaStatus::ReturnedInvalidData: {
             if (!(BuildConfig.JAVA_DOWNLOADER_ENABLED && m_autodownloadCheckBox->isChecked())) {
-
                 int button = QMessageBox::No;
                 if (m_result.mojangPlatform == "32" && maxHeapSize() > 2048) {
                     button = CustomMessageBox::selectable(

@@ -24,7 +24,6 @@
 class INISettingsObject : public SettingsObject {
     Q_OBJECT
    public:
-
     explicit INISettingsObject(QStringList paths, QObject* parent = nullptr);
 
     explicit INISettingsObject(QString path, QObject* parent = nullptr);

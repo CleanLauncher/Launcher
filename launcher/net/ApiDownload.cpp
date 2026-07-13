@@ -45,4 +45,4 @@ Download::Ptr ApiDownload::makeFile(QUrl url, QString path, Download::Options op
     return dl;
 }
 
-}
+}  // namespace Net

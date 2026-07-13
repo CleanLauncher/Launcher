@@ -46,17 +46,14 @@ bool processFolder(ShaderPack& pack, ProcessingLevel level)
     QFileInfo shaders_dir_info(FS::PathCombine(pack.fileinfo().filePath(), "shaders"));
     if (!shaders_dir_info.exists() || !shaders_dir_info.isDir()) {
         return false;
-
     }
     pack.setPackFormat(ShaderPackFormat::VALID);
 
     if (level == ProcessingLevel::BasicInfoOnly) {
         return true;
-
     }
 
     return true;
-
 }
 
 bool processZIP(ShaderPack& pack, ProcessingLevel level)
@@ -68,7 +65,6 @@ bool processZIP(ShaderPack& pack, ProcessingLevel level)
         return false;
 
     if (!zip.exists("/shaders")) {
-
         QStringList files = zip.getFiles();
 
         bool isShaderPresent = false;
@@ -87,7 +83,6 @@ bool processZIP(ShaderPack& pack, ProcessingLevel level)
 
     if (level == ProcessingLevel::BasicInfoOnly) {
         return true;
-
     }
 
     return true;
@@ -99,7 +94,7 @@ bool validate(QFileInfo file)
     return ShaderPackUtils::process(sp, ProcessingLevel::BasicInfoOnly) && sp.valid();
 }
 
-}
+}  // namespace ShaderPackUtils
 
 LocalShaderPackParseTask::LocalShaderPackParseTask(int token, ShaderPack& sp) : Task(false), m_token(token), m_shader_pack(sp) {}
 

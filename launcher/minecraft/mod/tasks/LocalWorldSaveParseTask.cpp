@@ -46,7 +46,7 @@ bool process(WorldSave& pack, ProcessingLevel level)
 
 static std::tuple<bool, QString, bool> contains_level_dat(QDir dir, bool saves = false)
 {
-    for (auto const& entry : dir.entryInfoList()) {
+    for (const auto& entry : dir.entryInfoList()) {
         if (!entry.isDir()) {
             continue;
         }
@@ -81,11 +81,9 @@ bool processFolder(WorldSave& save, ProcessingLevel level)
 
     if (level == ProcessingLevel::BasicInfoOnly) {
         return true;
-
     }
 
     return true;
-
 }
 
 static std::tuple<bool, QString, bool> contains_level_dat(QString fileName)
@@ -147,7 +145,6 @@ bool processZIP(WorldSave& save, ProcessingLevel level)
 
     if (level == ProcessingLevel::BasicInfoOnly) {
         return true;
-
     }
 
     return true;
@@ -159,7 +156,7 @@ bool validate(QFileInfo file)
     return WorldSaveUtils::process(sp, ProcessingLevel::BasicInfoOnly) && sp.valid();
 }
 
-}
+}  // namespace WorldSaveUtils
 
 LocalWorldSaveParseTask::LocalWorldSaveParseTask(int token, WorldSave& save) : Task(false), m_token(token), m_save(save) {}
 

@@ -91,4 +91,4 @@ QNetworkReply* Download::getReply(QNetworkRequest& request)
 {
     return m_network->get(request);
 }
-}
+}  // namespace Net

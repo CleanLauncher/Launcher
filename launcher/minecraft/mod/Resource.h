@@ -161,7 +161,6 @@ class Resource : public QObject {
     bool isMoreThanOneHardLink() const;
 
    protected:
-
     QFileInfo m_file_info;
 
     QDateTime m_changed_date_time;

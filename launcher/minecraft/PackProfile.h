@@ -131,7 +131,6 @@ class PackProfile : public QAbstractListModel {
     void minecraftChanged();
 
    public:
-
     ComponentPtr getComponent(const QString& id);
 
     ComponentPtr getComponent(size_t index);

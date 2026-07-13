@@ -111,7 +111,6 @@ QString JsonCatPack::path(QDate now) const
         QDate startDate = ensureDay(now.year(), var.startTime.month, var.startTime.day);
         QDate endDate = ensureDay(now.year(), var.endTime.month, var.endTime.day);
         if (startDate > endDate) {
-
             if (endDate < now)
 
                 endDate = endDate.addYears(1);

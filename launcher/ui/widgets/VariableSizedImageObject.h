@@ -47,7 +47,6 @@ class VariableSizedImageObject final : public QObject, public QTextObjectInterfa
     void flush();
 
    private:
-
     void parseImage(QTextDocument* doc, std::shared_ptr<ImageMetadata> meta);
 
     void loadImage(QTextDocument* doc, std::shared_ptr<ImageMetadata> meta);

@@ -38,4 +38,4 @@ QMap<QString, QString> DataPackResourcePage::urlHandlers() const
     return map;
 }
 
-}
+}  // namespace ResourceDownload

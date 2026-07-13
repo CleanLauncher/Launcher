@@ -49,7 +49,7 @@ bool validate(QFileInfo file);
 
 bool validateResourcePack(QFileInfo file);
 
-}
+}  // namespace DataPackUtils
 
 class LocalDataPackParseTask : public Task {
     Q_OBJECT

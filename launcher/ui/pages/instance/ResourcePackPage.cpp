@@ -83,7 +83,6 @@ void ResourcePackPage::downloadResourcePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     m_downloadDialog = new ResourceDownload::ResourcePackDownloadDialog(this, m_model, m_instance);
@@ -137,7 +136,6 @@ void ResourcePackPage::updateResourcePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -242,7 +240,6 @@ void ResourcePackPage::changeResourcePackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

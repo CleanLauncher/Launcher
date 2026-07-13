@@ -66,10 +66,7 @@ void LanguagePage::applySettings()
     settings->set("Language", key);
 }
 
-void LanguagePage::loadSettings()
-{
-
-}
+void LanguagePage::loadSettings() {}
 
 void LanguagePage::retranslate()
 {

@@ -40,8 +40,8 @@
 #include "FlameResourcePages.h"
 #include <QList>
 #include <memory>
-#include "modplatform/flame/FlameAPI.h"
 #include "../ui_ResourcePage.h"
+#include "modplatform/flame/FlameAPI.h"
 
 #include "FlameResourceModels.h"
 #include "ui/dialogs/ResourceDownloadDialog.h"
@@ -69,7 +69,6 @@ void FlameModPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-
             query.remove(0, 10);
             ModPage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
 
@@ -102,7 +101,6 @@ void FlameResourcePackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-
             query.remove(0, 10);
             ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
 
@@ -135,7 +133,6 @@ void FlameTexturePackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-
             query.remove(0, 10);
             ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
 
@@ -152,7 +149,6 @@ void FlameDataPackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-
             query.remove(0, 10);
             DataPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
 
@@ -200,7 +196,6 @@ void FlameShaderPackPage::openUrl(const QUrl& url)
         QString query = url.query(QUrl::FullyDecoded);
 
         if (query.startsWith("remoteUrl=")) {
-
             query.remove(0, 10);
             ShaderPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
 
@@ -247,4 +242,4 @@ void FlameModPage::prepareProviderCategories()
     });
     m_categoriesTask->start();
 };
-}
+}  // namespace ResourceDownload

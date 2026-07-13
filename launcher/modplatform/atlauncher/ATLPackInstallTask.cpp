@@ -73,7 +73,7 @@ Meta::Version::Ptr getComponentVersion(const QString& uid, const QString& versio
 {
     return APPLICATION->metadataIndex()->getLoadedVersion(uid, version);
 }
-}
+}  // namespace
 
 namespace ATLauncher {
 
@@ -300,7 +300,6 @@ void PackInstallTask::deleteExistingFiles()
 QString PackInstallTask::getDirForModType(ModType type, const QString& raw)
 {
     switch (type) {
-
         case ModType::Root:
         case ModType::Extract:
         case ModType::Decomp:
@@ -370,7 +369,6 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
                 }
 
                 if (m_version.loader.recommended) {
-
                     if (!version->isRecommended()) {
                         continue;
                     }
@@ -383,7 +381,6 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
             return Q_NULLPTR;
         }
         if (m_version.loader.choose) {
-
             if (m_version.loader.type == "fabric") {
                 return m_support->chooseVersion(vlist, Q_NULLPTR);
             }
@@ -402,7 +399,6 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
 
 QString PackInstallTask::detectLibrary(const VersionLibrary& library)
 {
-
     if (!library.server.isEmpty() && library.server.split("/").length() >= 3) {
         auto lastSlash = library.server.lastIndexOf("/");
         auto locationAndVersion = library.server.mid(0, lastSlash);
@@ -490,7 +486,6 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
     };
 
     for (const auto& lib : m_version.libraries) {
-
         if (s_liteLoaderMap.contains(lib.md5)) {
             auto ver = getComponentVersion("com.mumfrey.liteloader", s_liteLoaderMap.value(lib.md5));
             if (ver) {
@@ -505,7 +500,6 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
         bool libExempt = false;
         for (const auto& existingLib : exempt) {
             if (libSpecifier.matchName(existingLib)) {
-
                 libExempt = Version(libSpecifier.version()) >= Version(existingLib.version());
             }
         }
@@ -720,7 +714,6 @@ void PackInstallTask::downloadMods()
 
     QList<VersionMod> blockedMods;
     for (const auto& mod : m_version.mods) {
-
         if (!mod.client) {
             continue;
         }
@@ -956,7 +949,6 @@ bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
 
         qDebug() << "Extracting " + mod.file + " to " + extractToDir;
         if (!MMCZip::extractDir(modPath, folderToExtract, extractToPath)) {
-
             return false;
         }
     }
@@ -1070,4 +1062,4 @@ void PackInstallTask::install()
     emitSucceeded();
 }
 
-}
+}  // namespace ATLauncher

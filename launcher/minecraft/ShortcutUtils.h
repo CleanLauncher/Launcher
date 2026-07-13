@@ -62,4 +62,4 @@ bool createInstanceShortcutInApplications(const Shortcut& shortcut);
 
 bool createInstanceShortcutInOther(const Shortcut& shortcut);
 
-}
+}  // namespace ShortcutUtils

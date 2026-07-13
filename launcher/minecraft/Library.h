@@ -80,7 +80,6 @@ class Library {
     }
 
    public:
-
     const GradleSpecifier& rawName() const { return m_name; }
 
     void setRawName(const GradleSpecifier& spec) { m_name = spec; }
@@ -138,7 +137,6 @@ class Library {
     QString getCompatibleNative(const RuntimeContext& runtimeContext) const;
 
    private:
-
     static QString defaultStoragePrefix();
 
     QString storagePrefix() const;
@@ -148,7 +146,6 @@ class Library {
     QString hint() const { return m_hint; }
 
    protected:
-
     GradleSpecifier m_name;
 
     QString m_repositoryURL;

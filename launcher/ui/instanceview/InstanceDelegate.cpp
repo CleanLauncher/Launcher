@@ -198,9 +198,7 @@ void ListViewDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opti
     textHighlightRect.adjust(0, iconSize + 5, 0, 0);
 
     {
-
         drawSelectionRect(painter, opt, textHighlightRect);
-
     }
 
     QIcon::Mode mode = QIcon::Normal;

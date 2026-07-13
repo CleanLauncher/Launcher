@@ -96,4 +96,4 @@ bool ExportToZipTask::abort()
     }
     return false;
 }
-}
+}  // namespace MMCZip

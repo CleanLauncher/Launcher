@@ -41,10 +41,10 @@
 #include <algorithm>
 
 #include "Application.h"
-#include "settings/SettingsObject.h"
 #include "java/JavaChecker.h"
 #include "java/JavaInstallList.h"
 #include "java/JavaUtils.h"
+#include "settings/SettingsObject.h"
 #include "tasks/ConcurrentTask.h"
 
 JavaInstallList::JavaInstallList(QObject* parent, bool onlyManagedVersions)
@@ -200,7 +200,6 @@ void JavaListLoadTask::javaCheckerFinished()
 
     QList<BaseVersion::Ptr> javas_bvp;
     for (auto java : candidates) {
-
         BaseVersion::Ptr bp_java = std::dynamic_pointer_cast<BaseVersion>(java);
 
         if (bp_java) {

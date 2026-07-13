@@ -107,7 +107,6 @@ void PackInstallTask::executeTask()
 
 void PackInstallTask::onManifestDownloadSucceeded(QByteArray* responsePtr)
 {
-
     QByteArray response = std::move(*responsePtr);
     m_net_job.reset();
 
@@ -384,4 +383,4 @@ void PackInstallTask::copyBlockedMods()
     setAbortable(true);
 }
 
-}
+}  // namespace FTB

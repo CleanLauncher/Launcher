@@ -121,4 +121,4 @@ QString getSupportedJavaArchitecture()
     }
     return {};
 }
-}
+}  // namespace SysInfo

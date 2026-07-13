@@ -27,7 +27,6 @@ class MacSparkleUpdater : public ExternalUpdater {
     Q_OBJECT
 
    public:
-
     MacSparkleUpdater();
     ~MacSparkleUpdater() override;
 

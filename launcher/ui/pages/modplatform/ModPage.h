@@ -47,9 +47,9 @@ class ModPage : public ResourcePage {
 
     QMap<QString, QString> urlHandlers() const override;
 
-    void addResourceToPage(ModPlatform::IndexedPack::Ptr ,
-                           ModPlatform::IndexedVersion& ,
-                           ResourceFolderModel* ,
+    void addResourceToPage(ModPlatform::IndexedPack::Ptr,
+                           ModPlatform::IndexedVersion&,
+                           ResourceFolderModel*,
                            QString downloadReason = "standalone") override;
 
     virtual std::unique_ptr<ModFilterWidget> createFilterWidget() = 0;
@@ -72,4 +72,4 @@ class ModPage : public ResourcePage {
     std::shared_ptr<ModFilterWidget::Filter> m_filter;
 };
 
-}
+}  // namespace ResourceDownload

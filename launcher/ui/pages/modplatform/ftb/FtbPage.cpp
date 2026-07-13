@@ -152,7 +152,7 @@ void FtbPage::onSortingSelectionChanged(QString selected)
     m_filterModel->setSorting(toSet);
 }
 
-void FtbPage::onSelectionChanged(QModelIndex first, QModelIndex )
+void FtbPage::onSelectionChanged(QModelIndex first, QModelIndex)
 {
     m_ui->versionSelectionBox->clear();
 

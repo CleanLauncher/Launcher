@@ -134,7 +134,7 @@ class Task : public QObject, public QRunnable {
     void status(QString status);
     void details(QString details);
     void warningLogged(const QString& warning);
-    void stepProgress(TaskStepProgress const& task_progress);
+    void stepProgress(const TaskStepProgress& task_progress);
 
     void abortStatusChanged(bool can_abort);
 
@@ -159,13 +159,9 @@ class Task : public QObject, public QRunnable {
         emit abortStatusChanged(can_abort);
     }
 
-    void setAbortButtonText(QString text)
-    {
-        emit abortButtonTextChanged(text);
-    }
+    void setAbortButtonText(QString text) { emit abortButtonTextChanged(text); }
 
    protected:
-
     virtual void executeTask() = 0;
 
    protected slots:
@@ -176,7 +172,7 @@ class Task : public QObject, public QRunnable {
 
     virtual void emitFailed(QString reason = "");
 
-    virtual void propagateStepProgress(TaskStepProgress const& task_progress);
+    virtual void propagateStepProgress(const TaskStepProgress& task_progress);
 
    public slots:
     void setStatus(const QString& status);
@@ -195,7 +191,6 @@ class Task : public QObject, public QRunnable {
     bool m_show_debug = true;
 
    private:
-
     bool m_can_abort = false;
     QUuid m_uid;
 };

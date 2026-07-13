@@ -127,9 +127,7 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
         return {};
     }
     for (auto mcVer : versionArray) {
-        file.mcVersion.append({ ModrinthAPI::mapMCVersionFromModrinth(mcVer.toString()),
-                                mcVer.toString() });
-
+        file.mcVersion.append({ ModrinthAPI::mapMCVersionFromModrinth(mcVer.toString()), mcVer.toString() });
     }
     auto loaders = Json::requireArray(obj, "loaders");
     for (auto loader : loaders) {
@@ -182,7 +180,6 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
     int i = 0;
 
     if (files.empty()) {
-
         qWarning() << "Modrinth returned an unexpected empty list of files:" << obj;
         return {};
     }

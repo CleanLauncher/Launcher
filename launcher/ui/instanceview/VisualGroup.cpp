@@ -200,7 +200,6 @@ void VisualGroup::drawHeader(QPainter* painter, const QStyleOptionViewItem& opti
         polygon << QPoint(startPoint, lineHeight) << QPoint(optRect.right() - 3, lineHeight);
         painter->drawPolyline(polygon);
     }
-
 }
 
 int VisualGroup::totalHeight() const
@@ -214,10 +213,8 @@ int VisualGroup::headerHeight()
     font.setBold(true);
     QFontMetrics fontMetrics(font);
 
-    const int height = fontMetrics.height() + 1
-                       + 11 ;
+    const int height = fontMetrics.height() + 1 + 11;
     return height;
-
 }
 
 int VisualGroup::contentHeight() const

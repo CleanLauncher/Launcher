@@ -119,7 +119,6 @@ bool XboxAuthorizationStep::processSTSError(const QByteArray& response)
                 return true;
             }
             case 2148916235: {
-
                 emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("Xbox Live is not available in your country. You've been blocked."));
                 return true;
             }

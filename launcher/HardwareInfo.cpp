@@ -56,7 +56,7 @@ bool readFromOutput(const char* command, F function)
 
     return true;
 }
-}
+}  // namespace
 
 #endif
 
@@ -84,7 +84,6 @@ uint64_t HardwareInfo::totalRamMiB()
     status.dwLength = sizeof status;
 
     if (GlobalMemoryStatusEx(&status) == TRUE) {
-
         return status.ullTotalPhys / 1024 / 1024;
     }
 
@@ -98,7 +97,6 @@ uint64_t HardwareInfo::availableRamMiB()
     status.dwLength = sizeof status;
 
     if (GlobalMemoryStatusEx(&status) == TRUE) {
-
         return status.ullAvailPhys / 1024 / 1024;
     }
 
@@ -153,7 +151,6 @@ uint64_t HardwareInfo::totalRamMiB()
     uint64_t memsize = 0;
     size_t memsizeSize = sizeof memsize;
     if (sysctlbyname("hw.memsize", &memsize, &memsizeSize, nullptr, 0) == 0) {
-
         return memsize / 1024 / 1024;
     }
 
@@ -180,7 +177,6 @@ MacOSHardwareInfo::MemoryPressureLevel MacOSHardwareInfo::memoryPressureLevel()
 
 QString MacOSHardwareInfo::memoryPressureLevelName()
 {
-
     switch (memoryPressureLevel()) {
         case MemoryPressureLevel::Normal:
             return "Green";
@@ -198,7 +194,6 @@ QStringList HardwareInfo::gpuInfo()
 {
     QStringList out;
     const bool success = readFromOutput("system_profiler SPDisplaysDataType", [&](const QString& str) {
-
         if (str.contains("Chipset Model")) {
             out << "GPU: " + afterColon(str);
         }
@@ -217,7 +212,6 @@ QString HardwareInfo::cpuInfo()
 {
     std::ifstream cpuin("/proc/cpuinfo");
     for (std::string line; std::getline(cpuin, line);) {
-
         if (const QString str = QString::fromStdString(line); str.startsWith("model name")) {
             return afterColon(str);
         }
@@ -232,7 +226,6 @@ uint64_t readMemInfo(const QString& searchTarget)
 {
     std::ifstream memin("/proc/meminfo");
     for (std::string line; std::getline(memin, line);) {
-
         if (const QString str = QString::fromStdString(line); str.startsWith(searchTarget)) {
             bool ok = false;
             const uint total = str.simplified().section(' ', 1, 1).toUInt(&ok);
@@ -248,7 +241,7 @@ uint64_t readMemInfo(const QString& searchTarget)
     qWarning() << "Could not read /proc/meminfo: search target not found:" << searchTarget;
     return 0;
 }
-}
+}  // namespace
 
 uint64_t HardwareInfo::totalRamMiB()
 {

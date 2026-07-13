@@ -174,7 +174,6 @@ void ExportInstanceDialog::done(int result)
 
 void ExportInstanceDialog::rowsInserted(QModelIndex parent, int top, int bottom)
 {
-
     for (int i = top; i < bottom; i++) {
         auto node = m_proxyModel->index(i, 0, parent);
         if (m_proxyModel->shouldExpand(node)) {

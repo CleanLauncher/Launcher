@@ -70,4 +70,4 @@ class ListModel : public QAbstractListModel {
     Task::Ptr m_jobPtr;
 };
 
-}
+}  // namespace Flame

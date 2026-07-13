@@ -26,11 +26,7 @@ class Usable {
 
 class UseLock {
    public:
-    UseLock(Usable* usable) : m_usable(usable)
-    {
-
-        m_usable->incrementUses();
-    }
+    UseLock(Usable* usable) : m_usable(usable) { m_usable->incrementUses(); }
     ~UseLock() { m_usable->decrementUses(); }
 
    private:

@@ -11,7 +11,6 @@ using ComponentContainer = QList<ComponentPtr>;
 using ComponentIndex = QMap<QString, ComponentPtr>;
 
 struct PackProfileData {
-
     MinecraftInstance* m_instance;
 
     std::shared_ptr<LaunchProfile> m_profile;

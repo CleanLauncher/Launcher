@@ -72,7 +72,6 @@ bool ConcurrentTask::abort()
     m_queue.clear();
 
     if (m_doing.isEmpty()) {
-
         emit aborted();
         emit finished();
 
@@ -124,7 +123,6 @@ void ConcurrentTask::executeNextSubTask()
                 auto task = m_failed.keys().first();
                 auto reason = task->failReason();
                 if (reason.isEmpty()) {
-
                     reason = tr("Task failed");
                 }
                 emitFailed(reason);

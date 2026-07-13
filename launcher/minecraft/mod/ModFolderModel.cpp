@@ -276,7 +276,7 @@ Mod* findById(QSet<Mod*> mods, const QString& resourceId)
     auto found = std::ranges::find_if(mods, [resourceId](Mod* m) { return m->mod_id() == resourceId; });
     return found != mods.end() ? *found : nullptr;
 }
-}
+}  // namespace
 
 void ModFolderModel::onParseFinished()
 {
@@ -355,7 +355,7 @@ QSet<Mod*> collectMods(const QSet<Mod*>& mods, QHash<QString, QSet<Mod*>> relati
     }
     return affectedList;
 }
-}
+}  // namespace
 
 QModelIndexList ModFolderModel::getAffectedMods(const QModelIndexList& indexes, EnableAction action)
 {
@@ -379,7 +379,6 @@ QModelIndexList ModFolderModel::getAffectedMods(const QModelIndexList& indexes, 
         }
         case EnableAction::TOGGLE: {
             return {};
-
         }
     }
     for (auto* affected : affectedMods) {
@@ -492,7 +491,7 @@ QStringList reqToList(const QSet<Mod*>& l)
     }
     return req;
 }
-}
+}  // namespace
 
 QStringList ModFolderModel::requiresList(const QString& id)
 {

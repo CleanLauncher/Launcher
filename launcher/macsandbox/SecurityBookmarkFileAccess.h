@@ -32,7 +32,6 @@ class QByteArray;
 class QUrl;
 
 class SecurityBookmarkFileAccess {
-
     NSMutableDictionary* m_bookmarks;
 
     NSMutableDictionary* m_paths;
@@ -44,7 +43,6 @@ class SecurityBookmarkFileAccess {
     NSURL* securityScopedBookmarkToNSURL(QByteArray& bookmark, bool& isStale);
 
    public:
-
     SecurityBookmarkFileAccess(bool readOnly = false);
     ~SecurityBookmarkFileAccess();
 

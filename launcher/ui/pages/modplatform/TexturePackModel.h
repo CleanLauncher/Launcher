@@ -25,4 +25,4 @@ class TexturePackResourceModel : public ResourcePackResourceModel {
     Task::Ptr m_task;
 };
 
-}
+}  // namespace ResourceDownload

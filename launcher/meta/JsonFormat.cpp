@@ -189,4 +189,4 @@ void serializeRequires(QJsonObject& obj, RequireSet* ptr, const char* keyName)
     obj.insert(keyName, arrOut);
 }
 
-}
+}  // namespace Meta

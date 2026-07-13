@@ -64,4 +64,4 @@ class Download : public NetRequest {
    protected:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
 };
-}
+}  // namespace Net

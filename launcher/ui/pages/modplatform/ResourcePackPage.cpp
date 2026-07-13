@@ -39,4 +39,4 @@ QMap<QString, QString> ResourcePackResourcePage::urlHandlers() const
     return map;
 }
 
-}
+}  // namespace ResourceDownload

@@ -114,7 +114,6 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
                 return false;
             }
         } else if (mod->type() == ResourceType::SINGLEFILE) {
-
             auto filename = mod->fileinfo();
             if (!zipOut.addFile(filename.absoluteFilePath(), filename.fileName())) {
                 zipOut.close();
@@ -124,7 +123,6 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
             }
             addedFiles.insert(filename.fileName());
         } else if (mod->type() == ResourceType::FOLDER) {
-
             auto filename = mod->fileinfo();
             QString what_to_zip = filename.absoluteFilePath();
             QDir dir(what_to_zip);
@@ -146,7 +144,6 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
             }
             qDebug() << "Adding folder" << filename.fileName() << "from" << filename.absoluteFilePath();
         } else {
-
             zipOut.close();
             FS::deletePath(targetJarPath);
             qCritical() << "Failed to add unknown mod type" << mod->fileinfo().fileName() << "to the jar.";
@@ -244,7 +241,6 @@ std::optional<QStringList> extractSubDir(ArchiveReader* zip, const QString& subd
 
 std::optional<QStringList> extractDir(QString fileCompressed, QString dir)
 {
-
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return QStringList();
@@ -255,7 +251,6 @@ std::optional<QStringList> extractDir(QString fileCompressed, QString dir)
 
 std::optional<QStringList> extractDir(QString fileCompressed, QString subdir, QString dir)
 {
-
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return QStringList();
@@ -266,7 +261,6 @@ std::optional<QStringList> extractDir(QString fileCompressed, QString subdir, QS
 
 bool extractFile(QString fileCompressed, QString file, QString target)
 {
-
     QFileInfo fileInfo(fileCompressed);
     if (fileInfo.size() == 22) {
         return true;
@@ -312,8 +306,7 @@ bool collectFileListRecursively(const QString& rootDir, const QString& subDir, Q
         }
 
         files->append(e);
-
     }
     return true;
 }
-}
+}  // namespace MMCZip

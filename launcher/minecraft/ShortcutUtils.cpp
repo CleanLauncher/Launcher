@@ -71,7 +71,8 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
 
     QFile iconFile(iconPath);
     if (!iconFile.open(QFile::WriteOnly)) {
-        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"), QObject::tr("Failed to create icon for application: %1").arg(iconFile.errorString()));
+        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"),
+                              QObject::tr("Failed to create icon for application: %1").arg(iconFile.errorString()));
         return false;
     }
 
@@ -86,7 +87,6 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
     }
 #elif defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
     if (appPath.startsWith("/tmp/.mount_")) {
-
         appPath = QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE"));
         if (appPath.isEmpty()) {
             QMessageBox::critical(
@@ -101,7 +101,8 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
 
     QFile iconFile(iconPath);
     if (!iconFile.open(QFile::WriteOnly)) {
-        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"), QObject::tr("Failed to create icon for shortcut: %1").arg(iconFile.errorString()));
+        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"),
+                              QObject::tr("Failed to create icon for shortcut: %1").arg(iconFile.errorString()));
         return false;
     }
     bool success = icon->icon().pixmap(64, 64).save(&iconFile, "PNG");
@@ -125,7 +126,8 @@ bool createInstanceShortcut(const Shortcut& shortcut, const QString& filePath)
 
     QFile iconFile(iconPath);
     if (!iconFile.open(QFile::WriteOnly)) {
-        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"), QObject::tr("Failed to create icon for shortcut: %1").arg(iconFile.errorString()));
+        QMessageBox::critical(shortcut.parent, QObject::tr("Create Shortcut"),
+                              QObject::tr("Failed to create icon for shortcut: %1").arg(iconFile.errorString()));
         return false;
     }
     bool success = icon->icon().pixmap(64, 64).save(&iconFile, "ICO");
@@ -242,4 +244,4 @@ bool createInstanceShortcutInOther(const Shortcut& shortcut)
     return true;
 }
 
-}
+}  // namespace ShortcutUtils

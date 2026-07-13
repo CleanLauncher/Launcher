@@ -115,7 +115,6 @@ void InfoFrame::updateWithMod(const Mod& m)
         for (auto l : licenses) {
             if (!licenseText.isEmpty()) {
                 licenseText += "\n";
-
             }
             if (!l.name.isEmpty()) {
                 if (l.url.isEmpty()) {
@@ -160,7 +159,6 @@ void InfoFrame::updateWithResource(const Resource& resource)
 
 QString InfoFrame::renderColorCodes(QString input)
 {
-
     const QMap<QChar, QString> color_codes_map = { { '0', "#000000" }, { '1', "#0000AA" }, { '2', "#00AA00" }, { '3', "#00AAAA" },
                                                    { '4', "#AA0000" }, { '5', "#AA00AA" }, { '6', "#FFAA00" }, { '7', "#AAAAAA" },
                                                    { '8', "#555555" }, { '9', "#5555FF" }, { 'a', "#55FF55" }, { 'b', "#55FFFF" },
@@ -173,7 +171,6 @@ QString InfoFrame::renderColorCodes(QString input)
 
     auto it = input.constBegin();
     while (it != input.constEnd()) {
-
         if (*it == u'§' && (it + 1) != input.constEnd()) {
             const auto& code = *(++it);
 
@@ -181,20 +178,16 @@ QString InfoFrame::renderColorCodes(QString input)
             const auto tag_entry = formatting_codes_map.constFind(code);
 
             if (color_entry != color_codes_map.constEnd()) {
-
                 html += QString("<span style=\"color: %1;\">").arg(color_entry.value());
                 tags << "span";
             } else if (tag_entry != formatting_codes_map.constEnd()) {
-
                 html += QString("<%1>").arg(tag_entry.value());
                 tags << tag_entry.value();
             } else if (code == 'r') {
-
                 while (!tags.isEmpty()) {
                     html += QString("</%1>").arg(tags.takeLast());
                 }
             } else {
-
                 html += QString("§%1").arg(code);
             }
         } else {

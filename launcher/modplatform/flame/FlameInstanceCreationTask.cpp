@@ -144,11 +144,10 @@ bool FlameCreationTask::updateInstance()
 
         auto files_iterator = files.begin();
         while (files_iterator != files.end()) {
-            auto const& file = files_iterator;
+            const auto& file = files_iterator;
 
             auto old_file = old_files.find(file.key());
             if (old_file != old_files.end()) {
-
                 if (old_file->fileId == file->fileId) {
                     qDebug() << "Removed file at" << file->targetFolder << "with id" << file->fileId << "from list of downloads";
 
@@ -181,7 +180,6 @@ bool FlameCreationTask::updateInstance()
         QEventLoop loop;
 
         connect(job.get(), &Task::succeeded, this, [this, raw_response, fileIds, old_inst_dir, &old_files, old_minecraft_dir] {
-
             QJsonParseError parse_error{};
             auto doc = QJsonDocument::fromJson(*raw_response, &parse_error);
             if (parse_error.error != QJsonParseError::NoError) {
@@ -229,7 +227,6 @@ bool FlameCreationTask::updateInstance()
 
         m_processUpdateFileInfoJob = nullptr;
     } else {
-
         auto dialog = CustomMessageBox::selectable(m_parent, tr("No index file."),
                                                    tr("We couldn't find a suitable index file for the older version. This may cause some "
                                                       "of the files to be duplicated. Do you want to continue?"),
@@ -269,7 +266,6 @@ QString FlameCreationTask::getVersionForLoader(QString uid, QString loaderType, 
         }
 
         for (auto version : vlist->versions()) {
-
             if (!version->isRecommended())
                 continue;
             auto reqs = version->requiredSet();
@@ -319,7 +315,6 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
     if (!m_pack.overrides.isEmpty()) {
         QString overridePath = FS::PathCombine(m_stagingPath, m_pack.overrides);
         if (QFile::exists(overridePath)) {
-
             Override::createOverrides("overrides", parent_folder, overridePath);
 
             QString mcPath = FS::PathCombine(m_stagingPath, "minecraft");
@@ -418,7 +413,6 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
     QString jarmodsPath = FS::PathCombine(m_stagingPath, "minecraft", "jarmods");
     QFileInfo jarmodsInfo(jarmodsPath);
     if (jarmodsInfo.isDir()) {
-
         qDebug() << "Found jarmods:";
         QDir jarmodsDir(jarmodsPath);
         QStringList jarMods;
@@ -583,14 +577,14 @@ void FlameCreationTask::setupDownloadJob(QEventLoop& loop)
     m_filesJob->start();
 }
 
-void FlameCreationTask::copyBlockedMods(QList<BlockedMod> const& blocked_mods)
+void FlameCreationTask::copyBlockedMods(const QList<BlockedMod>& blocked_mods)
 {
     setStatus(tr("Copying Blocked Mods..."));
     setAbortable(false);
     int i = 0;
     int total = blocked_mods.length();
     setProgress(i, total);
-    for (auto const& mod : blocked_mods) {
+    for (const auto& mod : blocked_mods) {
         if (!mod.matched) {
             qDebug() << mod.name << "was not matched to a local file, skipping copy";
             continue;

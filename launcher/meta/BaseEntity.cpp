@@ -26,8 +26,8 @@
 #include "net/NetJob.h"
 
 #include "Application.h"
-#include "settings/SettingsObject.h"
 #include "BuildConfig.h"
+#include "settings/SettingsObject.h"
 #include "tasks/Task.h"
 
 namespace Meta {
@@ -93,7 +93,6 @@ Task::Ptr BaseEntity::loadTask(Net::Mode mode, bool forceReload)
 
 bool BaseEntity::isLoaded() const
 {
-
     return m_sha256.isEmpty() ? m_load_status == LoadStatus::Remote : m_load_status != LoadStatus::NotLoaded && m_sha256 == m_file_sha256;
 }
 
@@ -159,7 +158,6 @@ void BaseEntityLoadTask::executeTask()
     auto url = m_entity->url();
     auto entry = APPLICATION->metacache()->resolveEntry("meta", m_entity->localFilename());
     if (m_force_reload) {
-
         entry->setETag({});
         entry->setRemoteChangedTimestamp({});
     }
@@ -200,4 +198,4 @@ bool BaseEntityLoadTask::abort()
     return Task::abort();
 }
 
-}
+}  // namespace Meta

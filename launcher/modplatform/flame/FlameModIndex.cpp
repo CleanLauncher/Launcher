@@ -96,7 +96,6 @@ void FlameMod::loadIndexedPackVersions(ModPlatform::IndexedPack& pack, QJsonArra
     }
 
     auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-
         return a.date > b.date;
     };
     std::sort(unsortedVersions.begin(), unsortedVersions.end(), orderSortPredicate);

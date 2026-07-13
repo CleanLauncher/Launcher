@@ -47,4 +47,4 @@ bool FlameTexturePackModel::optedOut(const ModPlatform::IndexedVersion& ver) con
     return isOptedOut(ver);
 }
 
-}
+}  // namespace ResourceDownload

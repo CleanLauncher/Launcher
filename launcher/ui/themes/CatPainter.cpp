@@ -23,14 +23,11 @@
 
 CatPainter::CatPainter(const QString& path, QObject* parent) : QObject(parent)
 {
-
     m_movie = new QMovie(path, QByteArray(), this);
     if (m_movie->isValid()) {
-
         connect(m_movie, &QMovie::frameChanged, this, &CatPainter::updateFrame);
         m_movie->start();
     } else {
-
         delete m_movie;
         m_movie = nullptr;
 

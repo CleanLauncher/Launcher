@@ -50,7 +50,6 @@ QString Time::humanReadableDuration(double duration, int precision)
         neg = true;
 
         duration *= -1;
-
     }
 
     auto std_duration = std::chrono::duration<double>(duration);
@@ -80,25 +79,21 @@ QString Time::humanReadableDuration(double duration, int precision)
         if (dc)
             os << " ";
         os << qSetFieldWidth(2) << hc << QObject::tr("h");
-
     }
     if (mc) {
         if (dc || hc)
             os << " ";
         os << qSetFieldWidth(2) << mc << QObject::tr("m");
-
     }
     if (dc || hc || mc || sc) {
         if (dc || hc || mc)
             os << " ";
         os << qSetFieldWidth(2) << sc << QObject::tr("s");
-
     }
     if ((msc && (precision > 0)) || !(dc || hc || mc || sc)) {
         if (dc || hc || mc || sc)
             os << " ";
         os << qSetFieldWidth(0) << qSetRealNumberPrecision(precision) << msc << QObject::tr("ms");
-
     }
 
     os.flush();

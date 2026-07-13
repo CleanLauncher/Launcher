@@ -71,7 +71,6 @@ static bool isBinaryJson(const QByteArray& data)
 QJsonDocument requireDocument(const QByteArray& data, const QString& what)
 {
     if (isBinaryJson(data)) {
-
         throw JsonException(what + ": Invalid JSON. Binary JSON unsupported");
     } else {
         QJsonParseError error;
@@ -339,4 +338,4 @@ QString fromMap(const QVariantMap& map)
     return QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
 }
 
-}
+}  // namespace Json

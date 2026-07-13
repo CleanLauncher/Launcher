@@ -214,6 +214,6 @@ QString fromStringList(const QStringList& list);
 QVariantMap toMap(const QString& jsonString);
 QString fromMap(const QVariantMap& map);
 
-}
+}  // namespace Json
 
 using JSONValidationError = Json::JsonException;

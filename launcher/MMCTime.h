@@ -23,4 +23,4 @@ namespace Time {
 QString prettifyDuration(int64_t duration, bool noDays = false);
 
 QString humanReadableDuration(double duration, int precision = 0);
-}
+}  // namespace Time

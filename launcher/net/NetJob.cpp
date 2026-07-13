@@ -66,11 +66,9 @@ auto NetJob::addNetAction(Net::NetRequest::Ptr action) -> bool
 
 void NetJob::executeNextSubTask()
 {
-
     if (isRunning() && m_queue.isEmpty() && m_doing.isEmpty() && !m_failed.isEmpty() && m_try < 3) {
         m_try += 1;
         m_failed.removeIf([this](QHash<Task*, Task::Ptr>::iterator task) {
-
             if (static_cast<Net::NetRequest*>(task->get())->replyStatusCode() == 404) {
                 return false;
             }
@@ -102,13 +100,11 @@ auto NetJob::canAbort() const -> bool
 
 auto NetJob::abort() -> bool
 {
-
     for (auto task : m_queue)
         m_failed.insert(task.get(), task);
     m_queue.clear();
 
     if (m_doing.isEmpty()) {
-
         return true;
     }
 
@@ -154,7 +150,6 @@ void NetJob::updateState()
 
 bool NetJob::isOnline()
 {
-
     for (auto job : getFailedActions()) {
         auto err = job->error();
         if (err != QNetworkReply::HostNotFoundError && err != QNetworkReply::NetworkSessionFailedError) {

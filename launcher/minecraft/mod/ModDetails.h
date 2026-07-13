@@ -49,7 +49,6 @@ struct ModLicense {
 
     ModLicense(const QString license)
     {
-
         auto parts = license.split(' ');
         QStringList notNameParts = {};
         for (auto part : parts) {
@@ -107,7 +106,6 @@ struct ModLicense {
 };
 
 struct ModDetails {
-
     QString mod_id = {};
 
     QString name = {};

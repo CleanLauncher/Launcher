@@ -45,4 +45,4 @@ class FilterModel : public QSortFilterProxyModel {
     QString searchTerm;
 };
 
-}
+}  // namespace Atl

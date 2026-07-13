@@ -106,7 +106,6 @@ bool ModrinthCreationTask::updateInstance()
                     filesIterator = m_files.erase(filesIterator);
                     oldFilesIterator = oldFiles.erase(oldFilesIterator);
                     goto begin;
-
                 }
 
                 oldFilesIterator++;
@@ -133,7 +132,6 @@ bool ModrinthCreationTask::updateInstance()
             scheduleToDelete(m_parent, oldMinecraftDir, entry);
         }
     } else {
-
         auto* dialog = CustomMessageBox::selectable(m_parent, tr("No index file."),
                                                     tr("We couldn't find a suitable index file for the older version. This may cause some "
                                                        "of the files to be duplicated. Do you want to continue?"),
@@ -172,7 +170,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 
     auto overridePath = FS::PathCombine(m_stagingPath, "overrides");
     if (QFile::exists(overridePath)) {
-
         Override::createOverrides("overrides", parentFolder, overridePath);
 
         if (!FS::move(overridePath, mcPath)) {
@@ -183,7 +180,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 
     auto clientOverridePath = FS::PathCombine(m_stagingPath, "client-overrides");
     if (QFile::exists(clientOverridePath)) {
-
         Override::createOverrides("client-overrides", parentFolder, clientOverridePath);
 
         if (!FS::overrideFolder(mcPath, clientOverridePath)) {
@@ -244,7 +240,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         fileName = FS::RemoveInvalidPathChars(fileName);
         auto filePath = FS::PathCombine(rootModpackPath, fileName);
         if (!rootModpackUrl.isParentOf(QUrl::fromLocalFile(filePath))) {
-
             setError(tr("One of the files has a path that leads to an arbitrary location (%1). This is a security risk and isn't allowed.")
                          .arg(fileName));
             return nullptr;
@@ -273,7 +268,6 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         dl->addValidator(new Net::ChecksumValidator(file.hashAlgorithm, file.hash));
         downloadMods->addNetAction(dl);
         if (!file.downloads.empty()) {
-
             auto param = dl.toWeakRef();
             connect(dl.get(), &Task::failed, [&file, filePath, param, downloadMods, meta] {
                 QUrl fallbackUrl = file.downloads.dequeue();

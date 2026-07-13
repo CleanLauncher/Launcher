@@ -27,8 +27,8 @@
 #include "ui_BlockedModsDialog.h"
 
 #include "Application.h"
-#include "settings/SettingsObject.h"
 #include "modplatform/helpers/HashUtils.h"
+#include "settings/SettingsObject.h"
 
 #include <QDebug>
 #include <QDesktopServices>
@@ -93,12 +93,10 @@ void BlockedModsDialog::dropEvent(QDropEvent* e)
 {
     for (QUrl& url : e->mimeData()->urls()) {
         if (url.scheme().isEmpty()) {
-
             url.setScheme("file");
         }
 
         if (!url.isLocalFile()) {
-
             continue;
         }
 
@@ -148,10 +146,8 @@ void BlockedModsDialog::update()
 
     for (auto& mod : m_mods) {
         if (mod.matched) {
-
             span = QString(tr("<span style=\"color:green\"> &#x2714; Found at %1 </span>")).arg(mod.localPath);
         } else {
-
             span = QString(tr("<span style=\"color:red\"> &#x2718; Not Found </span>"));
         }
         text += QString(tr("%1: <a href='%2'>%2</a> <p>Hash: %3 %4</p> <br/>")).arg(mod.name, mod.websiteUrl, mod.hash, span);
@@ -305,7 +301,6 @@ bool BlockedModsDialog::checkValidPath(QString path)
     };
 
     auto laxCompare = [](QString fsfilename, QString metadataFilename) {
-
         QList<QChar> allowedSeperators = { '-', '+', '.', '_' };
 
         auto fsName = fsfilename.toLower();
@@ -326,7 +321,6 @@ bool BlockedModsDialog::checkValidPath(QString path)
     auto moveFiles = APPLICATION->settings()->get("MoveModsFromDownloadsDir").toBool();
     for (auto& mod : m_mods) {
         if (compare(filename, mod.name)) {
-
             if (!mod.matched && mod.hash.isEmpty()) {
                 mod.matched = true;
                 mod.localPath = path;
@@ -349,7 +343,7 @@ bool BlockedModsDialog::checkValidPath(QString path)
 
 bool BlockedModsDialog::allModsMatched()
 {
-    return std::all_of(m_mods.begin(), m_mods.end(), [](auto const& mod) { return mod.matched; });
+    return std::all_of(m_mods.begin(), m_mods.end(), [](const auto& mod) { return mod.matched; });
 }
 
 void BlockedModsDialog::validateMatchedMods()

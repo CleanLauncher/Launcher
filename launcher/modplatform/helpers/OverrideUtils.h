@@ -8,4 +8,4 @@ void createOverrides(const QString& name, const QString& parent_folder, const QS
 
 QStringList readOverrides(const QString& name, const QString& parent_folder);
 
-}
+}  // namespace Override

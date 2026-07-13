@@ -84,7 +84,6 @@ void LogParser::setError()
 void LogParser::clearError()
 {
     m_error = {};
-
 }
 
 bool isPotentialLog4JStart(QStringView buffer)
@@ -133,7 +132,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
 
                     } break;
                     default: {
-
                     }
                 }
                 if (m_parser.hasError()) {
@@ -248,7 +246,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
 
                         } break;
                         default: {
-
                         }
                     }
 
@@ -271,7 +268,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                     auto consumed = m_parser.characterOffset();
                     if (consumed > 0 && consumed <= m_buffer.length()) {
                         m_buffer = m_buffer.right(m_buffer.length() - consumed);
-
                     }
                     clearError();
                     return entryReady;
@@ -297,7 +293,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                     return {};
                 } break;
                 default: {
-
                 }
             }
 
@@ -309,7 +304,6 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                     return entry;
                 case noOp:
                 default: {
-
                 }
             }
 
@@ -327,13 +321,11 @@ MessageLevel LogParser::guessLevel(const QString& line, MessageLevel previous)
     static const QRegularExpression LINE_WITH_LEVEL("^\\[(?<timestamp>[0-9:]+)\\] \\[[^/]+/(?<level>[^\\]]+)\\]");
     auto match = LINE_WITH_LEVEL.match(line);
     if (match.hasMatch()) {
-
         QString timestamp = match.captured("timestamp");
         QString levelStr = match.captured("level");
 
         return MessageLevel::fromName(levelStr);
     } else {
-
         if (line.contains("[INFO]") || line.contains("[CONFIG]") || line.contains("[FINE]") || line.contains("[FINER]") ||
             line.contains("[FINEST]"))
             return MessageLevel::Info;

@@ -36,8 +36,8 @@
 #include "MSAStep.h"
 
 #include <QAbstractOAuth2>
-#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QOAuthHttpServerReplyHandler>
 #include <QOAuthOobReplyHandler>
 
@@ -111,10 +111,12 @@ class LoggingOAuthHttpServerReplyHandler final : public QOAuthHttpServerReplyHan
     }
 };
 
-MSAStep::MSAStep(AccountData* data, bool silent, QString clientId, QString scopes, QUrl authorizeUrl, QUrl tokenUrl) : AuthStep(data), m_silent(silent)
+MSAStep::MSAStep(AccountData* data, bool silent, QString clientId, QString scopes, QUrl authorizeUrl, QUrl tokenUrl)
+    : AuthStep(data), m_silent(silent)
 {
     m_clientId = !clientId.isEmpty() ? clientId : APPLICATION->getMSAClientID();
-    if (QCoreApplication::applicationFilePath().startsWith("/tmp/.mount_") || APPLICATION->isPortable() || !isSchemeHandlerRegistered() || clientId.isEmpty())
+    if (QCoreApplication::applicationFilePath().startsWith("/tmp/.mount_") || APPLICATION->isPortable() || !isSchemeHandlerRegistered() ||
+        clientId.isEmpty())
 
     {
         auto replyHandler = new LoggingOAuthHttpServerReplyHandler(this);
@@ -189,8 +191,7 @@ void MSAStep::perform()
 {
     if (m_silent) {
         if (m_data->msaClientID != m_clientId) {
-            emit finished(AccountTaskState::STATE_DISABLED,
-                          tr("OAuth2 user authentication failed - client identification has changed."));
+            emit finished(AccountTaskState::STATE_DISABLED, tr("OAuth2 user authentication failed - client identification has changed."));
             return;
         }
         if (m_data->msaToken.refresh_token.isEmpty()) {

@@ -200,4 +200,4 @@ void PackFetchTask::fileDownloadAborted()
     emit aborted();
 }
 
-}
+}  // namespace LegacyFTB

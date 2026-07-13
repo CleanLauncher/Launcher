@@ -89,17 +89,17 @@ InstallLoaderDialog::InstallLoaderDialog(PackProfile* profile, const QString& ui
 {
     auto layout = new QVBoxLayout(this);
 
-    #ifndef Q_OS_MACOS
+#ifndef Q_OS_MACOS
     layout->setContentsMargins(0, 0, 0, 0);
-    #endif
+#endif
     container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     layout->addWidget(container);
 
     auto buttonLayout = new QHBoxLayout(this);
 
-    #ifndef Q_OS_MACOS
+#ifndef Q_OS_MACOS
     buttonLayout->setContentsMargins(0, 0, 6, 6);
-    #endif
+#endif
     auto refreshButton = new QPushButton(tr("&Refresh"), this);
     connect(refreshButton, &QPushButton::clicked, this, [this] { pageCast(container->selectedPage())->loadList(true); });
     buttonLayout->addWidget(refreshButton);
@@ -136,15 +136,15 @@ QList<BasePage*> InstallLoaderDialog::getPages()
 {
     return {
 
-             new InstallLoaderPage("net.neoforged", "neoforged", tr("NeoForge"), {}, profile),
+        new InstallLoaderPage("net.neoforged", "neoforged", tr("NeoForge"), {}, profile),
 
-             new InstallLoaderPage("net.minecraftforge", "forge", tr("Forge"), {}, profile),
+        new InstallLoaderPage("net.minecraftforge", "forge", tr("Forge"), {}, profile),
 
-             new InstallLoaderPage("net.fabricmc.fabric-loader", "fabricmc", tr("Fabric"), Version("1.14"), profile),
+        new InstallLoaderPage("net.fabricmc.fabric-loader", "fabricmc", tr("Fabric"), Version("1.14"), profile),
 
-             new InstallLoaderPage("org.quiltmc.quilt-loader", "quiltmc", tr("Quilt"), Version("1.14"), profile),
+        new InstallLoaderPage("org.quiltmc.quilt-loader", "quiltmc", tr("Quilt"), Version("1.14"), profile),
 
-             new InstallLoaderPage("com.mumfrey.liteloader", "liteloader", tr("LiteLoader"), {}, profile)
+        new InstallLoaderPage("com.mumfrey.liteloader", "liteloader", tr("LiteLoader"), {}, profile)
     };
 }
 

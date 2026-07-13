@@ -191,4 +191,4 @@ class DataPackDownloadDialog final : public ResourceDownloadDialog {
     BaseInstance* m_instance;
 };
 
-}
+}  // namespace ResourceDownload

@@ -73,13 +73,11 @@ void NewsChecker::reloadNews(const QString& newUrl)
 
 void NewsChecker::rssDownloadFinished()
 {
-
     qDebug() << "Finished loading RSS feed.";
 
     m_newsNetJob.reset();
     QDomDocument doc;
     {
-
         QString errorMsg = "Unknown error.";
         int errorLine = -1;
         int errorCol = -1;
@@ -116,7 +114,6 @@ void NewsChecker::rssDownloadFinished()
 
 void NewsChecker::rssDownloadFailed(QString reason)
 {
-
     fail(tr("Failed to load news RSS feed:\n%1").arg(reason));
 }
 

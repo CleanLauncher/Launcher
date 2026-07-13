@@ -53,7 +53,7 @@ void runPciconf(QStringList& log)
     }
     pclose(pciconf);
 }
-}
+}  // namespace
 
 #endif
 

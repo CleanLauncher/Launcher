@@ -87,7 +87,6 @@ Task::State MetaCacheSink::finalizeCache(QNetworkReply& reply)
     m_entry->setLocalChangedTimestamp(output_file_info.lastModified().toUTC().toMSecsSinceEpoch());
 
     {
-
         if (m_is_eternal) {
             qCDebug(taskMetaCacheLogC) << "Adding eternal cache entry:" << m_entry->getFullPath();
             m_entry->makeEternal(true);
@@ -131,4 +130,4 @@ bool MetaCacheSink::hasLocalData()
     QFileInfo info(m_filename);
     return info.exists() && info.size() != 0;
 }
-}
+}  // namespace Net

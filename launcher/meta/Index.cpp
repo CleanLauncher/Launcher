@@ -160,4 +160,4 @@ Version::Ptr Index::getLoadedVersion(const QString& uid, const QString& version)
     ev.exec();
     return get(uid, version);
 }
-}
+}  // namespace Meta

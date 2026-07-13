@@ -85,4 +85,4 @@ class ByteArraySink : public Sink {
    protected:
     QByteArray m_output;
 };
-}
+}  // namespace Net

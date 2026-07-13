@@ -58,7 +58,6 @@
 
 APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 {
-
     int comboBoxEntries[] = { PasteUpload::PasteType::Mclogs, PasteUpload::PasteType::NullPointer, PasteUpload::PasteType::PasteGG,
                               PasteUpload::PasteType::Hastebin };
 
@@ -114,15 +113,13 @@ APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 
     connect(ui->fetchFlameKey, &QPushButton::clicked, this, [this] {
         FetchFlameAPIKey task{};
-        connect(&task, &Task::succeeded, this, [this, &task] {
-            ui->flameKey->setText(task.result());
-        });
+        connect(&task, &Task::succeeded, this, [this, &task] { ui->flameKey->setText(task.result()); });
         connect(&task, &Task::failed, this, [this, &task] {
             QMessageBox::critical(this, tr("Could not fetch API key"),
-                tr("Could not fetch CurseForge API key:\n%1").arg(task.failReason()));
+                                  tr("Could not fetch CurseForge API key:\n%1").arg(task.failReason()));
         });
 
-        ProgressDialog dialog{this};
+        ProgressDialog dialog{ this };
         dialog.setSkipButton(true, tr("Abort"));
         dialog.execWithTask(&task);
     });

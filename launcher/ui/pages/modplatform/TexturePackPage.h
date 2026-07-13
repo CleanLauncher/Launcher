@@ -42,4 +42,4 @@ class TexturePackResourcePage : public ResourcePackResourcePage {
     TexturePackResourcePage(TexturePackDownloadDialog* dialog, BaseInstance& instance) : ResourcePackResourcePage(dialog, instance) {}
 };
 
-}
+}  // namespace ResourceDownload

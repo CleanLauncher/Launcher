@@ -118,7 +118,6 @@ void Task::start()
 
 void Task::emitFailed(QString reason)
 {
-
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "failed while not running!!!!:" << reason;
         return;
@@ -132,7 +131,6 @@ void Task::emitFailed(QString reason)
 
 void Task::emitAborted()
 {
-
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "aborted while not running!!!!";
         return;
@@ -147,7 +145,6 @@ void Task::emitAborted()
 
 void Task::emitSucceeded()
 {
-
     if (ASSERT_NEVER(!isRunning())) {
         qCCritical(taskLogC) << "Task" << describe() << "succeeded while not running!!!!";
         return;
@@ -159,7 +156,7 @@ void Task::emitSucceeded()
     emit finished();
 }
 
-void Task::propagateStepProgress(TaskStepProgress const& task_progress)
+void Task::propagateStepProgress(const TaskStepProgress& task_progress)
 {
     emit stepProgress(task_progress);
 }

@@ -22,7 +22,6 @@
 
 class ModpackProviderBasePage : public BasePage {
    public:
-
     virtual void setSearchTerm(QString) = 0;
 
     virtual QString getSerachTerm() const = 0;

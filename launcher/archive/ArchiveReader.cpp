@@ -275,7 +275,6 @@ bool ArchiveReader::exists(const QString& filePath) const
     }
     if (normalizedPath == QLatin1String("..")) {
         return false;
-
     }
 
     if (m_fileNames.contains(normalizedPath, Qt::CaseInsensitive)) {
@@ -293,4 +292,4 @@ bool ArchiveReader::exists(const QString& filePath) const
 }
 
 ArchiveReader::File::File() : m_archive(ArchivePtr(archive_read_new(), archive_read_free)) {}
-}
+}  // namespace MMCZip

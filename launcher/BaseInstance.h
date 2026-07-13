@@ -78,7 +78,6 @@ bool shouldStopOnConsoleOverflow(SettingsObject* settings);
 class BaseInstance : public QObject {
     Q_OBJECT
    protected:
-
     BaseInstance(SettingsObject* globalSettings, std::unique_ptr<SettingsObject> settings, const QString& rootDir);
 
    public:
@@ -89,7 +88,6 @@ class BaseInstance : public QObject {
     };
 
    public:
-
     virtual ~BaseInstance();
 
     virtual void saveNow() = 0;

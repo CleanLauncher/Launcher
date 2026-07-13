@@ -59,7 +59,6 @@ Hashing::Hasher::Ptr EnsureMetadataTask::createNewHash(Resource* resource)
 
 QString EnsureMetadataTask::getExistingHash(Resource* resource)
 {
-
     auto it = m_resources.keyValueBegin();
     while (it != m_resources.keyValueEnd()) {
         if ((*it).second == resource)
@@ -76,7 +75,6 @@ QString EnsureMetadataTask::getExistingHash(Resource* resource)
 
 bool EnsureMetadataTask::abort()
 {
-
     disconnect(this, 0, 0, 0);
 
     if (m_currentTask)
@@ -467,7 +465,6 @@ Task::Ptr EnsureMetadataTask::flameProjectsTask()
 void EnsureMetadataTask::updateMetadata(ModPlatform::IndexedPack& pack, ModPlatform::IndexedVersion& ver, Resource* resource)
 {
     try {
-
         ver.fileName = resource->fileinfo().fileName();
         if (ver.fileName.endsWith(".disabled"))
             ver.fileName.chop(9);

@@ -81,7 +81,7 @@ class ModFolderModel : public ResourceFolderModel {
     int columnCount(const QModelIndex& parent) const override;
 
     [[nodiscard]] Resource* createResource(const QFileInfo& file) override { return new Mod(file); }
-    [[nodiscard]] Task* createParseTask(Resource& ) override;
+    [[nodiscard]] Task* createParseTask(Resource&) override;
 
     bool isValid();
 

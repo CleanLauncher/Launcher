@@ -21,7 +21,7 @@ class DataPackResourceModel : public ResourceModel {
     Q_OBJECT
 
    public:
-    DataPackResourceModel(BaseInstance const&, ResourceAPI*, QString, QString);
+    DataPackResourceModel(const BaseInstance&, ResourceAPI*, QString, QString);
 
     void searchWithTerm(const QString& term, unsigned int sort);
 
@@ -41,4 +41,4 @@ class DataPackResourceModel : public ResourceModel {
     QString m_metaEntryBase;
 };
 
-}
+}  // namespace ResourceDownload

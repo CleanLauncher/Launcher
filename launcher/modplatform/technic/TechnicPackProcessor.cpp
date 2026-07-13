@@ -86,7 +86,6 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
             if (zipFile.exists("/forgeversion.properties")) {
                 auto file = zipFile.goToFile("forgeversion.properties");
                 if (!file) {
-
                     emit failed(tr("Unable to open \"forgeversion.properties\""));
                     return;
                 }
@@ -120,7 +119,6 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
         data = file.readAll();
         file.close();
     } else {
-
         components->setComponentVersion("net.minecraft", minecraftVersion, true);
         components->saveNow();
         emit succeeded();
@@ -148,7 +146,6 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
             auto libraryName = libraryObject["name"].toString();
 
             if (libraryName.startsWith("net.neoforged.fancymodloader:")) {
-
                 auto arguments = root["arguments"].toObject();
                 bool isVersionArg = false;
                 QString neoforgeVersion;
@@ -171,12 +168,10 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                 if (!libraryVersion.startsWith("1.7.10-")) {
                     components->setComponentVersion("net.minecraftforge", libraryName.section('-', 1));
                 } else {
-
                     components->setComponentVersion("net.minecraftforge", libraryName.section('-', 1, 1));
                 }
                 break;
             } else {
-
                 static QMap<QString, QString> loaderMap{ { "net.minecraftforge:minecraftforge:", "net.minecraftforge" },
                                                          { "net.fabricmc:fabric-loader:", "net.fabricmc.fabric-loader" },
                                                          { "org.quiltmc:quilt-loader:", "org.quiltmc.quilt-loader" } };

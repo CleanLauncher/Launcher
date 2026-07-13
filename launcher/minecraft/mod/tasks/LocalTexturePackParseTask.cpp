@@ -151,11 +151,9 @@ bool processPackPNG(const TexturePack& pack)
                 pack_png_file.close();
                 if (!pack_png_result) {
                     return png_invalid();
-
                 }
             } else {
                 return png_invalid();
-
             }
             return false;
         }
@@ -170,11 +168,9 @@ bool processPackPNG(const TexturePack& pack)
 
                 if (!pack_png_result) {
                     return png_invalid();
-
                 }
             }
             return png_invalid();
-
         }
         default:
             qWarning() << "Invalid type for resource pack parse task!";
@@ -188,7 +184,7 @@ bool validate(QFileInfo file)
     return TexturePackUtils::process(rp, ProcessingLevel::BasicInfoOnly) && rp.valid();
 }
 
-}
+}  // namespace TexturePackUtils
 
 LocalTexturePackParseTask::LocalTexturePackParseTask(int token, TexturePack& rp) : Task(false), m_token(token), m_texture_pack(rp) {}
 

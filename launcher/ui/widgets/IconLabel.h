@@ -8,7 +8,6 @@ class IconLabel : public QWidget {
     Q_OBJECT
 
    public:
-
     explicit IconLabel(QWidget* parent, QIcon icon, QSize size);
 
     virtual QSize sizeHint() const;

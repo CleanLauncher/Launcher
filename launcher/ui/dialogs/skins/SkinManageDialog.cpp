@@ -34,10 +34,10 @@
 #include <QUrl>
 
 #include "Application.h"
-#include "settings/SettingsObject.h"
 #include "DesktopServices.h"
 #include "Json.h"
 #include "QObjectPtr.h"
+#include "settings/SettingsObject.h"
 
 #include "minecraft/auth/Parsers.h"
 #include "minecraft/skins/CapeChange.h"
@@ -202,7 +202,6 @@ QPixmap previewCape(QImage capeImage, bool elytra = false)
 
 void SkinManageDialog::setupCapes()
 {
-
     auto& accountData = *m_acct->accountData();
     int index = 0;
     m_ui->capeCombo->addItem(tr("No Cape"), QVariant());

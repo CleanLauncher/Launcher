@@ -192,10 +192,8 @@ void Technic::SolderPackInstallTask::extractFinished()
         auto permissions = QFile::permissions(filepath);
         auto origPermissions = permissions;
         if (file.isDir()) {
-
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {
-
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser;
         }
         if (origPermissions != permissions) {

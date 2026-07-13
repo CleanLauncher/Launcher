@@ -95,7 +95,6 @@ void LaunchController::decideAccount()
     }
 
     if (accounts->isEmpty()) {
-
         auto reply = CustomMessageBox::selectable(m_parentWidget, tr("No Accounts"),
                                                   tr("In order to play Minecraft, you must have at least one account added. "
                                                      "Would you like to open the account manager to add an account now?"),
@@ -103,16 +102,13 @@ void LaunchController::decideAccount()
                          ->exec();
 
         if (reply == QMessageBox::Yes) {
-
             APPLICATION->ShowGlobalSettings(m_parentWidget, "accounts");
         } else if (reply == QMessageBox::No) {
-
             return;
         }
     }
 
     if (!m_accountToUse && !accounts->isEmpty()) {
-
         ProfileSelectDialog selectDialog(tr("Which account would you like to use?"), ProfileSelectDialog::GlobalDefaultCheckbox,
                                          m_parentWidget);
 
@@ -168,7 +164,6 @@ LaunchDecision LaunchController::decideLaunchMode()
     }
 
     if (state == AccountState::Working) {
-
         ProgressDialog progDialog(m_parentWidget);
         progDialog.setSkipButton(true, tr("Abort"));
 
@@ -200,7 +195,6 @@ LaunchDecision LaunchController::decideLaunchMode()
             m_actualLaunchMode =
                 state == AccountState::Online && m_wantedLaunchMode == LaunchMode::Normal ? LaunchMode::Normal : LaunchMode::Offline;
             return LaunchDecision::Continue;
-
     }
 
     if (reauthenticateAccount(accountToCheck, reauthReason)) {
@@ -312,7 +306,6 @@ void LaunchController::login()
 
     if (m_accountToUse->accountType() != AccountType::Offline) {
         if (m_actualLaunchMode == LaunchMode::Normal && !m_accountToUse->hasProfile()) {
-
             if (ProfileSetupDialog dialog(m_accountToUse, m_parentWidget); dialog.exec() != QDialog::Accepted) {
                 emitAborted();
                 return;

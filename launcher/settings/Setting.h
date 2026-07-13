@@ -25,7 +25,6 @@ class SettingsObject;
 class Setting : public QObject {
     Q_OBJECT
    public:
-
     explicit Setting(QStringList synonyms, QVariant defVal = QVariant());
 
     virtual QString id() const { return m_synonyms.first(); }

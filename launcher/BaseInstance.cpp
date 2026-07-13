@@ -357,14 +357,12 @@ qint64 BaseInstance::lastLaunch() const
 
 void BaseInstance::setLastLaunch(qint64 val)
 {
-
     m_settings->set("lastLaunchTime", val);
     emit propertiesChanged(this);
 }
 
 void BaseInstance::setNotes(QString val)
 {
-
     m_settings->set("notes", val);
 }
 
@@ -375,7 +373,6 @@ QString BaseInstance::notes() const
 
 void BaseInstance::setIconKey(QString val)
 {
-
     m_settings->set("iconKey", val);
     emit propertiesChanged(this);
 }
@@ -387,7 +384,6 @@ QString BaseInstance::iconKey() const
 
 void BaseInstance::setName(QString val)
 {
-
     m_settings->set("name", val);
     emit propertiesChanged(this);
 }
@@ -408,7 +404,6 @@ void BaseInstance::registerShortcut(const ShortcutData& data)
 
 void BaseInstance::setShortcuts(const QList<ShortcutData>& shortcuts)
 {
-
     QJsonArray array;
     for (const auto& elem : shortcuts) {
         array.append(QJsonObject{ { "name", elem.name }, { "filePath", elem.filePath }, { "target", static_cast<int>(elem.target) } });
@@ -469,10 +464,7 @@ LaunchTask* BaseInstance::getLaunchTask()
     return m_launchProcess.get();
 }
 
-void BaseInstance::updateRuntimeContext()
-{
-
-}
+void BaseInstance::updateRuntimeContext() {}
 
 bool BaseInstance::isLegacy()
 {

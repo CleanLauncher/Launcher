@@ -184,7 +184,6 @@ class VersionTest : public QObject {
 
     static void test_strict_weak_order()
     {
-
         const Version a("1.10 Pre-Release 1");
 
         const Version b("1.10-pre1");

@@ -97,7 +97,6 @@ using MetaEntryPtr = std::shared_ptr<MetaEntry>;
 class HttpMetaCache : public QObject {
     Q_OBJECT
    public:
-
     HttpMetaCache(QString path = QString());
     ~HttpMetaCache() override;
 
@@ -123,7 +122,6 @@ class HttpMetaCache : public QObject {
     void SaveNow();
 
    private:
-
     auto staleEntry(QString base, QString resource_path) -> MetaEntryPtr;
 
     struct EntryMap {

@@ -29,7 +29,6 @@ class EnsureMetadataTask : public Task {
     void executeTask() override;
 
    private:
-
     Task::Ptr modrinthVersionsTask();
     Task::Ptr modrinthProjectsTask();
 

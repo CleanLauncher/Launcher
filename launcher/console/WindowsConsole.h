@@ -41,4 +41,4 @@ class WindowsConsoleGuard {
     bool m_consoleAttached;
 };
 
-}
+}  // namespace console

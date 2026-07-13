@@ -70,4 +70,4 @@ class ImportFTBPage : public QWidget, public ModpackProviderBasePage {
     Ui::ImportFTBPage* ui = nullptr;
 };
 
-}
+}  // namespace FTBImportAPP

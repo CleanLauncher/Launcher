@@ -78,7 +78,6 @@ MSALoginDialog::MSALoginDialog(QWidget* parent) : QDialog(parent), ui(new Ui::MS
 
 int MSALoginDialog::exec()
 {
-
     m_account = MinecraftAccount::createBlank(m_accountType);
     m_authflow_task = m_account->login(false);
     connect(m_authflow_task.get(), &Task::failed, this, &MSALoginDialog::onTaskFailed);
@@ -110,7 +109,6 @@ MSALoginDialog::~MSALoginDialog()
 
 void MSALoginDialog::onTaskFailed(QString reason)
 {
-
     m_authflow_task->disconnect();
     m_devicecode_task->disconnect();
     ui->stackedWidget->setCurrentIndex(0);

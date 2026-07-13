@@ -25,7 +25,11 @@
 
 #include "ui_NetworkJobFailedDialog.h"
 
-NetworkJobFailedDialog::NetworkJobFailedDialog(const QString& jobName, const int attempts, const int requests, const int failed, QWidget* parent)
+NetworkJobFailedDialog::NetworkJobFailedDialog(const QString& jobName,
+                                               const int attempts,
+                                               const int requests,
+                                               const int failed,
+                                               QWidget* parent)
     : QDialog(parent), m_ui(new Ui::NetworkJobFailedDialog)
 {
     m_ui->setupUi(this);

@@ -30,4 +30,4 @@ inline bool isConsole()
 #endif
 }
 
-}
+}  // namespace console

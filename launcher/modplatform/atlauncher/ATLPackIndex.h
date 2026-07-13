@@ -42,7 +42,7 @@ struct IndexedPack {
 };
 
 void loadIndexedPack(IndexedPack& m, QJsonObject& obj);
-}
+}  // namespace ATLauncher
 
 Q_DECLARE_METATYPE(ATLauncher::IndexedPack)
 Q_DECLARE_METATYPE(QList<ATLauncher::IndexedVersion>)

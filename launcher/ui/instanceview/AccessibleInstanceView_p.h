@@ -55,7 +55,6 @@ class AccessibleInstanceView : public QAccessibleTableInterface, public QAccessi
     void modelChange(QAccessibleTableModelChangeEvent* event) override;
 
    protected:
-
     using ChildCache = QHash<int, QAccessible::Id>;
     mutable ChildCache childToId;
 

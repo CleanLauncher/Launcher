@@ -26,7 +26,6 @@
 class NewsChecker : public QObject {
     Q_OBJECT
    public:
-
     NewsChecker(QNetworkAccessManager* network, const QString& feedUrl);
 
     QString getLastLoadErrorMsg() const;
@@ -50,7 +49,6 @@ class NewsChecker : public QObject {
     void rssDownloadFailed(QString reason);
 
    protected:
-
     QString m_feedUrl;
 
     QList<NewsEntryPtr> m_newsEntries;

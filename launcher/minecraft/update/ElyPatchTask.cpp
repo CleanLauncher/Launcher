@@ -24,9 +24,9 @@
 #include <minecraft/PackProfile.h>
 #include <net/NetJob.h>
 
-ElyPatchTask::ElyPatchTask(MinecraftInstance *inst, RuntimeContext &context, Net::Mode mode) : m_inst(inst), m_runtimeContext(context), m_netMode(mode)
-{
-}
+ElyPatchTask::ElyPatchTask(MinecraftInstance* inst, RuntimeContext& context, Net::Mode mode)
+    : m_inst(inst), m_runtimeContext(context), m_netMode(mode)
+{}
 
 void ElyPatchTask::executeTask()
 {
@@ -67,9 +67,7 @@ void ElyPatchTask::resolveAuthlib(QString version)
 
     if (!metaVersion->isLoaded()) {
         m_currentTask = APPLICATION->metadataIndex()->loadVersion("by.ely.authlib", version, m_netMode);
-        connect(m_currentTask.get(), &Task::succeeded, this, [this, metaVersion] {
-            applyAuthlib(metaVersion);
-        });
+        connect(m_currentTask.get(), &Task::succeeded, this, [this, metaVersion] { applyAuthlib(metaVersion); });
         connect(m_currentTask.get(), &Task::failed, this, [this](QString reason) {
             qWarning() << "Resolving Ely.by Authlib failed:" << reason;
             resolveAuthlibInjector();
@@ -90,9 +88,7 @@ void ElyPatchTask::resolveAuthlibInjector()
     const auto metaVersionList = APPLICATION->metadataIndex()->get("moe.yushi.authlibinjector");
     if (metaVersionList->status() == Meta::BaseEntity::LoadStatus::NotLoaded) {
         m_currentTask = metaVersionList->loadTask(m_netMode);
-        connect(m_currentTask.get(), &Task::succeeded, this, [this] {
-            resolveAuthlibInjector();
-        });
+        connect(m_currentTask.get(), &Task::succeeded, this, [this] { resolveAuthlibInjector(); });
         connect(m_currentTask.get(), &Task::failed, this, &ElyPatchTask::emitFailed);
         connect(m_currentTask.get(), &Task::progress, this, &ElyPatchTask::setProgress);
         connect(m_currentTask.get(), &Task::stepProgress, this, &ElyPatchTask::propagateStepProgress);
@@ -115,9 +111,7 @@ void ElyPatchTask::resolveAuthlibInjector()
 
     if (!recommendedVersion->isLoaded()) {
         m_currentTask = APPLICATION->metadataIndex()->loadVersion("moe.yushi.authlibinjector", recommendedVersion->version(), m_netMode);
-        connect(m_currentTask.get(), &Task::succeeded, this, [this, recommendedVersion] {
-            applyMetaVersion(recommendedVersion);
-        });
+        connect(m_currentTask.get(), &Task::succeeded, this, [this, recommendedVersion] { applyMetaVersion(recommendedVersion); });
         connect(m_currentTask.get(), &Task::failed, this, &ElyPatchTask::emitFailed);
         connect(m_currentTask.get(), &Task::progress, this, &ElyPatchTask::setProgress);
         connect(m_currentTask.get(), &Task::stepProgress, this, &ElyPatchTask::propagateStepProgress);

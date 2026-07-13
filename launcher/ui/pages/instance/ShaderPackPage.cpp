@@ -80,7 +80,6 @@ void ShaderPackPage::downloadShaderPack()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     m_downloadDialog = new ResourceDownload::ShaderPackDownloadDialog(this, m_model, m_instance);
@@ -134,7 +133,6 @@ void ShaderPackPage::updateShaderPacks()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -239,7 +237,6 @@ void ShaderPackPage::changeShaderPackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

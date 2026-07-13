@@ -63,7 +63,6 @@ class Version : public QObject, public BaseVersion, public BaseEntity {
     ::Version toComparableVersion() const;
 
    public:
-
     void setType(const QString& type);
     void setTime(qint64 time);
     void setRequires(const Meta::RequireSet& reqs, const Meta::RequireSet& conflicts);
@@ -90,6 +89,6 @@ class Version : public QObject, public BaseVersion, public BaseEntity {
     bool m_volatile = false;
     VersionFilePtr m_data;
 };
-}
+}  // namespace Meta
 
 Q_DECLARE_METATYPE(Meta::Version::Ptr)

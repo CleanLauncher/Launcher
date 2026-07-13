@@ -186,17 +186,17 @@ InstallDialog::InstallDialog(const QString& uid, BaseInstance* instance, QWidget
 {
     auto layout = new QVBoxLayout(this);
 
-    #ifndef Q_OS_MACOS
+#ifndef Q_OS_MACOS
     layout->setContentsMargins(0, 0, 0, 0);
-    #endif
+#endif
     container->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     layout->addWidget(container);
 
     auto buttonLayout = new QHBoxLayout(this);
 
-    #ifndef Q_OS_MACOS
+#ifndef Q_OS_MACOS
     buttonLayout->setContentsMargins(0, 0, 6, 6);
-    #endif
+#endif
 
     auto refreshLayout = new QHBoxLayout(this);
 
@@ -352,6 +352,6 @@ void InstallDialog::done(int result)
     QDialog::done(result);
 }
 
-}
+}  // namespace Java
 
 #include "InstallJavaDialog.moc"

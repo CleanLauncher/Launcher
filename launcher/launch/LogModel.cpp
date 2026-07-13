@@ -39,7 +39,6 @@ void LogModel::append(MessageLevel level, QString line)
 
     if (m_numLines == m_maxLines) {
         if (m_stopOnOverflow) {
-
             return;
         }
         beginRemoveRows(QModelIndex(), 0, 0);
@@ -89,7 +88,6 @@ QString LogModel::toPlainText()
 
 void LogModel::setMaxLines(int maxLines)
 {
-
     if (maxLines == m_maxLines) {
         return;
     }
@@ -103,13 +101,11 @@ void LogModel::setMaxLines(int maxLines)
     QList<entry> newContent;
     newContent.resize(maxLines);
     if (m_numLines <= maxLines) {
-
         for (int i = 0; i < m_numLines; i++) {
             newContent[i] = m_content[(m_firstLine + i) % m_maxLines];
         }
         m_content.swap(newContent);
     } else {
-
         int lead = m_numLines - maxLines;
         beginRemoveRows(QModelIndex(), 0, lead - 1);
         for (int i = 0; i < maxLines; i++) {

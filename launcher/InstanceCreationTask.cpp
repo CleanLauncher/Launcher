@@ -130,7 +130,6 @@ void InstanceCreationTask::scheduleToDelete(QWidget* parent, const QDir& dir, co
     m_filesToRemove.append(dir.absoluteFilePath(path));
     if (checkDisabled) {
         if (path.endsWith(".disabled")) {
-
             m_filesToRemove.append(dir.absoluteFilePath(path.chopped(9)));
         } else {
             m_filesToRemove.append(dir.absoluteFilePath(path + ".disabled"));

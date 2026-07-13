@@ -88,4 +88,4 @@ class ListModel : public QAbstractListModel {
     NetJob::Ptr jobPtr;
 };
 
-}
+}  // namespace Technic

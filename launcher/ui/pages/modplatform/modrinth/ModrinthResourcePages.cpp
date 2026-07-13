@@ -37,8 +37,8 @@
  */
 
 #include "ModrinthResourcePages.h"
-#include "ui/pages/modplatform/DataPackModel.h"
 #include "../ui_ResourcePage.h"
+#include "ui/pages/modplatform/DataPackModel.h"
 
 #include "modplatform/modrinth/ModrinthAPI.h"
 
@@ -160,4 +160,4 @@ void ModrinthModPage::prepareProviderCategories()
     });
     m_categoriesTask->start();
 };
-}
+}  // namespace ResourceDownload

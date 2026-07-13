@@ -30,4 +30,4 @@ class PrivatePackManager {
     mutable bool dirty = false;
 };
 
-}
+}  // namespace LegacyFTB

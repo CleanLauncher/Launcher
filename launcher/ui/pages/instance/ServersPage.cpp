@@ -58,7 +58,6 @@
 static const int COLUMN_COUNT = 3;
 
 struct Server {
-
     enum class AcceptsTextures : int { ASK = 0, ALWAYS = 1, NEVER = 2 };
 
     Server() { m_name = QObject::tr("Minecraft Server"); }
@@ -109,7 +108,6 @@ struct Server {
     QByteArray m_icon;
 
     std::optional<int> m_currentPlayers;
-
 };
 
 static std::unique_ptr<nbt::tag_compound> parseServersDat(const QString& filename)
@@ -424,7 +422,6 @@ class ServersModel : public QAbstractListModel {
 
     void queryServersStatus()
     {
-
         if (m_currentQueryTask != nullptr) {
             m_currentQueryTask->abort();
             qDebug() << "Aborted previous server query task";
@@ -434,7 +431,6 @@ class ServersModel : public QAbstractListModel {
             new ConcurrentTask("Query servers status", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt()));
         int row = 0;
         for (Server& server : m_servers) {
-
             server.m_currentPlayers = {};
             emit dataChanged(index(row, 0), index(row, COLUMN_COUNT - 1));
 
@@ -632,13 +628,10 @@ void ServersPage::currentChanged(const QModelIndex& current, [[maybe_unused]] co
 void ServersPage::rowsRemoved([[maybe_unused]] const QModelIndex& parent, int first, int last)
 {
     if (currentServer < first) {
-
         return;
     } else if (currentServer >= first && currentServer <= last) {
-
         return;
     } else {
-
         int count = last - first + 1;
         currentServer -= count;
     }
@@ -690,7 +683,7 @@ void ServersPage::openedImpl()
 {
     m_model->observe();
 
-    auto const setting_name = QString("WideBarVisibility_%1").arg(id());
+    const auto setting_name = QString("WideBarVisibility_%1").arg(id());
     m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));

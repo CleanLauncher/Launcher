@@ -50,4 +50,4 @@ class ExtractZipTask : public Task {
     QFuture<ZipResult> m_zipFuture;
     QFutureWatcher<ZipResult> m_zipWatcher;
 };
-}
+}  // namespace MMCZip

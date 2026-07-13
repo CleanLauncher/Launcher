@@ -44,17 +44,13 @@ struct RegReplace {
 };
 
 static const QVector<RegReplace> anonymizeRules = {
-    RegReplace(QRegularExpression("C:\\\\Users\\\\([^\\\\]+)\\\\", QRegularExpression::CaseInsensitiveOption),
-               "C:\\Users\\********\\"),
+    RegReplace(QRegularExpression("C:\\\\Users\\\\([^\\\\]+)\\\\", QRegularExpression::CaseInsensitiveOption), "C:\\Users\\********\\"),
 
-    RegReplace(QRegularExpression("C:\\/Users\\/([^\\/]+)\\/", QRegularExpression::CaseInsensitiveOption),
-               "C:/Users/********/"),
+    RegReplace(QRegularExpression("C:\\/Users\\/([^\\/]+)\\/", QRegularExpression::CaseInsensitiveOption), "C:/Users/********/"),
 
-    RegReplace(QRegularExpression("(?<!\\\\w)\\/home\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption),
-               "/home/********/"),
+    RegReplace(QRegularExpression("(?<!\\\\w)\\/home\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption), "/home/********/"),
 
-    RegReplace(QRegularExpression("(?<!\\\\w)\\/Users\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption),
-               "/Users/********/"),
+    RegReplace(QRegularExpression("(?<!\\\\w)\\/Users\\/[^\\/]+\\/", QRegularExpression::CaseInsensitiveOption), "/Users/********/"),
 
     RegReplace(QRegularExpression("\\(Session ID is [^\\)]+\\)", QRegularExpression::CaseInsensitiveOption),
                "(Session ID is <SESSION_TOKEN>)"),

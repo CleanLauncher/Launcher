@@ -27,7 +27,7 @@ bool validate(QFileInfo file);
 
 bool processIconPNG(const Mod& mod, QByteArray&& raw_data, QPixmap* pixmap);
 bool loadIconFile(const Mod& mod, QPixmap* pixmap);
-}
+}  // namespace ModUtils
 
 class LocalModParseTask : public Task {
     Q_OBJECT

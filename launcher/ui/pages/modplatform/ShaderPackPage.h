@@ -38,9 +38,9 @@ class ShaderPackResourcePage : public ResourcePage {
 
     bool supportsFiltering() const override { return false; };
 
-    void addResourceToPage(ModPlatform::IndexedPack::Ptr ,
-                           ModPlatform::IndexedVersion& ,
-                           ResourceFolderModel* ,
+    void addResourceToPage(ModPlatform::IndexedPack::Ptr,
+                           ModPlatform::IndexedVersion&,
+                           ResourceFolderModel*,
                            QString downloadReason = "standalone") override;
 
     QMap<QString, QString> urlHandlers() const override;
@@ -54,4 +54,4 @@ class ShaderPackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}
+}  // namespace ResourceDownload

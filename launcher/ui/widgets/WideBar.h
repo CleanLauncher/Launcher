@@ -46,7 +46,7 @@ class WideBar : public QToolBar {
     auto getMatching(QAction* act) -> QList<BarEntry>::iterator;
 
     QByteArray getHash() const;
-    bool checkHash(QByteArray const&) const;
+    bool checkHash(const QByteArray&) const;
 
    private:
     QList<BarEntry> m_entries;

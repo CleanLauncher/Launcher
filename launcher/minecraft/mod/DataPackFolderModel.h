@@ -64,7 +64,7 @@ class DataPackFolderModel : public ResourceFolderModel {
     int columnCount(const QModelIndex& parent) const override;
 
     [[nodiscard]] Resource* createResource(const QFileInfo& file) override;
-    [[nodiscard]] Task* createParseTask(Resource& ) override;
+    [[nodiscard]] Task* createParseTask(Resource&) override;
 
     RESOURCE_HELPERS(DataPack)
 };

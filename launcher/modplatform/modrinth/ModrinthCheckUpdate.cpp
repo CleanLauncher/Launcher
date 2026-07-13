@@ -23,7 +23,6 @@ ModrinthCheckUpdate::ModrinthCheckUpdate(QList<Resource*>& resources,
     , m_hashType(ModPlatform::ProviderCapabilities::hashType(ModPlatform::ResourceProvider::MODRINTH).first())
 {
     if (!m_loadersList.isEmpty()) {
-
         m_initialSize = m_loadersList.length();
         ModPlatform::ModLoaderTypes modLoaders;
         for (auto* m : resources) {
@@ -193,12 +192,10 @@ void ModrinthCheckUpdate::checkNextLoader()
         return;
     }
     if (m_loaderIdx < m_loadersList.size()) {
-
         getUpdateModsForLoader(m_loadersList.at(m_loaderIdx), m_loaderIdx > m_initialSize);
         return;
     }
     if (m_loadersList.isEmpty() && m_loaderIdx == 0) {
-
         getUpdateModsForLoader();
         return;
     }

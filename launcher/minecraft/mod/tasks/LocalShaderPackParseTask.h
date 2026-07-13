@@ -38,7 +38,7 @@ bool processZIP(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full)
 bool processFolder(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full);
 
 bool validate(QFileInfo file);
-}
+}  // namespace ShaderPackUtils
 
 class LocalShaderPackParseTask : public Task {
     Q_OBJECT

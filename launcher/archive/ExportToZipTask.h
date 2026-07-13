@@ -69,4 +69,4 @@ class ExportToZipTask : public Task {
     QFuture<ZipResult> m_buildZipFuture;
     QFutureWatcher<ZipResult> m_buildZipWatcher;
 };
-}
+}  // namespace MMCZip

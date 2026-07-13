@@ -219,4 +219,4 @@ DependencyType DependencyTypeUtils::fromString(const QString& str)
 
     return map.value(str.toUpper(), DependencyType::UNKNOWN);
 }
-}
+}  // namespace ModPlatform

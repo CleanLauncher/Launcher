@@ -56,4 +56,4 @@ class Upload : public NetRequest {
     QByteArray m_post_data;
 };
 
-}
+}  // namespace Net

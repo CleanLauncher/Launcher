@@ -99,4 +99,4 @@ class Sink {
     std::vector<std::shared_ptr<Validator>> validators;
     QString m_fail_reason;
 };
-}
+}  // namespace Net

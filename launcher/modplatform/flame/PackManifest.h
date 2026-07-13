@@ -84,4 +84,4 @@ struct Manifest {
 };
 
 void loadManifest(Flame::Manifest& m, const QString& filepath);
-}
+}  // namespace Flame

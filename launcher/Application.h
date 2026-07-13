@@ -194,9 +194,9 @@ class Application : public QApplication {
    signals:
     void updateAllowedChanged(bool status);
     void globalSettingsAboutToOpen();
-     void globalSettingsApplied();
+    void globalSettingsApplied();
 
-     void oauthReplyRecieved(QVariantMap);
+    void oauthReplyRecieved(QVariantMap);
 
     void shouldReloadNews(QString newUrl);
 

@@ -48,7 +48,6 @@
 
 auto MetaEntry::getFullPath() -> QString
 {
-
     return FS::PathCombine(m_basePath, m_relativePath);
 }
 
@@ -68,9 +67,7 @@ HttpMetaCache::~HttpMetaCache()
 
 auto HttpMetaCache::getEntry(QString base, QString resource_path) -> MetaEntryPtr
 {
-
     if (!m_entries.contains(base)) {
-
         return {};
     }
 
@@ -96,13 +93,11 @@ auto HttpMetaCache::resolveEntry(QString base, QString resource_path, QString ex
     QFileInfo finfo(real_path);
 
     if (!finfo.isFile() || !finfo.isReadable()) {
-
         selected_base.entry_list.remove(resource_path);
         return staleEntry(base, resource_path);
     }
 
     if (!expected_etag.isEmpty() && expected_etag != entry->m_etag) {
-
         selected_base.entry_list.remove(resource_path);
         return staleEntry(base, resource_path);
     }
@@ -205,7 +200,6 @@ auto HttpMetaCache::staleEntry(QString base, QString resource_path) -> MetaEntry
 
 void HttpMetaCache::addBase(QString base, QString base_root)
 {
-
     if (m_entries.contains(base))
         return;
 
@@ -284,7 +278,6 @@ void HttpMetaCache::Load()
 
 void HttpMetaCache::SaveEventually()
 {
-
     saveBatchingTimer.stop();
     saveBatchingTimer.start(30000);
 }
@@ -302,7 +295,6 @@ void HttpMetaCache::SaveNow()
     QJsonArray entriesArr;
     for (auto group : m_entries) {
         for (auto entry : group.entry_list) {
-
             if (entry->m_stale) {
                 continue;
             }

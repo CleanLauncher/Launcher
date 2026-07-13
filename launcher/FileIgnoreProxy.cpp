@@ -143,7 +143,6 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
     auto blockedPath = relPath(fsm->filePath(sourceIndex));
     bool changed = false;
     if (state == Qt::Unchecked) {
-
         auto& node = m_blocked.insert(blockedPath);
 
         node.clear();
@@ -174,10 +173,8 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
                 if (blockedPath.startsWith(relpath))
 
                 {
-
                     todo.push(node);
                 } else {
-
                     m_blocked.insert(relpath);
                 }
                 row++;
@@ -186,7 +183,6 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
         changed = true;
     }
     if (changed) {
-
         emit dataChanged(index, index, { Qt::CheckStateRole });
 
         QModelIndex up = index.parent();
@@ -215,7 +211,6 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
             todo.push(node);
             row++;
         }
-
     }
     return true;
 }

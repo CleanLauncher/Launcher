@@ -56,4 +56,4 @@ void ResourcePackResourceModel::searchWithTerm(const QString& term, unsigned int
     refresh();
 }
 
-}
+}  // namespace ResourceDownload

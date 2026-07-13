@@ -9,13 +9,11 @@ class MojangVersionFormat {
     friend class OneSixVersionFormat;
 
    protected:
-
     static void readVersionProperties(const QJsonObject& in, VersionFile* out);
 
     static void writeVersionProperties(const VersionFile* in, QJsonObject& out);
 
    public:
-
     static VersionFilePtr versionFileFromJson(const QJsonDocument& doc, const QString& filename);
     static QJsonDocument versionFileToJson(const VersionFilePtr& patch);
 

@@ -5,7 +5,6 @@ VersionFilterData g_VersionFilterData = VersionFilterData();
 
 VersionFilterData::VersionFilterData()
 {
-
     auto libs13 = QList<FMLlib>{ { "argo-2.25.jar", "bb672829fde76cb163004752b86b0484bd0a7f4b" },
                                  { "guava-12.0.1.jar", "b8e78b9af7bf45900e14c6f958486b6ca682195f" },
                                  { "asm-all-4.0.jar", "98308890597acb64047f7e896638e0d98753ae82" } };

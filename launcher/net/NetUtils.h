@@ -24,7 +24,6 @@
 namespace Net {
 inline bool isApplicationError(QNetworkReply::NetworkError x)
 {
-
     static QSet<QNetworkReply::NetworkError> errors = { QNetworkReply::ProtocolInvalidOperationError,
                                                         QNetworkReply::AuthenticationRequiredError,
                                                         QNetworkReply::ContentAccessDenied,
@@ -43,11 +42,10 @@ inline bool isApplicationError(QNetworkReply::NetworkError x)
 
 inline bool isServerError(QNetworkReply::NetworkError x)
 {
-    static QSet<QNetworkReply::NetworkError> errors = { QNetworkReply::InternalServerError,
-                                                        QNetworkReply::OperationNotImplementedError,
+    static QSet<QNetworkReply::NetworkError> errors = { QNetworkReply::InternalServerError, QNetworkReply::OperationNotImplementedError,
                                                         QNetworkReply::ServiceUnavailableError,
 
                                                         QNetworkReply::UnknownServerError };
     return errors.contains(x);
 }
-}
+}  // namespace Net

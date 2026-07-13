@@ -90,7 +90,6 @@ class SettingsObject : public QObject {
     virtual void resetSetting(const Setting& setting) = 0;
 
    protected:
-
     void connectSignals(const Setting& setting);
 
     virtual QVariant retrieveValue(const Setting& setting) = 0;

@@ -58,7 +58,6 @@ SystemTheme::SystemTheme(const QString& styleName, const QPalette& defaultPalett
 
 void SystemTheme::apply(bool initial)
 {
-
     if (initial && S_NATIVE_STYLES.contains(m_themeName)) {
         QApplication::setStyle(new HintOverrideProxyStyle(QStyleFactory::create(qtTheme())));
         return;

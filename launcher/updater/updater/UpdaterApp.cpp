@@ -109,7 +109,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     QString binPath = applicationDirPath();
 
     {
-
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
         QDir foo(FS::PathCombine(binPath, ".."));
 
@@ -128,7 +127,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
     QString dirParam = parser.value("dir");
     if (!dirParam.isEmpty()) {
-
         adjustedBy = "Command line";
         m_dataPath = dirParam;
 #ifndef Q_OS_MACOS
@@ -170,13 +168,11 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     m_updateLogPath = FS::PathCombine(m_dataPath, "logs", "launcher_update.log");
 
     {
-
         FS::ensureFolderPathExists(FS::PathCombine(m_dataPath, "logs"));
         static const QString baseLogFile = BuildConfig.LAUNCHER_NAME + "Updater" + (m_checkOnly ? "-CheckOnly" : "") + "-%0.log";
         static const QString logBase = FS::PathCombine(m_dataPath, "logs", baseLogFile);
 
         if (FS::ensureFolderPathExists("logs")) {
-
             FS::move(logBase.arg(1), logBase.arg(2));
             FS::move(logBase.arg(0), logBase.arg(1));
         }
@@ -233,7 +229,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         }
 
         if (foundLoggingRules) {
-
             qDebug() << "Loading logging rules from:" << logRulesPath;
             QSettings loggingRules(logRulesPath, QSettings::IniFormat);
             loggingRules.beginGroup("Rules");
@@ -253,7 +248,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     }
 
     {
-
         qDebug() << qPrintable(BuildConfig.LAUNCHER_DISPLAYNAME + " Updater, " +
                                QString(BuildConfig.LAUNCHER_COPYRIGHT).replace("\n", ", "));
         qDebug() << "Version                    :" << BuildConfig.printableVersionString();
@@ -277,7 +271,6 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     }
 
     {
-
         m_network = std::make_unique<QNetworkAccessManager>();
         qDebug() << "Detecting proxy settings...";
         QNetworkProxy proxy = QNetworkProxy::applicationProxy();
@@ -503,7 +496,6 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
 
     QStringList file_list;
     if (manifest.isFile()) {
-
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
             auto contents = QString::fromUtf8(FS::read(manifest.absoluteFilePath()));
@@ -944,10 +936,8 @@ void UpdaterApp::unpackAndInstall(QFileInfo archive)
             return exit(10);
         }
         return exit();
-
     }
     return exit(1);
-
 }
 
 void UpdaterApp::backupAppDir()
@@ -957,7 +947,6 @@ void UpdaterApp::backupAppDir()
 
     QStringList file_list;
     if (manifest.isFile()) {
-
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
             auto contents = QString::fromUtf8(FS::read(manifest.absoluteFilePath()));
@@ -970,11 +959,9 @@ void UpdaterApp::backupAppDir()
     }
 
     if (file_list.isEmpty()) {
-
         if (BuildConfig.BUILD_ARTIFACT.toLower().contains("linux")) {
             file_list.append({ "ElyLauncher", "bin", "share", "lib" });
         } else {
-
             file_list.append({
                 "jars",
                 "elylauncher.exe",
@@ -995,9 +982,8 @@ void UpdaterApp::backupAppDir()
     logUpdate(tr("Backing up:\n  %1").arg(file_list.join(",\n  ")));
     static const QRegularExpression s_replaceRegex("[" + QRegularExpression::escape("\\/:*?\"<>|") + "]");
     auto app_dir = QDir(m_rootPath);
-    auto backup_dir =
-        FS::PathCombine(app_dir.absolutePath(),
-                        QStringLiteral("backup_") + QString(m_version).replace(s_replaceRegex, QString("_")) + "-" + m_gitCommit);
+    auto backup_dir = FS::PathCombine(
+        app_dir.absolutePath(), QStringLiteral("backup_") + QString(m_version).replace(s_replaceRegex, QString("_")) + "-" + m_gitCommit);
     FS::ensureFolderPathExists(backup_dir);
     auto backup_marker_path = FS::PathCombine(m_dataPath, ".launcher_update_backup_path.txt");
     FS::write(backup_marker_path, backup_dir.toUtf8());
@@ -1154,7 +1140,6 @@ void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
     connect(download.get(), &Net::Download::succeeded, this, [this, response, per_page, api_url, page]() {
         int num_found = parseReleasePage(response);
         if (!(num_found < per_page)) {
-
             downloadReleasePage(api_url, page + 1);
         } else {
             run();
@@ -1163,9 +1148,8 @@ void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
     connect(download.get(), &Net::Download::failed, this, &UpdaterApp::downloadError);
 
     m_current_task.reset(download);
-    connect(download.get(), &Net::Download::finished, this, [this]() {
-        qDebug() << "Download" << m_current_task->getUid().toString() << "finished";
-    });
+    connect(download.get(), &Net::Download::finished, this,
+            [this]() { qDebug() << "Download" << m_current_task->getUid().toString() << "finished"; });
 
     QCoreApplication::processEvents();
 

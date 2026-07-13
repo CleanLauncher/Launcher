@@ -18,4 +18,4 @@ bool openUrl(const QUrl& url);
 bool isFlatpak();
 
 bool isSnap();
-}
+}  // namespace DesktopServices

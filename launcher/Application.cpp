@@ -234,7 +234,6 @@ void appDebugOutput(QtMsgType type, const QMessageLogContext& context, const QSt
     const std::lock_guard<std::mutex> lock(loggerMutex);
 
     if (isANSIColorConsole) {
-
         qSetMessagePattern(defaultLogFormat);
     }
 
@@ -248,7 +247,6 @@ void appDebugOutput(QtMsgType type, const QMessageLogContext& context, const QSt
     APPLICATION->logFile->flush();
 
     if (isANSIColorConsole) {
-
         qSetMessagePattern(ansiLogFormat);
         out = qFormatLogMessage(type, context, msg);
         out += QChar::LineFeed;
@@ -258,7 +256,7 @@ void appDebugOutput(QtMsgType type, const QMessageLogContext& context, const QSt
     fflush(stderr);
 }
 
-}
+}  // namespace
 
 std::tuple<QDateTime, QString, QString, QString, QString> read_lock_File(const QString& path)
 {
@@ -359,7 +357,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     QString binPath = applicationDirPath();
 
     {
-
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
         QDir foo(FS::PathCombine(binPath, ".."));
 
@@ -380,7 +377,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     QString dataDirEnv;
     QString dirParam = parser.value("dir");
     if (!dirParam.isEmpty()) {
-
         adjustedBy = "Command line";
         dataPath = dirParam;
     } else if (dataDirEnv = QProcessEnvironment::systemEnvironment().value(QString("%1_DATA_DIR").arg(BuildConfig.LAUNCHER_NAME.toUpper()));
@@ -438,7 +434,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
     auto appID = ApplicationId::fromPathAndVersion(QDir::currentPath(), BuildConfig.printableVersionString());
     {
-
         m_peerInstance = new LocalPeer(this, appID);
         connect(m_peerInstance, &LocalPeer::messageReceived, this, &Application::messageReceived);
         if (m_peerInstance->isClient()) {
@@ -492,10 +487,8 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         static const QString baseLogFile = BuildConfig.LAUNCHER_NAME + "-%0.log";
         static const QString logBase = FS::PathCombine("logs", baseLogFile);
         if (FS::ensureFolderPathExists("logs")) {
-
             for (auto i = 0; i <= 4; i++)
-                if (auto oldName = baseLogFile.arg(i);
-                    QFile::exists(oldName))
+                if (auto oldName = baseLogFile.arg(i); QFile::exists(oldName))
 
                     FS::move(oldName, logBase.arg(i));
         }
@@ -548,7 +541,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
         }
 
         if (foundLoggingRules) {
-
             qInfo() << "Loading logging rules from:" << logRulesPath;
             QSettings loggingRules(logRulesPath, QSettings::IniFormat);
             loggingRules.beginGroup("Rules");
@@ -622,7 +614,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
             } else {
                 qWarning() << "Could not write into" << liveCheckFile << "error:" << check.errorString();
                 check.remove();
-
             }
         } else {
             qWarning() << "Could not open" << liveCheckFile << "for writing:" << check.errorString();
@@ -630,9 +621,7 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
     }
 
     {
-
-        m_settings.reset(
-            new INISettingsObject({ BuildConfig.LAUNCHER_CONFIGFILE, "launcher.cfg", "polymc.cfg", "multimc.cfg" }, this));
+        m_settings.reset(new INISettingsObject({ BuildConfig.LAUNCHER_CONFIGFILE, "launcher.cfg", "polymc.cfg", "multimc.cfg" }, this));
 
         m_settings->registerSetting("IconTheme", QString());
         m_settings->registerSetting("ApplicationTheme", QString());
@@ -997,7 +986,6 @@ Application::Application(int& argc, char** argv) : QApplication(argc, argv)
 
     connect(this, &Application::aboutToQuit, [this]() {
         if (m_instances) {
-
             m_instances->saveNow();
         }
         if (logFile) {
@@ -1185,7 +1173,6 @@ bool Application::createSetupWizard()
     bool themeInterventionRequired = !validWidgets || !validIcons;
     bool wizardRequired = javaRequired || languageRequired || pasteInterventionRequired || themeInterventionRequired || askjava || login;
     if (wizardRequired) {
-
         if (!validIcons)
             settings()->set("IconTheme", QString("breeze_dark"));
         if (!validWidgets) {
@@ -1291,7 +1278,6 @@ void Application::performMainStartupAction()
 
             qDebug() << "<> Instance" << m_instanceIdToLaunch << "launching";
             if (!m_serverToJoin.isEmpty()) {
-
                 targetToJoin.reset(new MinecraftTarget(MinecraftTarget::parse(m_serverToJoin, false)));
                 qDebug() << "   Launching with server" << m_serverToJoin;
             } else if (!m_worldToJoin.isEmpty()) {
@@ -1323,7 +1309,6 @@ void Application::performMainStartupAction()
         }
     }
     if (!m_mainWindow) {
-
         showMainWindow(false);
         qDebug() << "<> Main window shown.";
     }
@@ -1341,7 +1326,6 @@ void Application::performMainStartupAction()
     }
 
     {
-
         auto instDir = m_settings->get("InstanceDir").toString();
         const QString tempRoot = FS::PathCombine(instDir, ".tmp");
         FS::deletePath(tempRoot);
@@ -1362,7 +1346,6 @@ void Application::showFatalErrorMessage(const QString& title, const QString& con
 
 Application::~Application()
 {
-
     qInstallMessageHandler(nullptr);
 }
 
@@ -1463,7 +1446,6 @@ bool Application::openJsonEditor(const QString& filename)
     if (m_settings->get("JsonEditor").toString().isEmpty()) {
         return DesktopServices::openUrl(QUrl::fromLocalFile(file));
     } else {
-
         return DesktopServices::run(m_settings->get("JsonEditor").toString(), { file });
     }
 }
@@ -1659,7 +1641,6 @@ InstanceWindow* Application::showInstanceWindow(BaseInstance* instance, QString 
     auto& window = extras.window;
 
     if (window) {
-
 #ifdef Q_OS_MACOS
         if (window->isMinimized()) {
             window->setWindowState(window->windowState() & ~Qt::WindowMinimized);
@@ -1715,16 +1696,13 @@ void Application::on_windowClose()
 
 void Application::updateProxySettings(QString proxyTypeStr, QString addr, int port, QString user, QString password)
 {
-
     if (proxyTypeStr == "SOCKS5") {
         QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::Socks5Proxy, addr, port, user, password));
     } else if (proxyTypeStr == "HTTP") {
         QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::HttpProxy, addr, port, user, password));
     } else if (proxyTypeStr == "None") {
-
         QNetworkProxy::setApplicationProxy(QNetworkProxy(QNetworkProxy::NoProxy));
     } else {
-
         QNetworkProxyFactory::setUseSystemConfiguration(true);
     }
 
@@ -1925,11 +1903,9 @@ bool Application::handleDataMigration(const QString& currentData,
         qDebug() << "<> Migration declined for" << name;
         setDoNotMigrate();
         return currentExists;
-
     }
 
     if (!currentExists) {
-
         using namespace Filters;
 
         QList<Filter> filters;

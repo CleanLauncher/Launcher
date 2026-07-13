@@ -53,7 +53,6 @@ void RedirectHandle(DWORD handle, FILE* stream, const char* mode)
 
 void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr)
 {
-
     if (bindStdIn) {
         FILE* dummyFile;
         freopen_s(&dummyFile, "nul", "r", stdin);
@@ -123,7 +122,6 @@ bool AttachWindowsConsole()
 
 std::error_code EnableAnsiSupport()
 {
-
     HANDLE console_handle = CreateFileW(L"CONOUT$", FILE_GENERIC_READ | FILE_GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, 0);
     if (console_handle == INVALID_HANDLE_VALUE) {
         return std::error_code(GetLastError(), std::system_category());
@@ -135,7 +133,6 @@ std::error_code EnableAnsiSupport()
     }
 
     if ((console_mode & ENABLE_VIRTUAL_TERMINAL_PROCESSING) == 0) {
-
         if (0 == SetConsoleMode(console_handle, console_mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING)) {
             return std::error_code(GetLastError(), std::system_category());
         }
@@ -164,10 +161,9 @@ WindowsConsoleGuard::WindowsConsoleGuard() : m_consoleAttached(false)
 
 WindowsConsoleGuard::~WindowsConsoleGuard()
 {
-
     if (m_consoleAttached) {
         console::FreeWindowsConsole();
     }
 }
 
-}
+}  // namespace console

@@ -169,7 +169,6 @@ void TechnicPage::suggestCurrent()
         QString("%1modpack/%2?build=%3").arg(BuildConfig.TECHNIC_API_BASE_URL, slug, BuildConfig.TECHNIC_API_BUILD));
     netJob->addNetAction(action);
     connect(netJob.get(), &NetJob::succeeded, this, [this, responsePtr, slug] {
-
         QByteArray response = std::move(*responsePtr);
         jobPtr.reset();
 
@@ -248,16 +247,13 @@ void TechnicPage::metadataLoaded()
     }
 
     if (!current.isSolder) {
-
         ui->versionSelectionBox->addItem(current.currentVersion);
     } else if (current.versionsLoaded) {
-
         for (auto i = current.versions.size(); i--;) {
             ui->versionSelectionBox->addItem(current.versions.at(i));
         }
         ui->versionSelectionBox->setCurrentText(current.recommended);
     } else {
-
         ui->versionSelectionBox->addItem(current.currentVersion);
 
         auto netJob = makeShared<NetJob>(QString("Technic::SolderMeta(%1)").arg(current.name), APPLICATION->network());
@@ -298,7 +294,6 @@ void TechnicPage::selectVersion()
 
 void TechnicPage::onSolderLoaded(QByteArray* responsePtr)
 {
-
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 

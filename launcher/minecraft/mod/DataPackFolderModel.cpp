@@ -85,7 +85,6 @@ QVariant DataPackFolderModel::data(const QModelIndex& index, int role) const
         }
         case Qt::ToolTipRole: {
             if (column == PackFormatColumn) {
-
                 return tr("The data pack format ID, as well as the Minecraft versions it was designed for.");
             }
             break;

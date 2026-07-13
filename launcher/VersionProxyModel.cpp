@@ -252,7 +252,6 @@ QModelIndex VersionProxyModel::mapToSource(const QModelIndex& proxyIndex) const
 
 QModelIndex VersionProxyModel::index(int row, int column, const QModelIndex& parent) const
 {
-
     if (parent.isValid()) {
         return QModelIndex();
     }

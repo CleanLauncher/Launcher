@@ -59,7 +59,6 @@ class FlameAPI : public ResourceAPI {
 
     static int getMappedModLoader(ModPlatform::ModLoaderType loaders)
     {
-
         switch (loaders) {
             case ModPlatform::Forge:
                 return 1;
@@ -81,7 +80,6 @@ class FlameAPI : public ResourceAPI {
             case ModPlatform::Rift:
             case ModPlatform::None:
                 break;
-
         }
         return 0;
     }

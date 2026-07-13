@@ -64,7 +64,6 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
         bool hasCustomLogColors = false;
 
         if (read(themeFilePath, hasCustomLogColors)) {
-
             m_palette = fadeInactive(m_palette, m_fadeAmount, m_fadeColor);
 
             if (!hasCustomLogColors)
@@ -79,7 +78,6 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
         QFileInfo info(qssFilePath);
         if (info.isFile()) {
             try {
-
                 m_styleSheet = QString::fromUtf8(FS::read(qssFilePath));
             } catch (const Exception& e) {
                 themeWarningLog() << "Couldn't load qss:" << e.cause() << "from" << qssFilePath;
@@ -102,7 +100,6 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
 
         m_palette = baseTheme->colorScheme();
         try {
-
             m_styleSheet = QString::fromUtf8(FS::read(path));
         } catch (const Exception& e) {
             themeWarningLog() << "Couldn't load qss:" << e.cause() << "from" << path;

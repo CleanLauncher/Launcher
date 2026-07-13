@@ -48,4 +48,4 @@ class Validator {
     virtual bool abort() = 0;
     virtual bool validate(QNetworkReply& reply) = 0;
 };
-}
+}  // namespace Net

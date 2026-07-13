@@ -227,20 +227,17 @@ AuthenticationResponse parseAuthenticationResponse(const QByteArray& data)
 void MSADeviceCodeStep::authenticationFinished(QByteArray* response)
 {
     if (m_request->error() == QNetworkReply::TimeoutError) {
-
         interval *= 2;
         startPoolTimer();
         return;
     }
     auto rsp = parseAuthenticationResponse(*response);
     if (rsp.error == "slow_down") {
-
         interval += 5;
         startPoolTimer();
         return;
     }
     if (rsp.error == "authorization_pending") {
-
         startPoolTimer();
         return;
     }

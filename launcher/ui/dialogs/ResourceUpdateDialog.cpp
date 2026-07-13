@@ -34,7 +34,7 @@ std::vector<Version> mcVersions(BaseInstance* inst)
 {
     return { static_cast<MinecraftInstance*>(inst)->getPackProfile()->getComponent("net.minecraft")->getVersion() };
 }
-}
+}  // namespace
 
 ResourceUpdateDialog::ResourceUpdateDialog(QWidget* parent,
                                            BaseInstance* instance,
@@ -59,7 +59,6 @@ ResourceUpdateDialog::ResourceUpdateDialog(QWidget* parent,
 
 void ResourceUpdateDialog::checkCandidates()
 {
-
     auto wentWell = ensureMetadata();
     if (!wentWell) {
         m_aborted = true;
@@ -167,7 +166,6 @@ void ResourceUpdateDialog::checkCandidates()
                 text += tr("Reason: %1").arg(reason) + "<br>";
             }
             if (!recoverUrl.isEmpty()) {
-
                 text += tr("Possible solution: Getting the latest version manually:<br>%1<br>")
                             .arg(QString("<a href='%1'>%1</a>").arg(recoverUrl.toString()));
             }
@@ -194,7 +192,6 @@ void ResourceUpdateDialog::checkCandidates()
     }
 
     if (m_includeDeps && !APPLICATION->settings()->get("ModDependenciesDisabled").toBool()) {
-
         auto* modModel = dynamic_cast<ModFolderModel*>(m_resourceModel);
 
         if (modModel != nullptr) {
@@ -249,7 +246,6 @@ void ResourceUpdateDialog::checkCandidates()
     if (ui->modTreeWidget->topLevelItemCount() == 0) {
         m_noUpdates = true;
     } else {
-
         ui->modTreeWidget->sortItems(0, Qt::SortOrder::AscendingOrder);
 
         auto* item = ui->modTreeWidget->topLevelItem(0);
@@ -379,7 +375,6 @@ auto ResourceUpdateDialog::ensureMetadata() -> bool
 
 void ResourceUpdateDialog::onMetadataEnsured(Resource* resource)
 {
-
     if (!resource->metadata()) {
         return;
     }

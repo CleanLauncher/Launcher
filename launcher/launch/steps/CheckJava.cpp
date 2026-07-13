@@ -112,7 +112,6 @@ void CheckJava::checkJavaFinished(const JavaChecker::Result& result)
 {
     switch (result.validity) {
         case JavaChecker::Result::Validity::Errored: {
-
             emit logLine(QString("Could not start java:"), MessageLevel::Error);
             emit logLines(result.errorLog.split('\n'), MessageLevel::Error);
             emit logLine(QString("\nCheck your Java settings."), MessageLevel::Launcher);
@@ -144,7 +143,6 @@ void CheckJava::checkJavaFinished(const JavaChecker::Result& result)
 
 void CheckJava::printJavaInfo(const QString& version, const QString& architecture, const QString& realArchitecture, const QString& vendor)
 {
-    emit logLine(
-        QString("Java is version %1, using %2 (%3) architecture, from %4").arg(version, architecture, realArchitecture, vendor),
-        MessageLevel::Launcher);
+    emit logLine(QString("Java is version %1, using %2 (%3) architecture, from %4").arg(version, architecture, realArchitecture, vendor),
+                 MessageLevel::Launcher);
 }

@@ -36,11 +36,7 @@ class McClient : public QObject {
     void emitSucceed(QJsonObject data);
 
    private:
-    enum class ResponseReadState : uint8_t {
-        Waiting,
-        GotLength,
-        Finished
-    };
+    enum class ResponseReadState : uint8_t { Waiting, GotLength, Finished };
 
     QString m_domain;
     QString m_ip;

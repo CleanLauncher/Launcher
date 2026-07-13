@@ -57,7 +57,6 @@ class ResourceAPI {
     virtual ~ResourceAPI() = default;
 
     struct SortingMethod {
-
         unsigned int index;
 
         QString name;
@@ -106,7 +105,6 @@ class ResourceAPI {
     };
 
    public:
-
     virtual auto getSortingMethods() const -> QList<SortingMethod> = 0;
 
    public slots:

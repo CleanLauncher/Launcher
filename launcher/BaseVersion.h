@@ -21,7 +21,6 @@
 
 class BaseVersion {
    public:
-
     using Ptr = std::shared_ptr<BaseVersion>;
     virtual ~BaseVersion() {}
 

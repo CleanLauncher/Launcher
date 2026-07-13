@@ -37,7 +37,6 @@ class BigConcurrentTask : public ConcurrentTask {
 
     void executeNextSubTask() override
     {
-
         [[maybe_unused]] volatile std::array<uint32_t, 1024> some_data_on_the_stack{};
 
         ConcurrentTask::executeNextSubTask();

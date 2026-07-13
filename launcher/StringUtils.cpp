@@ -49,7 +49,6 @@ int StringUtils::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSe
 {
     int l1 = 0, l2 = 0;
     while (l1 <= s1.size() && l2 <= s2.size()) {
-
         QChar c1 = getNextChar(s1, l1);
         while (c1.isSpace())
             c1 = getNextChar(s1, ++l1);
@@ -144,7 +143,6 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
     }
 
     if ((url_compact.length() >= max_len) && hard_limit) {
-
         url_compact = QString(str_url);
         auto to_remove = url_compact.length() - max_len + 3;
         url_compact.remove(url_compact.length() - to_remove - 1, to_remove);

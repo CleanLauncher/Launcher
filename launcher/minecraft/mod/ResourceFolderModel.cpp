@@ -44,7 +44,6 @@ ResourceFolderModel::ResourceFolderModel(const QDir& dir, BaseInstance* instance
         m_resourceResolverRunning = false;
     });
     if (APPLICATION_DYN) {
-
         m_resourceResolver.setMaxConcurrent(APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
     }
 }
@@ -58,7 +57,6 @@ ResourceFolderModel::~ResourceFolderModel()
 
 bool ResourceFolderModel::startWatching(const QStringList& paths)
 {
-
     m_firstFolderLoad = true;
 
     if (m_isWatching) {
@@ -101,7 +99,6 @@ bool ResourceFolderModel::stopWatching(const QStringList& paths)
 
 bool ResourceFolderModel::installResource(QString originalPath)
 {
-
     originalPath = FS::NormalizePath(originalPath);
     QFileInfo fileInfo(originalPath);
 
@@ -323,7 +320,6 @@ bool ResourceFolderModel::setResourceEnabled(const QModelIndexList& indexes, Ena
 static QMutex s_update_task_mutex;
 bool ResourceFolderModel::update()
 {
-
     QMutexLocker lock(&s_update_task_mutex);
 
     if (m_currentUpdateTask) {
@@ -448,14 +444,13 @@ bool ResourceFolderModel::hasPendingParseTasks() const
     return !m_activeParseTasks.isEmpty();
 }
 
-void ResourceFolderModel::directoryChanged(const QString& )
+void ResourceFolderModel::directoryChanged(const QString&)
 {
     update();
 }
 
 Qt::DropActions ResourceFolderModel::supportedDropActions() const
 {
-
     return Qt::CopyAction | Qt::MoveAction;
 }
 
@@ -476,11 +471,7 @@ QStringList ResourceFolderModel::mimeTypes() const
     return types;
 }
 
-bool ResourceFolderModel::dropMimeData(const QMimeData* data,
-                                       Qt::DropAction action,
-                                       int ,
-                                       int ,
-                                       const QModelIndex& )
+bool ResourceFolderModel::dropMimeData(const QMimeData* data, Qt::DropAction action, int, int, const QModelIndex&)
 {
     if (action == Qt::IgnoreAction) {
         return true;
@@ -493,7 +484,6 @@ bool ResourceFolderModel::dropMimeData(const QMimeData* data,
     if (data->hasUrls()) {
         auto urls = data->urls();
         for (const auto& url : urls) {
-
             if (!url.isLocalFile()) {
                 continue;
             }
@@ -627,7 +617,6 @@ QVariant ResourceFolderModel::headerData(int section, [[maybe_unused]] Qt::Orien
                     return {};
             }
         case Qt::ToolTipRole: {
-
             switch (section) {
                 case ActiveColumn:
                     return tr("Is the resource enabled?");
@@ -729,7 +718,6 @@ QMenu* ResourceFolderModel::createHeaderContextMenu(QTreeView* tree)
     auto* menu = new QMenu(tree);
 
     {
-
         auto* act = new QAction(tr("Override Columns Visibility"), menu);
         const auto overrideSettingName = QString("UI/%1_Page/ColumnsOverride").arg(id());
 
@@ -746,7 +734,6 @@ QMenu* ResourceFolderModel::createHeaderContextMenu(QTreeView* tree)
     menu->addSeparator()->setText(tr("Show / Hide Columns"));
 
     for (int col = 0; col < columnCount(); ++col) {
-
         if (!m_columnsHideable.at(col)) {
             continue;
         }
@@ -844,7 +831,6 @@ void ResourceFolderModel::onParseFailed(int ticket, const QString& resourceId)
 
 void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>& newSet, QMap<QString, Resource::Ptr>& newResources)
 {
-
     {
         QSet<QString> keptSet = currentSet;
         keptSet.intersect(newSet);
@@ -858,7 +844,6 @@ void ResourceFolderModel::applyUpdates(QSet<QString>& currentSet, QSet<QString>&
             const auto& currentResource = m_resources.at(row);
 
             if (newResource->dateTimeChanged() == currentResource->dateTimeChanged()) {
-
                 bool hadIssues = !currentResource->hasIssues();
                 currentResource->updateIssues(m_instance);
 

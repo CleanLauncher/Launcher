@@ -28,7 +28,6 @@ InstanceCopyTask::InstanceCopyTask(BaseInstance* origInstance, const InstanceCop
     qDebug() << "CopyFilters:" << filters;
 
     if (!filters.isEmpty()) {
-
         QRegularExpression regexp(filters, QRegularExpression::CaseInsensitiveOption);
         m_matcher = Filters::regexp(regexp);
     }
@@ -162,14 +161,11 @@ void InstanceCopyTask::copyFinished()
             allowed_symlinks.append(FS::read(allowed_symlinks_file.filePath()));
             if (allowed_symlinks.right(1) != "\n")
                 allowed_symlinks.append("\n");
-
         }
         allowed_symlinks.append(m_origInstance->gameRoot().toUtf8());
         allowed_symlinks.append("\n");
         if (allowed_symlinks_file.isSymLink())
-            FS::deletePath(
-                allowed_symlinks_file
-                    .filePath());
+            FS::deletePath(allowed_symlinks_file.filePath());
 
         try {
             FS::write(allowed_symlinks_file.filePath(), allowed_symlinks);

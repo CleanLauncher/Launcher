@@ -48,7 +48,6 @@ class InstanceImportTask : public InstanceTask {
     bool abort() override;
 
    protected:
-
     virtual void executeTask() override;
 
    private:

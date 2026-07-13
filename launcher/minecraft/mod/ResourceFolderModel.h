@@ -149,7 +149,7 @@ class ResourceFolderModel : public QAbstractListModel {
 
     [[nodiscard]] virtual Resource* createResource(const QFileInfo& info) { return new Resource(info); }
 
-    [[nodiscard]] virtual Task* createParseTask(Resource& ) { return nullptr; }
+    [[nodiscard]] virtual Task* createParseTask(Resource&) { return nullptr; }
 
     void applyUpdates(QSet<QString>& currentSet, QSet<QString>& newSet, QMap<QString, Resource::Ptr>& newResources);
 
@@ -163,7 +163,6 @@ class ResourceFolderModel : public QAbstractListModel {
     virtual void onParseFailed(int ticket, const QString& resourceId);
 
    protected:
-
     QList<SortType> m_columnSortKeys = { SortType::Enabled,  SortType::Name, SortType::Date,
                                          SortType::Provider, SortType::Size, SortType::Filename };
     QStringList m_columnNames = { "Enable", "Name", "Last Modified", "Provider", "Size", "File Name" };

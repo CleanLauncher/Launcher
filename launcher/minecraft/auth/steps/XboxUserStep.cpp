@@ -47,7 +47,8 @@ void XboxUserStep::perform()
     m_task->setAskRetry(false);
     m_task->addNetAction(m_request);
 
-    connect(m_task.get(), &Task::finished, this, [this, response] { onRequestDone(response); });
+    connect(m_task.get(), &Task::finished, this, [this, response] {
+        onRequestDone(response); });
 
     m_task->start();
     qDebug() << "First layer of Xbox auth ... commencing.";

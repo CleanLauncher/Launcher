@@ -43,12 +43,10 @@
 
 LabeledToolButton::LabeledToolButton(QWidget* parent) : QToolButton(parent), m_label(new QLabel(this))
 {
-
     m_label->setWordWrap(true);
     m_label->setMouseTracking(false);
     m_label->setAlignment(Qt::AlignCenter);
     m_label->setTextInteractionFlags(Qt::NoTextInteraction);
-
 }
 
 QString LabeledToolButton::text() const
@@ -69,7 +67,6 @@ void LabeledToolButton::setIcon(QIcon icon)
 
 QSize LabeledToolButton::sizeHint() const
 {
-
     ensurePolished();
 
     int w = 0, h = 0;

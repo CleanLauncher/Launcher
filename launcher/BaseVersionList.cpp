@@ -98,7 +98,6 @@ BaseVersionList::RoleList BaseVersionList::providesRoles() const
 
 int BaseVersionList::rowCount(const QModelIndex& parent) const
 {
-
     return parent.isValid() ? 0 : count();
 }
 

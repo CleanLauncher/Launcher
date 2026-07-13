@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include <QWidget>
 #include <QTextCursor>
+#include <QWidget>
 
 class QTextCharFormat;
 class SettingsObject;

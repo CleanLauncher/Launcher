@@ -5,7 +5,6 @@
 #include "Library.h"
 
 struct Agent {
-
     LibraryPtr library;
 
     QString argument;

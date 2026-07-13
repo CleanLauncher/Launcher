@@ -48,4 +48,4 @@ class DataPackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}
+}  // namespace ResourceDownload

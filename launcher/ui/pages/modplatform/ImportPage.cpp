@@ -107,7 +107,6 @@ void ImportPage::updateState()
         QString input = ui->modpackEdit->text().trimmed();
         auto url = QUrl::fromUserInput(input);
         if (url.isLocalFile()) {
-
             QFileInfo fi(input);
 
             bool isZip = QMimeDatabase().mimeTypeForUrl(url).suffixes().contains("zip");
@@ -121,7 +120,6 @@ void ImportPage::updateState()
                 dialog->setSuggestedIcon("default");
             }
         } else if (url.scheme() == "curseforge") {
-
             QUrlQuery query(url);
             if (query.allQueryItemValues("addonId").isEmpty() || query.allQueryItemValues("fileId").isEmpty()) {
                 qDebug() << "Invalid curseforge link:" << url;
@@ -142,7 +140,6 @@ void ImportPage::updateState()
 
                 auto fileName = data["fileName"].toString();
                 if (fileName.endsWith(".zip")) {
-
                     auto dl_url = QUrl(data["downloadUrl"].toString(""));
                     if (!dl_url.isValid()) {
                         CustomMessageBox::selectable(

@@ -8,7 +8,6 @@
 
 class OneSixVersionFormat {
    public:
-
     static VersionFilePtr versionFileFromJson(const QJsonDocument& doc, const QString& filename, bool requireOrder);
     static QJsonDocument versionFileToJson(const VersionFilePtr& patch);
 

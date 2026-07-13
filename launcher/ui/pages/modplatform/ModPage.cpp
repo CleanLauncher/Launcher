@@ -115,4 +115,4 @@ void ModPage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);
 }
 
-}
+}  // namespace ResourceDownload

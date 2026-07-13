@@ -76,7 +76,7 @@ class ProgressDialog : public QDialog {
 
     void changeStatus(const QString& status);
     void changeProgress(qint64 current, qint64 total);
-    void changeStepProgress(TaskStepProgress const& task_progress);
+    void changeStepProgress(const TaskStepProgress& task_progress);
 
    private slots:
     void on_skipButton_clicked(bool checked);
@@ -87,7 +87,7 @@ class ProgressDialog : public QDialog {
 
    private:
     bool handleImmediateResult(QDialog::DialogCode& result);
-    void addTaskProgress(TaskStepProgress const& progress);
+    void addTaskProgress(const TaskStepProgress& progress);
 
    private:
     Ui::ProgressDialog* ui;

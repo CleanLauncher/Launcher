@@ -64,7 +64,6 @@ bool GZip::unzip(const QByteArray& compressedBytes, QByteArray& uncompressedByte
     int err = Z_OK;
 
     while (!done) {
-
         if (strm.total_out >= uncompLength) {
             uncompressedBytes.resize(uncompLength * 2);
             uncompLength *= 2;

@@ -95,7 +95,6 @@ class LaunchProfile : public ProblemProvider {
     const QList<PatchProblem> getProblems() const override;
 
    private:
-
     QString m_minecraftVersion;
 
     QString m_minecraftVersionType;

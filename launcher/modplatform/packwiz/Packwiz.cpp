@@ -45,7 +45,6 @@ auto getRealIndexName(const QDir& indexDir, const QString& normalizedFname, bool
 
     QString realFname = normalizedFname;
     if (!indexFile.exists()) {
-
         for (auto& fileName : indexDir.entryList(QDir::Filter::Files)) {
             if (QString::compare(normalizedFname, fileName, Qt::CaseInsensitive) == 0) {
                 realFname = fileName;
@@ -102,7 +101,7 @@ bool sortMCVersions(const QString& a, const QString& b)
     return cmp == std::strong_ordering::less;
 }
 
-}
+}  // namespace
 
 auto V1::createModFormat([[maybe_unused]] const QDir& index_dir,
                          ModPlatform::IndexedPack& mod_pack,
@@ -289,7 +288,6 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
     mod.slug = slug;
 
     {
-
         mod.name = stringEntry(table, "name");
         mod.filename = stringEntry(table, "filename");
         mod.side = ModPlatform::SideUtils::fromString(stringEntry(table, "side"));
@@ -317,7 +315,6 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
     mod.version_number = table["x-launcher-version-number"].value_or("");
 
     {
-
         auto download_table = table["download"].as_table();
         if (!download_table) {
             qCritical() << QString("No [download] section found on mod metadata!");
@@ -331,7 +328,6 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
     }
 
     {
-
         using Provider = ModPlatform::ResourceProvider;
 
         auto update_table = table["update"];
@@ -355,7 +351,6 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
         }
     }
     {
-
         auto deps = table["x-launcher-dependencies"].as_array();
         if (deps) {
             for (auto&& depNode : *deps) {
@@ -388,4 +383,4 @@ auto V1::getIndexForMod(const QDir& index_dir, QVariant& mod_id) -> Mod
     return {};
 }
 
-}
+}  // namespace Packwiz

@@ -44,4 +44,4 @@ QString findBestIconIn(const QString& folder, const QString& iconKey);
 QString getIconFilter();
 
 bool isIconSuffix(QString suffix);
-}
+}  // namespace IconUtils

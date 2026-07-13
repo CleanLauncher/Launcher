@@ -138,7 +138,6 @@ struct _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER {
     WORD Reserved;
 
     DWORD Flags;
-
 };
 
 using FSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER;
@@ -151,14 +150,12 @@ using PFSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION
 #endif
 
 #ifndef FSCTL_GET_INTEGRITY_INFORMATION
-#define FSCTL_GET_INTEGRITY_INFORMATION \
-    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 159, METHOD_BUFFERED, FILE_ANY_ACCESS)
+#define FSCTL_GET_INTEGRITY_INFORMATION CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 159, METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 #endif
 
 #ifndef FSCTL_SET_INTEGRITY_INFORMATION
-#define FSCTL_SET_INTEGRITY_INFORMATION \
-    CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 160, METHOD_BUFFERED, FILE_READ_DATA | FILE_WRITE_DATA)
+#define FSCTL_SET_INTEGRITY_INFORMATION CTL_CODE(FILE_DEVICE_FILE_SYSTEM, 160, METHOD_BUFFERED, FILE_READ_DATA | FILE_WRITE_DATA)
 
 #endif
 
@@ -630,12 +627,10 @@ void ExternalLinkFileProcess::runLinkFile()
 bool moveByCopy(const QString& source, const QString& dest)
 {
     if (!copy(source, dest)()) {
-
         qDebug() << "Copy of" << source << "to" << dest << "failed!";
         return false;
     }
     if (!deletePath(source)) {
-
         qDebug() << "Deletion of" << source << "failed!";
         return false;
     };
@@ -700,7 +695,6 @@ bool deleteContents(const QString& path)
 
 bool trash(QString path, QString* pathInTrash)
 {
-
     if (DesktopServices::isFlatpak())
         return false;
 #if defined Q_OS_WIN32
@@ -822,7 +816,7 @@ QString removeChars(QString source, QChar replace, const QString& extraChars = "
 
     return source;
 }
-}
+}  // namespace
 
 QString RemoveInvalidFilenameChars(QString string, QChar replaceWith)
 {
@@ -1489,7 +1483,6 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
 
 bool linux_ficlone(const std::string& src_path, const std::string& dst_path, std::error_code& ec)
 {
-
     int src_fd = open(src_path.c_str(), O_RDONLY);
     if (src_fd == -1) {
         qDebug() << "Failed to open file:" << src_path.c_str();
@@ -1529,7 +1522,6 @@ bool linux_ficlone(const std::string& src_path, const std::string& dst_path, std
 
 bool macos_bsd_clonefile(const std::string& src_path, const std::string& dst_path, std::error_code& ec)
 {
-
     qDebug() << "attempting file clone via clonefile" << src_path.c_str() << "to" << dst_path.c_str();
     if (clonefile(src_path.c_str(), dst_path.c_str(), 0) == -1) {
         qDebug() << "Failed to clone file:" << src_path.c_str() << "to" << dst_path.c_str();
@@ -1601,7 +1593,6 @@ QString getPathNameInLocal8bit(const QString& file)
         if (!path.isEmpty()) {
             return path;
         }
-
     }
     return file;
 }
@@ -1612,7 +1603,6 @@ QString getUniqueResourceName(const QString& filePath)
     auto newFileName = filePath;
     if (!newFileName.endsWith(".disabled")) {
         return newFileName;
-
     }
     newFileName.chop(9);
     if (!QFile::exists(newFileName)) {
@@ -1639,9 +1629,8 @@ bool removeFiles(QStringList listFile)
     bool ret = true;
 
     for (int i = 0; i < listFile.count(); i++) {
-
         ret = ret && QFile::remove(listFile.at(i));
     }
     return ret;
 }
-}
+}  // namespace FS

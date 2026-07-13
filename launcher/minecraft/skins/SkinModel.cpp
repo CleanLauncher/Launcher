@@ -53,7 +53,6 @@ static QImage improveSkin(QImage skin)
     int height = skin.height();
     int width = skin.width();
     if (width != 64 || (height != 32 && height != 64)) {
-
         return skin;
     }
 

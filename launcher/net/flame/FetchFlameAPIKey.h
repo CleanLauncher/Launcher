@@ -33,9 +33,9 @@ class FetchFlameAPIKey final : public Task {
     QString result() { return m_result; }
 
    public slots:
-     void downloadFinished();
+    void downloadFinished();
 
-protected:
+   protected:
     void executeTask() override;
 
     QString m_result;

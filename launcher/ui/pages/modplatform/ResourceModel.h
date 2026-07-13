@@ -36,7 +36,7 @@ class ResourceModel : public QAbstractListModel {
     ResourceModel(ResourceAPI* api);
     ~ResourceModel() override;
 
-    auto data(const QModelIndex& , int role) const -> QVariant override;
+    auto data(const QModelIndex&, int role) const -> QVariant override;
     auto roleNames() const -> QHash<int, QByteArray> override;
     bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
@@ -96,7 +96,6 @@ class ResourceModel : public QAbstractListModel {
     QList<DownloadTaskPtr> selectedPacks() { return m_selected; }
 
    protected:
-
     void clearData();
 
     void runSearchJob(Task::Ptr);
@@ -107,7 +106,6 @@ class ResourceModel : public QAbstractListModel {
     virtual bool isPackInstalled(ModPlatform::IndexedPack::Ptr) const { return false; }
 
    protected:
-
     enum class SearchState { None, CanFetchMore, ResetRequested, Finished } m_search_state = SearchState::None;
     int m_next_search_offset = 0;
     QString m_search_term;
@@ -129,7 +127,6 @@ class ResourceModel : public QAbstractListModel {
     static QHash<ResourceModel*, bool> s_running_models;
 
    private:
-
     void searchRequestSucceeded(QList<ModPlatform::IndexedPack::Ptr>&);
     void searchRequestForOneSucceeded(ModPlatform::IndexedPack::Ptr);
     void searchRequestFailed(QString reason, int network_error_code);
@@ -144,4 +141,4 @@ class ResourceModel : public QAbstractListModel {
     void projectInfoUpdated(const QModelIndex& index);
 };
 
-}
+}  // namespace ResourceDownload

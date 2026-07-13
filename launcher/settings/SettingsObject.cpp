@@ -39,7 +39,6 @@ std::shared_ptr<Setting> SettingsObject::registerOverride(std::shared_ptr<Settin
     if (contains(original->id())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
         return nullptr;
-
     }
     auto override = std::make_shared<OverrideSetting>(original, gate);
     override->m_storage = this;
@@ -53,7 +52,6 @@ std::shared_ptr<Setting> SettingsObject::registerPassthrough(std::shared_ptr<Set
     if (contains(original->id())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
         return nullptr;
-
     }
     auto passthrough = std::make_shared<PassthroughSetting>(original, gate);
     passthrough->m_storage = this;
@@ -69,7 +67,6 @@ std::shared_ptr<Setting> SettingsObject::registerSetting(QStringList synonyms, Q
     if (contains(synonyms.first())) {
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(synonyms.first());
         return nullptr;
-
     }
     auto setting = std::make_shared<Setting>(synonyms, defVal);
     setting->m_storage = this;
@@ -80,7 +77,6 @@ std::shared_ptr<Setting> SettingsObject::registerSetting(QStringList synonyms, Q
 
 std::shared_ptr<Setting> SettingsObject::getSetting(const QString& id) const
 {
-
     if (!m_settings.contains(id))
         return NULL;
 
@@ -197,7 +193,6 @@ bool SettingsObject::setPathWithBookmark(const QString& id, const QString& path)
         bookmarkSetting->set(bytes);
         bool stale;
         m_sandboxedFileAccess.startUsingSecurityScopedBookmark(bytes, stale);
-
     }
 
     setting->set(path);

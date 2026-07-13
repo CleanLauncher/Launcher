@@ -80,7 +80,6 @@ void IconList::sortIconList()
         bool bIsSubdir = b.m_key.contains(QDir::separator());
         if (aIsSubdir != bIsSubdir) {
             return !aIsSubdir;
-
         }
         return a.m_key.localeAwareCompare(b.m_key) < 0;
     });
@@ -281,7 +280,6 @@ bool IconList::dropMimeData(const QMimeData* data,
         auto urls = data->urls();
         QStringList iconFiles;
         for (const auto& url : urls) {
-
             if (!url.isLocalFile())
                 continue;
             iconFiles += url.toLocalFile();
@@ -393,7 +391,6 @@ bool IconList::addThemeIcon(const QString& key)
 
 bool IconList::addIcon(const QString& key, const QString& name, const QString& path, const IconType type)
 {
-
     QIcon icon;
 
     if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
@@ -438,7 +435,6 @@ void IconList::reindex()
     for (int i = 0; i < m_icons.size(); i++) {
         m_nameIndex[m_icons[i].m_key] = i;
         emit iconUpdated(m_icons[i].m_key);
-
     }
 }
 

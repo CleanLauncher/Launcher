@@ -77,9 +77,7 @@ class PageEntryFilterModel : public QSortFilterProxyModel {
 };
 
 PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, QWidget* parent)
-    : QWidget(parent)
-    , m_proxyModel(new PageEntryFilterModel(this))
-    , m_model(new PageModel(this))
+    : QWidget(parent), m_proxyModel(new PageEntryFilterModel(this)), m_model(new PageModel(this))
 {
     createUI();
     useSidebarStyle(true);
@@ -117,7 +115,6 @@ PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, 
 
 bool PageContainer::selectPage(QString pageId)
 {
-
     auto* page = m_model->findPageEntryById(pageId);
     QModelIndex index;
     if (page) {
@@ -156,7 +153,6 @@ void PageContainer::refreshContainer()
         if (index.isValid()) {
             m_pageList->setCurrentIndex(index);
         } else {
-
         }
     }
 }

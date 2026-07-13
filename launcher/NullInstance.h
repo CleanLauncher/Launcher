@@ -70,8 +70,5 @@ class NullInstance : public BaseInstance {
         return out;
     }
     QString modsRoot() const override { return QString(); }
-    void updateRuntimeContext() override
-    {
-
-    }
+    void updateRuntimeContext() override {}
 };

@@ -123,7 +123,7 @@ void VersionPage::retranslate()
 
 void VersionPage::openedImpl()
 {
-    auto const setting_name = QString("WideBarVisibility_%1").arg(id());
+    const auto setting_name = QString("WideBarVisibility_%1").arg(id());
     m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
@@ -531,11 +531,9 @@ void VersionPage::on_actionCustomize_triggered()
     }
     auto patch = m_profile->getComponent(version);
     if (!patch->getVersionFile()) {
-
         return;
     }
     if (!m_profile->customize(version)) {
-
     }
     updateButtons();
     preselect(currentIdx);
@@ -575,7 +573,6 @@ void VersionPage::on_actionRevert_triggered()
         return;
 
     if (!m_profile->revertToBase(version)) {
-
     }
     updateButtons();
     preselect(currentIdx);

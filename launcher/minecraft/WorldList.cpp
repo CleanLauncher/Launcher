@@ -340,13 +340,11 @@ Qt::ItemFlags WorldList::flags(const QModelIndex& index) const
 
 Qt::DropActions WorldList::supportedDragActions() const
 {
-
     return Qt::MoveAction;
 }
 
 Qt::DropActions WorldList::supportedDropActions() const
 {
-
     return Qt::CopyAction | Qt::MoveAction;
 }
 
@@ -378,7 +376,6 @@ bool WorldList::dropMimeData(const QMimeData* data,
             stopWatching();
         auto urls = data->urls();
         for (auto url : urls) {
-
             if (!url.isLocalFile())
                 continue;
             QString filename = url.toLocalFile();

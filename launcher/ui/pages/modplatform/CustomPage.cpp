@@ -132,7 +132,6 @@ void CustomPage::loaderFilterChanged()
         ui->loaderVersionList->setExactFilter(BaseVersionList::ParentVersionRole, minecraftVersion);
         m_selectedLoader = "net.minecraftforge";
     } else if (ui->fabricFilter->isChecked()) {
-
         if (Version(minecraftVersion) >= Version("1.14"))
 
             ui->loaderVersionList->setExactFilter(BaseVersionList::ParentVersionRole, "");
@@ -142,7 +141,6 @@ void CustomPage::loaderFilterChanged()
 
         m_selectedLoader = "net.fabricmc.fabric-loader";
     } else if (ui->quiltFilter->isChecked()) {
-
         if (Version(minecraftVersion) >= Version("1.14"))
 
             ui->loaderVersionList->setExactFilter(BaseVersionList::ParentVersionRole, "");

@@ -76,13 +76,12 @@ QSet<QString> collectPathsFromDir(QString dirPath)
     }
     return out;
 }
-}
+}  // namespace
 
 namespace AssetsUtils {
 
 bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsIndex& index)
 {
-
     QFile file(path);
 
     if (!file.open(QIODevice::ReadOnly)) {
@@ -124,14 +123,12 @@ bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsInd
     QVariantMap map = objects.toVariant().toMap();
 
     for (QVariantMap::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
-
         QVariant variant = iter.value();
         QVariantMap nested_objects = variant.toMap();
 
         AssetObject object;
 
         for (QVariantMap::const_iterator nested_iter = nested_objects.begin(); nested_iter != nested_objects.end(); ++nested_iter) {
-
             QString key = nested_iter.key();
             QVariant value = nested_iter.value();
 
@@ -251,7 +248,7 @@ bool reconstructAssets(QString assetsId, QString resourcesFolder)
     return true;
 }
 
-}
+}  // namespace AssetsUtils
 
 Net::NetRequest::Ptr AssetObject::getDownloadAction()
 {

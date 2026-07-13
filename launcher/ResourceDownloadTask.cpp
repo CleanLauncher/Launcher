@@ -55,7 +55,7 @@ Net::ModrinthDownloadMeta createModrinthMeta(BaseInstance* instance, QString rea
         .loader = !loaders.isEmpty() ? ModPlatform::getModLoaderAsString(loaders.first()) : "",
     };
 }
-}
+}  // namespace
 
 ResourceDownloadTask::ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
                                            ModPlatform::IndexedVersion version,

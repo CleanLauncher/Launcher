@@ -180,4 +180,4 @@ void Scene::setElytraVisible(bool elytraVisible)
 {
     m_elytraVisible = elytraVisible;
 }
-}
+}  // namespace opengl

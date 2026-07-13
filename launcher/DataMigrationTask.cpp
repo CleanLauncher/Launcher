@@ -22,10 +22,7 @@ void DataMigrationTask::executeTask()
 {
     setStatus(tr("Scanning files..."));
 
-    m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] {
-        return m_copy(true);
-
-    });
+    m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] { return m_copy(true); });
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::finished, this, &DataMigrationTask::dryRunFinished);
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::canceled, this, &DataMigrationTask::dryRunAborted);
     m_copyFutureWatcher.setFuture(m_copyFuture);
@@ -50,10 +47,7 @@ void DataMigrationTask::dryRunFinished()
         setProgress(m_copy.totalCopied(), m_toCopy);
         setStatus(tr("Copying %1…").arg(shortenedName));
     });
-    m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] {
-        return m_copy(false);
-
-    });
+    m_copyFuture = QtConcurrent::run(QThreadPool::globalInstance(), [this] { return m_copy(false); });
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::finished, this, &DataMigrationTask::copyFinished);
     connect(&m_copyFutureWatcher, &QFutureWatcher<bool>::canceled, this, &DataMigrationTask::copyAborted);
     m_copyFutureWatcher.setFuture(m_copyFuture);

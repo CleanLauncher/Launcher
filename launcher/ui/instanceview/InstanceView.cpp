@@ -290,7 +290,6 @@ void InstanceView::mousePressEvent(QMouseEvent* event)
 
     if (index.isValid() && (index.flags() & Qt::ItemIsEnabled)) {
         if (index != currentIndex()) {
-
             m_currentCursorColumn = -1;
         }
 
@@ -304,7 +303,6 @@ void InstanceView::mousePressEvent(QMouseEvent* event)
 
         emit pressed(index);
     } else {
-
         selectionModel()->select(QModelIndex(), QItemSelectionModel::Select);
     }
 }
@@ -785,7 +783,6 @@ QRegion InstanceView::visualRegionForSelection(const QItemSelection& selection) 
             for (int column = start_column; column <= end_column; ++column) {
                 QModelIndex index = model()->index(row, column, rootIndex());
                 region += visualRect(index);
-
             }
         }
     }

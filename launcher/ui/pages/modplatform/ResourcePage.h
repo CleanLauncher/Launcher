@@ -120,4 +120,4 @@ class ResourcePage : public QWidget, public BasePage {
     bool m_suppressInitialSearch = false;
 };
 
-}
+}  // namespace ResourceDownload

@@ -89,7 +89,6 @@ void TexturePackPage::downloadTexturePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     m_downloadDialog = new ResourceDownload::TexturePackDownloadDialog(this, m_model, m_instance);
@@ -142,7 +141,6 @@ void TexturePackPage::updateTexturePacks()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {
@@ -247,7 +245,6 @@ void TexturePackPage::changeTexturePackVersion()
 {
     if (m_instance->typeName() != "Minecraft") {
         return;
-
     }
 
     if (APPLICATION->settings()->get("ModMetadataDisabled").toBool()) {

@@ -207,7 +207,6 @@ bool SkinList::dropMimeData(const QMimeData* data,
         auto urls = data->urls();
         QStringList skinFiles;
         for (auto url : urls) {
-
             if (!url.isLocalFile())
                 continue;
             skinFiles << url.toLocalFile();

@@ -90,7 +90,6 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
 
     if (m_QuickJoinSupported) {
         for (const auto& world : worldList->allWorlds()) {
-
             QString entry_name = tr("%1 [%2] - Last Played: %3")
                                      .arg(world.name(), world.gameType().toTranslatedString(), world.lastPlayed().toString(Qt::ISODate));
             ui->worldSelectionBox->addItem(entry_name, world.name());

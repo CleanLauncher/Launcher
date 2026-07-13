@@ -96,7 +96,6 @@ class ServersPage : public QMainWindow, public BasePage {
     void ShowContextMenu(const QPoint& pos);
 
    private:
-
     int currentServer = -1;
     bool m_locked = true;
     Ui::ServersPage* ui = nullptr;

@@ -56,4 +56,4 @@ void ShaderPackResourceModel::searchWithTerm(const QString& term, unsigned int s
     refresh();
 }
 
-}
+}  // namespace ResourceDownload

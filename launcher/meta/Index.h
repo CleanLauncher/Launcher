@@ -52,7 +52,6 @@ class Index : public QAbstractListModel, public BaseEntity {
     Version::Ptr getLoadedVersion(const QString& uid, const QString& version);
 
    public:
-
     void merge(const std::shared_ptr<Index>& other);
 
    protected:
@@ -64,4 +63,4 @@ class Index : public QAbstractListModel, public BaseEntity {
 
     void connectVersionList(int row, const VersionList::Ptr& list);
 };
-}
+}  // namespace Meta

@@ -73,4 +73,4 @@ class ArchiveReader {
 
     QStringList m_fileNames;
 };
-}
+}  // namespace MMCZip

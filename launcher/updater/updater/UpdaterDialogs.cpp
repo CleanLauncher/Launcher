@@ -73,7 +73,7 @@ void SelectReleaseDialog::loadReleases()
     }
 }
 
-void SelectReleaseDialog::appendRelease(GitHubRelease const& release)
+void SelectReleaseDialog::appendRelease(const GitHubRelease& release)
 {
     auto rls_item = new QTreeWidgetItem(ui->versionsTree);
     rls_item->setText(0, release.tag_name);
@@ -95,7 +95,7 @@ GitHubRelease SelectReleaseDialog::getRelease(QTreeWidgetItem* item)
     return release;
 }
 
-void SelectReleaseDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* )
+void SelectReleaseDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem*)
 {
     GitHubRelease release = getRelease(current);
     QString body = markdownToHTML(release.body.toUtf8());
@@ -144,7 +144,7 @@ void SelectReleaseAssetDialog::loadAssets()
     }
 }
 
-void SelectReleaseAssetDialog::appendAsset(GitHubReleaseAsset const& asset)
+void SelectReleaseAssetDialog::appendAsset(const GitHubReleaseAsset& asset)
 {
     auto rls_item = new QTreeWidgetItem(ui->versionsTree);
     rls_item->setText(0, asset.name);
@@ -166,7 +166,7 @@ GitHubReleaseAsset SelectReleaseAssetDialog::getAsset(QTreeWidgetItem* item)
     return selected_asset;
 }
 
-void SelectReleaseAssetDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* )
+void SelectReleaseAssetDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem*)
 {
     GitHubReleaseAsset asset = getAsset(current);
     m_selectedAsset = asset;

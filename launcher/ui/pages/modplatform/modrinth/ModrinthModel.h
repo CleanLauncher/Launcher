@@ -121,4 +121,4 @@ class ModpackListModel : public QAbstractListModel {
 
     int m_modpacks_per_page = 20;
 };
-}
+}  // namespace Modrinth

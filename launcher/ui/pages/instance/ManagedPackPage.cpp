@@ -105,8 +105,7 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
 
     connect(ui->changelogTextBrowser, &QTextBrowser::anchorClicked, this, [](const QUrl url) {
         if (url.scheme().isEmpty()) {
-            auto querry =
-                QUrlQuery(url.query()).queryItemValue("remoteUrl", QUrl::FullyDecoded);
+            auto querry = QUrlQuery(url.query()).queryItemValue("remoteUrl", QUrl::FullyDecoded);
 
             auto decoded = QUrl::fromPercentEncoding(querry.toUtf8());
             auto newUrl = QUrl(decoded);
@@ -117,7 +116,8 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
         QDesktopServices::openUrl(url);
     });
 
-    connect(ui->urlLine, &QLineEdit::textChanged, this, [this](QString text) { m_inst->settings()->set("ManagedPackURL", text.trimmed()); });
+    connect(ui->urlLine, &QLineEdit::textChanged, this,
+            [this](QString text) { m_inst->settings()->set("ManagedPackURL", text.trimmed()); });
 }
 
 ManagedPackPage::~ManagedPackPage()
@@ -280,7 +280,7 @@ void ModrinthManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString& , int) { setFailState(); };
+    callbacks.on_fail = [this](const QString&, int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
     m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
                                              .mcVersions = {},
@@ -315,7 +315,6 @@ void ModrinthManagedPackPage::suggestVersion()
 
 void ManagedPackPage::onUpdateTaskCompleted(bool did_succeed) const
 {
-
     if (did_succeed) {
         if (m_instance_window != nullptr)
             m_instance_window->close();
@@ -425,7 +424,7 @@ void FlameManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString& , int) { setFailState(); };
+    callbacks.on_fail = [this](const QString&, int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
     m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
                                              .mcVersions = {},
@@ -439,7 +438,6 @@ void FlameManagedPackPage::parseManagedPack()
 
 QString FlameManagedPackPage::url() const
 {
-
     return "https://www.curseforge.com/projects/" + m_inst->getManagedPackID();
 }
 

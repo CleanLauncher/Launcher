@@ -156,7 +156,6 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         callbacks.on_succeed = [this, id, curr](auto& pack) {
             if (id != m_current->addonId) {
                 return;
-
             }
 
             QVariant current_updated;
@@ -186,7 +185,6 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         callbacks.on_succeed = [this, curr, addonId](auto& doc) {
             if (addonId != m_current->addonId) {
                 return;
-
             }
 
             m_current->versions = doc;

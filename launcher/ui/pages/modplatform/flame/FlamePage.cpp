@@ -165,7 +165,6 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
         callbacks.on_succeed = [this, curr, addonId](auto& doc) {
             if (addonId != m_current->addonId) {
                 return;
-
             }
 
             m_current->versions = doc;

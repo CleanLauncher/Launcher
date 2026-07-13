@@ -24,7 +24,6 @@ class NewsEntry : public QObject {
     Q_OBJECT
 
    public:
-
     explicit NewsEntry(QObject* parent = 0);
 
     NewsEntry(const QString& title, const QString& content, const QString& link, QObject* parent = 0);

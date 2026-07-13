@@ -385,4 +385,4 @@ QString Page::getSerachTerm() const
 {
     return ui->searchEdit->text();
 }
-}
+}  // namespace LegacyFTB

@@ -202,7 +202,6 @@ static const QString SKIN_URL_ALEX =
 
 bool isDefaultModelSteve(QString uuid)
 {
-
     uuid.remove('-');
 
     if (uuid.size() != 32) {
@@ -214,7 +213,7 @@ bool isDefaultModelSteve(QString uuid)
     qulonglong xored = most ^ least;
     return ((static_cast<quint32>(xored >> 32)) ^ static_cast<quint32>(xored)) % 2 == 0;
 }
-}
+}  // namespace
 
 bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
 {
@@ -424,4 +423,4 @@ bool parseMojangResponse(QByteArray& data, Token& output)
     return true;
 }
 
-}
+}  // namespace Parsers

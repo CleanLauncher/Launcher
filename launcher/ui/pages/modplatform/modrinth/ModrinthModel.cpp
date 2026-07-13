@@ -80,7 +80,6 @@ auto ModpackListModel::data(const QModelIndex& index, int role) const -> QVarian
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -320,10 +319,8 @@ void ModpackListModel::searchRequestForOneSucceeded(ModPlatform::IndexedPack::Pt
 void ModpackListModel::searchRequestFailed(QString reason, int network_error_code)
 {
     if (network_error_code == -1) {
-
         QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load modpacks."));
     } else if (network_error_code == 409) {
-
         QMessageBox::critical(nullptr, tr("Error"),
 
                               QString("%1 %2")
@@ -344,4 +341,4 @@ void ModpackListModel::searchRequestFailed(QString reason, int network_error_cod
     }
 }
 
-}
+}  // namespace Modrinth

@@ -45,4 +45,4 @@ bool loadAssetsIndexJson(const QString& id, const QString& file, AssetsIndex& in
 QDir getAssetsDir(const QString& assetsId, const QString& resourcesFolder);
 
 bool reconstructAssets(QString assetsId, QString resourcesFolder);
-}
+}  // namespace AssetsUtils

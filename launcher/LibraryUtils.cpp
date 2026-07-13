@@ -40,7 +40,6 @@ namespace LibraryUtils {
 
 QString findMangoHud()
 {
-
     QStringList vkLayerList;
     {
         QString home = QDir::homePath();
@@ -76,7 +75,6 @@ QString findMangoHud()
     }
 
     for (const QString& vkLayer : vkLayerList) {
-
         QString currentArch = QSysInfo::currentCpuArchitecture();
 
         if (currentArch == "arm64") {
@@ -154,7 +152,7 @@ QString find(QString libName)
     return {};
 #endif
 }
-}
+}  // namespace LibraryUtils
 
 #ifdef UNDEF_GNU_SOURCE
 #undef _GNU_SOURCE

@@ -283,14 +283,12 @@ bool AccessibleInstanceView::unselectRow(int row)
             }
             break;
         case QAbstractItemView::ContiguousSelection: {
-
             if (selectedRowCount() == 1) {
                 return false;
             }
 
             if ((!row || selectionModel->isRowSelected(row - 1, view()->rootIndex())) &&
                 selectionModel->isRowSelected(row + 1, view()->rootIndex())) {
-
                 selection = QItemSelection(index, view()->model()->index(rowCount() - 1, 0, view()->rootIndex()));
             }
         }
@@ -319,7 +317,6 @@ bool AccessibleInstanceView::unselectColumn(int column)
 
     switch (view()->selectionMode()) {
         case QAbstractItemView::SingleSelection: {
-
             if (selectedColumnCount() == 1) {
                 return false;
             }
@@ -332,7 +329,6 @@ bool AccessibleInstanceView::unselectColumn(int column)
 
             if ((!column || view()->selectionModel()->isColumnSelected(column - 1, view()->rootIndex())) &&
                 view()->selectionModel()->isColumnSelected(column + 1, view()->rootIndex())) {
-
                 selection = QItemSelection(index, model->index(0, columnCount() - 1, view()->rootIndex()));
             }
         default:
@@ -460,7 +456,6 @@ void* AccessibleInstanceView::interface_cast(QAccessible::InterfaceType t)
 
 void AccessibleInstanceView::modelChange(QAccessibleTableModelChangeEvent* event)
 {
-
     if (childToId.isEmpty())
         return;
 
@@ -483,7 +478,6 @@ void AccessibleInstanceView::modelChange(QAccessibleTableModelChangeEvent* event
                 if (indexOfChild(iface) >= 0) {
                     newCache.insert(indexOfChild(iface), id);
                 } else {
-
                     QAccessible::deleteAccessibleInterface(id);
                 }
                 ++iter;
@@ -743,7 +737,7 @@ QString AccessibleInstanceViewItem::text(QAccessible::Text t) const
     return value;
 }
 
-void AccessibleInstanceViewItem::setText(QAccessible::Text , const QString& text)
+void AccessibleInstanceViewItem::setText(QAccessible::Text, const QString& text)
 {
     if (!isValid() || !(m_index.flags() & Qt::ItemIsEditable))
         return;

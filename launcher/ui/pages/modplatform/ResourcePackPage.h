@@ -49,4 +49,4 @@ class ResourcePackResourcePage : public ResourcePage {
     void triggerSearch() override;
 };
 
-}
+}  // namespace ResourceDownload

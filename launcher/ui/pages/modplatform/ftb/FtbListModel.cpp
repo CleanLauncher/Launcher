@@ -113,7 +113,6 @@ void ListModel::abortRequest()
 
 void ListModel::requestFinished(QByteArray* responsePtr)
 {
-
     QByteArray response = std::move(*responsePtr);
     m_jobPtr.reset();
     m_remainingPacks.clear();
@@ -248,4 +247,4 @@ void ListModel::requestLogo(QString logo, QString url)
     job->start();
 }
 
-}
+}  // namespace Ftb

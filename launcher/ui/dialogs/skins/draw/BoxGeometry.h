@@ -46,4 +46,4 @@ class BoxGeometry : protected QOpenGLFunctions {
     QMatrix4x4 m_matrix;
     GLsizei m_indecesCount;
 };
-}
+}  // namespace opengl

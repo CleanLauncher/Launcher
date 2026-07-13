@@ -119,7 +119,8 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
         if (sha1.size()) {
             auto dl = Net::ApiDownload::makeCached(url, entry, options);
             dl->addValidator(new Net::ChecksumValidator(QCryptographicHash::Sha1, sha1));
-            qDebug() << "Checksummed Download for:" << rawName().serialize() << "storage:" << storage << "url:" << url << "expected sha1:" << sha1;
+            qDebug() << "Checksummed Download for:" << rawName().serialize() << "storage:" << storage << "url:" << url
+                     << "expected sha1:" << sha1;
             out.append(dl);
         } else {
             out.append(Net::ApiDownload::makeCached(url, entry, options));
@@ -229,7 +230,6 @@ bool Library::isAlwaysStale() const
 
 QString Library::getCompatibleNative(const RuntimeContext& runtimeContext) const
 {
-
     auto entry = m_nativeClassifiers.constFind(runtimeContext.getClassifier());
 
     if (entry == m_nativeClassifiers.constEnd() && runtimeContext.isLegacyArch())
@@ -288,7 +288,6 @@ QString Library::displayName(const RuntimeContext& runtimeContext) const
 
 QString Library::storageSuffix(const RuntimeContext& runtimeContext) const
 {
-
     if (!isNative()) {
         return m_name.toPath(m_filename);
     }

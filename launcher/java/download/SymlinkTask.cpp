@@ -78,4 +78,4 @@ void SymlinkTask::executeTask()
     }
 }
 
-}
+}  // namespace Java

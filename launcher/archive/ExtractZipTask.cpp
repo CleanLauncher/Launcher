@@ -129,4 +129,4 @@ bool ExtractZipTask::abort()
     return false;
 }
 
-}
+}  // namespace MMCZip

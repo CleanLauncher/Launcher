@@ -50,7 +50,6 @@ void LookupServerAddress::executeTask()
 void LookupServerAddress::on_dnsLookupFinished()
 {
     if (isFinished()) {
-
         return;
     }
 

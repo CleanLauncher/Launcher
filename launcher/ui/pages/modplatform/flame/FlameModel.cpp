@@ -40,7 +40,6 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack->description.length() > 100) {
-
                 QString edit = pack->description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -279,4 +278,4 @@ void Flame::ListModel::searchRequestFailed(QString reason)
     }
 }
 
-}
+}  // namespace Flame

@@ -42,7 +42,6 @@
 LoggedProcess::LoggedProcess(const QStringConverter::Encoding output_codec, QObject* parent)
     : QProcess(parent), m_err_decoder(output_codec), m_out_decoder(output_codec)
 {
-
     connect(this, &QProcess::readyReadStandardOutput, this, &LoggedProcess::on_stdOut);
     connect(this, &QProcess::readyReadStandardError, this, &LoggedProcess::on_stdErr);
     connect(this, &QProcess::finished, this, &LoggedProcess::on_exit);
@@ -86,16 +85,13 @@ void LoggedProcess::on_stdOut()
 
 void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
 {
-
     m_exit_code = exit_code;
 
     if (!m_is_aborting) {
         if (status == QProcess::NormalExit) {
-
             emit log({ tr("Process exited with code %1.").arg(exit_code) }, MessageLevel::Launcher);
             changeState(LoggedProcess::Finished);
         } else {
-
             if (exit_code == -1)
                 emit log({ tr("Process crashed.") }, MessageLevel::Launcher);
             else
@@ -103,7 +99,6 @@ void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
             changeState(LoggedProcess::Crashed);
         }
     } else {
-
         emit log({ tr("Process was killed by user.") }, MessageLevel::Error);
         changeState(LoggedProcess::Aborted);
     }

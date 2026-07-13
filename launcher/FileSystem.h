@@ -424,4 +424,4 @@ QString getPathNameInLocal8bit(const QString& file);
 
 QString getUniqueResourceName(const QString& filePath);
 
-}
+}  // namespace FS

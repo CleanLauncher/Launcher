@@ -157,10 +157,8 @@ void MinecraftAccount::authFailed(QString reason)
     switch (m_currentTask->taskState()) {
         case AccountTaskState::STATE_OFFLINE:
         case AccountTaskState::STATE_DISABLED: {
-
         }
         case AccountTaskState::STATE_FAILED_SOFT: {
-
         } break;
         case AccountTaskState::STATE_FAILED_HARD: {
             if (accountType() == AccountType::MSA || accountType() == AccountType::Ely) {
@@ -184,7 +182,6 @@ void MinecraftAccount::authFailed(QString reason)
         } break;
         case AccountTaskState::STATE_CREATED:
         case AccountTaskState::STATE_SUCCEEDED: {
-
         }
     }
     m_currentTask.reset();
@@ -206,7 +203,8 @@ QString MinecraftAccount::displayName() const
         return QString();
     };
     const QString nameWithType = QString("%1 [%2]").arg(profileName(), typeFriendlyString(data.type));
-    if (const QList validStates{ AccountState::Unchecked, AccountState::Working, AccountState::Offline, AccountState::Online }; !validStates.contains(accountState())) {
+    if (const QList validStates{ AccountState::Unchecked, AccountState::Working, AccountState::Offline, AccountState::Online };
+        !validStates.contains(accountState())) {
         return QString("⚠ %1").arg(nameWithType);
     }
     return nameWithType;
@@ -219,7 +217,6 @@ bool MinecraftAccount::isActive() const
 
 bool MinecraftAccount::shouldRefresh() const
 {
-
     if (isInUse()) {
         return false;
     }
@@ -249,7 +246,6 @@ bool MinecraftAccount::shouldRefresh() const
 
 void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreference)
 {
-
     session->access_token = data.accessToken();
 
     session->player_name = data.profileName();
@@ -266,19 +262,15 @@ void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreferenc
     }
     switch (elyPatchPreference) {
         case 0: {
-
             session->wantsElyPatch = true;
         } break;
         case 1: {
-
             session->wantsElyPatch = data.type == AccountType::Ely || data.type == AccountType::Offline;
         } break;
         case 2: {
-
             session->wantsElyPatch = data.type == AccountType::Ely;
         } break;
         default: {
-
             session->wantsElyPatch = false;
         }
     }

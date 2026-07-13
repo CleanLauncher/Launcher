@@ -184,4 +184,4 @@ struct PackVersion {
 
 void loadVersion(PackVersion& v, QJsonObject& obj);
 
-}
+}  // namespace ATLauncher

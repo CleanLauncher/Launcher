@@ -35,10 +35,10 @@
 
 #include "ListModel.h"
 #include "Application.h"
-#include "settings/SettingsObject.h"
 #include "net/ApiDownload.h"
 #include "net/HttpMetaCache.h"
 #include "net/NetJob.h"
+#include "settings/SettingsObject.h"
 
 #include <Version.h>
 #include "StringUtils.h"
@@ -162,7 +162,6 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack.description.length() > 100) {
-
                 QString edit = pack.description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -184,10 +183,8 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
         }
         case Qt::ForegroundRole: {
             if (pack.broken) {
-
                 return QColor(255, 0, 50);
             } else if (pack.bugged) {
-
                 return QColor(244, 229, 66);
             }
             return {};
@@ -304,4 +301,4 @@ Qt::ItemFlags ListModel::flags(const QModelIndex& index) const
     return QAbstractListModel::flags(index);
 }
 
-}
+}  // namespace LegacyFTB

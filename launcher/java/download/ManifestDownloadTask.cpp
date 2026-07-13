@@ -73,7 +73,6 @@ void ManifestDownloadTask::executeTask()
 
 void ManifestDownloadTask::downloadJava(const QJsonDocument& doc)
 {
-
     FS::ensureFolderPathExists(m_final_path);
     std::vector<File> toDownload;
     auto list = doc.object()["files"].toObject();
@@ -85,13 +84,11 @@ void ManifestDownloadTask::downloadJava(const QJsonDocument& doc)
         if (type == "directory") {
             FS::ensureFolderPathExists(file);
         } else if (type == "link") {
-
             auto path = meta["target"].toString();
             if (!path.isEmpty()) {
                 QFile::link(path, file);
             }
         } else if (type == "file") {
-
             auto raw = meta["downloads"].toObject()["raw"].toObject();
             auto isExec = meta["executable"].toBool();
             auto url = raw["url"].toString();
@@ -133,4 +130,4 @@ bool ManifestDownloadTask::abort()
     emitAborted();
     return aborted;
 };
-}
+}  // namespace Java

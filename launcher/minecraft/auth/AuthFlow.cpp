@@ -77,7 +77,6 @@ void AuthFlow::nextStep()
         return;
     }
     if (m_steps.size() == 0) {
-
         m_currentStep.reset();
         succeed();
         return;

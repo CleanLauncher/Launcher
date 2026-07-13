@@ -76,4 +76,4 @@ QStringList splitArgs(QString args)
         argv << current;
     return argv;
 }
-}
+}  // namespace Commandline

@@ -81,7 +81,6 @@ LogColors ITheme::defaultLogColors(const QPalette& palette)
 
     auto blend = [bg, fg](QColor color) {
         if (Rainbow::luma(fg) > Rainbow::luma(bg)) {
-
             color = Rainbow::tint(fg, color, 0.5);
         }
 

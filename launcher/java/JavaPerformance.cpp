@@ -52,18 +52,20 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
         case GarbageCollectorPreset::None:
             return {};
         case GarbageCollectorPreset::G1GC: {
+            QStringList args{ "-XX:+UnlockExperimentalVMOptions",
+                              "-XX:+UseG1GC",
+                              "-XX:G1NewSizePercent=20",
+                              "-XX:G1ReservePercent=20",
+                              "-XX:MaxGCPauseMillis=50",
+                              "-XX:G1HeapRegionSize=32M",
 
-            QStringList args{ "-XX:+UnlockExperimentalVMOptions", "-XX:+UseG1GC",
-                              "-XX:G1NewSizePercent=20", "-XX:G1ReservePercent=20",
-                              "-XX:MaxGCPauseMillis=50", "-XX:G1HeapRegionSize=32M",
-
-                              "-XX:SurvivorRatio=32", "-XX:MaxTenuringThreshold=1" };
+                              "-XX:SurvivorRatio=32",
+                              "-XX:MaxTenuringThreshold=1" };
             return args;
         }
         case GarbageCollectorPreset::Shenandoah: {
             QStringList args{ "-XX:+UseShenandoahGC" };
             if (version.major() >= 24) {
-
                 if (version.major() == 24) {
                     args << "-XX:+UnlockExperimentalVMOptions";
                 }
@@ -72,7 +74,6 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
             return args;
         }
         case GarbageCollectorPreset::ZGC: {
-
             QStringList args{ "-XX:+UseZGC" };
 
             if (version.major() >= 21 && version.major() < 23) {
@@ -88,7 +89,9 @@ QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version,
     return {};
 }
 
-QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion& version, const bool useOptimized, GarbageCollectorPreset preset,
+QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion& version,
+                                                        const bool useOptimized,
+                                                        GarbageCollectorPreset preset,
                                                         QString* warning)
 {
     GarbageCollectorPreset maximumSupported;

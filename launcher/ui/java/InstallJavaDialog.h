@@ -44,4 +44,4 @@ class InstallDialog final : public QDialog, private BasePageProvider {
     PageContainer* container;
     QDialogButtonBox* buttons;
 };
-}
+}  // namespace Java

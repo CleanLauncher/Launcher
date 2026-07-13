@@ -31,7 +31,6 @@ namespace Packwiz {
 
 class V1 {
    public:
-
     struct Mod {
         QString slug{};
         QString name{};
@@ -54,7 +53,6 @@ class V1 {
         QList<ModPlatform::Dependency> dependencies;
 
        public:
-
         auto isValid() const -> bool { return !slug.isEmpty() && !project_id.isNull(); }
 
         auto mod_id() -> QVariant& { return project_id; }
@@ -72,4 +70,4 @@ class V1 {
     static auto getIndexForMod(const QDir& index_dir, QVariant& mod_id) -> Mod;
 };
 
-}
+}  // namespace Packwiz

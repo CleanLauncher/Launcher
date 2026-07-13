@@ -50,4 +50,4 @@ bool saveJsonFile(const QJsonDocument& doc, const QString& filename);
 
 void removeLwjglFromPatch(VersionFilePtr patch);
 
-}
+}  // namespace ProfileUtils

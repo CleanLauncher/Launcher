@@ -37,4 +37,4 @@ QMessageBox* selectable(QWidget* parent,
 
     return messageBox;
 }
-}
+}  // namespace CustomMessageBox

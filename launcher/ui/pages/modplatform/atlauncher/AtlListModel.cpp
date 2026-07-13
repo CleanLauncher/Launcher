@@ -50,7 +50,6 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
     switch (role) {
         case Qt::ToolTipRole: {
             if (pack.description.length() > 100) {
-
                 QString edit = pack.description.left(97);
                 edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
                 return edit;
@@ -110,7 +109,6 @@ void ListModel::request()
 
 void ListModel::requestFinished(QByteArray* responsePtr)
 {
-
     QByteArray response = std::move(*responsePtr);
     jobPtr.reset();
 
@@ -217,4 +215,4 @@ void ListModel::requestLogo(QString file, QString url)
     m_loadingLogos.append(file);
 }
 
-}
+}  // namespace Atl

@@ -148,7 +148,6 @@ class MinecraftInstance : public BaseInstance {
     QMap<QString, QString> makeProfileVarMapping(std::shared_ptr<LaunchProfile> profile) const;
 
    protected:
-
     std::unique_ptr<PackProfile> m_components;
     std::unique_ptr<ModFolderModel> m_loader_mod_list;
     std::unique_ptr<ModFolderModel> m_core_mod_list;

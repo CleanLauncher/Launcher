@@ -54,7 +54,6 @@ bool JavaVersion::requiresPermGen() const
 
 bool JavaVersion::defaultsToUtf8() const
 {
-
     return m_parseable && m_major >= 18;
 }
 
@@ -85,13 +84,10 @@ bool JavaVersion::operator<(const JavaVersion& rhs) const
         bool thisPre = !m_prerelease.isEmpty();
         bool rhsPre = !rhs.m_prerelease.isEmpty();
         if (thisPre && !rhsPre) {
-
             return true;
         } else if (!thisPre && rhsPre) {
-
             return false;
         } else if (thisPre && rhsPre) {
-
             return StringUtils::naturalCompare(m_prerelease, rhs.m_prerelease, Qt::CaseSensitive) < 0;
         }
 

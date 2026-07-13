@@ -81,4 +81,4 @@ QPair<QString, QString> splitFirst(const QString& s, const QRegularExpression& r
 
 QString htmlListPatch(QString htmlStr);
 
-}
+}  // namespace StringUtils

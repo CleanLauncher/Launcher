@@ -397,7 +397,6 @@ bool InstanceList::undoTrashInstance()
     bool ok = true;
     for (const auto& [data, trashPath] : top.shortcuts) {
         if (QDir(data.filePath).exists()) {
-
             qWarning() << "Shortcut" << trashPath << "original directory" << data.filePath << "already exists!";
             ok = false;
             continue;
@@ -512,7 +511,6 @@ InstanceList::InstListError InstanceList::loadList()
     }
 
     if (!existingIds.isEmpty()) {
-
         auto deadList = existingIds.values();
         auto orderSortPredicate = [](const InstanceLocator& a, const InstanceLocator& b) -> bool { return a.second > b.second; };
         std::sort(deadList.begin(), deadList.end(), orderSortPredicate);
@@ -532,12 +530,9 @@ InstanceList::InstListError InstanceList::loadList()
             instPtr->invalidate();
             currentItem = removedItem.second;
             if (back_bookmark == -1) {
-
                 back_bookmark = currentItem;
             } else if (currentItem == front_bookmark - 1) {
-
             } else {
-
                 removeNow();
             }
             front_bookmark = currentItem;
@@ -846,7 +841,6 @@ void InstanceList::loadGroupList()
         ungroupedHidden = ungrouped.value("hidden").toBool(false);
     }
     if (ungroupedHidden) {
-
         m_collapsedGroups.insert("");
     }
     m_groupsLoaded = true;

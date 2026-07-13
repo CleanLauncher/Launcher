@@ -108,13 +108,11 @@ Task::Ptr ResourceAPI::getProjectVersions(VersionSearchArgs&& args, Callback<QVe
                 }
 
                 if (file.fileId.isValid() && !file.downloadUrl.isEmpty()) {
-
                     unsortedVersions.append(file);
                 }
             }
 
             auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-
                 return a.date > b.date;
             };
             std::sort(unsortedVersions.begin(), unsortedVersions.end(), orderSortPredicate);
@@ -226,14 +224,12 @@ Task::Ptr ResourceAPI::getDependencyVersion(DependencySearchArgs&& args, Callbac
             if (!file.addonId.isValid())
                 file.addonId = args.dependency.addonId;
 
-            if (file.fileId.isValid() &&
-                (!file.loaders || args.loader & file.loaders))
+            if (file.fileId.isValid() && (!file.loaders || args.loader & file.loaders))
 
                 versions.append(file);
         }
 
         auto orderSortPredicate = [](const ModPlatform::IndexedVersion& a, const ModPlatform::IndexedVersion& b) -> bool {
-
             return a.date > b.date;
         };
         std::sort(versions.begin(), versions.end(), orderSortPredicate);

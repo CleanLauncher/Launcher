@@ -4,7 +4,6 @@
 #include <memory>
 
 struct MojangDownloadInfo {
-
     using Ptr = std::shared_ptr<MojangDownloadInfo>;
 
     QString path;
@@ -36,7 +35,6 @@ struct MojangLibraryDownloadInfo {
 };
 
 struct MojangAssetIndexInfo : public MojangDownloadInfo {
-
     using Ptr = std::shared_ptr<MojangAssetIndexInfo>;
 
     MojangAssetIndexInfo() {}

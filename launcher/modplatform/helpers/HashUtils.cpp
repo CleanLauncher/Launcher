@@ -102,7 +102,6 @@ QString hash(QIODevice* device, Algorithm type)
             alg = QCryptographicHash::Algorithm::Sha512;
             break;
         case Algorithm::Murmur2: {
-
             auto should_filter_out = [](char c) { return (c == 9 || c == 10 || c == 13 || c == 32); };
             auto reader = std::make_unique<QIODeviceReader>(device);
             auto result = QString::number(Murmur2::hash(reader.get(), 4 * MiB, should_filter_out));
@@ -162,4 +161,4 @@ bool Hasher::abort()
     }
     return false;
 }
-}
+}  // namespace Hashing

@@ -185,7 +185,6 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
 
         auto dataV = skinObj.value("data");
         if (dataV.isString()) {
-
             out.skin.data = QByteArray::fromBase64(dataV.toString().toLatin1());
         } else if (!dataV.isUndefined()) {
             qWarning() << "skin data is something unexpected";
@@ -221,7 +220,6 @@ MinecraftProfile profileFromJSONV3(const QJsonObject& parent, const char* tokenN
 
             auto dataV = capeObj.value("data");
             if (dataV.isString()) {
-
                 cape.data = QByteArray::fromBase64(dataV.toString().toLatin1());
             } else if (!dataV.isUndefined()) {
                 qWarning() << "cape data is something unexpected";
@@ -275,7 +273,7 @@ bool entitlementFromJSONV3(const QJsonObject& parent, MinecraftEntitlement& out)
     return true;
 }
 
-}
+}  // namespace
 
 bool AccountData::resumeStateFromV3(QJsonObject data)
 {

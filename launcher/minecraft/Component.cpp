@@ -84,7 +84,6 @@ std::shared_ptr<Meta::Version> Component::getMeta()
 
 void Component::applyTo(LaunchProfile* profile)
 {
-
     if (!isEnabled()) {
         return;
     }
@@ -107,7 +106,6 @@ std::shared_ptr<class VersionFile> Component::getVersionFile() const
 
 std::shared_ptr<class Meta::VersionList> Component::getVersionList() const
 {
-
     if (APPLICATION->metadataIndex()->hasUid(m_uid)) {
         return APPLICATION->metadataIndex()->get(m_uid);
     }
@@ -218,7 +216,6 @@ bool Component::isRevertible()
 
 bool Component::isMoveable()
 {
-
     return true;
 }
 
@@ -303,26 +300,20 @@ void Component::setVersion(const QString& version)
     }
     m_version = version;
     if (m_loaded) {
-
         if (m_file) {
-
         } else {
-
             m_cachedVersion = version;
 
             auto metaVersion = APPLICATION->metadataIndex()->get(m_uid, version);
             if (metaVersion->isLoaded()) {
-
                 m_metaVersion = metaVersion;
             } else {
-
                 m_metaVersion.reset();
                 m_loaded = false;
             }
             updateCachedData();
         }
     } else {
-
     }
     emit dataChanged();
 }
@@ -364,7 +355,6 @@ bool Component::customize()
 bool Component::revert()
 {
     if (!isCustom()) {
-
         return true;
     }
     auto filename = getFilename();
@@ -374,7 +364,6 @@ bool Component::revert()
         result = FS::deletePath(filename);
     }
     if (result) {
-
         m_file.reset();
 
         auto version = APPLICATION->metadataIndex()->get(m_uid, m_version);
@@ -391,7 +380,6 @@ bool Component::revert()
 
 static bool deepCompare(const std::set<Meta::Require>& a, const std::set<Meta::Require>& b)
 {
-
     if (a.size() != b.size()) {
         return false;
     }
@@ -437,7 +425,6 @@ void Component::updateCachedData()
             emit dataChanged();
         }
     } else {
-
         m_cachedRequires.clear();
         m_cachedConflicts.clear();
         emit dataChanged();
@@ -448,7 +435,6 @@ void Component::waitLoadMeta()
 {
     if (!m_loaded) {
         if (!m_metaVersion || !m_metaVersion->isLoaded()) {
-
             m_metaVersion = APPLICATION->metadataIndex()->getLoadedVersion(m_uid, m_version);
         }
         m_loaded = true;

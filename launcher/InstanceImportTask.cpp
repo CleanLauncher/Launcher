@@ -136,12 +136,10 @@ void InstanceImportTask::processZipPack()
         }
         auto fileName = f->filename();
         if (fileName == "modrinth.index.json") {
-
             qDebug() << "Modrinth:" << true;
             m_modpackType = ModpackType::Modrinth;
             stop = true;
         } else if (fileName == "bin/modpack.jar" || fileName == "bin/version.json") {
-
             qDebug() << "Technic:" << true;
             extractDir.mkpath("minecraft");
             extractDir.cd("minecraft");
@@ -213,10 +211,8 @@ void InstanceImportTask::extractFinished()
         auto permissions = QFile::permissions(filepath);
         auto origPermissions = permissions;
         if (file.isDir()) {
-
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {
-
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser;
         }
         if (origPermissions != permissions) {
@@ -255,7 +251,6 @@ bool installIcon(QString root, QString instIconKey)
     if (importIconPath.isNull() || !QFile::exists(importIconPath))
         importIconPath = IconUtils::findBestIconIn(FS::PathCombine(root, "overrides"), "icon.png");
     if (!importIconPath.isNull() && QFile::exists(importIconPath)) {
-
         auto iconList = APPLICATION->icons();
         if (iconList->iconFileExists(instIconKey)) {
             iconList->deleteIcon(instIconKey);
@@ -286,7 +281,6 @@ void InstanceImportTask::processFlame()
         inst_creation_task =
             makeShared<FlameCreationTask>(m_stagingPath, m_globalSettings, m_parent, pack_id, pack_version_id, original_instance_id);
     } else {
-
         inst_creation_task = makeShared<FlameCreationTask>(m_stagingPath, m_globalSettings, m_parent, QString(), QString());
     }
 

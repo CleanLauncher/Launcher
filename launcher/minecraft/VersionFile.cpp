@@ -53,7 +53,6 @@ static bool isMinecraftVersion(const QString& uid)
 
 void VersionFile::applyTo(LaunchProfile* profile, const RuntimeContext& runtimeContext)
 {
-
     if (isMinecraftVersion(uid)) {
         profile->applyMinecraftVersion(version);
         profile->applyMinecraftVersionType(type);

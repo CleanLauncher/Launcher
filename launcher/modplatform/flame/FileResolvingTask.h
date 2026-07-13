@@ -45,4 +45,4 @@ class FileResolvingTask : public Task {
     Flame::Manifest m_manifest;
     Task::Ptr m_task;
 };
-}
+}  // namespace Flame

@@ -65,7 +65,6 @@ void ResourceFolderLoadTask::executeTask()
     }
 
     if (m_is_indexed) {
-
         getFromMetadata();
     }
 

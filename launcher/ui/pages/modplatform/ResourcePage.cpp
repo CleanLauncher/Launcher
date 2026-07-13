@@ -143,7 +143,6 @@ auto ResourcePage::eventFilter(QObject* watched, QEvent* event) -> bool
             m_searchTimer.start(350);
 
         } else if (watched == m_ui->packView) {
-
             if (keyEvent->key() == Qt::Key_Return) {
                 onResourceToggle(m_ui->packView->currentIndex());
                 keyEvent->accept();
@@ -471,7 +470,6 @@ void ResourcePage::onResourceToggle(const QModelIndex& index)
         variant.setValue(pack);
         m_model->setData(index, variant, Qt::UserRole);
     } else {
-
         m_enableQueue.insert(index.row());
 
         if (!isSelected) {
@@ -482,7 +480,6 @@ void ResourcePage::onResourceToggle(const QModelIndex& index)
 
 void ResourcePage::openUrl(const QUrl& url)
 {
-
     if (!(url.scheme() == "http" || url.scheme() == "https")) {
         qWarning() << "Unsupported scheme" << url.scheme();
         return;
@@ -594,4 +591,4 @@ void ResourcePage::openProject(const QVariant& projectID)
         jump();
     }
 }
-}
+}  // namespace ResourceDownload

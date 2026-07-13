@@ -125,7 +125,6 @@ void PackInstallTask::install()
     progress(3, 4);
     QDir unzipMcDir(m_stagingPath + "/unzip/minecraft");
     if (unzipMcDir.exists()) {
-
         if (!FS::move(m_stagingPath + "/unzip/minecraft", m_stagingPath + "/minecraft")) {
             emitFailed(tr("Failed to move unpacked Minecraft!"));
             return;
@@ -187,7 +186,6 @@ void PackInstallTask::install()
         FS::deletePath(m_stagingPath + "/unzip");
 
         if (fallback) {
-
             emitFailed(tr("No installation method found!"));
             return;
         }
@@ -216,4 +214,4 @@ bool PackInstallTask::abort()
     return InstanceTask::abort();
 }
 
-}
+}  // namespace LegacyFTB

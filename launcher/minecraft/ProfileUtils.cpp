@@ -167,4 +167,4 @@ void removeLwjglFromPatch(VersionFilePtr patch)
     };
     filter(patch->libraries);
 }
-}
+}  // namespace ProfileUtils

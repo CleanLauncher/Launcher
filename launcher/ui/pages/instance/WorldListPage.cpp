@@ -76,7 +76,6 @@ class WorldListProxyModel : public QSortFilterProxyModel {
             WorldList* worlds = qobject_cast<WorldList*>(sourceModel());
             auto iconFile = worlds->data(sourceIndex, WorldList::IconFileRole).toString();
             if (iconFile.isNull()) {
-
                 return QIcon::fromTheme("unknown_server");
             }
             return QIcon(iconFile);

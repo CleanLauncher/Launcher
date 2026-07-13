@@ -6,7 +6,6 @@ MinecraftLoadAndCheck::MinecraftLoadAndCheck(MinecraftInstance* inst, Net::Mode 
 
 void MinecraftLoadAndCheck::executeTask()
 {
-
     auto components = m_inst->getPackProfile();
     if (auto result = components->reload(m_netmode); !result) {
         emitFailed(result.error);

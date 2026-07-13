@@ -26,4 +26,4 @@ class FlameTexturePackModel : public TexturePackResourceModel {
     ResourceAPI::VersionSearchArgs createVersionsArguments(const QModelIndex&) override;
 };
 
-}
+}  // namespace ResourceDownload

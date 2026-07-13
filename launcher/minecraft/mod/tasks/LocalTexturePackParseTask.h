@@ -41,7 +41,7 @@ bool processPackPNG(const TexturePack& pack, QByteArray&& raw_data);
 bool processPackPNG(const TexturePack& pack);
 
 bool validate(QFileInfo file);
-}
+}  // namespace TexturePackUtils
 
 class LocalTexturePackParseTask : public Task {
     Q_OBJECT
