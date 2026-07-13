@@ -19,24 +19,16 @@ permissions: {}
 jobs:
   blocked_status:
     name: Check Blocked Status
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
 
     steps:
-      - name: Generate token
-        id: generate-token
-        uses: actions/create-github-app-token@v3
-        with:
-          app-id: ${{ vars.PULL_REQUEST_APP_ID }}
-          private-key: ${{ secrets.PULL_REQUEST_APP_PRIVATE_KEY }}
-
       - name: Setup From Dispatch Event
         if: github.event_name == 'workflow_dispatch'
         id: dispatch_event_setup
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ inputs.pr_id }}
         run: |
-          # setup env for the rest of the workflow
           OWNER=$(dirname "${{ github.repository }}")
           REPO=$(basename "${{ github.repository }}")
           PR_JSON=$(
@@ -52,7 +44,6 @@ jobs:
         env:
           EVENT_PR_JSON: ${{ toJSON(github.event.pull_request) }}
         run: |
-          # setup env for the rest of the workflow
           PR_JSON=${PR_JSON:-"$EVENT_PR_JSON"}
           {
             echo "REPO=$(jq -r '.base.repo.name' <<< "$PR_JSON")"
@@ -71,7 +62,6 @@ jobs:
               }
             ' <<< "$PR_JSON")"
           } >> "$GITHUB_ENV"
-
 
       - name: Find Blocked/Stacked PRs in body
         id: pr_ids
@@ -112,7 +102,7 @@ jobs:
         id: blocking_data
         if: fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BLOCKING_PRS: ${{ steps.pr_ids.outputs.prs }}
         run: |
           blocked_pr_data=$(
@@ -121,8 +111,7 @@ jobs:
                 -H "Accept: application/vnd.github+json" \
                 -H "X-GitHub-Api-Version: 2022-11-28" \
                 "/repos/$OWNER/$REPO/pulls/$(jq -r '.number' <<< "$pr_data")" \
-                | jq -c --arg type "$(jq -r '.type' <<< "$pr_data")" \
-                  '
+                | jq -c --arg type "$(jq -r '.type' <<< "$pr_data")" '
                     . | {
                       "type": $type,
                       "number": .number,
@@ -155,7 +144,7 @@ jobs:
         if: "(fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0) && !contains(fromJSON(env.JOB_DATA).prLabels, 'status: blocked') && !fromJSON(steps.blocking_data.outputs.all_merged)"
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh -R ${{ github.repository }} issue edit --add-label 'status: blocked' "$PR_NUMBER"
 
@@ -164,7 +153,7 @@ jobs:
         if: fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0 && fromJSON(steps.blocking_data.outputs.all_merged)
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh -R ${{ github.repository }} issue edit --remove-label 'status: blocked' "$PR_NUMBER"
 
@@ -173,7 +162,7 @@ jobs:
         if: fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BLOCKING_ISSUES: ${{ steps.blocking_data.outputs.current_blocking }}
         run: |
           while read -r pr ; do
@@ -185,11 +174,10 @@ jobs:
         if: fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BLOCKING_DATA: ${{ steps.blocking_data.outputs.data }}
         run: |
           pr_head_sha=$(jq -r '.prHeadSha' <<< "$JOB_DATA")
-          # create commit Status, overwrites previous identical context
           while read -r pr_data ; do
             DESC=$(
               jq -r 'if .type == "Stacked on" then
@@ -243,15 +231,14 @@ jobs:
             echo 'EOF';
           } >> "$GITHUB_OUTPUT"
 
-      - name: 💬 PR Comment
+      - name: PR Comment
         if: fromJSON(steps.pr_ids.outputs.prs).numBlocking > 0
         continue-on-error: true
         env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COMMENT_BODY: ${{ steps.generate-comment.outputs.body }}
         run: |
           gh -R ${{ github.repository }} issue comment "$PR_NUMBER" \
             --body "$COMMENT_BODY" \
             --create-if-none \
             --edit-last
-
