@@ -96,7 +96,7 @@
             ```
 
             Feel free to ask any questions on our GitHub Issues:
-              - https://github.com/CleanLauncher/Launcher/issues
+              - https://github.com/CLauncherOrg/Launcher/issues
 
             And thanks for helping out :)
           '';
