@@ -354,6 +354,7 @@ void WorldListPage::mceditState(LoggedProcess::State state)
         case LoggedProcess::Crashed:
         case LoggedProcess::Aborted: {
             failed = true;
+            [[fallthrough]];
         }
 
         case LoggedProcess::Running:
