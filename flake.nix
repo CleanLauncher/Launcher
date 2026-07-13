@@ -1,12 +1,5 @@
 {
-  description = "A custom launcher for Minecraft that allows you to easily manage multiple installations of Minecraft at once (Fork of MultiMC)";
-
-  nixConfig = {
-    extra-substituters = [ "https://prismlauncher.cachix.org" ];
-    extra-trusted-public-keys = [
-      "prismlauncher.cachix.org-1:9/n/FGyABA2jLUVfY+DEp4hKds/rwO+SCOtbOkDzd+c="
-    ];
-  };
+  description = "CleanLauncher - A clean Minecraft launcher (fork of PineconeMC/PrismLauncher)";
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";

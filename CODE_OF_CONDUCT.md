@@ -1,8 +1,5 @@
 # Contributor Covenant Code of Conduct
 
-This is a modified version of the Contributor Covenant.
-See commit history to see our changes.
-
 ## Our Pledge
 
 We as members, contributors, and leaders pledge to make participation in our
@@ -62,9 +59,10 @@ representative at an online or offline event.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be
-reported to the community leaders responsible for enforcement via email at
-[coc@scrumplex.net](mailto:coc@scrumplex.net) (Email
-address subject to change).
+reported to the community leaders responsible for enforcement via GitHub Issues.
+Please open an issue in the repository describing the behavior. Do not include
+sensitive personal information.
+
 All complaints will be reviewed and investigated promptly and fairly.
 
 All community leaders are obligated to respect the privacy and security of the
