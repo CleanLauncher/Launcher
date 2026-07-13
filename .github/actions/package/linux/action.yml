@@ -58,6 +58,8 @@ runs:
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "$INSTALL_APPIMAGE_DIR"
 
         cp "$BUILD_DIR/program_info/io.github.launcher.Launcher.desktop" "$INSTALL_APPIMAGE_DIR/"
+        cp "${{ github.workspace }}/program_info/io.github.launcher.Launcher_256.png" "$INSTALL_APPIMAGE_DIR/io.github.launcher.Launcher.png"
+        cp "${{ github.workspace }}/program_info/io.github.launcher.Launcher.svg" "$INSTALL_APPIMAGE_DIR/io.github.launcher.Launcher.svg"
 
         sharun lib4bin \
           --hard-links \
