@@ -57,6 +57,8 @@ runs:
       run: |
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "$INSTALL_APPIMAGE_DIR"
 
+        cp "$BUILD_DIR/program_info/io.github.launcher.Launcher.desktop" "$INSTALL_APPIMAGE_DIR/"
+
         sharun lib4bin \
           --hard-links \
           --with-hooks \

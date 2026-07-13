@@ -93,8 +93,10 @@ runs:
         host_machine="$(uname -m)"
         case "$os_name" in
           linux)
-            QT_HOST="linux"
-            QT_ARCH="linux_gcc_64"
+            case "$host_machine" in
+              aarch64) QT_HOST="linux_arm64"; QT_ARCH="gcc_arm64" ;;
+              *)       QT_HOST="linux";      QT_ARCH="linux_gcc_64" ;;
+            esac
             ;;
           darwin)
             QT_HOST="mac"
@@ -103,7 +105,12 @@ runs:
           *)
             QT_HOST="windows"
             case "${{ inputs.vcvars-arch }}" in
-              arm64) QT_ARCH="win64_msvc2022_arm64_cross_compiled" ;;
+              arm64)
+                QT_ARCH="win64_msvc2022_64"
+                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
+                  -O "$GITHUB_WORKSPACE/qt" \
+                  -m qtimageformats qtnetworkauth
+                ;;
               *)     QT_ARCH="win64_msvc2022_64" ;;
             esac
             ;;

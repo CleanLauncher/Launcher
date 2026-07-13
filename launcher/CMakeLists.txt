@@ -1270,7 +1270,10 @@ endif()
 target_link_libraries(${Launcher_Name} Launcher_logic)
 
 if(DEFINED Launcher_APP_BINARY_NAME)
-    set_target_properties(${Launcher_Name} PROPERTIES OUTPUT_NAME "${Launcher_APP_BINARY_NAME}")
+    set_target_properties(${Launcher_Name} PROPERTIES
+        OUTPUT_NAME "${Launcher_APP_BINARY_NAME}"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    )
 endif()
 if(DEFINED Launcher_BINARY_RPATH)
     SET_TARGET_PROPERTIES(${Launcher_Name} PROPERTIES INSTALL_RPATH "${Launcher_BINARY_RPATH}")

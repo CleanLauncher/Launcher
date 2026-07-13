@@ -54,6 +54,20 @@ runs:
         install: >-
           mingw-w64-${{ inputs.msystem == 'CLANG64' && 'clang-x86_64' || inputs.msystem == 'CLANGARM64' && 'clang-aarch64' || inputs.msystem == 'MINGW64' && 'x86_64' || 'ucrt-x86_64' }}-toolchain
 
+    - name: Set MSYS2 compiler for CMake (MinGW)
+      if: ${{ inputs.msystem != '' }}
+      shell: bash
+      run: |
+        case "${{ inputs.msystem }}" in
+          CLANG64)    CC="clang" CXX="clang++" ;;
+          CLANGARM64) CC="clang" CXX="clang++" ;;
+          MINGW64)    CC="gcc"   CXX="g++" ;;
+          UCRT64)     CC="gcc"   CXX="g++" ;;
+        esac
+        MSYS2_BIN="$(cygpath -u "C:/msys64/${{ inputs.msystem == 'CLANG64' && 'clang64' || inputs.msystem == 'CLANGARM64' && 'clangarm64' || inputs.msystem == 'MINGW64' && 'mingw64' || 'ucrt64' }}/bin")"
+        echo "CC=$MSYS2_BIN/$CC" >> "$GITHUB_ENV"
+        echo "CXX=$MSYS2_BIN/$CXX" >> "$GITHUB_ENV"
+
     - name: Install MSYS2 packages (MinGW)
       if: ${{ inputs.msystem != '' }}
       shell: msys2 {0}
