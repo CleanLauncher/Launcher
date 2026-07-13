@@ -90,7 +90,18 @@ runs:
           MINGW64)    SUBDIR="mingw64"; CC="gcc.exe"; CXX="g++.exe" ;;
           UCRT64)     SUBDIR="ucrt64"; CC="gcc.exe"; CXX="g++.exe" ;;
         esac
-        MSYS2_BIN="C:/msys64/$SUBDIR/bin"
+        if [ -d "C:/msys64/$SUBDIR/bin" ]; then
+          MSYS2_BIN="C:/msys64/$SUBDIR/bin"
+        elif [ -d "D:/a/_temp/msys64/$SUBDIR/bin" ]; then
+          MSYS2_BIN="D:/a/_temp/msys64/$SUBDIR/bin"
+        else
+          MSYS2_BIN="$(find /c/msys64 /d/a -maxdepth 4 -path "*/$SUBDIR/bin/$CC" 2>/dev/null | head -1 | xargs dirname 2>/dev/null || true)"
+        fi
+        if [ -z "$MSYS2_BIN" ] || [ ! -f "$MSYS2_BIN/$CC" ]; then
+          echo "::error::MSYS2 compiler not found at $MSYS2_BIN/$CC"
+          find /c/msys64 -name "clang.exe" -o -name "gcc.exe" 2>/dev/null | head -5
+          exit 1
+        fi
         echo "$MSYS2_BIN" >> "$GITHUB_PATH"
         echo "CC=$MSYS2_BIN/$CC" >> "$GITHUB_ENV"
         echo "CXX=$MSYS2_BIN/$CXX" >> "$GITHUB_ENV"
