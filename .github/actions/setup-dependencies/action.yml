@@ -93,33 +93,29 @@ runs:
         host_machine="$(uname -m)"
         case "$os_name" in
           linux)
-            HOST_ARCH="linux"
             case "$host_machine" in
-              x86_64)  QT_ARCH="linux_gcc_64" ;;
-              aarch64) QT_ARCH="linux_gcc_arm64" ;;
-              *)       QT_ARCH="linux_gcc_64" ;;
+              aarch64) QT_HOST="linux_arm64"; QT_ARCH="gcc_arm64" ;;
+              *)       QT_HOST="linux";      QT_ARCH="gcc_64" ;;
             esac
             ;;
           darwin)
-            HOST_ARCH="mac"
-            case "$host_machine" in
-              x86_64)  QT_ARCH="macos" ;;
-              arm64)   QT_ARCH="macos" ;;
-              *)       QT_ARCH="macos" ;;
-            esac
+            QT_HOST="mac"
+            QT_ARCH="clang_64"
             ;;
           *)
-            HOST_ARCH="windows"
-            QT_ARCH="${{ inputs.vcvars-arch == 'arm64' && 'win64_msvc2019_arm64' || 'win64_msvc2019_64' }}"
+            QT_HOST="windows"
+            case "${{ inputs.vcvars-arch }}" in
+              arm64) QT_ARCH="win64_msvc2019_arm64" ;;
+              *)     QT_ARCH="win64_msvc2019_64" ;;
+            esac
             ;;
         esac
 
-        aqt install-qt "$HOST_ARCH" desktop "${{ inputs.qt-version }}" \
-          -a "$QT_ARCH" \
+        aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
           -O "$GITHUB_WORKSPACE/qt" \
           -m qtimageformats qtnetworkauth
 
-        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${HOST_ARCH}_64"
+        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/clang_64"
         fi
