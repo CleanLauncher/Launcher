@@ -34,7 +34,7 @@
 #include <QUrl>
 #include <memory>
 
-#define CLEANLAUNCHER_EXTERNAL_EXE
+#define LAUNCHER_EXTERNAL_EXE
 #include "FileSystem.h"
 
 class FileLinkApp : public QCoreApplication {

@@ -83,11 +83,11 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
     // Command line parsing
     QCommandLineParser parser;
-    parser.setApplicationDescription(QObject::tr("An auto-updater for CleanLauncher"));
+    parser.setApplicationDescription(QObject::tr("An auto-updater for Launcher"));
 
     parser.addOptions(
         { { { "d", "dir" }, tr("Use a custom path as application root (use '.' for current directory)."), tr("directory") },
-          { { "V", "cleanlauncher-version" },
+          { { "V", "launcher-version" },
             tr("Use this version as the installed launcher version. (provided because stdout can not be reliably captured on windows)"),
             tr("installed launcher version") },
           { { "I", "install-version" }, "Install a specific version.", tr("version name") },
@@ -129,7 +129,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     // change folder
     QString dirParam = parser.value("dir");
     if (!dirParam.isEmpty()) {
-        // the dir param. it makes cleanlauncher data path point to whatever the user specified
+        // the dir param. it makes launcher data path point to whatever the user specified
         // on command line
         adjustedBy = "Command line";
         m_dataPath = dirParam;
@@ -169,7 +169,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 #endif
     }
 
-    m_updateLogPath = FS::PathCombine(m_dataPath, "logs", "clean_launcher_update.log");
+    m_updateLogPath = FS::PathCombine(m_dataPath, "logs", "launcher_update.log");
 
     {  // setup logging
         FS::ensureFolderPathExists(FS::PathCombine(m_dataPath, "logs"));
@@ -326,7 +326,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     m_selectUI = parser.isSet("select-ui");
     m_allowDowngrade = parser.isSet("allow-downgrade");
 
-    auto version = parser.value("cleanlauncher-version");
+    auto version = parser.value("launcher-version");
     if (!version.isEmpty()) {
         if (version.contains('-')) {
             auto index = version.indexOf('-');
@@ -346,7 +346,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
     m_allowPreRelease = parser.isSet("pre-release");
 
-    auto marker_file_path = QDir(m_rootPath).absoluteFilePath(".clean_launcher_updater_unpack.marker");
+    auto marker_file_path = QDir(m_rootPath).absoluteFilePath(".launcher_updater_unpack.marker");
     auto marker_file = QFileInfo(marker_file_path);
     if (marker_file.exists()) {
         auto target_dir = QString(FS::read(marker_file_path)).trimmed();
@@ -448,7 +448,7 @@ void UpdaterApp::run()
 
     if (m_isFlatpak) {
         showFatalErrorMessage(tr("Updating flatpack not supported"), tr("Actions outside of checking if an update is available are not "
-                                                                        "supported when running the flatpak version of CleanLauncher."));
+                                                                        "supported when running the flatpak version of Launcher."));
         return;
     }
     if (m_isAppimage) {
@@ -571,14 +571,14 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
 
     if (error) {
         logUpdate(tr("There were errors installing the update."));
-        auto fail_marker = FS::PathCombine(m_dataPath, ".clean_launcher_update.fail");
+        auto fail_marker = FS::PathCombine(m_dataPath, ".launcher_update.fail");
         FS::copy(m_updateLogPath, fail_marker).overwrite(true)();
     } else {
         logUpdate(tr("Update succeed."));
-        auto success_marker = FS::PathCombine(m_dataPath, ".clean_launcher_update.success");
+        auto success_marker = FS::PathCombine(m_dataPath, ".launcher_update.success");
         FS::copy(m_updateLogPath, success_marker).overwrite(true)();
     }
-    auto update_lock_path = FS::PathCombine(m_dataPath, ".clean_launcher_update.lock");
+    auto update_lock_path = FS::PathCombine(m_dataPath, ".launcher_update.lock");
     FS::deletePath(update_lock_path);
 
     QProcess proc;
@@ -851,7 +851,7 @@ bool write_lock_file(const QString& path, QDateTime timestamp, QString from, QSt
 void UpdaterApp::performInstall(QFileInfo file)
 {
     qDebug() << "starting install";
-    auto update_lock_path = FS::PathCombine(m_dataPath, ".clean_launcher_update.lock");
+    auto update_lock_path = FS::PathCombine(m_dataPath, ".launcher_update.lock");
     QFileInfo update_lock(update_lock_path);
     if (update_lock.exists()) {
         auto [timestamp, from, to, target, data_path] = read_lock_File(update_lock_path);
@@ -866,7 +866,7 @@ void UpdaterApp::performInstall(QFileInfo file)
                "\n"
                "This likely means that a previous update attempt failed. Please ensure your installation is in working order before "
                "proceeding.\n"
-               "Check the CleanLauncher updater log at: \n"
+               "Check the Launcher updater log at: \n"
                "%7\n"
                "for details on the last update attempt.\n"
                "\n"
@@ -892,7 +892,7 @@ void UpdaterApp::performInstall(QFileInfo file)
     }
     clearUpdateLog();
 
-    auto changelog_path = FS::PathCombine(m_dataPath, ".clean_launcher_update.changelog");
+    auto changelog_path = FS::PathCombine(m_dataPath, ".launcher_update.changelog");
     FS::write(changelog_path, m_install_release.body.toUtf8());
 
     logUpdate(tr("Updating from %1 to %2").arg(m_version).arg(m_install_release.tag_name));
@@ -921,7 +921,7 @@ void UpdaterApp::unpackAndInstall(QFileInfo archive)
     backupAppDir();
 
     if (auto loc = unpackArchive(archive)) {
-        auto marker_file_path = loc.value().absoluteFilePath(".clean_launcher_updater_unpack.marker");
+        auto marker_file_path = loc.value().absoluteFilePath(".launcher_updater_unpack.marker");
         FS::write(marker_file_path, m_rootPath.toUtf8());
 
         QProcess proc = QProcess();
@@ -971,13 +971,13 @@ void UpdaterApp::backupAppDir()
     if (file_list.isEmpty()) {
         // best guess
         if (BuildConfig.BUILD_ARTIFACT.toLower().contains("linux")) {
-            file_list.append({ "ElyCleanLauncher", "bin", "share", "lib" });
+            file_list.append({ "ElyLauncher", "bin", "share", "lib" });
         } else {  // windows by process of elimination
             file_list.append({
                 "jars",
-                "elycleanlauncher.exe",
-                "elycleanlauncher_filelink.exe",
-                "elycleanlauncher_updater.exe",
+                "elylauncher.exe",
+                "elylauncher_filelink.exe",
+                "elylauncher_updater.exe",
                 "qtlogging.ini",
                 "imageformats",
                 "iconengines",
@@ -997,7 +997,7 @@ void UpdaterApp::backupAppDir()
         FS::PathCombine(app_dir.absolutePath(),
                         QStringLiteral("backup_") + QString(m_version).replace(s_replaceRegex, QString("_")) + "-" + m_gitCommit);
     FS::ensureFolderPathExists(backup_dir);
-    auto backup_marker_path = FS::PathCombine(m_dataPath, ".clean_launcher_update_backup_path.txt");
+    auto backup_marker_path = FS::PathCombine(m_dataPath, ".launcher_update_backup_path.txt");
     FS::write(backup_marker_path, backup_dir.toUtf8());
 
     QProgressDialog progress(tr("Backing up install at %1").arg(m_rootPath), "", 0, file_list.length());
@@ -1047,7 +1047,7 @@ void UpdaterApp::backupAppDir()
 
 std::optional<QDir> UpdaterApp::unpackArchive(QFileInfo archive)
 {
-    auto temp_extract_path = FS::PathCombine(m_dataPath, "clean_launcher_update_release");
+    auto temp_extract_path = FS::PathCombine(m_dataPath, "launcher_update_release");
     FS::ensureFolderPathExists(temp_extract_path);
     auto tmp_extract_dir = QDir(temp_extract_path);
 

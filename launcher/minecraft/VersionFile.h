@@ -65,19 +65,19 @@ class VersionFile : public ProblemContainer {
     void applyTo(LaunchProfile* profile, const RuntimeContext& runtimeContext);
 
    public: /* data */
-    /// CleanLauncher: order hint for this version file if no explicit order is set
+    /// Launcher: order hint for this version file if no explicit order is set
     int order = 0;
 
-    /// CleanLauncher: human readable name of this package
+    /// Launcher: human readable name of this package
     QString name;
 
-    /// CleanLauncher: package ID of this package
+    /// Launcher: package ID of this package
     QString uid;
 
-    /// CleanLauncher: version of this package
+    /// Launcher: version of this package
     QString version;
 
-    /// CleanLauncher: DEPRECATED dependency on a Minecraft version
+    /// Launcher: DEPRECATED dependency on a Minecraft version
     QString dependsOnMinecraftVersion;
 
     /// Mojang: DEPRECATED used to version the Mojang version format
@@ -89,13 +89,13 @@ class VersionFile : public ProblemContainer {
     /// Mojang: class to launch Minecraft with
     QString mainClass;
 
-    /// CleanLauncher: class to launch legacy Minecraft with (embed in a custom window)
+    /// Launcher: class to launch legacy Minecraft with (embed in a custom window)
     QString appletClass;
 
     /// Mojang: Minecraft launch arguments (may contain placeholders for variable substitution)
     QString minecraftArguments;
 
-    /// CleanLauncher: Additional JVM launch arguments
+    /// Launcher: Additional JVM launch arguments
     QStringList addnJvmArguments;
 
     /// Mojang: list of compatible java majors
@@ -116,38 +116,38 @@ class VersionFile : public ProblemContainer {
     /// Mojang: DEPRECATED asset group to be used with Minecraft
     QString assets;
 
-    /// CleanLauncher: list of tweaker mod arguments for launchwrapper
+    /// Launcher: list of tweaker mod arguments for launchwrapper
     QStringList addTweakers;
 
     /// Mojang: list of libraries to add to the version
     QList<LibraryPtr> libraries;
 
-    /// CleanLauncher: list of maven files to put in the libraries folder, but not in classpath
+    /// Launcher: list of maven files to put in the libraries folder, but not in classpath
     QList<LibraryPtr> mavenFiles;
 
-    /// CleanLauncher: list of agents to add to JVM arguments
+    /// Launcher: list of agents to add to JVM arguments
     QList<Agent> agents;
 
     /// The main jar (Minecraft version library, normally)
     LibraryPtr mainJar;
 
-    /// CleanLauncher: list of attached traits of this version file - used to enable features
+    /// Launcher: list of attached traits of this version file - used to enable features
     QSet<QString> traits;
 
-    /// CleanLauncher: list of jar mods added to this version
+    /// Launcher: list of jar mods added to this version
     QList<LibraryPtr> jarMods;
 
-    /// CleanLauncher: list of mods added to this version
+    /// Launcher: list of mods added to this version
     QList<LibraryPtr> mods;
 
     /**
-     * CleanLauncher: set of packages this depends on
+     * Launcher: set of packages this depends on
      * NOTE: this is shared with the meta format!!!
      */
     Meta::RequireSet m_requires;
 
     /**
-     * CleanLauncher: set of packages this conflicts with
+     * Launcher: set of packages this conflicts with
      * NOTE: this is shared with the meta format!!!
      */
     Meta::RequireSet conflicts;

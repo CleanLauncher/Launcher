@@ -1,5 +1,5 @@
 name: Setup macOS dependencies
-description: Install and setup dependencies for building CleanLauncher on macOS
+description: Install and setup dependencies for building Launcher on macOS
 
 inputs:
   build-type:

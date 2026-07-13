@@ -39,9 +39,9 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QGroupBox" name="groupBox_pinecone">
+        <widget class="QGroupBox" name="groupBox_servers">
          <property name="title">
-          <string>PineconeMC</string>
+          <string>Launcher</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
@@ -62,7 +62,7 @@
                </sizepolicy>
               </property>
               <property name="text">
-               <string>Set servers to pineconemc.ru</string>
+               <string>Set servers to primary</string>
               </property>
              </widget>
             </item>

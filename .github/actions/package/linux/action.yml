@@ -1,5 +1,5 @@
 name: Package for Linux
-description: Create Linux packages for CleanLauncher
+description: Create Linux packages for Launcher
 
 inputs:
   version:
@@ -63,18 +63,18 @@ runs:
         cp ~/bin/AppImageUpdate.AppImage "$INSTALL_APPIMAGE_DIR"/bin/
         find "$INSTALL_APPIMAGE_DIR" -name '*gamemode*' -exec rm {} +
 
-        echo "CLEANLAUNCHER_DISABLE_GLVULKAN=1" >> "$INSTALL_APPIMAGE_DIR"/.env
+        echo "LAUNCHER_DISABLE_GLVULKAN=1" >> "$INSTALL_APPIMAGE_DIR"/.env
         echo "QT_QPA_PLATFORMTHEME=xdgdesktopportal" >> "$INSTALL_APPIMAGE_DIR"/.env
         mv "$INSTALL_APPIMAGE_DIR"/{sharun,AppRun}
 
         if [[ "${{ github.ref_type }}" == "tag" ]]; then
-          APPIMAGE_DEST="CleanLauncher-Linux-$APPIMAGE_ARCH.AppImage"
+          APPIMAGE_DEST="Launcher-Linux-$APPIMAGE_ARCH.AppImage"
         else
-          APPIMAGE_DEST="CleanLauncher-Linux-$VERSION-${{ inputs.build-type }}-$APPIMAGE_ARCH.AppImage"
+          APPIMAGE_DEST="Launcher-Linux-$VERSION-${{ inputs.build-type }}-$APPIMAGE_ARCH.AppImage"
         fi
 
         mkappimage \
-          --updateinformation "gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|CleanLauncher-Linux-$APPIMAGE_ARCH.AppImage.zsync" \
+          --updateinformation "gh-releases-zsync|${{ github.repository_owner }}|${{ github.event.repository.name }}|latest|Launcher-Linux-$APPIMAGE_ARCH.AppImage.zsync" \
           "$INSTALL_APPIMAGE_DIR" \
           "$APPIMAGE_DEST"
 
@@ -103,22 +103,22 @@ runs:
         done > "$INSTALL_PORTABLE_DIR"/manifest.txt
 
         cd "$INSTALL_PORTABLE_DIR"
-        tar -czf ../CleanLauncher-portable.tar.gz *
+        tar -czf ../Launcher-portable.tar.gz *
 
     - name: Upload binary tarball
       uses: actions/upload-artifact@v7
       with:
-        name: CleanLauncher-${{ inputs.artifact-name }}-Qt6-Portable-${{ inputs.version }}-${{ inputs.build-type }}
-        path: CleanLauncher-portable.tar.gz
+        name: Launcher-${{ inputs.artifact-name }}-Qt6-Portable-${{ inputs.version }}-${{ inputs.build-type }}
+        path: Launcher-portable.tar.gz
 
     - name: Upload AppImage
       uses: actions/upload-artifact@v7
       with:
-        name: CleanLauncher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage
-        path: CleanLauncher-Linux-*${{ env.APPIMAGE_ARCH }}.AppImage
+        name: Launcher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage
+        path: Launcher-Linux-*${{ env.APPIMAGE_ARCH }}.AppImage
 
     - name: Upload AppImage Zsync
       uses: actions/upload-artifact@v7
       with:
-        name: CleanLauncher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage.zsync
-        path: CleanLauncher-Linux-*${{ env.APPIMAGE_ARCH }}.AppImage.zsync
+        name: Launcher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage.zsync
+        path: Launcher-Linux-*${{ env.APPIMAGE_ARCH }}.AppImage.zsync

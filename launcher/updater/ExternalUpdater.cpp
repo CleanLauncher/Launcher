@@ -57,7 +57,7 @@ ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const Q
 {
     priv->appDir = QDir(appDir);
     priv->dataDir = QDir(dataDir);
-    auto settingsFile = priv->dataDir.absoluteFilePath("cleanlauncher_update.cfg");
+    auto settingsFile = priv->dataDir.absoluteFilePath("launcher_update.cfg");
     priv->settings = std::make_unique<QSettings>(settingsFile, QSettings::Format::IniFormat);
     priv->allowBeta = priv->settings->value("allow_beta", false).toBool();
     priv->autoCheck = priv->settings->value("auto_check", true).toBool();

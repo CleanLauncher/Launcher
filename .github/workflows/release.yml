@@ -29,7 +29,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           submodules: "true"
-          path: "CleanLauncher-source"
+          path: "Launcher-source"
 
       - name: Download artifacts
         uses: actions/download-artifact@v8
@@ -41,49 +41,49 @@ jobs:
 
       - name: Package artifacts properly
         run: |
-          mv ${{ github.workspace }}/CleanLauncher-source CleanLauncher-${{ env.VERSION }}
-          mv CleanLauncher-Linux-Qt6-Portable*/CleanLauncher-portable.tar.gz CleanLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv CleanLauncher-Linux-aarch64-Qt6-Portable*/CleanLauncher-portable.tar.gz CleanLauncher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv CleanLauncher-*.AppImage/CleanLauncher-*-x86_64.AppImage CleanLauncher-Linux-x86_64.AppImage
-          mv CleanLauncher-*.AppImage.zsync/CleanLauncher-*-x86_64.AppImage.zsync CleanLauncher-Linux-x86_64.AppImage.zsync
-          mv CleanLauncher-*.AppImage/CleanLauncher-*-aarch64.AppImage CleanLauncher-Linux-aarch64.AppImage
-          mv CleanLauncher-*.AppImage.zsync/CleanLauncher-*-aarch64.AppImage.zsync CleanLauncher-Linux-aarch64.AppImage.zsync
-          mv CleanLauncher-macOS*/CleanLauncher.zip CleanLauncher-macOS-${{ env.VERSION }}.zip
-          mv CleanLauncher-macOS*/CleanLauncher.dmg CleanLauncher-macOS-${{ env.VERSION }}.dmg
+          mv ${{ github.workspace }}/Launcher-source Launcher-${{ env.VERSION }}
+          mv Launcher-Linux-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
+          mv Launcher-Linux-aarch64-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz
+          mv Launcher-*.AppImage/Launcher-*-x86_64.AppImage Launcher-Linux-x86_64.AppImage
+          mv Launcher-*.AppImage.zsync/Launcher-*-x86_64.AppImage.zsync Launcher-Linux-x86_64.AppImage.zsync
+          mv Launcher-*.AppImage/Launcher-*-aarch64.AppImage Launcher-Linux-aarch64.AppImage
+          mv Launcher-*.AppImage.zsync/Launcher-*-aarch64.AppImage.zsync Launcher-Linux-aarch64.AppImage.zsync
+          mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip
+          mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg
 
-          tar --exclude='.git' -czf CleanLauncher-${{ env.VERSION }}.tar.gz CleanLauncher-${{ env.VERSION }}
+          tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
 
-          for d in CleanLauncher-Windows-MSVC*; do
+          for d in Launcher-Windows-MSVC*; do
             cd "${d}" || continue
             ARM64="$(echo -n ${d} | grep -o arm64 || true)"
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="CleanLauncher-Windows-MSVC"
+            NAME="Launcher-Windows-MSVC"
             test -z "${ARM64}" || NAME="${NAME}-arm64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv CleanLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
             test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
             cd ..
           done
 
-          for d in CleanLauncher-Windows-MinGW-w64*; do
+          for d in Launcher-Windows-MinGW-w64*; do
             cd "${d}" || continue
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="CleanLauncher-Windows-MinGW-w64"
+            NAME="Launcher-Windows-MinGW-w64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv CleanLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
             test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
             cd ..
           done
 
-          for d in CleanLauncher-Windows-MinGW-arm64*; do
+          for d in Launcher-Windows-MinGW-arm64*; do
             cd "${d}" || continue
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="CleanLauncher-Windows-MinGW-arm64"
+            NAME="Launcher-Windows-MinGW-arm64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv CleanLauncher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
+            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
             test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
             cd ..
           done
@@ -95,27 +95,27 @@ jobs:
         run: |
           gh release create "${{ github.ref_name }}" \
             --repo "${{ github.repository }}" \
-            --title "CleanLauncher ${{ env.VERSION }}" \
+            --title "Launcher ${{ env.VERSION }}" \
             --draft \
             --generate-notes \
-            CleanLauncher-Linux-x86_64.AppImage \
-            CleanLauncher-Linux-x86_64.AppImage.zsync \
-            CleanLauncher-Linux-aarch64.AppImage \
-            CleanLauncher-Linux-aarch64.AppImage.zsync \
-            "CleanLauncher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
-            "CleanLauncher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
-            "CleanLauncher-Windows-MinGW-w64-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
-            "CleanLauncher-Windows-MinGW-arm64-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MinGW-arm64-Portable-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
-            "CleanLauncher-Windows-MSVC-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MSVC-Portable-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MSVC-Setup-${{ env.VERSION }}.exe" \
-            "CleanLauncher-Windows-MSVC-arm64-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip" \
-            "CleanLauncher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe" \
-            "CleanLauncher-macOS-${{ env.VERSION }}.zip" \
-            "CleanLauncher-macOS-${{ env.VERSION }}.dmg" \
-            "CleanLauncher-${{ env.VERSION }}.tar.gz"
+            Launcher-Linux-x86_64.AppImage \
+            Launcher-Linux-x86_64.AppImage.zsync \
+            Launcher-Linux-aarch64.AppImage \
+            Launcher-Linux-aarch64.AppImage.zsync \
+            "Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
+            "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
+            "Launcher-Windows-MinGW-w64-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
+            "Launcher-Windows-MinGW-arm64-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MinGW-arm64-Portable-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
+            "Launcher-Windows-MSVC-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MSVC-Portable-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MSVC-Setup-${{ env.VERSION }}.exe" \
+            "Launcher-Windows-MSVC-arm64-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip" \
+            "Launcher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe" \
+            "Launcher-macOS-${{ env.VERSION }}.zip" \
+            "Launcher-macOS-${{ env.VERSION }}.dmg" \
+            "Launcher-${{ env.VERSION }}.tar.gz"

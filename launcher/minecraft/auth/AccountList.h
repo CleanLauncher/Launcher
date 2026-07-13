@@ -45,7 +45,7 @@
 
 /*!
  * List of available Mojang accounts.
- * This should be loaded in the background by CleanLauncher on startup.
+ * This should be loaded in the background by Launcher on startup.
  */
 class AccountList : public QAbstractListModel {
     Q_OBJECT

@@ -1,6 +1,6 @@
-# CleanLauncher
+# Launcher
 
-CleanLauncher is a fork of PineconeMC (itself a fork of PrismLauncher), providing a clean and maintained Minecraft launcher experience.
+Launcher is a clean and maintained Minecraft launcher, forked from PrismLauncher.
 
 ## Building
 

@@ -23,7 +23,7 @@
   openal,
   pciutils,
   pipewire,
-  cleanlauncher-unwrapped,
+  launcher-unwrapped,
   stdenv,
   symlinkJoin,
   udev,
@@ -53,13 +53,13 @@ assert lib.assertMsg (
 ) "textToSpeechSupport only has an effect on Linux.";
 
 let
-  cleanlauncher' = cleanlauncher-unwrapped.override { inherit msaClientID; };
+  launcher' = launcher-unwrapped.override { inherit msaClientID; };
 in
 
 symlinkJoin {
-  name = "cleanlauncher-${cleanlauncher'.version}";
+  name = "launcher-${launcher'.version}";
 
-  paths = [ cleanlauncher' ];
+  paths = [ launcher' ];
 
   nativeBuildInputs = [ kdePackages.wrapQtAppsHook ];
 
@@ -115,14 +115,14 @@ symlinkJoin {
       ++ additionalPrograms;
 
     in
-    [ "--prefix PINECONEMC_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}" ]
+    [ "--prefix LAUNCHER_JAVA_PATHS : ${lib.makeSearchPath "bin/java" jdks}" ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [
       "--set LD_LIBRARY_PATH ${addDriverRunpath.driverLink}/lib:${lib.makeLibraryPath runtimeLibs}"
       "--prefix PATH : ${lib.makeBinPath runtimePrograms}"
     ];
 
   meta = {
-    inherit (cleanlauncher'.meta)
+    inherit (launcher'.meta)
       description
       longDescription
       homepage

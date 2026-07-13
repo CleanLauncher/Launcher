@@ -45,7 +45,7 @@ let
 in
 
 stdenv.mkDerivation {
-  pname = "cleanlauncher-unwrapped";
+  pname = "launcher-unwrapped";
   version = "10.0-unstable-${date}";
 
   src = lib.fileset.toSource {
@@ -120,7 +120,7 @@ stdenv.mkDerivation {
       Scrumplex
       getchoo
     ];
-    mainProgram = "cleanlauncher";
+    mainProgram = "launcher";
     platforms = lib.platforms.linux ++ lib.platforms.darwin;
   };
 }

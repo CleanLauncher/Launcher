@@ -1,5 +1,5 @@
 name: Setup Windows dependencies
-description: Install and setup dependencies for building CleanLauncher on Windows
+description: Install and setup dependencies for building Launcher on Windows
 
 inputs:
   build-type:

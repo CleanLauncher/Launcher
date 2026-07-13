@@ -1,5 +1,5 @@
 {
-  description = "CleanLauncher - A clean Minecraft launcher (fork of PineconeMC/PrismLauncher)";
+  description = "Launcher - A clean Minecraft launcher";
 
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixos-unstable/nixexprs.tar.xz";
@@ -85,7 +85,7 @@
           packages' = self.packages.${system};
 
           welcomeMessage = ''
-            Welcome to the CleanLauncher repository! 🌈
+            Welcome to the Launcher repository! 🌈
 
             We just set some things up for you. To get building, you can run:
 
@@ -102,13 +102,13 @@
           '';
 
           # Re-use our package wrapper to wrap our development environment
-          qt-wrapper-env = packages'.cleanlauncher.overrideAttrs (old: {
+          qt-wrapper-env = packages'.launcher.overrideAttrs (old: {
             name = "qt-wrapper-env";
 
             # Required to use script-based makeWrapper below
             strictDeps = true;
 
-            # We don't need/want the unwrapped CleanLauncher package
+            # We don't need/want the unwrapped Launcher package
             paths = [ ];
 
             nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [
@@ -126,9 +126,9 @@
 
         {
           default = mkShell {
-            name = "clean-launcher";
+            name = "launcher";
 
-            inputsFrom = [ packages'.cleanlauncher-unwrapped ];
+            inputsFrom = [ packages'.launcher-unwrapped ];
 
             packages = [
               pkgs.ccache
@@ -154,7 +154,7 @@
             ];
 
             cmakeBuildType = "Debug";
-            cmakeFlags = [ "-GNinja" ] ++ packages'.cleanlauncher-unwrapped.cmakeFlags;
+            cmakeFlags = [ "-GNinja" ] ++ packages'.launcher-unwrapped.cmakeFlags;
             dontFixCmake = true;
 
             shellHook = ''
@@ -185,7 +185,7 @@
         in
 
         {
-          cleanlauncher-unwrapped = prev.callPackage ./nix/unwrapped.nix {
+          launcher-unwrapped = prev.callPackage ./nix/unwrapped.nix {
             inherit (llvm) stdenv;
             inherit
               libnbtplusplus
@@ -193,7 +193,7 @@
               ;
           };
 
-          cleanlauncher = final.callPackage ./nix/wrapper.nix { };
+          launcher = final.callPackage ./nix/wrapper.nix { };
         };
 
       packages = forAllSystems (
@@ -203,12 +203,12 @@
           pkgs = nixpkgsFor.${system};
 
           # Build a scope from our overlay
-          cleanlauncherPackages = lib.makeScope pkgs.newScope (final: self.overlays.default final pkgs);
+          launcherPackages = lib.makeScope pkgs.newScope (final: self.overlays.default final pkgs);
 
           # Grab our packages from it and set the default
           packages = {
-            inherit (cleanlauncherPackages) cleanlauncher-unwrapped cleanlauncher;
-            default = cleanlauncherPackages.cleanlauncher;
+            inherit (launcherPackages) launcher-unwrapped launcher;
+            default = launcherPackages.launcher;
           };
         in
 
@@ -226,11 +226,11 @@
         in
 
         {
-          cleanlauncher-debug = packages'.cleanlauncher.override {
-            cleanlauncher-unwrapped = legacyPackages'.cleanlauncher-unwrapped-debug;
+          launcher-debug = packages'.launcher.override {
+            launcher-unwrapped = legacyPackages'.launcher-unwrapped-debug;
           };
 
-          cleanlauncher-unwrapped-debug = packages'.cleanlauncher-unwrapped.overrideAttrs {
+          launcher-unwrapped-debug = packages'.launcher-unwrapped.overrideAttrs {
             cmakeBuildType = "Debug";
             dontStrip = true;
           };

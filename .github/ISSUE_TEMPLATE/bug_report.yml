@@ -8,8 +8,8 @@ body:
       If you need help with running Minecraft, please visit us on our Discord before making a bug report.
 
       Before submitting a bug report, please make sure you have read this *entire* form, and that:
-      * You have read the FAQ on the [website](https://pineconemc.ru/#faq) ([alternative link](https://github.com/CleanLauncher/Launcher#faq)) and it has not answered your question.
-      * You have read the [CleanLauncher wiki](https://github.com/CleanLauncher/Launcher/wiki) and it has not answered your question.
+      * You have read the FAQ on the [website](https://launcher.github.io/#faq) ([alternative link](https://github.com/CleanLauncher/Launcher#faq)) and it has not answered your question.
+      * You have read the [Launcher wiki](https://github.com/CleanLauncher/Launcher/wiki) and it has not answered your question.
       * Your bug is not caused by Minecraft or any mods you have installed.
       * Your issue has not been reported before, [make sure to use the search function!](https://github.com/CleanLauncher/Launcher/issues)
 
@@ -26,15 +26,15 @@ body:
     - Other
 - type: input
   attributes:
-    label: Version of PineconeMC
-    description: The version of PineconeMC used in the bug report.
-    placeholder: PineconeMC 10.0.6
+    label: Version of Launcher
+    description: The version of Launcher used in the bug report.
+    placeholder: Launcher 10.0.6
   validations:
     required: true
 - type: input
   attributes:
     label: Version of Qt
-    description: The version of Qt used in the bug report. You can find it in Help -> About PineconeMC -> About Qt.
+    description: The version of Qt used in the bug report. You can find it in Help -> About Launcher -> About Qt.
     placeholder: Qt 6.3.0
   validations:
     required: true

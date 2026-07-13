@@ -51,7 +51,7 @@
 
 #include "minecraft/auth/MinecraftAccount.h"
 
-class PineconeNetworkCheck;
+class NetworkCheck;
 class LaunchController;
 class LocalPeer;
 class InstanceWindow;
@@ -305,7 +305,7 @@ class Application : public QApplication {
 
     SetupWizard* m_setupWizard = nullptr;
 
-    std::unique_ptr<PineconeNetworkCheck> m_pineconeNetworkCheck;
+    std::unique_ptr<NetworkCheck> m_networkCheck;
 
    public:
     QString m_detectedGLFWPath;

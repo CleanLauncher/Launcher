@@ -126,7 +126,7 @@ void LauncherPartLaunch::executeTask()
 #else
     args << classPath.join(':');
 #endif
-    args << "org.cleanlauncher.EntryPoint";
+    args << "org.launcher.EntryPoint";
 
     qDebug() << args.join(' ');
 

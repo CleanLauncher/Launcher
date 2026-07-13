@@ -147,8 +147,8 @@ set(NET_SOURCES
     net/NetRequest.cpp
     net/NetRequest.h
 
-    PineconeNetworkCheck.cpp
-    PineconeNetworkCheck.h
+    NetworkCheck.cpp
+    NetworkCheck.h
     net/flame/FetchFlameAPIKey.cpp
     net/flame/FetchFlameAPIKey.h
 )
@@ -191,7 +191,7 @@ set(MAC_UPDATE_SOURCES
     updater/MacSparkleUpdater.mm
 )
 
-set(CLEANLAUNCHER_UPDATE_SOURCES
+set(LAUNCHER_UPDATE_SOURCES
     updater/ExternalUpdater.h
     updater/ExternalUpdater.cpp
 )
@@ -623,7 +623,7 @@ set(LINKEXE_SOURCES
     DesktopServices.cpp
 )
 
-set(CLEANLAUNCHERUPDATER_SOURCES
+set(LAUNCHER_UPDATER_SOURCES
     updater/updater/UpdaterApp.h
     updater/updater/UpdaterApp.cpp
     updater/updater/UpdaterDialogs.h
@@ -684,10 +684,10 @@ set(CLEANLAUNCHERUPDATER_SOURCES
 )
 
 if(WIN32)
-    set(CLEANLAUNCHERUPDATER_SOURCES
+    set(LAUNCHER_UPDATER_SOURCES
         console/WindowsConsole.h
         console/WindowsConsole.cpp
-        ${CLEANLAUNCHERUPDATER_SOURCES}
+        ${LAUNCHER_UPDATER_SOURCES}
     )
 endif()
 
@@ -803,7 +803,7 @@ set(LOGIC_SOURCES
 if(APPLE AND Launcher_ENABLE_UPDATER)
     set (LOGIC_SOURCES ${LOGIC_SOURCES} ${MAC_UPDATE_SOURCES})
 else()
-    set (LOGIC_SOURCES ${LOGIC_SOURCES} ${CLEANLAUNCHER_UPDATE_SOURCES})
+    set (LOGIC_SOURCES ${LOGIC_SOURCES} ${LAUNCHER_UPDATE_SOURCES})
 endif()
 
 SET(LAUNCHER_SOURCES
@@ -1370,14 +1370,14 @@ endif()
 
 if(Launcher_BUILD_UPDATER)
     # Updater
-    add_library(cleanlauncher_updater_logic STATIC ${CLEANLAUNCHERUPDATER_SOURCES} ${TASKS_SOURCES})
-    target_include_directories(cleanlauncher_updater_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    add_library(launcher_updater_logic STATIC ${LAUNCHER_UPDATER_SOURCES} ${TASKS_SOURCES})
+    target_include_directories(launcher_updater_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
     if(${Launcher_USE_PCH})
-        target_precompile_headers(cleanlauncher_updater_logic PRIVATE ${PRECOMPILED_HEADERS})
+        target_precompile_headers(launcher_updater_logic PRIVATE ${PRECOMPILED_HEADERS})
     endif()
 
-    target_link_libraries(cleanlauncher_updater_logic
+    target_link_libraries(launcher_updater_logic
         ${ZLIB_LIBRARIES}
         BuildConfig
         Qt${QT_VERSION_MAJOR}::Widgets
@@ -1387,17 +1387,17 @@ if(Launcher_BUILD_UPDATER)
         cmark::cmark
     )
     if(TARGET PkgConfig::libarchive)
-        target_link_libraries(cleanlauncher_updater_logic PkgConfig::libarchive)
+        target_link_libraries(launcher_updater_logic PkgConfig::libarchive)
     else()
-        target_link_libraries(cleanlauncher_updater_logic LibArchive::LibArchive)
+        target_link_libraries(launcher_updater_logic LibArchive::LibArchive)
     endif()
 
     add_executable("${Launcher_Name}_updater" WIN32 updater/updater/updater_main.cpp)
     target_sources("${Launcher_Name}_updater" PRIVATE updater/updater/updater.exe.manifest)
-    target_link_libraries("${Launcher_Name}_updater" cleanlauncher_updater_logic)
+    target_link_libraries("${Launcher_Name}_updater" launcher_updater_logic)
 
     if(${Launcher_USE_PCH})
-        target_precompile_headers("${Launcher_Name}_updater" REUSE_FROM cleanlauncher_updater_logic)
+        target_precompile_headers("${Launcher_Name}_updater" REUSE_FROM launcher_updater_logic)
     endif()
 
     if(DEFINED Launcher_APP_BINARY_NAME)
@@ -1615,7 +1615,7 @@ if(CLANG_FORMAT)
     message(STATUS "Creating clang-format target")
     add_custom_target(
         clang-format
-        COMMAND ${CLANG_FORMAT} -i --style=file:${CMAKE_SOURCE_DIR}/.clang-format ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${CLEANLAUNCHERUPDATER_SOURCES} ${LINKEXE_SOURCES} ${PRECOMPILED_HEADERS}
+        COMMAND ${CLANG_FORMAT} -i --style=file:${CMAKE_SOURCE_DIR}/.clang-format ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${LAUNCHER_UPDATER_SOURCES} ${LINKEXE_SOURCES} ${PRECOMPILED_HEADERS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 else()

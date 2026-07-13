@@ -49,7 +49,7 @@
 
 #include "Application.h"
 #include "BuildConfig.h"
-#include "PineconeNetworkCheck.h"
+#include "NetworkCheck.h"
 #include "net/PasteUpload.h"
 #include "net/flame/FetchFlameAPIKey.h"
 #include "settings/SettingsObject.h"
@@ -97,19 +97,19 @@ APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
     onAutoServersChanged();
     connect(ui->autoServersCheckBox, &QCheckBox::checkStateChanged, this, &APIPage::onAutoServersChanged);
     connect(ui->setHostedServers, &QPushButton::clicked, this, [this] {
-        constexpr auto key = PineconeNetworkCheck::Result::UsePrimary;
-        ui->metaURL->setText(PineconeNetworkCheck::metaUrls().value(key));
-        ui->legacyFMLLibsURL->setText(PineconeNetworkCheck::fmlLibsUrls().value(key));
+        constexpr auto key = NetworkCheck::Result::UsePrimary;
+        ui->metaURL->setText(NetworkCheck::metaUrls().value(key));
+        ui->legacyFMLLibsURL->setText(NetworkCheck::fmlLibsUrls().value(key));
     });
     connect(ui->setGitHubNew, &QPushButton::clicked, this, [this] {
-        constexpr auto key = PineconeNetworkCheck::Result::UseNewFallback;
-        ui->metaURL->setText(PineconeNetworkCheck::metaUrls().value(key));
-        ui->legacyFMLLibsURL->setText(PineconeNetworkCheck::fmlLibsUrls().value(key));
+        constexpr auto key = NetworkCheck::Result::UseNewFallback;
+        ui->metaURL->setText(NetworkCheck::metaUrls().value(key));
+        ui->legacyFMLLibsURL->setText(NetworkCheck::fmlLibsUrls().value(key));
     });
     connect(ui->setGitHubOld, &QPushButton::clicked, this, [this] {
-        constexpr auto key = PineconeNetworkCheck::Result::UseOldFallback;
-        ui->metaURL->setText(PineconeNetworkCheck::metaUrls().value(key));
-        ui->legacyFMLLibsURL->setText(PineconeNetworkCheck::fmlLibsUrls().value(key));
+        constexpr auto key = NetworkCheck::Result::UseOldFallback;
+        ui->metaURL->setText(NetworkCheck::metaUrls().value(key));
+        ui->legacyFMLLibsURL->setText(NetworkCheck::fmlLibsUrls().value(key));
     });
 
     connect(ui->fetchFlameKey, &QPushButton::clicked, this, [this] {
@@ -209,7 +209,7 @@ void APIPage::loadSettings()
     ui->userAgentLineEdit->setText(customUserAgent);
     ui->technicClientID->setText(s->get("TechnicClientID").toString());
 
-    ui->autoServersCheckBox->setChecked(s->get("PineconeAutoServers").toBool());
+    ui->autoServersCheckBox->setChecked(s->get("AutoServers").toBool());
 }
 
 void APIPage::applySettings()
@@ -262,7 +262,7 @@ void APIPage::applySettings()
     s->set("UserAgentOverride", ui->userAgentLineEdit->text());
     s->set("TechnicClientID", ui->technicClientID->text());
 
-    s->set("PineconeAutoServers", ui->autoServersCheckBox->isChecked());
+    s->set("AutoServers", ui->autoServersCheckBox->isChecked());
 }
 
 bool APIPage::apply()

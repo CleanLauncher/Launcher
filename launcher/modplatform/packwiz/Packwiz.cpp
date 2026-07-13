@@ -224,11 +224,11 @@ void V1::updateModIndex(const QDir& index_dir, Mod& mod)
         auto tbl = toml::table{ { "name", mod.name.toStdString() },
                                 { "filename", mod.filename.toStdString() },
                                 { "side", ModPlatform::SideUtils::toString(mod.side).toStdString() },
-                                { "x-cleanlauncher-loaders", loaders },
-                                { "x-cleanlauncher-mc-versions", mcVersions },
-                                { "x-cleanlauncher-release-type", mod.releaseType.toString().toStdString() },
-                                { "x-cleanlauncher-version-number", mod.version_number.toStdString() },
-                                { "x-cleanlauncher-dependencies", deps },
+                                { "x-launcher-loaders", loaders },
+                                { "x-launcher-mc-versions", mcVersions },
+                                { "x-launcher-release-type", mod.releaseType.toString().toStdString() },
+                                { "x-launcher-version-number", mod.version_number.toStdString() },
+                                { "x-launcher-dependencies", deps },
                                 { "download",
                                   toml::table{
                                       { "mode", mod.mode.toStdString() },
@@ -301,15 +301,15 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
         mod.name = stringEntry(table, "name");
         mod.filename = stringEntry(table, "filename");
         mod.side = ModPlatform::SideUtils::fromString(stringEntry(table, "side"));
-        mod.releaseType = ModPlatform::IndexedVersionType::fromString(table["x-cleanlauncher-release-type"].value_or(""));
-        if (auto loaders = table["x-cleanlauncher-loaders"]; loaders && loaders.is_array()) {
+        mod.releaseType = ModPlatform::IndexedVersionType::fromString(table["x-launcher-release-type"].value_or(""));
+        if (auto loaders = table["x-launcher-loaders"]; loaders && loaders.is_array()) {
             for (auto&& loader : *loaders.as_array()) {
                 if (loader.is_string()) {
                     mod.loaders |= ModPlatform::getModLoaderFromString(QString::fromStdString(loader.as_string()->value_or("")));
                 }
             }
         }
-        if (auto versions = table["x-cleanlauncher-mc-versions"]; versions && versions.is_array()) {
+        if (auto versions = table["x-launcher-mc-versions"]; versions && versions.is_array()) {
             for (auto&& version : *versions.as_array()) {
                 if (version.is_string()) {
                     auto ver = QString::fromStdString(version.as_string()->value_or(""));
@@ -322,7 +322,7 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
             std::ranges::sort(mod.mcVersions, sortMCVersions);
         }
     }
-    mod.version_number = table["x-cleanlauncher-version-number"].value_or("");
+    mod.version_number = table["x-launcher-version-number"].value_or("");
 
     {  // [download] info
         auto download_table = table["download"].as_table();
@@ -361,7 +361,7 @@ auto V1::getIndexForMod(const QDir& index_dir, QString slug) -> Mod
         }
     }
     {  // dependencies
-        auto deps = table["x-cleanlauncher-dependencies"].as_array();
+        auto deps = table["x-launcher-dependencies"].as_array();
         if (deps) {
             for (auto&& depNode : *deps) {
                 auto dep = depNode.as_table();

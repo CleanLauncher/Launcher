@@ -126,9 +126,8 @@
         <file>scalable/instances/fabricmc.svg</file>
         <file>scalable/instances/neoforged.svg</file>
 
-        <!-- PineconeMC branding -->
-        <file>scalable/instances/pineconemc.svg</file>
-        <file>scalable/instances/cleanlauncher.svg</file>
+        <!-- Launcher branding -->
+        <file>scalable/instances/launcher.svg</file>
 
         <!-- Java provider icons (functional) -->
         <file>scalable/adoptium.svg</file>

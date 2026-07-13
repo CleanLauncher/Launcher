@@ -40,7 +40,7 @@
 #include "QObjectPtr.h"
 #include "net/Download.h"
 
-#define CLEANLAUNCHER_EXTERNAL_EXE
+#define LAUNCHER_EXTERNAL_EXE
 #include "FileSystem.h"
 
 #include "GitHubRelease.h"

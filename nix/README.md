@@ -1,8 +1,8 @@
-# Building CleanLauncher with Nix
+# Building Launcher with Nix
 
 ## Building locally
 
-With Nix installed, you can build CleanLauncher directly:
+With Nix installed, you can build Launcher directly:
 
 ```sh
 nix build

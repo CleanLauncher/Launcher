@@ -443,7 +443,7 @@
     <iconset theme="launcher"/>
    </property>
    <property name="text">
-    <string>CleanLauncher (zip)</string>
+    <string>Launcher (zip)</string>
    </property>
   </action>
   <action name="actionExportInstanceMrPack">

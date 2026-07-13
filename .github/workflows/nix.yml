@@ -88,10 +88,10 @@ jobs:
         run: |
           nix build \
             --no-link --print-build-logs --print-out-paths \
-            .#cleanlauncher-debug >> "$GITHUB_STEP_SUMMARY"
+            .#launcher-debug >> "$GITHUB_STEP_SUMMARY"
 
       - name: Build release package
         if: ${{ env.DEBUG == 'false' }}
         run: |
-          nix build --no-link --print-out-paths .#cleanlauncher \
+          nix build --no-link --print-out-paths .#launcher \
             | tee -a "$GITHUB_STEP_SUMMARY"

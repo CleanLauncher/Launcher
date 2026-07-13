@@ -1,6 +1,6 @@
-# Contributing to CleanLauncher
+# Contributing to Launcher
 
-Thank you for your interest in contributing to CleanLauncher!
+Thank you for your interest in contributing to Launcher!
 
 ## Development Setup
 

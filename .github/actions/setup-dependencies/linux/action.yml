@@ -1,5 +1,5 @@
 name: Setup Linux dependencies
-description: Install and setup dependencies for building CleanLauncher
+description: Install and setup dependencies for building Launcher
 
 runs:
   using: composite
