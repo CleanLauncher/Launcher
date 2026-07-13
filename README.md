@@ -11,7 +11,7 @@ The basic steps are:
 1. Clone the repository with submodules:
 
 ```sh
-git clone --recurse-submodules https://github.com/CLauncherOrg/Launcher.git
+git clone --recurse-submodules https://github.com/CleanLauncher/Launcher.git
 cd Launcher
 ```
 

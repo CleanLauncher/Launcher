@@ -114,7 +114,7 @@ stdenv.mkDerivation {
       their own mods, texture packs, saves, etc) and helps you manage them and
       their associated options with a simple interface.
     '';
-    homepage = "https://github.com/CLauncherOrg/Launcher";
+    homepage = "https://github.com/CleanLauncher/Launcher";
     license = lib.licenses.gpl3Only;
     maintainers = with lib.maintainers; [
       Scrumplex
