@@ -206,10 +206,9 @@ class Application : public QApplication {
    signals:
     void updateAllowedChanged(bool status);
     void globalSettingsAboutToOpen();
-    void globalSettingsApplied();
-    int currentCatChanged(int index);
+     void globalSettingsApplied();
 
-    void oauthReplyRecieved(QVariantMap);
+     void oauthReplyRecieved(QVariantMap);
 
     void shouldReloadNews(QString newUrl);
 
