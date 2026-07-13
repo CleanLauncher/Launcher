@@ -76,13 +76,7 @@ jobs:
           cppcheck \
             --enable=warning,style,performance,portability \
             --error-exitcode=1 \
-            --suppress=missingIncludeSystem \
-            --suppress=unknownMacro \
-            --suppress=syntaxError:launcher/minecraft/auth/steps/XboxUserStep.cpp \
-            --suppress=danglingTempReference:launcher/FileIgnoreProxy.cpp \
-            --suppress=unreadVariable:libraries/murmur2/src/MurmurHash2.cpp \
-            --suppress=useInitializationList:libraries/rainbow/src/rainbow.cpp \
-            --suppress=unreadVariable:launcher/GZip.cpp \
+            --suppressions-list=.cppcheck-suppressions \
             --inline-suppr \
             -I libraries/ \
             -I launcher/ \
