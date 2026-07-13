@@ -93,10 +93,8 @@ runs:
         host_machine="$(uname -m)"
         case "$os_name" in
           linux)
-            case "$host_machine" in
-              aarch64) QT_HOST="linux_arm64"; QT_ARCH="gcc_arm64" ;;
-              *)       QT_HOST="linux";      QT_ARCH="gcc_64" ;;
-            esac
+            QT_HOST="linux"
+            QT_ARCH="linux_gcc_64"
             ;;
           darwin)
             QT_HOST="mac"
@@ -105,8 +103,8 @@ runs:
           *)
             QT_HOST="windows"
             case "${{ inputs.vcvars-arch }}" in
-              arm64) QT_ARCH="win64_msvc2019_arm64" ;;
-              *)     QT_ARCH="win64_msvc2019_64" ;;
+              arm64) QT_ARCH="win64_msvc2022_arm64_cross_compiled" ;;
+              *)     QT_ARCH="win64_msvc2022_64" ;;
             esac
             ;;
         esac

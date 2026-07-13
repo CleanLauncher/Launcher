@@ -47,47 +47,38 @@ runs:
 
     - name: Setup MSYS2 (MinGW)
       if: ${{ inputs.msystem != '' }}
-      shell: bash
-      env:
-        MSYSTEM: ${{ inputs.msystem }}
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: ${{ inputs.msystem }}
+        update: true
+        install: >-
+          mingw-w64-${{ inputs.msystem == 'CLANG64' && 'clang-x86_64' || inputs.msystem == 'CLANGARM64' && 'clang-aarch64' || inputs.msystem == 'MINGW64' && 'x86_64' || 'ucrt-x86_64' }}-toolchain
+
+    - name: Install MSYS2 packages (MinGW)
+      if: ${{ inputs.msystem != '' }}
+      shell: msys2 {0}
       run: |
-        echo "C:\msys64\usr\bin" >> "$GITHUB_PATH"
-
-        MSYS_INPUT="${{ inputs.msystem }}"
-        MSYS_INPUT="$(printf '%s' "$MSYS_INPUT" | tr -d '[:space:]')"
-
-        case "$MSYS_INPUT" in
-          CLANG64)    PKG_PREFIX="mingw-w64-clang-x86_64" ;;
-          CLANGARM64) PKG_PREFIX="mingw-w64-clang-aarch64" ;;
-          MINGW64)    PKG_PREFIX="mingw-w64-x86_64" ;;
-          UCRT64)     PKG_PREFIX="mingw-w64-ucrt-x86_64" ;;
-          *)          echo "::error::Unknown msystem: ${{ inputs.msystem }}"; exit 1 ;;
+        case "$MSYSTEM" in
+          CLANG64)    PKG="mingw-w64-clang-x86_64" ;;
+          CLANGARM64) PKG="mingw-w64-clang-aarch64" ;;
+          MINGW64)    PKG="mingw-w64-x86_64" ;;
+          UCRT64)     PKG="mingw-w64-ucrt-x86_64" ;;
+          *)          echo "Unknown msystem: $MSYSTEM"; exit 1 ;;
         esac
 
-        echo "PKG_PREFIX=$PKG_PREFIX" >> "$GITHUB_ENV"
-
-        /c/msys64/usr/bin/bash.exe -lc "pacman -Syu --noconfirm"
-
-        /c/msys64/usr/bin/bash.exe -lc "pacman -S --noconfirm \
-          $PKG_PREFIX-toolchain \
-          $PKG_PREFIX-ccache \
-          $PKG_PREFIX-cmake \
-          $PKG_PREFIX-extra-cmake-modules \
-          $PKG_PREFIX-ninja \
-          $PKG_PREFIX-qt6-base \
-          $PKG_PREFIX-qt6-svg \
-          $PKG_PREFIX-qt6-imageformats \
-          $PKG_PREFIX-qt6-networkauth \
-          $PKG_PREFIX-cmark \
-          $PKG_PREFIX-qrencode \
-          $PKG_PREFIX-tomlplusplus \
-          $PKG_PREFIX-libarchive"
-
-    - name: List pacman packages (MinGW)
-      if: ${{ inputs.msystem != '' }}
-      shell: bash
-      run: |
-        /c/msys64/usr/bin/bash.exe -lc "pacman -Qe"
+        pacman -S --noconfirm \
+          $PKG-cmake \
+          $PKG-extra-cmake-modules \
+          $PKG-ninja \
+          $PKG-qt6-base \
+          $PKG-qt6-svg \
+          $PKG-qt6-imageformats \
+          $PKG-qt6-networkauth \
+          $PKG-cmark \
+          $PKG-qrencode \
+          $PKG-tomlplusplus \
+          $PKG-libarchive \
+          $PKG-ccache
 
     - name: Retrieve ccache cache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
@@ -100,11 +91,9 @@ runs:
 
     - name: Setup ccache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
-      shell: bash
+      shell: msys2 {0}
       run: |
-        /c/msys64/usr/bin/bash.exe -lc "
-          ccache --set-config=cache_dir='${{ github.workspace }}/.ccache'
-          ccache --set-config=max_size='500M'
-          ccache --set-config=compression=true
-          ccache -p
-        "
+        ccache --set-config=cache_dir='${{ github.workspace }}/.ccache'
+        ccache --set-config=max_size='500M'
+        ccache --set-config=compression=true
+        ccache -p

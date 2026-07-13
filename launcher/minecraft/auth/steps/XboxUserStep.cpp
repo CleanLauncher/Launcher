@@ -23,14 +23,13 @@ void XboxUserStep::perform()
         "SiteName": "user.auth.xboxlive.com",
         "RpsTicket": "d=%1"
     },
-    "RelyingParty": "http:
-
+    "RelyingParty": "http://auth.xboxlive.com",
     "TokenType": "JWT"
 }
 )XXX";
     auto xbox_auth_data = xbox_auth_template.arg(m_data->msaToken.token);
 
-    QUrl url("https:
+    QUrl url("https://user.auth.xboxlive.com/user/authenticate");
 
     auto headers = QList<Net::HeaderPair>{
         { "Content-Type", "application/json" },
