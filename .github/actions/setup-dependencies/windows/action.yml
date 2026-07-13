@@ -1,5 +1,5 @@
-name: Setup Windows Dependencies
-description: Install and setup dependencies for building Prism Launcher
+name: Setup Windows dependencies
+description: Install and setup dependencies for building CleanLauncher on Windows
 
 inputs:
   build-type:
@@ -18,41 +18,26 @@ runs:
   using: composite
 
   steps:
-    # NOTE: Installed on MinGW as well for SignTool
-    - name: Enter VS Developer shell
-      if: ${{ runner.os == 'Windows' }}
-      uses: ilammy/msvc-dev-cmd@v1
-      with:
-        arch: ${{ inputs.vcvars-arch }}
-        vsversion: 2022
+    - name: Enter VS Developer shell (MSVC)
+      if: ${{ inputs.msystem == '' }}
+      shell: pwsh
+      run: |
+        $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+        $installPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+        $vcvarsall = Join-Path $installPath "VC\Auxiliary\Build\vcvarsall.bat"
+        cmd /c "`"$vcvarsall`" ${{ inputs.vcvars-arch }} && set" | ForEach-Object {
+          if ($_ -match "^(.+?)=(.*)$") {
+            [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], "Process")
+            "$($matches[1])=$($matches[2])" | Out-File -Append $env:GITHUB_ENV
+          }
+        }
 
     - name: Setup Java (MSVC)
+      if: ${{ inputs.msystem == '' }}
       uses: actions/setup-java@v5
       with:
-        # NOTE(@getchoo): We should probably stay on Zulu.
-        # Temurin doesn't have Java 17 builds for WoA
         distribution: zulu
         java-version: 17
-
-    - name: Setup vcpkg cache (MSVC)
-      if: ${{ inputs.msystem == '' && inputs.build-type == 'Debug' }}
-      shell: pwsh
-      env:
-        USERNAME: ${{ github.repository_owner }}
-        GITHUB_TOKEN: ${{ github.token }}
-        FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      run: |
-        .$(vcpkg fetch nuget) `
-          sources add `
-          -Source "$env:FEED_URL" `
-          -StorePasswordInClearText `
-          -Name GitHubPackages `
-          -UserName "$env:USERNAME" `
-          -Password "$env:GITHUB_TOKEN"
-        .$(vcpkg fetch nuget) `
-          setapikey "$env:GITHUB_TOKEN" `
-          -Source "$env:FEED_URL"
-        "VCPKG_BINARY_SOURCES=clear;nuget,$env:FEED_URL,readwrite" | Out-File -Append $env:GITHUB_ENV
 
     - name: Setup vcpkg environment (MSVC)
       if: ${{ inputs.msystem == '' }}
@@ -62,47 +47,61 @@ runs:
 
     - name: Setup MSYS2 (MinGW)
       if: ${{ inputs.msystem != '' }}
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: ${{ inputs.msystem }}
-        update: true
-        install: >-
-          git
-        pacboy: >-
-          toolchain:p
-          ccache:p
-          cmake:p
-          extra-cmake-modules:p
-          ninja:p
-          qt6-base:p
-          qt6-svg:p
-          qt6-imageformats:p
-          qt6-networkauth:p
-          cmark:p
-          qrencode:p
-          tomlplusplus:p
-          libarchive:p
+      shell: bash
+      env:
+        MSYSTEM: ${{ inputs.msystem }}
+      run: |
+        echo "C:\msys64\usr\bin" >> "$GITHUB_PATH"
+
+        case "${{ inputs.msystem }}" in
+          CLANG64)    PKG_PREFIX="mingw-w64-clang-x86_64" ;;
+          CLANGARM64) PKG_PREFIX="mingw-w64-clang-aarch64" ;;
+          MINGW64)    PKG_PREFIX="mingw-w64-x86_64" ;;
+          UCRT64)     PKG_PREFIX="mingw-w64-ucrt-x86_64" ;;
+          *)          echo "::error::Unknown msystem: ${{ inputs.msystem }}"; exit 1 ;;
+        esac
+
+        echo "PKG_PREFIX=$PKG_PREFIX" >> "$GITHUB_ENV"
+
+        C:\msys64\usr\bin\bash.exe -lc "pacman -Syu --noconfirm"
+
+        C:\msys64\usr\bin\bash.exe -lc "pacman -S --noconfirm \
+          $PKG_PREFIX-toolchain \
+          $PKG_PREFIX-ccache \
+          $PKG_PREFIX-cmake \
+          $PKG_PREFIX-extra-cmake-modules \
+          $PKG_PREFIX-ninja \
+          $PKG_PREFIX-qt6-base \
+          $PKG_PREFIX-qt6-svg \
+          $PKG_PREFIX-qt6-imageformats \
+          $PKG_PREFIX-qt6-networkauth \
+          $PKG_PREFIX-cmark \
+          $PKG_PREFIX-qrencode \
+          $PKG_PREFIX-tomlplusplus \
+          $PKG_PREFIX-libarchive"
 
     - name: List pacman packages (MinGW)
       if: ${{ inputs.msystem != '' }}
-      shell: msys2 {0}
+      shell: bash
       run: |
-        pacman -Qe
+        C:\msys64\usr\bin\bash.exe -lc "pacman -Qe"
 
     - name: Retrieve ccache cache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
-      uses: actions/cache@v5.0.5
+      uses: actions/cache@v5
       with:
         path: '${{ github.workspace }}\.ccache'
-        key: ${{ runner.os }}-mingw-w64-ccache-${{ github.run_id }}
+        key: ${{ runner.os }}-${{ inputs.msystem }}-ccache-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-mingw-w64-ccache
+          ${{ runner.os }}-${{ inputs.msystem }}-ccache
 
     - name: Setup ccache (MinGW)
       if: ${{ inputs.msystem != '' && inputs.build-type == 'Debug' }}
-      shell: msys2 {0}
+      shell: bash
       run: |
-        ccache --set-config=cache_dir='${{ github.workspace }}\.ccache'
-        ccache --set-config=max_size='500M'
-        ccache --set-config=compression=true
-        ccache -p  # Show config
+        C:\msys64\usr\bin\bash.exe -lc "
+          ccache --set-config=cache_dir='${{ github.workspace }}/.ccache'
+          ccache --set-config=max_size='500M'
+          ccache --set-config=compression=true
+          ccache -p
+        "

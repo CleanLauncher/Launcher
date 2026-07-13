@@ -1,5 +1,5 @@
 name: Setup Dependencies
-description: Install and setup dependencies for building PineconeMC
+description: Install and setup dependencies for building CleanLauncher
 
 inputs:
   build-type:
@@ -14,9 +14,6 @@ inputs:
     required: false
   vcvars-arch:
     description: Visual Studio architecture to use
-    required: false
-  qt-architecture:
-    description: Qt architecture
     required: false
   qt-version:
     description: Version of Qt to use
@@ -52,30 +49,65 @@ runs:
         msystem: ${{ inputs.msystem }}
         vcvars-arch: ${{ inputs.vcvars-arch }}
 
-    # TODO(@getchoo): Get this working on MSYS2!
-    - name: Setup ccache
-      if: ${{ (runner.os != 'Windows' || inputs.msystem == '') && inputs.build-type == 'Debug' }}
-      uses: hendrikmuhs/ccache-action@v1.2.23
-      with:
-        variant: sccache
-        create-symlink: ${{ runner.os != 'Windows' }}
-        key: ${{ runner.os }}-${{ runner.arch }}-${{ inputs.artifact-name }}-sccache
-
-    - name: Use ccache on debug builds
-      if: ${{ inputs.build-type == 'Debug' }}
+    - name: Install sccache (non-Windows Debug)
+      if: ${{ runner.os != 'Windows' && inputs.build-type == 'Debug' }}
       shell: bash
-      env:
-        # Only use ccache on MSYS2
-        CCACHE_VARIANT: ${{ (runner.os == 'Windows' && inputs.msystem != '') && 'ccache' || 'sccache' }}
       run: |
-        echo "CMAKE_C_COMPILER_LAUNCHER=$CCACHE_VARIANT" >> "$GITHUB_ENV"
-        echo "CMAKE_CXX_COMPILER_LAUNCHER=$CCACHE_VARIANT" >> "$GITHUB_ENV"
+        SCCACHE_VERSION="v0.10.0"
+        case "$(uname -s)" in
+          Linux)
+            case "$(uname -m)" in
+              x86_64)  SCCACHE_ARCH="x86_64-unknown-linux-musl" ;;
+              aarch64) SCCACHE_ARCH="aarch64-unknown-linux-musl" ;;
+            esac
+            ;;
+          Darwin)
+            SCCACHE_ARCH="aarch64-apple-darwin"
+            ;;
+        esac
+        curl -fsSL "https://github.com/mozilla/sccache/releases/download/${SCCACHE_VERSION}/sccache-${SCCACHE_VERSION}-${SCCACHE_ARCH}.tar.gz" \
+          | tar xz --strip-components=1 -C /usr/local/bin "sccache-${SCCACHE_VERSION}-${SCCACHE_ARCH}/sccache"
+        sccache --version
 
-    - name: Install Qt
+    - name: Set compiler launcher (non-Windows Debug)
+      if: ${{ runner.os != 'Windows' && inputs.build-type == 'Debug' }}
+      shell: bash
+      run: |
+        echo "CMAKE_C_COMPILER_LAUNCHER=sccache" >> "$GITHUB_ENV"
+        echo "CMAKE_CXX_COMPILER_LAUNCHER=sccache" >> "$GITHUB_ENV"
+
+    - name: Set compiler launcher (MSYS2 MinGW Debug)
+      if: ${{ runner.os == 'Windows' && inputs.msystem != '' && inputs.build-type == 'Debug' }}
+      shell: bash
+      run: |
+        echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
+        echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
+
+    - name: Install Qt (non-MSYS2)
       if: ${{ inputs.msystem == '' }}
-      uses: jurplel/install-qt-action@v4
-      with:
-        aqtversion: "==3.1.*"
-        version: ${{ inputs.qt-version }}
-        modules: qtimageformats qtnetworkauth
-        cache: ${{ inputs.build-type == 'Debug' }}
+      shell: bash
+      run: |
+        pip install aqtinstall
+
+        os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
+        case "$os_name" in
+          linux)  HOST_ARCH="linux" ;;
+          darwin) HOST_ARCH="mac" ;;
+        esac
+
+        aqt install-qt "$HOST_ARCH" desktop "${{ inputs.qt-version }}" \
+          -O "$GITHUB_WORKSPACE/qt" \
+          -m qtimageformats qtnetworkauth
+
+        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${HOST_ARCH}_64"
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/clang_64"
+        fi
+        if [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_64"
+        fi
+
+        echo "Qt6_DIR=$QT_ROOT/lib/cmake/Qt6" >> "$GITHUB_ENV"
+        echo "CMAKE_PREFIX_PATH=$QT_ROOT" >> "$GITHUB_ENV"
+        echo "QT_PLUGIN_PATH=$QT_ROOT/plugins" >> "$GITHUB_ENV"
+        echo "$QT_ROOT/bin" >> "$GITHUB_PATH"

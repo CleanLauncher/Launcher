@@ -1,5 +1,5 @@
 name: Setup Linux dependencies
-description: Install and setup dependencies for building Prism Launcher
+description: Install and setup dependencies for building CleanLauncher
 
 runs:
   using: composite
@@ -20,7 +20,8 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        # Determinate AppImage architecture to use
+        mkdir -p ~/bin
+
         dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU)"
         case "$dpkg_arch" in
           "amd64")
@@ -30,7 +31,7 @@ runs:
             APPIMAGE_ARCH="aarch64"
             ;;
           *)
-            echo "# 🚨 The Debian architecture \"$deb_arch\" is not recognized!" >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::Unrecognized Debian architecture: $dpkg_arch"
             exit 1
             ;;
         esac
@@ -40,7 +41,6 @@ runs:
           --pattern "sharun-$APPIMAGE_ARCH-aio" \
           --output ~/bin/sharun
 
-        # FIXME!: revert this to probonopd/go-appimage once https://github.com/probonopd/go-appimage/pull/377 is merged!
         gh release download continuous \
           --repo DioEgizio/go-appimage \
           --pattern "mkappimage-*-$APPIMAGE_ARCH.AppImage" \
@@ -50,5 +50,6 @@ runs:
           --repo AppImageCommunity/AppImageUpdate \
           --pattern "AppImageUpdate-$APPIMAGE_ARCH.AppImage" \
           --output ~/bin/AppImageUpdate.AppImage
+
         chmod +x ~/bin/*
         echo "$HOME/bin" >> "$GITHUB_PATH"
