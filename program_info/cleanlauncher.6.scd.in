@@ -13,15 +13,15 @@
 
 # DESCRIPTION
 
-CleanLauncher is a custom launcher for Minecraft that allows you to easily manage
+@Launcher_CommonName@ is a custom launcher for Minecraft that allows you to easily manage
 multiple installations of Minecraft at once, with integrated support for Ely.by accounts & skin system.
 
-CleanLauncher is not endorsed by Prism Launcher or Ely.by.
+@Launcher_CommonName@ is not endorsed by Prism Launcher or Ely.by.
 
 # OPTIONS
 
 *-d, --dir*=DIRECTORY
-	Use DIRECTORY as the CleanLauncher root.
+	Use DIRECTORY as the @Launcher_CommonName@ root.
 
 *-l, --launch*=INSTANCE_ID
 	Launch the instance specified by INSTANCE_ID.
@@ -30,7 +30,7 @@ CleanLauncher is not endorsed by Prism Launcher or Ely.by.
 	Show the configuration window of the instance specified by INSTANCE_ID.
 
 *--alive*
-	Write a small 'live.check' file after CleanLauncher starts.
+	Write a small 'live.check' file after @Launcher_CommonName@ starts.
 
 *-h, --help*
 	Display help text and exit.

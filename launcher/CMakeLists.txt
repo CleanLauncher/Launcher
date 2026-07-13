@@ -191,9 +191,9 @@ set(MAC_UPDATE_SOURCES
     updater/MacSparkleUpdater.mm
 )
 
-set(PRISM_UPDATE_SOURCES
-    updater/PrismExternalUpdater.h
-    updater/PrismExternalUpdater.cpp
+set(CLEANLAUNCHER_UPDATE_SOURCES
+    updater/ExternalUpdater.h
+    updater/ExternalUpdater.cpp
 )
 
 # Backend for the news bar... there's usually no news.
@@ -623,13 +623,13 @@ set(LINKEXE_SOURCES
     DesktopServices.cpp
 )
 
-set(PRISMUPDATER_SOURCES
-    updater/prismupdater/PrismUpdater.h
-    updater/prismupdater/PrismUpdater.cpp
-    updater/prismupdater/UpdaterDialogs.h
-    updater/prismupdater/UpdaterDialogs.cpp
-    updater/prismupdater/GitHubRelease.h
-    updater/prismupdater/GitHubRelease.cpp
+set(CLEANLAUNCHERUPDATER_SOURCES
+    updater/updater/UpdaterApp.h
+    updater/updater/UpdaterApp.cpp
+    updater/updater/UpdaterDialogs.h
+    updater/updater/UpdaterDialogs.cpp
+    updater/updater/GitHubRelease.h
+    updater/updater/GitHubRelease.cpp
 
     Json.h
     Json.cpp
@@ -684,10 +684,10 @@ set(PRISMUPDATER_SOURCES
 )
 
 if(WIN32)
-    set(PRISMUPDATER_SOURCES
+    set(CLEANLAUNCHERUPDATER_SOURCES
         console/WindowsConsole.h
         console/WindowsConsole.cpp
-        ${PRISMUPDATER_SOURCES}
+        ${CLEANLAUNCHERUPDATER_SOURCES}
     )
 endif()
 
@@ -803,7 +803,7 @@ set(LOGIC_SOURCES
 if(APPLE AND Launcher_ENABLE_UPDATER)
     set (LOGIC_SOURCES ${LOGIC_SOURCES} ${MAC_UPDATE_SOURCES})
 else()
-    set (LOGIC_SOURCES ${LOGIC_SOURCES} ${PRISM_UPDATE_SOURCES})
+    set (LOGIC_SOURCES ${LOGIC_SOURCES} ${CLEANLAUNCHER_UPDATE_SOURCES})
 endif()
 
 SET(LAUNCHER_SOURCES
@@ -1370,14 +1370,14 @@ endif()
 
 if(Launcher_BUILD_UPDATER)
     # Updater
-    add_library(prism_updater_logic STATIC ${PRISMUPDATER_SOURCES} ${TASKS_SOURCES})
-    target_include_directories(prism_updater_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    add_library(cleanlauncher_updater_logic STATIC ${CLEANLAUNCHERUPDATER_SOURCES} ${TASKS_SOURCES})
+    target_include_directories(cleanlauncher_updater_logic PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
     if(${Launcher_USE_PCH})
-        target_precompile_headers(prism_updater_logic PRIVATE ${PRECOMPILED_HEADERS})
+        target_precompile_headers(cleanlauncher_updater_logic PRIVATE ${PRECOMPILED_HEADERS})
     endif()
 
-    target_link_libraries(prism_updater_logic
+    target_link_libraries(cleanlauncher_updater_logic
         ${ZLIB_LIBRARIES}
         BuildConfig
         Qt${QT_VERSION_MAJOR}::Widgets
@@ -1387,17 +1387,17 @@ if(Launcher_BUILD_UPDATER)
         cmark::cmark
     )
     if(TARGET PkgConfig::libarchive)
-        target_link_libraries(prism_updater_logic PkgConfig::libarchive)
+        target_link_libraries(cleanlauncher_updater_logic PkgConfig::libarchive)
     else()
-        target_link_libraries(prism_updater_logic LibArchive::LibArchive)
+        target_link_libraries(cleanlauncher_updater_logic LibArchive::LibArchive)
     endif()
 
-    add_executable("${Launcher_Name}_updater" WIN32 updater/prismupdater/updater_main.cpp)
-    target_sources("${Launcher_Name}_updater" PRIVATE updater/prismupdater/updater.exe.manifest)
-    target_link_libraries("${Launcher_Name}_updater" prism_updater_logic)
+    add_executable("${Launcher_Name}_updater" WIN32 updater/updater/updater_main.cpp)
+    target_sources("${Launcher_Name}_updater" PRIVATE updater/updater/updater.exe.manifest)
+    target_link_libraries("${Launcher_Name}_updater" cleanlauncher_updater_logic)
 
     if(${Launcher_USE_PCH})
-        target_precompile_headers("${Launcher_Name}_updater" REUSE_FROM prism_updater_logic)
+        target_precompile_headers("${Launcher_Name}_updater" REUSE_FROM cleanlauncher_updater_logic)
     endif()
 
     if(DEFINED Launcher_APP_BINARY_NAME)
@@ -1615,7 +1615,7 @@ if(CLANG_FORMAT)
     message(STATUS "Creating clang-format target")
     add_custom_target(
         clang-format
-        COMMAND ${CLANG_FORMAT} -i --style=file:${CMAKE_SOURCE_DIR}/.clang-format ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${PRISMUPDATER_SOURCES} ${LINKEXE_SOURCES} ${PRECOMPILED_HEADERS}
+        COMMAND ${CLANG_FORMAT} -i --style=file:${CMAKE_SOURCE_DIR}/.clang-format ${LOGIC_SOURCES} ${LAUNCHER_SOURCES} ${CLEANLAUNCHERUPDATER_SOURCES} ${LINKEXE_SOURCES} ${PRECOMPILED_HEADERS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     )
 else()

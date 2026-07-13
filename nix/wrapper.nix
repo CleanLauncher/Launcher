@@ -23,7 +23,7 @@
   openal,
   pciutils,
   pipewire,
-  prismlauncher-unwrapped,
+  cleanlauncher-unwrapped,
   stdenv,
   symlinkJoin,
   udev,
@@ -53,13 +53,13 @@ assert lib.assertMsg (
 ) "textToSpeechSupport only has an effect on Linux.";
 
 let
-  prismlauncher' = prismlauncher-unwrapped.override { inherit msaClientID; };
+  cleanlauncher' = cleanlauncher-unwrapped.override { inherit msaClientID; };
 in
 
 symlinkJoin {
-  name = "prismlauncher-${prismlauncher'.version}";
+  name = "cleanlauncher-${cleanlauncher'.version}";
 
-  paths = [ prismlauncher' ];
+  paths = [ cleanlauncher' ];
 
   nativeBuildInputs = [ kdePackages.wrapQtAppsHook ];
 
@@ -122,7 +122,7 @@ symlinkJoin {
     ];
 
   meta = {
-    inherit (prismlauncher'.meta)
+    inherit (cleanlauncher'.meta)
       description
       longDescription
       homepage

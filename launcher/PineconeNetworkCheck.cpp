@@ -29,7 +29,7 @@ PineconeNetworkCheck::PineconeNetworkCheck(QNetworkAccessManager* network)
     static auto s_urlToResult = std::array{
         std::pair{ QUrl("https://pineconemc.ru"), Result::UsePrimary },
         std::pair{ QUrl("https://pineconemc.github.io"), Result::UseNewFallback },
-        std::pair{ QUrl("https://elyprismlauncher.github.io"), Result::UseOldFallback },
+        std::pair{ QUrl("https://elycleanlauncher.github.io"), Result::UseOldFallback },
     };
     for (auto& [url, result] : s_urlToResult) {
         launchRequest(url, result);
@@ -41,7 +41,7 @@ QMap<PineconeNetworkCheck::Result, QString> PineconeNetworkCheck::metaUrls()
     return {
         { Result::UsePrimary, "" },
         { Result::UseNewFallback, "https://pineconemc.github.io/meta/v1/" },
-        { Result::UseOldFallback, "https://elyprismlauncher.github.io/meta/v1/" },
+        { Result::UseOldFallback, "https://elycleanlauncher.github.io/meta/v1/" },
     };
 }
 
@@ -50,7 +50,7 @@ QMap<PineconeNetworkCheck::Result, QString> PineconeNetworkCheck::fmlLibsUrls()
     return {
         { Result::UsePrimary, "" },
         { Result::UseNewFallback, "https://pineconemc.github.io/files/fmllibs/" },
-        { Result::UseOldFallback, "https://elyprismlauncher.github.io/files/fmllibs/" },
+        { Result::UseOldFallback, "https://elycleanlauncher.github.io/files/fmllibs/" },
     };
 }
 
@@ -59,7 +59,7 @@ QMap<PineconeNetworkCheck::Result, QString> PineconeNetworkCheck::newsUrls()
     return {
         { Result::UsePrimary, "" },
         { Result::UseNewFallback, "https://pineconemc.github.io/feed/feed.xml" },
-        { Result::UseOldFallback, "https://elyprismlauncher.github.io/feed/feed.xml" },
+        { Result::UseOldFallback, "https://elycleanlauncher.github.io/feed/feed.xml" },
     };
 }
 
@@ -68,7 +68,7 @@ QMap<PineconeNetworkCheck::Result, QString> PineconeNetworkCheck::translationsUr
     return {
         { Result::UsePrimary, "" },
         { Result::UseNewFallback, "https://pineconemc.github.io/i18n" },
-        { Result::UseOldFallback, "https://elyprismlauncher.github.io/i18n" },
+        { Result::UseOldFallback, "https://elycleanlauncher.github.io/i18n" },
     };
 }
 

@@ -128,7 +128,7 @@
 
         <!-- PineconeMC branding -->
         <file>scalable/instances/pineconemc.svg</file>
-        <file>scalable/instances/prismlauncher.svg</file>
+        <file>scalable/instances/cleanlauncher.svg</file>
 
         <!-- Java provider icons (functional) -->
         <file>scalable/adoptium.svg</file>

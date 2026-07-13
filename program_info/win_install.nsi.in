@@ -11,7 +11,7 @@ Name "@Launcher_DisplayName@"
 InstallDir "$LOCALAPPDATA\Programs\@Launcher_CommonName@"
 InstallDirRegKey HKCU "Software\@Launcher_CommonName@" "InstallDir"
 RequestExecutionLevel user
-OutFile "../PineconeMC-Setup.exe"
+OutFile "../@Launcher_CommonName@-Setup.exe"
 
 !define MUI_ICON "../@Launcher_Branding_ICO@"
 
@@ -394,13 +394,13 @@ Section "@Launcher_DisplayName@"
   WriteRegStr HKCU Software\Classes\curseforge "URL Protocol" ""
   WriteRegStr HKCU Software\Classes\curseforge\shell\open\command "" '"$INSTDIR\@Launcher_APP_BINARY_NAME@.exe" "%1"'
 
-  ; Write the URL Handler into registry for prismlauncher
+  ; Write the URL Handler into registry for cleanlauncher
   WriteRegStr HKCU Software\Classes\@Launcher_APP_BINARY_NAME@ "URL Protocol" ""
   WriteRegStr HKCU Software\Classes\@Launcher_APP_BINARY_NAME@\shell\open\command "" '"$INSTDIR\@Launcher_APP_BINARY_NAME@.exe" "%1"'
 
-  ; Write the URL Handler into registry for prismlauncher import
-  WriteRegStr HKCU Software\Classes\prismlauncher "URL Protocol" ""
-  WriteRegStr HKCU Software\Classes\prismlauncher\shell\open\command "" '"$INSTDIR\@Launcher_APP_BINARY_NAME@.exe" "%1"'
+  ; Write the URL Handler into registry for cleanlauncher import
+  WriteRegStr HKCU Software\Classes\cleanlauncher "URL Protocol" ""
+  WriteRegStr HKCU Software\Classes\cleanlauncher\shell\open\command "" '"$INSTDIR\@Launcher_APP_BINARY_NAME@.exe" "%1"'
 
   ; Write the uninstall keys for Windows
   ; https://learn.microsoft.com/en-us/windows/win32/msi/uninstall-registry-key
