@@ -107,11 +107,11 @@ runs:
             case "${{ inputs.vcvars-arch }}" in
               arm64)
                 QT_ARCH="win64_msvc2022_64"
-                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
+                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_64" \
                   -O "$GITHUB_WORKSPACE/qt" \
-                  -m qtimageformats qtnetworkauth || \
+                  -m qtimageformats qtnetworkauth || true
                 aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
-                  -O "$GITHUB_WORKSPACE/qt"
+                  -O "$GITHUB_WORKSPACE/qt" || true
                 ;;
               *)     QT_ARCH="win64_msvc2022_64" ;;
             esac

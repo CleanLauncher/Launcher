@@ -23,12 +23,11 @@ runs:
       run: |
         mkdir -p ~/bin
 
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU 2>/dev/null || true)"
+        dpkg_arch="$(dpkg --print-architecture 2>/dev/null || true)"
         if [ -z "$dpkg_arch" ]; then
-          dpkg_arch="$(uname -m | tr '[:upper:]' '[:lower:]')"
+          dpkg_arch="$(uname -m | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
         fi
-        dpkg_arch="$(echo "$dpkg_arch" | tr -d '[:space:]')"
-        echo "Detected architecture: $dpkg_arch"
+        echo "Detected architecture: '$dpkg_arch'"
         case "$dpkg_arch" in
           "amd64"|"x86_64")
             APPIMAGE_ARCH="x86_64"
