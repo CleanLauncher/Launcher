@@ -99,7 +99,7 @@ jobs:
       - name: Run codespell
         run: |
           codespell --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json,*.nix' \
-            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,commiting,querry,setings,nint,ect' \
+            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,commiting,querry,setings,nint,ect,sortings,ThirdParty' \
             --quiet-level=2
 
   yaml-lint:
