@@ -53,19 +53,6 @@ jobs:
 
           tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
 
-          for d in Launcher-Windows-MSVC*; do
-            cd "${d}" || continue
-            ARM64="$(echo -n ${d} | grep -o arm64 || true)"
-            INST="$(echo -n ${d} | grep -o Setup || true)"
-            PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="Launcher-Windows-MSVC"
-            test -z "${ARM64}" || NAME="${NAME}-arm64"
-            test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
-            cd ..
-          done
-
           for d in Launcher-Windows-MinGW-w64*; do
             cd "${d}" || continue
             INST="$(echo -n ${d} | grep -o Setup || true)"
@@ -110,12 +97,6 @@ jobs:
             "Launcher-Windows-MinGW-arm64-${{ env.VERSION }}.zip" \
             "Launcher-Windows-MinGW-arm64-Portable-${{ env.VERSION }}.zip" \
             "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
-            "Launcher-Windows-MSVC-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MSVC-Portable-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MSVC-Setup-${{ env.VERSION }}.exe" \
-            "Launcher-Windows-MSVC-arm64-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MSVC-arm64-Portable-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MSVC-arm64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-macOS-${{ env.VERSION }}.zip" \
             "Launcher-macOS-${{ env.VERSION }}.dmg" \
             "Launcher-${{ env.VERSION }}.tar.gz"
