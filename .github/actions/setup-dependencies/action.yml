@@ -104,52 +104,57 @@ runs:
             ;;
           *)
             QT_HOST="windows"
-            case "${{ inputs.vcvars-arch }}" in
-              arm64)
-                QT_ARCH="win64_msvc2022_64"
-                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_64" \
-                  -O "$GITHUB_WORKSPACE/qt" \
-                  -m qtimageformats qtnetworkauth || true
-                aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
-                  -O "$GITHUB_WORKSPACE/qt" || true
-                ;;
-              *)     QT_ARCH="win64_msvc2022_64" ;;
-            esac
             ;;
         esac
 
-        aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
-          -O "$GITHUB_WORKSPACE/qt" \
-          -m qtimageformats qtnetworkauth || \
-        aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
-          -O "$GITHUB_WORKSPACE/qt"
+        case "${{ inputs.vcvars-arch }}" in
+          arm64)
+            aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_64" \
+              -O "$GITHUB_WORKSPACE/qt" \
+              -m qtimageformats qtnetworkauth
+            aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
+              -O "$GITHUB_WORKSPACE/qt" \
+              -m qtimageformats qtnetworkauth
+            ;;
+          *)
+            aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
+              -O "$GITHUB_WORKSPACE/qt" \
+              -m qtimageformats qtnetworkauth
+            ;;
+        esac
 
-        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
         if [ "${{ inputs.vcvars-arch }}" = "arm64" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64"
           if [ ! -d "$QT_ROOT" ]; then
-            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64_cross_compiled"
+            echo "::error::Qt arm64 cross-compiled directory not found"
+            ls "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/"
+            exit 1
+          fi
+          if [ ! -d "$QT_ROOT/lib/cmake/Qt6NetworkAuth" ]; then
+            echo "::error::Qt6NetworkAuth cmake config not found in arm64 Qt"
+            ls "$QT_ROOT/lib/cmake/"
+            exit 1
+          fi
+        else
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/clang_64"
           fi
           if [ ! -d "$QT_ROOT" ]; then
-            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64"
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_64"
           fi
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/clang_64"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_64"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_arm64"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/macos"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_64"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$(ls -d "$GITHUB_WORKSPACE"/qt/${{ inputs.qt-version }}/* 2>/dev/null | head -1)"
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/gcc_arm64"
+          fi
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/macos"
+          fi
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_64"
+          fi
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$(ls -d "$GITHUB_WORKSPACE"/qt/${{ inputs.qt-version }}/* 2>/dev/null | head -1)"
+          fi
         fi
 
         echo "Qt6_DIR=$QT_ROOT/lib/cmake/Qt6" >> "$GITHUB_ENV"
