@@ -51,7 +51,11 @@ runs:
       with:
         msystem: ${{ inputs.msystem }}
         update: true
-        install: mingw-w64-x86_64-ccache
+        install: >-
+          ${{ inputs.msystem == 'CLANG64' && 'mingw-w64-clang-x86_64-ccache' ||
+              inputs.msystem == 'CLANGARM64' && 'mingw-w64-clang-aarch64-ccache' ||
+              inputs.msystem == 'MINGW64' && 'mingw-w64-x86_64-ccache' ||
+              'mingw-w64-ucrt-x86_64-ccache' }}
 
     - name: Install MSYS2 packages (MinGW)
       if: ${{ inputs.msystem != '' }}

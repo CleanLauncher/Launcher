@@ -67,25 +67,11 @@ jobs:
             artifact-name: Windows-MinGW-w64
             cmake-preset: windows_mingw
             msystem: CLANG64
-            vcvars-arch: amd64_x86
 
           - os: windows-11-arm
             artifact-name: Windows-MinGW-arm64
             cmake-preset: windows_mingw
             msystem: CLANGARM64
-            vcvars-arch: arm64
-
-          - os: windows-2022
-            artifact-name: Windows-MSVC
-            cmake-preset: windows_msvc
-            vcvars-arch: amd64
-            qt-version: 6.10.2
-
-          - os: windows-11-arm
-            artifact-name: Windows-MSVC-arm64
-            cmake-preset: windows_msvc
-            vcvars-arch: arm64
-            qt-version: 6.10.2
 
           - os: macos-26
             artifact-name: macOS
@@ -119,7 +105,6 @@ jobs:
           build-type: ${{ env.BUILD_TYPE }}
           artifact-name: ${{ matrix.artifact-name }}
           msystem: ${{ matrix.msystem }}
-          vcvars-arch: ${{ matrix.vcvars-arch }}
           qt-version: ${{ matrix.qt-version }}
 
       - name: Configure project (MinGW)
@@ -128,7 +113,7 @@ jobs:
         run: |
           cmake --preset "$CMAKE_PRESET"
 
-      - name: Configure project (MSVC)
+      - name: Configure project (non-MinGW)
         if: ${{ matrix.msystem == '' }}
         run: |
           cmake --preset "$CMAKE_PRESET"
@@ -139,7 +124,7 @@ jobs:
         run: |
           cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"
 
-      - name: Run build (MSVC)
+      - name: Run build (non-MinGW)
         if: ${{ matrix.msystem == '' }}
         run: |
           cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"

@@ -47,7 +47,6 @@ runs:
       with:
         build-type: ${{ inputs.build-type }}
         msystem: ${{ inputs.msystem }}
-        vcvars-arch: ${{ inputs.vcvars-arch }}
 
     - name: Install sccache (non-Windows Debug)
       if: ${{ runner.os != 'Windows' && inputs.build-type == 'Debug' }}
@@ -104,42 +103,13 @@ runs:
         echo "QT_PLUGIN_PATH=$QT_ROOT/plugins" >> "$GITHUB_ENV"
         echo "$QT_ROOT/bin" >> "$GITHUB_PATH"
 
-    - name: Install Qt (Windows arm64)
-      if: ${{ inputs.msystem == '' && runner.os == 'Windows' && inputs.vcvars-arch == 'arm64' }}
-      shell: bash
-      run: |
-        pip install aqtinstall
-
-        aqt install-qt windows desktop "${{ inputs.qt-version }}" "win64_msvc2022_64" \
-          -O "$GITHUB_WORKSPACE/qt" \
-          -m qtimageformats qtnetworkauth
-
-        mkdir -p "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64/bin"
-        touch "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64/bin/qmake.bat"
-
-        aqt install-qt windows desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
-          -O "$GITHUB_WORKSPACE/qt"
-
-        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64"
-        if [ ! -d "$QT_ROOT" ]; then
-          echo "::error::Qt arm64 cross-compiled directory not found"
-          ls "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/"
-          exit 1
-        fi
-
-        echo "Qt6_DIR=$QT_ROOT/lib/cmake/Qt6" >> "$GITHUB_ENV"
-        echo "CMAKE_PREFIX_PATH=$QT_ROOT" >> "$GITHUB_ENV"
-        echo "QT_PLUGIN_PATH=$QT_ROOT/plugins" >> "$GITHUB_ENV"
-        echo "$QT_ROOT/bin" >> "$GITHUB_PATH"
-
-    - name: Install Qt (default)
-      if: ${{ inputs.msystem == '' && !(runner.os == 'Linux' && runner.arch == 'ARM64') && !(runner.os == 'Windows' && inputs.vcvars-arch == 'arm64') }}
+    - name: Install Qt (non-MSYS2, non-aarch64)
+      if: ${{ inputs.msystem == '' && !(runner.os == 'Linux' && runner.arch == 'ARM64') }}
       shell: bash
       run: |
         pip install aqtinstall
 
         os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
-        host_machine="$(uname -m)"
         case "$os_name" in
           linux)
             QT_HOST="linux"
