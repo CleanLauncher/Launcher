@@ -3,7 +3,7 @@
 , cmake
 , ninja
 , pkg-config
-, extra-cmake-modules
+, qt6Packages
 , qt6
 , libarchive
 , cmark
@@ -23,7 +23,7 @@ stdenv.mkDerivation {
     cmake
     ninja
     pkg-config
-    extra-cmake-modules
+    qt6Packages.extra-cmake-modules
   ];
 
   buildInputs = [

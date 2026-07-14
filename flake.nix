@@ -28,7 +28,12 @@
 
         checks.launcher = self.packages.${system}.launcher;
 
-        formatter = pkgs.alejandra;
+        formatter = {
+          type = "program";
+          name = "alejandra";
+          runtimeInputs = [pkgs.alejandra];
+          text = "alejandra $@";
+        };
 
         devShells.default = pkgs.mkShell {
           inputsFrom = [self.packages.${system}.launcher];
