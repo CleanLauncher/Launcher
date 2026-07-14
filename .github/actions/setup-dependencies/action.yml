@@ -83,8 +83,31 @@ runs:
         echo "CMAKE_C_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
         echo "CMAKE_CXX_COMPILER_LAUNCHER=ccache" >> "$GITHUB_ENV"
 
-    - name: Install Qt (non-MSYS2)
-      if: ${{ inputs.msystem == '' }}
+    - name: Install Qt (Linux aarch64 - system packages)
+      if: ${{ inputs.msystem == '' && runner.os == 'Linux' && runner.arch == 'ARM64' }}
+      shell: bash
+      run: |
+        sudo apt-get -y install \
+          qt6-base-dev qt6-base-dev-tools \
+          qt6-svg-dev \
+          qt6-tools-dev qt6-tools-dev-tools \
+          qt6-l10n-tools \
+          libqt6svg6-dev \
+          libqt6opengl6-dev
+
+        QT_ROOT="$(qmake6 -query QT_INSTALL_PREFIX 2>/dev/null || true)"
+        if [ -z "$QT_ROOT" ] || [ ! -d "$QT_ROOT" ]; then
+          QT_ROOT="/usr"
+        fi
+        echo "QT_ROOT=$QT_ROOT"
+
+        echo "Qt6_DIR=$QT_ROOT/lib/cmake/Qt6" >> "$GITHUB_ENV"
+        echo "CMAKE_PREFIX_PATH=$QT_ROOT" >> "$GITHUB_ENV"
+        echo "QT_PLUGIN_PATH=$QT_ROOT/plugins" >> "$GITHUB_ENV"
+        echo "$QT_ROOT/bin" >> "$GITHUB_PATH"
+
+    - name: Install Qt (non-MSYS2, non-aarch64)
+      if: ${{ inputs.msystem == '' && !(runner.os == 'Linux' && runner.arch == 'ARM64') }}
       shell: bash
       run: |
         pip install aqtinstall
@@ -93,10 +116,8 @@ runs:
         host_machine="$(uname -m)"
         case "$os_name" in
           linux)
-            case "$host_machine" in
-              aarch64) QT_HOST="linux_arm64"; QT_ARCH="gcc_arm64" ;;
-              *)       QT_HOST="linux";      QT_ARCH="linux_gcc_64" ;;
-            esac
+            QT_HOST="linux"
+            QT_ARCH="linux_gcc_64"
             ;;
           darwin)
             QT_HOST="mac"
@@ -124,7 +145,17 @@ runs:
         aqt install-qt "$QT_HOST" desktop "${{ inputs.qt-version }}" "$QT_ARCH" \
           -O "$GITHUB_WORKSPACE/qt"
 
-        QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
+        if [ "${{ inputs.vcvars-arch }}" = "arm64" ]; then
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64_cross_compiled"
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64"
+          fi
+          if [ ! -d "$QT_ROOT" ]; then
+            QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
+          fi
+        else
+          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/${QT_ARCH}"
+        fi
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/clang_64"
         fi
@@ -139,9 +170,6 @@ runs:
         fi
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_64"
-        fi
-        if [ ! -d "$QT_ROOT" ]; then
-          QT_ROOT="$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64_cross_compiled"
         fi
         if [ ! -d "$QT_ROOT" ]; then
           QT_ROOT="$(ls -d "$GITHUB_WORKSPACE"/qt/${{ inputs.qt-version }}/* 2>/dev/null | head -1)"
