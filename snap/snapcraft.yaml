@@ -1,0 +1,54 @@
+name: launcher
+base: core24
+version: git
+summary: Minecraft Launcher
+description: |
+  Clean and maintained Minecraft launcher.
+grade: stable
+confinement: classic
+architectures:
+  - build-on: amd64
+  - build-on: arm64
+parts:
+  launcher:
+    plugin: cmake
+    source: .
+    cmake-parameters:
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DCMAKE_BUILD_TYPE=Release
+    build-packages:
+      - ninja-build
+      - extra-cmake-modules
+      - pkg-config
+      - qt6-base-dev
+      - qt6-base-dev-tools
+      - libgl1-mesa-dev
+      - libglu1-mesa-dev
+      - libglvnd-dev
+      - libxcb-cursor-dev
+      - libtomlplusplus-dev
+      - libarchive-dev
+      - libqrencode-dev
+      - zlib1g-dev
+    stage-packages:
+      - libqt6core6
+      - libqt6gui6
+      - libqt6widgets6
+      - libqt6network6
+      - libqt6svg6
+      - libqt6networkauth6
+      - libgl1
+      - libglu1-mesa
+      - libxcb-cursor0
+      - libarchive13
+      - libqrencode4
+      - zlib1g
+    override-build: |
+      craftctl default
+      mkdir -p $CRAFT_PART_INSTALL/bin
+      cp $CRAFT_PART_BUILD/build/launcher $CRAFT_PART_INSTALL/bin/launcher
+apps:
+  launcher:
+    command: bin/launcher
+    environment:
+      DISABLE_WAYLAND: 1

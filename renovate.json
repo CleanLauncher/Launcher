@@ -9,5 +9,6 @@
         "priority: low",
         "type: robot",
         "changelog:omit"
-    ]
+    ],
+    "baseBranches": ["master"]
 }

@@ -17,13 +17,32 @@ jobs:
       build-type: Release
     secrets: inherit
 
+  build_nix:
+    name: Build Nix
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Build
+        run: nix build .#launcher --print-build-logs --no-link --print-out-paths > nix-path.txt
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: Launcher-nix-x86_64-linux
+          path: result/
+
   create_release:
-    needs: build_release
+    needs: [build_release, build_nix]
     permissions:
       contents: write
     runs-on: ubuntu-24.04
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -34,39 +53,40 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v8
 
-      - name: Grab and store version
+      - name: Grab version
         run: |
           tag_name=$(echo ${{ github.ref }} | grep -oE "[^/]+$")
           echo "VERSION=$tag_name" >> $GITHUB_ENV
 
-      - name: Package artifacts properly
+      - name: Package artifacts
         run: |
           mv ${{ github.workspace }}/Launcher-source Launcher-${{ env.VERSION }}
-          mv Launcher-Linux-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv Launcher-Linux-aarch64-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz
-          mv Launcher-*.AppImage/Launcher-*-x86_64.AppImage Launcher-Linux-x86_64.AppImage
-          mv Launcher-*.AppImage.zsync/Launcher-*-x86_64.AppImage.zsync Launcher-Linux-x86_64.AppImage.zsync
-          mv Launcher-*.AppImage/Launcher-*-aarch64.AppImage Launcher-Linux-aarch64.AppImage
-          mv Launcher-*.AppImage.zsync/Launcher-*-aarch64.AppImage.zsync Launcher-Linux-aarch64.AppImage.zsync
-          mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip
-          mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg
 
-          # .deb
-          find . -name '*.deb' -exec mv {} Launcher-${{ env.VERSION }}.deb \;
+          # Linux
+          mv Launcher-Linux-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz 2>/dev/null || true
+          mv Launcher-Linux-aarch64-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz 2>/dev/null || true
+          mv Launcher-*.AppImage/Launcher-*-x86_64.AppImage Launcher-Linux-x86_64.AppImage 2>/dev/null || true
+          mv Launcher-*.AppImage.zsync/Launcher-*-x86_64.AppImage.zsync Launcher-Linux-x86_64.AppImage.zsync 2>/dev/null || true
+          mv Launcher-*.AppImage/Launcher-*-aarch64.AppImage Launcher-Linux-aarch64.AppImage 2>/dev/null || true
+          mv Launcher-*.AppImage.zsync/Launcher-*-aarch64.AppImage.zsync Launcher-Linux-aarch64.AppImage.zsync 2>/dev/null || true
 
-          # .rpm
-          find . -name '*.rpm' -exec mv {} Launcher-${{ env.VERSION }}.rpm \;
+          # .deb and .rpm
+          find . -name '*.deb' -exec mv {} Launcher-${{ env.VERSION }}.deb \; 2>/dev/null || true
+          find . -name '*.rpm' -exec mv {} Launcher-${{ env.VERSION }}.rpm \; 2>/dev/null || true
 
-          tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
+          # macOS
+          mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip 2>/dev/null || true
+          mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg 2>/dev/null || true
 
+          # Windows
           for d in Launcher-Windows-MinGW-w64*; do
             cd "${d}" || continue
             INST="$(echo -n ${d} | grep -o Setup || true)"
             PORT="$(echo -n ${d} | grep -o Portable || true)"
             NAME="Launcher-Windows-MinGW-w64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
+            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
+            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" * 2>/dev/null || true
             cd ..
           done
 
@@ -76,10 +96,13 @@ jobs:
             PORT="$(echo -n ${d} | grep -o Portable || true)"
             NAME="Launcher-Windows-MinGW-arm64"
             test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" *
+            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
+            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" * 2>/dev/null || true
             cd ..
           done
+
+          # Source tarball
+          tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
 
       - name: Create release
         id: create_release

@@ -1,0 +1,55 @@
+name: Nix
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - "master"
+      - "develop"
+      - "release-*"
+    tags:
+      - "*"
+    paths:
+      - "**.nix"
+      - "flake.lock"
+      - "nix/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build (${{ matrix.system }})
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            system: x86_64-linux
+          - os: ubuntu-24.04-arm
+            system: aarch64-linux
+          - os: macos-26
+            system: aarch64-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Build
+        run: |
+          nix build .#launcher --print-build-logs --no-link
+
+      - name: Upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: Launcher-nix-${{ matrix.system }}
+          path: result/

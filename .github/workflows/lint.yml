@@ -67,3 +67,16 @@ jobs:
             -I libraries/ \
             -I launcher/ \
             launcher/ libraries/
+
+  nix-fmt:
+    name: nix format
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Run nix fmt
+        run: nix fmt -- --check .
