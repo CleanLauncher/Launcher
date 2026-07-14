@@ -24,19 +24,21 @@ jobs:
           fetch-depth: 0
           submodules: "true"
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
+      - name: Install dependencies
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install cmake ninja-build extra-cmake-modules pkg-config \
+            qt6-base-dev qt6-base-dev-tools qt6-svg-dev \
+            libgl1-mesa-dev libglu1-mesa-dev libglvnd-dev \
+            libxcb-cursor-dev libtomlplusplus-dev \
+            cmark libarchive-dev libqrencode-dev zlib1g-dev
 
       - name: Run source generators
         run: |
-          nix develop --command bash -c '
-            cmake -B build -D Launcher_USE_PCH=OFF && cmake --build build --target autogen autorcc
-          '
+          cmake -B build -D Launcher_USE_PCH=OFF && cmake --build build --target autogen autorcc
 
       - name: Run clang-tidy-diff
         env:
           BASE_REF: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
         run: |
-          nix develop --command bash -c '
-            clang-tidy -verify-config && git diff -U0 --no-color "$BASE_REF" | clang-tidy-diff.py -p1 -quiet -only-check-in-db
-          '
+          clang-tidy -verify-config && git diff -U0 --no-color "$BASE_REF" | clang-tidy-diff.py -p1 -quiet -only-check-in-db

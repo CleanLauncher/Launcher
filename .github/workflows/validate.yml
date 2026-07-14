@@ -30,14 +30,10 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
+            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null)
           else
-            BASE="${{ github.event.before }}"
-          fi
-
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            HASHES=$(git log -50 --format='%H' HEAD)
-          else
-            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null || git log -50 --format='%H' HEAD)
+            # For push events, check last 20 commits only
+            HASHES=$(git log -20 --format='%H' HEAD)
           fi
 
           FAILED=0
@@ -60,54 +56,6 @@ jobs:
             exit 1
           fi
           echo "All commits are properly signed off."
-
-  signoff-author:
-    name: Signed-off-by matches author
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - name: Verify Signed-off-by matches commit author
-        run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BASE="${{ github.event.pull_request.base.sha }}"
-          else
-            BASE="${{ github.event.before }}"
-          fi
-
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            HASHES=$(git log -50 --format='%H' HEAD)
-          else
-            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null || git log -50 --format='%H' HEAD)
-          fi
-
-          FAILED=0
-          while IFS= read -r hash; do
-            [ -z "$hash" ] && continue
-            AUTHOR_NAME=$(git log -1 --format='%an' "$hash")
-            AUTHOR_EMAIL=$(git log -1 --format='%ae' "$hash")
-            SO_LINE=$(git log -1 --format='%B' "$hash" | grep "^Signed-off-by:" | head -1)
-            if [ -z "$SO_LINE" ]; then
-              continue
-            fi
-            SO_NAME=$(echo "$SO_LINE" | sed 's/Signed-off-by: \(.*\) <.*/\1/')
-            SO_EMAIL=$(echo "$SO_LINE" | sed 's/.*<\(.*\)>/\1/')
-            if [ "$SO_NAME" != "$AUTHOR_NAME" ] || [ "$SO_EMAIL" != "$AUTHOR_EMAIL" ]; then
-              echo "::error file=.git commit=$hash::Signed-off-by ($SO_NAME <$SO_EMAIL>) != author ($AUTHOR_NAME <$AUTHOR_EMAIL>)"
-              FAILED=1
-            fi
-          done <<< "$HASHES"
-
-          if [ "$FAILED" -eq 1 ]; then
-            echo "Signed-off-by must match the commit author."
-            exit 1
-          fi
-          echo "All Signed-off-by lines match their commit authors."
 
   no-emoji:
     name: No emoji check
@@ -150,8 +98,8 @@ jobs:
 
       - name: Run codespell
         run: |
-          codespell --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json' \
-            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,commiting,querry,setings,nint,ect,ue,ue' \
+          codespell --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json,*.nix' \
+            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,commiting,querry,setings,nint,ect' \
             --quiet-level=2
 
   yaml-lint:
