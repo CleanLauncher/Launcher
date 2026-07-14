@@ -1,0 +1,93 @@
+name: Valgrind
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - "master"
+      - "develop"
+      - "release-*"
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  valgrind:
+    name: Memory leak check
+
+    permissions:
+      contents: read
+
+    runs-on: ubuntu-24.04
+
+    env:
+      BUILD_TYPE: Debug
+      CMAKE_PRESET: linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Setup dependencies
+        uses: ./.github/actions/setup-dependencies
+        with:
+          build-type: ${{ env.BUILD_TYPE }}
+          artifact-name: Linux
+          qt-version: 6.10.2
+
+      - name: Install Valgrind
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install valgrind
+
+      - name: Configure project
+        run: |
+          cmake --preset "$CMAKE_PRESET" \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_C_FLAGS="-g -O0" \
+            -DCMAKE_CXX_FLAGS="-g -O0"
+
+      - name: Build
+        run: |
+          cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"
+
+      - name: Run tests under Valgrind
+        run: |
+          valgrind --tool=memcheck \
+            --leak-check=full \
+            --show-leak-kinds=all \
+            --track-origins=yes \
+            --error-exitcode=1 \
+            --xml=yes \
+            --xml-file=valgrind-report.xml \
+            ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE" --output-on-failure || true
+
+          # Print human-readable summary
+          if [ -f valgrind-report.xml ]; then
+            echo "## Valgrind Summary" >> "$GITHUB_STEP_SUMMARY"
+            echo '```xml' >> "$GITHUB_STEP_SUMMARY"
+            grep -E "(error|leak|summary)" valgrind-report.xml | head -50 >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          # Check for actual errors (not just leaks)
+          if grep -q 'exit="0"' valgrind-report.xml 2>/dev/null; then
+            echo "Valgrind: no errors detected."
+          else
+            echo "::error::Valgrind detected memory errors"
+            exit 1
+          fi
+
+      - name: Upload Valgrind report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: valgrind-report
+          path: valgrind-report.xml
+          retention-days: 30
