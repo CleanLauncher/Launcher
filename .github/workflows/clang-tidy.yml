@@ -31,7 +31,8 @@ jobs:
             qt6-base-dev qt6-base-dev-tools qt6-svg-dev \
             libgl1-mesa-dev libglu1-mesa-dev libglvnd-dev \
             libxcb-cursor-dev libtomlplusplus-dev \
-            cmark libarchive-dev libqrencode-dev zlib1g-dev
+            cmark libarchive-dev libqrencode-dev zlib1g-dev \
+            libxkbcommon-dev qt6-networkauth-dev
 
       - name: Run source generators
         run: |

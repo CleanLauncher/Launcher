@@ -4,13 +4,14 @@
 , ninja
 , pkg-config
 , extra-cmake-modules
-, qt6Packages
 , qt6
 , libarchive
 , cmark
-, libqrencode
+, qrencode
 , tomlplusplus
 , zlib
+, libxkbcommon
+, qt6NetworkAuth
 }:
 
 stdenv.mkDerivation {
@@ -32,11 +33,14 @@ stdenv.mkDerivation {
     qt6.qtimageformats
     qt6.qt5compat
     qt6.qtwebengine
+    qt6.qtconnectivity
+    qt6.qtnetworkauth
     libarchive
     cmark
-    libqrencode
+    qrencode
     tomlplusplus
     zlib
+    libxkbcommon
   ];
 
   cmakeFlags = [
