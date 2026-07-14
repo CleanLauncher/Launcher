@@ -2,6 +2,8 @@
 
 Launcher is a clean and maintained Minecraft launcher, forked from PrismLauncher.
 
+No emojis, symbols, or special characters in commit messages, code, documentation, or UI text. ASCII only.
+
 ## Building
 
 See the [build instructions](https://prismlauncher.org/wiki/development/build-instructions) for details on building from source.

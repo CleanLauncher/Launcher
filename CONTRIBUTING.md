@@ -2,6 +2,11 @@
 
 Thank you for your interest in contributing to Launcher!
 
+## Rules
+
+- No emojis, symbols, or special characters in commit messages, code, documentation, or UI text. ASCII only.
+- All commits must be signed off with `Signed-off-by` using the original author's name and email.
+
 ## Development Setup
 
 1. Clone the repository with submodules:
