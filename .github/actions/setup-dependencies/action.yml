@@ -114,6 +114,9 @@ runs:
           -O "$GITHUB_WORKSPACE/qt" \
           -m qtimageformats qtnetworkauth
 
+        mkdir -p "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64/bin"
+        touch "$GITHUB_WORKSPACE/qt/${{ inputs.qt-version }}/msvc2022_arm64/bin/qmake.bat"
+
         aqt install-qt windows desktop "${{ inputs.qt-version }}" "win64_msvc2022_arm64_cross_compiled" \
           -O "$GITHUB_WORKSPACE/qt"
 
