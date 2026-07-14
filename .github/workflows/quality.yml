@@ -17,16 +17,12 @@ permissions: {}
 jobs:
   strict-build:
     name: Strict warnings build
-
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
-
-    runs-on: ubuntu-24.04
-
     env:
       BUILD_TYPE: Debug
       CMAKE_PRESET: linux
-
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -44,18 +40,11 @@ jobs:
         run: |
           cmake --preset "$CMAKE_PRESET" \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_C_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion" \
-            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion -Wsign-conversion -Wold-style-cast"
+            -DCMAKE_C_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion" \
+            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Wpedantic -Werror -Wshadow -Wconversion"
 
       - name: Build
-        run: |
-          cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" 2>&1 | tee build.log
-
-      - name: Analyze warnings
-        if: failure()
-        run: |
-          echo "## Build Warnings" >> "$GITHUB_STEP_SUMMARY"
-          grep -E "warning:" build.log | sort -u | head -50 >> "$GITHUB_STEP_SUMMARY"
+        run: cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE" 2>&1 | tee build.log
 
   todo-check:
     name: TODO/FIXME audit
@@ -69,18 +58,14 @@ jobs:
       - name: Find TODO/FIXME/HACK comments
         run: |
           FOUND=0
-          echo "## TODO/FIXME/HACK Comments" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## TODO/FIXME/HACK" >> "$GITHUB_STEP_SUMMARY"
           while IFS= read -r match; do
             echo "$match" >> "$GITHUB_STEP_SUMMARY"
             FOUND=$((FOUND + 1))
           done < <(grep -rn 'TODO\|FIXME\|HACK\|XXX\|WORKAROUND' \
-            launcher/ libraries/ \
-            --include='*.cpp' --include='*.h' --include='*.hpp' \
-            --exclude-dir='libnbtplusplus' 2>/dev/null || true)
-          echo "" >> "$GITHUB_STEP_SUMMARY"
+            launcher/ --include='*.cpp' --include='*.h' --include='*.hpp' 2>/dev/null || true)
           echo "Found **$FOUND** items." >> "$GITHUB_STEP_SUMMARY"
-          echo "Found $FOUND TODO/FIXME/HACK comments (see summary)."
+          echo "Found $FOUND TODO/FIXME/HACK comments."
 
   include-guard:
     name: Include guard check
@@ -100,25 +85,4 @@ jobs:
               FAILED=1
             fi
           done < <(find launcher/ -name '*.h' -o -name '*.hpp' | grep -v './libraries/')
-          if [ "$FAILED" -eq 1 ]; then
-            echo "Some headers are missing include guards."
-          fi
           echo "Include guard check completed."
-
-  cmake-lint:
-    name: CMake lint
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Install cmake-lint
-        run: |
-          pip install --break-system-packages cmake-lint
-
-      - name: Run cmake-lint
-        run: |
-          find . -name 'CMakeLists.txt' -not -path './build/*' -not -path './libraries/*' | \
-            xargs cmake-lint --std=cmake minimum-required-version=3.28

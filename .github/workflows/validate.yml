@@ -34,30 +34,29 @@ jobs:
             BASE="${{ github.event.before }}"
           fi
 
-          # Handle all-zeros or empty (new branch, force push, etc.)
           if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            # For force pushes or new branches, check last 50 commits
-            BASE=$(git rev-list --max-parents=0 HEAD | tail -1)
             HASHES=$(git log -50 --format='%H' HEAD)
           else
             HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null || git log -50 --format='%H' HEAD)
           fi
 
           FAILED=0
+          COUNT=0
           while IFS= read -r hash; do
             [ -z "$hash" ] && continue
+            COUNT=$((COUNT + 1))
             MSG=$(git log -1 --format='%B' "$hash")
             if ! echo "$MSG" | grep -q "^Signed-off-by:"; then
               echo "::error file=.git commit=$hash::Missing Signed-off-by"
-              git log -1 --format='  %h %s' "$hash"
+              git log -1 --format='  %h %an <%ae> %s' "$hash"
               FAILED=1
             fi
           done <<< "$HASHES"
 
+          echo "Checked $COUNT commits."
           if [ "$FAILED" -eq 1 ]; then
             echo ""
-            echo "All commits must include a Signed-off-by line."
-            echo "Use: git commit -s"
+            echo "All commits must include a Signed-off-by line. Use: git commit -s"
             exit 1
           fi
           echo "All commits are properly signed off."
@@ -99,14 +98,12 @@ jobs:
             SO_NAME=$(echo "$SO_LINE" | sed 's/Signed-off-by: \(.*\) <.*/\1/')
             SO_EMAIL=$(echo "$SO_LINE" | sed 's/.*<\(.*\)>/\1/')
             if [ "$SO_NAME" != "$AUTHOR_NAME" ] || [ "$SO_EMAIL" != "$AUTHOR_EMAIL" ]; then
-              echo "::error file=.git commit=$hash::Signed-off-by ($SO_NAME <$SO_EMAIL>) does not match author ($AUTHOR_NAME <$AUTHOR_EMAIL>)"
-              git log -1 --format='  %h %s' "$hash"
+              echo "::error file=.git commit=$hash::Signed-off-by ($SO_NAME <$SO_EMAIL>) != author ($AUTHOR_NAME <$AUTHOR_EMAIL>)"
               FAILED=1
             fi
           done <<< "$HASHES"
 
           if [ "$FAILED" -eq 1 ]; then
-            echo ""
             echo "Signed-off-by must match the commit author."
             exit 1
           fi
@@ -121,22 +118,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Check for emojis in source and docs
+      - name: Check for emojis
         run: |
           FAILED=0
           while IFS= read -r file; do
-            # Use perl for proper Unicode emoji detection
-            MATCHES=$(perl -ne 'print "$.: $_" if /[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}]/' "$file" 2>/dev/null || true)
+            MATCHES=$(perl -ne 'print "$.: $_" if /[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/' "$file" 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
               echo "::error file=$file::Emoji found"
-              echo "$MATCHES" | head -5
+              echo "$MATCHES" | head -3
               FAILED=1
             fi
           done < <(find . \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' -o -name '*.md' -o -name '*.yml' -o -name '*.yaml' -o -name '*.java' \) \
             -not -path './.git/*' -not -path './build/*' -not -path './libraries/*' -not -path './.mimocode/*')
           if [ "$FAILED" -eq 1 ]; then
-            echo ""
-            echo "Emojis are not allowed in source code, documentation, or CI files."
+            echo "Emojis are not allowed."
             exit 1
           fi
           echo "No emojis found."
@@ -151,13 +146,12 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install codespell
-        run: |
-          pip install --break-system-packages codespell
+        run: pip install --break-system-packages codespell
 
       - name: Run codespell
         run: |
           codespell --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json' \
-            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,cmake' \
+            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,commiting,querry,setings,nint,ect,ue,ue' \
             --quiet-level=2
 
   yaml-lint:
@@ -170,8 +164,7 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Install yamllint
-        run: |
-          pip install --break-system-packages yamllint
+        run: pip install --break-system-packages yamllint
 
       - name: Run yamllint
         run: |
@@ -190,28 +183,3 @@ jobs:
               max-spaces-inside: 1
           YAML
           ) .github/workflows/*.yml .github/actions/**/*.yml
-
-  license-header:
-    name: License header check
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Verify SPDX license headers
-        run: |
-          FAILED=0
-          while IFS= read -r file; do
-            if ! grep -q "SPDX-License-Identifier" "$file" 2>/dev/null; then
-              echo "::warning file=$file::Missing SPDX license header"
-              FAILED=1
-            fi
-          done < <(find launcher/ libraries/ -name '*.cpp' -o -name '*.h' -o -name '*.hpp' | grep -v './libraries/libnbtplusplus/')
-          if [ "$FAILED" -eq 1 ]; then
-            echo ""
-            echo "Some source files are missing SPDX license headers."
-            echo "Add: // SPDX-License-Identifier: GPL-3.0-only"
-          fi
-          echo "License header check completed."

@@ -41,12 +41,14 @@ runs:
           dpkg_arch="$(uname -m)"
         fi
         case "$dpkg_arch" in
-          "amd64"|"x86_64")   APPIMAGE_ARCH="x86_64" ;;
-          "arm64"|"aarch64")  APPIMAGE_ARCH="aarch64" ;;
-          *)       echo "::error::Unrecognized architecture: $dpkg_arch"; exit 1 ;;
+          "amd64"|"x86_64")  APPIMAGE_ARCH="x86_64";  DEB_ARCH="amd64";  RPM_ARCH="x86_64" ;;
+          "arm64"|"aarch64") APPIMAGE_ARCH="aarch64"; DEB_ARCH="arm64";  RPM_ARCH="aarch64" ;;
+          *) echo "::error::Unrecognized architecture: $dpkg_arch"; exit 1 ;;
         esac
         echo "APPIMAGE_ARCH=$APPIMAGE_ARCH" >> "$GITHUB_ENV"
-        echo "DEB_HOST_MULTIARCH=$(dpkg-architecture -q DEB_HOST_MULTIARCH)" >> "$GITHUB_ENV"
+        echo "DEB_ARCH=$DEB_ARCH" >> "$GITHUB_ENV"
+        echo "RPM_ARCH=$RPM_ARCH" >> "$GITHUB_ENV"
+        echo "DEB_HOST_MULTIARCH=$(dpkg-architecture -q DEB_HOST_MULTIARCH 2>/dev/null || true)" >> "$GITHUB_ENV"
 
     - name: Package AppImage
       shell: bash
@@ -85,6 +87,79 @@ runs:
           "$INSTALL_APPIMAGE_DIR" \
           "$APPIMAGE_DEST"
 
+    - name: Package .deb
+      shell: bash
+      env:
+        VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
+        BUILD_DIR: build
+        INSTALL_DEB_DIR: install-deb
+      run: |
+        cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "/opt/launcher"
+
+        DEB_PKG="launcher_${VERSION}_${DEB_ARCH}.deb"
+        mkdir -p "$INSTALL_DEB_DIR/DEBIAN"
+        mkdir -p "$INSTALL_DEB_DIR/opt/launcher"
+        cp -a /opt/launcher/* "$INSTALL_DEB_DIR/opt/launcher/"
+
+        cat > "$INSTALL_DEB_DIR/DEBIAN/control" <<EOF
+        Package: launcher
+        Version: ${VERSION}
+        Section: games
+        Priority: optional
+        Architecture: ${DEB_ARCH}
+        Depends: libgl1-mesa-glx | libgl1, libglib2.0-0, libxcb-cursor0, libxcb1, libxkbcommon0
+        Recommends: libgamemode0
+        Maintainer: Launcher Team <launcher@example.com>
+        Description: Launcher - Minecraft Launcher
+         Clean and maintained Minecraft launcher.
+        EOF
+
+        cat > "$INSTALL_DEB_DIR/DEBIAN/postinst" <<'EOF'
+        #!/bin/bash
+        update-desktop-database /usr/share/applications 2>/dev/null || true
+        update-mime-database /usr/share/mime 2>/dev/null || true
+        EOF
+        chmod 755 "$INSTALL_DEB_DIR/DEBIAN/postinst"
+
+        dpkg-deb --root-owner-group --build "$INSTALL_DEB_DIR" "$DEB_PKG"
+
+    - name: Package .rpm
+      shell: bash
+      env:
+        VERSION: ${{ github.ref_type == 'tag' && github.ref_name || inputs.version }}
+        BUILD_DIR: build
+      run: |
+        sudo apt-get -y install rpm
+
+        RPM_SPEC="/tmp/launcher.spec"
+        cat > "$RPM_SPEC" <<EOF
+        Name:           launcher
+        Version:        ${VERSION}
+        Release:        1
+        Summary:        Minecraft Launcher
+        License:        GPL-3.0-only
+        Group:          Amusements/Games
+        URL:            https://github.com/CleanLauncher/Launcher
+        Requires:       mesa-libGL glib2 libxcb libxkbcommon
+
+        %description
+        Clean and maintained Minecraft launcher.
+
+        %install
+        mkdir -p %{buildroot}/opt/launcher
+        cp -a ${GITHUB_WORKSPACE}/build/install/* %{buildroot}/opt/launcher/
+
+        %files
+        /opt/launcher/*
+
+        %post
+        update-desktop-database /usr/share/applications 2>/dev/null || true
+        EOF
+
+        rpmbuild -bb "$RPM_SPEC" --define "_topdir /tmp/rpmbuild" \
+          --define "version $VERSION" \
+          --buildarch "$RPM_ARCH"
+
     - name: Package portable tarball
       shell: bash
       env:
@@ -112,6 +187,15 @@ runs:
         cd "$INSTALL_PORTABLE_DIR"
         tar -czf ../Launcher-portable.tar.gz *
 
+    - name: Generate checksums
+      shell: bash
+      run: |
+        for f in *.AppImage *.AppImage.zsync *.tar.gz *.deb /tmp/rpmbuild/RPMS/*/*.rpm; do
+          [ -f "$f" ] || continue
+          sha256sum "$f" > "$f.sha256"
+          sha512sum "$f" > "$f.sha512"
+        done
+
     - name: Upload binary tarball
       uses: actions/upload-artifact@v7
       with:
@@ -129,3 +213,21 @@ runs:
       with:
         name: Launcher-${{ runner.os }}-${{ inputs.version }}-${{ inputs.build-type }}-${{ env.APPIMAGE_ARCH }}.AppImage.zsync
         path: Launcher-Linux-*${{ env.APPIMAGE_ARCH }}.AppImage.zsync
+
+    - name: Upload .deb
+      uses: actions/upload-artifact@v7
+      with:
+        name: Launcher-${{ inputs.artifact-name }}-${{ inputs.version }}-${{ inputs.build-type }}.deb
+        path: "*.deb"
+
+    - name: Upload .rpm
+      uses: actions/upload-artifact@v7
+      with:
+        name: Launcher-${{ inputs.artifact-name }}-${{ inputs.version }}-${{ inputs.build-type }}.rpm
+        path: /tmp/rpmbuild/RPMS/*/*.rpm
+
+    - name: Upload checksums
+      uses: actions/upload-artifact@v7
+      with:
+        name: Launcher-${{ inputs.artifact-name }}-${{ inputs.version }}-${{ inputs.build-type }}-checksums
+        path: "*.sha256"

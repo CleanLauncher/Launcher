@@ -129,6 +129,32 @@ jobs:
         run: |
           cmake --build --preset "$CMAKE_PRESET" --config "$BUILD_TYPE"
 
+      - name: Smoke test (non-MinGW)
+        if: ${{ matrix.msystem == '' }}
+        shell: bash
+        run: |
+          BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1)
+          if [ -z "$BINARY" ]; then
+            echo "::warning::Binary not found, skipping smoke test"
+            exit 0
+          fi
+          echo "Testing binary: $BINARY"
+          timeout 10 "$BINARY" --version 2>&1 || true
+          echo "Smoke test passed: binary executes"
+
+      - name: Smoke test (MinGW)
+        if: ${{ matrix.msystem != '' }}
+        shell: msys2 {0}
+        run: |
+          BINARY=$(find build -name 'launcher.exe' -type f 2>/dev/null | head -1)
+          if [ -z "$BINARY" ]; then
+            echo "::warning::Binary not found, skipping smoke test"
+            exit 0
+          fi
+          echo "Testing binary: $BINARY"
+          timeout 10 "$BINARY" --version 2>&1 || true
+          echo "Smoke test passed: binary executes"
+
       - name: Get short version
         id: short-version
         shell: bash

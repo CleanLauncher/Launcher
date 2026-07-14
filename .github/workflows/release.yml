@@ -51,6 +51,12 @@ jobs:
           mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip
           mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg
 
+          # .deb
+          find . -name '*.deb' -exec mv {} Launcher-${{ env.VERSION }}.deb \;
+
+          # .rpm
+          find . -name '*.rpm' -exec mv {} Launcher-${{ env.VERSION }}.rpm \;
+
           tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
 
           for d in Launcher-Windows-MinGW-w64*; do
@@ -80,17 +86,16 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" \
-            --repo "${{ github.repository }}" \
-            --title "Launcher ${{ env.VERSION }}" \
-            --draft \
-            --generate-notes \
-            Launcher-Linux-x86_64.AppImage \
-            Launcher-Linux-x86_64.AppImage.zsync \
-            Launcher-Linux-aarch64.AppImage \
-            Launcher-Linux-aarch64.AppImage.zsync \
+          ASSETS=""
+          for f in \
+            "Launcher-Linux-x86_64.AppImage" \
+            "Launcher-Linux-x86_64.AppImage.zsync" \
+            "Launcher-Linux-aarch64.AppImage" \
+            "Launcher-Linux-aarch64.AppImage.zsync" \
             "Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
             "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
+            "Launcher-${{ env.VERSION }}.deb" \
+            "Launcher-${{ env.VERSION }}.rpm" \
             "Launcher-Windows-MinGW-w64-${{ env.VERSION }}.zip" \
             "Launcher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip" \
             "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
@@ -100,3 +105,13 @@ jobs:
             "Launcher-macOS-${{ env.VERSION }}.zip" \
             "Launcher-macOS-${{ env.VERSION }}.dmg" \
             "Launcher-${{ env.VERSION }}.tar.gz"
+          do
+            test -f "$f" && ASSETS="$ASSETS $f"
+          done
+
+          gh release create "${{ github.ref_name }}" \
+            --repo "${{ github.repository }}" \
+            --title "Launcher ${{ env.VERSION }}" \
+            --draft \
+            --generate-notes \
+            $ASSETS
