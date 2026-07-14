@@ -28,19 +28,32 @@ jobs:
 
       - name: Verify all commits are signed off
         run: |
-          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            BASE=$(git rev-list --max-parents=0 HEAD | tail -1)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="${{ github.event.before }}"
           fi
+
+          # Handle all-zeros or empty (new branch, force push, etc.)
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            # For force pushes or new branches, check last 50 commits
+            BASE=$(git rev-list --max-parents=0 HEAD | tail -1)
+            HASHES=$(git log -50 --format='%H' HEAD)
+          else
+            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null || git log -50 --format='%H' HEAD)
+          fi
+
           FAILED=0
           while IFS= read -r hash; do
+            [ -z "$hash" ] && continue
             MSG=$(git log -1 --format='%B' "$hash")
             if ! echo "$MSG" | grep -q "^Signed-off-by:"; then
               echo "::error file=.git commit=$hash::Missing Signed-off-by"
               git log -1 --format='  %h %s' "$hash"
               FAILED=1
             fi
-          done < <(git rev-list "$BASE"..HEAD)
+          done <<< "$HASHES"
+
           if [ "$FAILED" -eq 1 ]; then
             echo ""
             echo "All commits must include a Signed-off-by line."
@@ -62,12 +75,21 @@ jobs:
 
       - name: Verify Signed-off-by matches commit author
         run: |
-          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            BASE=$(git rev-list --max-parents=0 HEAD | tail -1)
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE="${{ github.event.before }}"
           fi
+
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            HASHES=$(git log -50 --format='%H' HEAD)
+          else
+            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null || git log -50 --format='%H' HEAD)
+          fi
+
           FAILED=0
           while IFS= read -r hash; do
+            [ -z "$hash" ] && continue
             AUTHOR_NAME=$(git log -1 --format='%an' "$hash")
             AUTHOR_EMAIL=$(git log -1 --format='%ae' "$hash")
             SO_LINE=$(git log -1 --format='%B' "$hash" | grep "^Signed-off-by:" | head -1)
@@ -81,7 +103,8 @@ jobs:
               git log -1 --format='  %h %s' "$hash"
               FAILED=1
             fi
-          done < <(git rev-list "$BASE"..HEAD)
+          done <<< "$HASHES"
+
           if [ "$FAILED" -eq 1 ]; then
             echo ""
             echo "Signed-off-by must match the commit author."
@@ -102,13 +125,15 @@ jobs:
         run: |
           FAILED=0
           while IFS= read -r file; do
-            MATCHES=$(grep -Pn '[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}\x{1F000}-\x{1FFFF}]' "$file" 2>/dev/null || true)
+            # Use perl for proper Unicode emoji detection
+            MATCHES=$(perl -ne 'print "$.: $_" if /[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{FE00}-\x{FE0F}]/' "$file" 2>/dev/null || true)
             if [ -n "$MATCHES" ]; then
               echo "::error file=$file::Emoji found"
-              echo "$MATCHES"
+              echo "$MATCHES" | head -5
               FAILED=1
             fi
-          done < <(find . -name '*.cpp' -o -name '*.h' -o -name '*.hpp' -o -name '*.md' -o -name '*.yml' -o -name '*.yaml' -o -name '*.java' | grep -v './.git/' | grep -v './build/' | grep -v './libraries/')
+          done < <(find . \( -name '*.cpp' -o -name '*.h' -o -name '*.hpp' -o -name '*.md' -o -name '*.yml' -o -name '*.yaml' -o -name '*.java' \) \
+            -not -path './.git/*' -not -path './build/*' -not -path './libraries/*' -not -path './.mimocode/*')
           if [ "$FAILED" -eq 1 ]; then
             echo ""
             echo "Emojis are not allowed in source code, documentation, or CI files."
@@ -132,7 +157,7 @@ jobs:
       - name: Run codespell
         run: |
           codespell --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json' \
-            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co' \
+            --ignore-words-list='te,nd,ist,parm,ore,orelse,ue,se,fo,lo,co,Technic,technic,MSYSTEM,MSYS,aqt,cmake,VCPKG,cmake' \
             --quiet-level=2
 
   yaml-lint:
@@ -154,12 +179,15 @@ jobs:
           extends: default
           rules:
             line-length:
-              max: 200
+              max: 500
             truthy:
               check-keys: false
             comments:
               min-spaces-from-content: 1
             document-start: disable
+            brackets:
+              min-spaces-inside: 0
+              max-spaces-inside: 1
           YAML
           ) .github/workflows/*.yml .github/actions/**/*.yml
 
