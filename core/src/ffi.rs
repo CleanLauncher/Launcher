@@ -1,3 +1,5 @@
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
@@ -59,7 +61,7 @@ pub extern "C" fn launcher_gzip_zip(
 pub extern "C" fn launcher_free_buffer(raw_ptr: *mut u8, length: usize) {
     if !raw_ptr.is_null() {
         unsafe {
-            let _ = Box::from_raw(slice::from_raw_parts_mut(raw_ptr, length));
+            let _ = Box::from_raw(std::ptr::slice_from_raw_parts_mut(raw_ptr, length));
         }
     }
 }

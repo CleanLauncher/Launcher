@@ -10,10 +10,10 @@ pub fn natural_compare(
 
     loop {
         // Skip whitespace on both sides.
-        while left_chars.peek().map_or(false, |c| c.is_whitespace()) {
+        while left_chars.peek().is_some_and(|c| c.is_whitespace()) {
             left_chars.next();
         }
-        while right_chars.peek().map_or(false, |c| c.is_whitespace()) {
+        while right_chars.peek().is_some_and(|c| c.is_whitespace()) {
             right_chars.next();
         }
 
@@ -43,24 +43,24 @@ pub fn natural_compare(
 
                     if left_char == '0' {
                         left_digits.push(left_char);
-                        while left_chars.peek().map_or(false, |c| *c == '0') {
+                        while left_chars.peek().is_some_and(|c| *c == '0') {
                             left_digits.push(left_chars.next().unwrap());
                         }
                     }
-                    if left_chars.peek().map_or(false, |c| c.is_ascii_digit()) {
-                        while left_chars.peek().map_or(false, |c| c.is_ascii_digit()) {
+                    if left_chars.peek().is_some_and(|c| c.is_ascii_digit()) {
+                        while left_chars.peek().is_some_and(|c| c.is_ascii_digit()) {
                             left_digits.push(left_chars.next().unwrap());
                         }
                     }
 
                     if right_char == '0' {
                         right_digits.push(right_char);
-                        while right_chars.peek().map_or(false, |c| *c == '0') {
+                        while right_chars.peek().is_some_and(|c| *c == '0') {
                             right_digits.push(right_chars.next().unwrap());
                         }
                     }
-                    if right_chars.peek().map_or(false, |c| c.is_ascii_digit()) {
-                        while right_chars.peek().map_or(false, |c| c.is_ascii_digit()) {
+                    if right_chars.peek().is_some_and(|c| c.is_ascii_digit()) {
+                        while right_chars.peek().is_some_and(|c| c.is_ascii_digit()) {
                             right_digits.push(right_chars.next().unwrap());
                         }
                     }
@@ -117,17 +117,17 @@ pub fn human_readable_file_size(
     )
 }
 
-pub fn truncate_url_human_friendly(url_input: &str, max_length: usize, hard_limit: bool) -> String {
+pub fn truncate_url_human_friendly(
+    url_input: &str,
+    max_length: usize,
+    _hard_limit: bool,
+) -> String {
     if url_input.len() <= max_length {
         return url_input.to_string();
     }
 
     let truncated_url = &url_input[..max_length.saturating_sub(3)];
-    if hard_limit {
-        format!("{}...", truncated_url)
-    } else {
-        format!("{}...", truncated_url)
-    }
+    format!("{}...", truncated_url)
 }
 
 pub fn get_random_alpha_numeric() -> String {
