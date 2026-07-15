@@ -102,23 +102,23 @@ runs:
         cp -a /opt/launcher/* "$INSTALL_DEB_DIR/opt/launcher/"
 
         cat > "$INSTALL_DEB_DIR/DEBIAN/control" <<EOF
-        Package: launcher
-        Version: ${VERSION}
-        Section: games
-        Priority: optional
-        Architecture: ${DEB_ARCH}
-        Depends: libgl1-mesa-glx | libgl1, libglib2.0-0, libxcb-cursor0, libxcb1, libxkbcommon0
-        Recommends: libgamemode0
-        Maintainer: Launcher Team <launcher@example.com>
-        Description: Launcher - Minecraft Launcher
-         Clean and maintained Minecraft launcher.
-        EOF
+Package: launcher
+Version: ${VERSION}
+Section: games
+Priority: optional
+Architecture: ${DEB_ARCH}
+Depends: libgl1-mesa-glx | libgl1, libglib2.0-0, libxcb-cursor0, libxcb1, libxkbcommon0
+Recommends: libgamemode0
+Maintainer: Clean Launcher Team <launcher@example.com>
+Description: Clean Launcher: Minecraft Launcher
+ Clean and maintained Minecraft launcher.
+EOF
 
         cat > "$INSTALL_DEB_DIR/DEBIAN/postinst" <<'EOF'
-        #!/bin/bash
-        update-desktop-database /usr/share/applications 2>/dev/null || true
-        update-mime-database /usr/share/mime 2>/dev/null || true
-        EOF
+#!/bin/bash
+update-desktop-database /usr/share/applications 2>/dev/null || true
+update-mime-database /usr/share/mime 2>/dev/null || true
+EOF
         chmod 755 "$INSTALL_DEB_DIR/DEBIAN/postinst"
 
         dpkg-deb --root-owner-group --build "$INSTALL_DEB_DIR" "$DEB_PKG"

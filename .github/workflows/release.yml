@@ -17,29 +17,8 @@ jobs:
       build-type: Release
     secrets: inherit
 
-  build_nix:
-    name: Build Nix
-    permissions:
-      contents: read
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@main
-
-      - name: Build
-        run: nix build .#launcher --print-build-logs --no-link --print-out-paths > nix-path.txt
-
-      - name: Upload
-        uses: actions/upload-artifact@v7
-        with:
-          name: Launcher-nix-x86_64-linux
-          path: result/
-
   create_release:
-    needs: [build_release, build_nix]
+    needs: build_release
     permissions:
       contents: write
     runs-on: ubuntu-24.04
