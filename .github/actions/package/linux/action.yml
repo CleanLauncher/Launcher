@@ -142,7 +142,7 @@ runs:
         printf '\n' >> "$RPM_SPEC"
         printf '%%install\n' >> "$RPM_SPEC"
         printf 'mkdir -p %%{buildroot}/opt/launcher\n' >> "$RPM_SPEC"
-        printf 'cp -a %s/build/install/* %%{buildroot}/opt/launcher/\n' "$GITHUB_WORKSPACE" >> "$RPM_SPEC"
+        printf 'cp -a /opt/launcher/* %%{buildroot}/opt/launcher/\n' >> "$RPM_SPEC"
         printf '\n' >> "$RPM_SPEC"
         printf '%%files\n' >> "$RPM_SPEC"
         printf '/opt/launcher/*\n' >> "$RPM_SPEC"

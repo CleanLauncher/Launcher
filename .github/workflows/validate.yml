@@ -32,7 +32,6 @@ jobs:
             BASE="${{ github.event.pull_request.base.sha }}"
             HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null)
           else
-            # For push events, check last 20 commits only
             HASHES=$(git log -20 --format='%H' HEAD)
           fi
 
@@ -56,6 +55,57 @@ jobs:
             exit 1
           fi
           echo "All commits are properly signed off."
+
+  commit-format:
+    name: Commit message format
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Verify commit message is exactly one line + signoff
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+            HASHES=$(git rev-list "$BASE"..HEAD 2>/dev/null)
+          else
+            HASHES=$(git log -20 --format='%H' HEAD)
+          fi
+
+          FAILED=0
+          COUNT=0
+          while IFS= read -r hash; do
+            [ -z "$hash" ] && continue
+            PARENTS=$(git cat-file -p "$hash" | grep -c '^parent ' || true)
+            if [ "$PARENTS" -gt 1 ]; then
+              continue
+            fi
+            AUTHOR=$(git log -1 --format='%an' "$hash")
+            if echo "$AUTHOR" | grep -qi 'bot\|dependabot\|renovate'; then
+              continue
+            fi
+            COUNT=$((COUNT + 1))
+            BODY=$(git log -1 --format='%B' "$hash")
+            LINE_COUNT=$(echo "$BODY" | grep -c '^' || true)
+            if [ "$LINE_COUNT" -ne 3 ]; then
+              echo "::error file=.git commit=$hash::Commit message must be exactly one line + blank line + Signed-off-by (got $LINE_COUNT lines)"
+              git log -1 --format='  %h %s' "$hash"
+              FAILED=1
+            fi
+          done <<< "$HASHES"
+
+          echo "Checked $COUNT commits."
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "Format: <subject line> + blank line + Signed-off-by: ..."
+            echo "Use: git commit -s -m 'type: short description'"
+            exit 1
+          fi
+          echo "All commits follow the format."
 
   no-emoji:
     name: No emoji check
