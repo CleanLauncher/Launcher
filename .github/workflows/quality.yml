@@ -63,7 +63,7 @@ jobs:
             echo "$match" >> "$GITHUB_STEP_SUMMARY"
             FOUND=$((FOUND + 1))
           done < <(grep -rn 'TODO\|FIXME\|HACK\|XXX\|WORKAROUND' \
-            launcher/ --include='*.cpp' --include='*.h' --include='*.hpp' 2>/dev/null || true)
+            src/ --include='*.cpp' --include='*.h' --include='*.hpp' 2>/dev/null || true)
           echo "Found **$FOUND** items." >> "$GITHUB_STEP_SUMMARY"
           echo "Found $FOUND TODO/FIXME/HACK comments."
 
@@ -84,5 +84,5 @@ jobs:
               echo "::warning file=$header::Missing include guard or #pragma once"
               FAILED=1
             fi
-          done < <(find launcher/ -name '*.h' -o -name '*.hpp' | grep -v './libraries/')
+          done < <(find src/ -name '*.h' -o -name '*.hpp' | grep -v './libraries/')
           echo "Include guard check completed."

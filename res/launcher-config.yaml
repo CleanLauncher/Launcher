@@ -1,0 +1,46 @@
+# Launcher build configuration
+# All data separated from source code — loaded at build time via CMake
+
+app:
+  name: Launcher
+  display_name: Launcher
+  app_id: io.github.launcher.Launcher
+  domain: github.com/CleanLauncher/Launcher
+  git_url: https://github.com/CleanLauncher/Launcher
+  binary_name: launcher
+
+version:
+  major: 12
+  minor: 0
+  patch: 0
+
+urls:
+  news_rss: https://prismlauncher.org/feed/feed.xml
+  news_open: https://discord.gg/5kcBCvnbTp
+  wiki: https://github.com/CleanLauncher/Launcher/wiki
+  help: https://github.com/CleanLauncher/Launcher/wiki/%1
+  login_callback: https://prismlauncher.org/successful-login
+  legacy_fmllibs: https://prismlauncher.org/files/fmllibs/
+  meta: https://prismlauncher.org/meta/v1/
+  bug_tracker: https://github.com/CleanLauncher/Launcher/issues
+  translations: https://hosted.weblate.org/projects/launcher/launcher/
+  translation_files: https://i18n.prismlauncher.org/
+  discord: https://discord.gg/5kcBCvnbTp
+  imgur_client_id: 5b97b0713fba4a3
+
+updater:
+  github_repo: https://github.com/CleanLauncher/Launcher
+
+copyright:
+  label: "Launcher, Prism Launcher & MultiMC Contributors"
+  text: "Copyright (C) 2025-2026 Launcher Contributors\\n(c) 2022-2026 Prism Launcher Contributors\\n(c) 2021-2022 PolyMC Contributors\\n(c) 2012-2021 MultiMC Contributors"
+  mac: "Copyright (C) 2025-2026 Launcher Contributors, (c) 2022-2026 Prism Launcher Contributors, (c) 2021-2022 PolyMC Contributors and (c) 2012-2021 MultiMC Contributors"
+
+native:
+  glfw_library: libglfw.so
+  openal_library: libopenal.so
+
+build:
+  qt_version_major: "6"
+  use_pch: true
+  java_downloader_default: false

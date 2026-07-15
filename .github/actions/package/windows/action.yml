@@ -107,7 +107,7 @@ runs:
         Expand-Archive -Path "NSISPlugins/NScurl.zip" -DestinationPath "NSISPlugins/NScurl"
 
         cd "${{ github.workspace }}/${{ env.INSTALL_DIR }}"
-        makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/program_info/win_install.nsi"
+        makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/res/win_install.nsi"
 
     - name: Upload binary zip
       uses: actions/upload-artifact@v7

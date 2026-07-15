@@ -10,7 +10,7 @@ if(IS_IN_SOURCE_BUILD)
     message(FATAL_ERROR "You are building the Launcher in-source. Please separate the build tree from the source tree.")
 endif()
 
-##################################### Set CMake options #####################################
+# Set CMake options
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -28,7 +28,7 @@ if(UNIX)
 endif()
 set(CMAKE_JAVA_TARGET_OUTPUT_DIR ${PROJECT_BINARY_DIR}/jars)
 
-######## Set compiler flags ########
+# Set compiler flags
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_C_STANDARD_REQUIRED true)
 set(CMAKE_CXX_STANDARD 20)
@@ -172,20 +172,21 @@ if(BUILD_TESTING)
     enable_testing()
 endif()
 
-##################################### Set Application options #####################################
+# Set Application options
 
-######## Set URLs ########
-set(Launcher_NEWS_RSS_URL "https://prismlauncher.org/feed/feed.xml" CACHE STRING "URL to fetch Launcher's news RSS feed from.")
-set(Launcher_NEWS_OPEN_URL "https://discord.gg/5kcBCvnbTp" CACHE STRING "URL that gets opened when the user clicks 'More News'")
-set(Launcher_WIKI_URL "https://github.com/CleanLauncher/Launcher/wiki" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
-set(Launcher_HELP_URL "https://github.com/CleanLauncher/Launcher/wiki/%1" CACHE STRING "URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window")
-set(Launcher_LOGIN_CALLBACK_URL "https://prismlauncher.org/successful-login" CACHE STRING "URL that gets opened when the user successfully logins.")
-set(Launcher_LEGACY_FMLLIBS_BASE_URL "https://prismlauncher.org/files/fmllibs/" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
+# Load build configuration from YAML
+include(ParseLauncherConfig)
+parse_launcher_config()
 
-######## Set version numbers ########
-set(Launcher_VERSION_MAJOR 12)
-set(Launcher_VERSION_MINOR 0)
-set(Launcher_VERSION_PATCH 0)
+# URLs (defaults from res/launcher-config.yaml, overridable via -D)
+set(Launcher_NEWS_RSS_URL "${Launcher_NEWS_RSS_URL}" CACHE STRING "URL to fetch Launcher's news RSS feed from.")
+set(Launcher_NEWS_OPEN_URL "${Launcher_NEWS_OPEN_URL}" CACHE STRING "URL that gets opened when the user clicks 'More News'")
+set(Launcher_WIKI_URL "${Launcher_WIKI_URL}" CACHE STRING "URL that gets opened when the user clicks 'Launcher Help'")
+set(Launcher_HELP_URL "${Launcher_HELP_URL}" CACHE STRING "URL (with arg %1 to be substituted with page-id) that gets opened when the user requests help in a dialog window")
+set(Launcher_LOGIN_CALLBACK_URL "${Launcher_LOGIN_CALLBACK_URL}" CACHE STRING "URL that gets opened when the user successfully logins.")
+set(Launcher_LEGACY_FMLLIBS_BASE_URL "${Launcher_LEGACY_FMLLIBS_BASE_URL}" CACHE STRING "URL for legacy (<=1.5.2) FML Libraries.")
+
+# Version numbers (from res/launcher-config.yaml)
 
 set(Launcher_VERSION_NAME "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}")
 set(Launcher_VERSION_NAME4 "${Launcher_VERSION_MAJOR}.${Launcher_VERSION_MINOR}.${Launcher_VERSION_PATCH}.0")
@@ -195,35 +196,35 @@ set(Launcher_VERSION_NAME4_COMMA "${Launcher_VERSION_MAJOR},${Launcher_VERSION_M
 set(Launcher_BUILD_PLATFORM "unknown" CACHE STRING "A short string identifying the platform that this build was built for. Only used to display in the about dialog.")
 
 # Github repo URL with releases for updater
-set(Launcher_UPDATER_GITHUB_REPO "https://github.com/CleanLauncher/Launcher" CACHE STRING "Base github URL for the updater.")
+set(Launcher_UPDATER_GITHUB_REPO "${Launcher_UPDATER_GITHUB_REPO}" CACHE STRING "Base github URL for the updater.")
 
 # Name to help updater identify valid artifacts
 set(Launcher_BUILD_ARTIFACT "" CACHE STRING "Artifact name to help the updater identify valid artifacts.")
 
 # The metadata server
-set(Launcher_META_URL "https://prismlauncher.org/meta/v1/" CACHE STRING "URL to fetch Launcher's meta files from.")
+set(Launcher_META_URL "${Launcher_META_URL}" CACHE STRING "URL to fetch Launcher's meta files from.")
 
 # Imgur API Client ID
-set(Launcher_IMGUR_CLIENT_ID "5b97b0713fba4a3" CACHE STRING "Client ID you can get from Imgur when you register an application")
+set(Launcher_IMGUR_CLIENT_ID "${Launcher_IMGUR_CLIENT_ID}" CACHE STRING "Client ID you can get from Imgur when you register an application")
 
 # Bug tracker URL
-set(Launcher_BUG_TRACKER_URL "https://github.com/CleanLauncher/Launcher/issues" CACHE STRING "URL for the bug tracker.")
+set(Launcher_BUG_TRACKER_URL "${Launcher_BUG_TRACKER_URL}" CACHE STRING "URL for the bug tracker.")
 
 # Translations Platform URL
-set(Launcher_TRANSLATIONS_URL "https://hosted.weblate.org/projects/launcher/launcher/" CACHE STRING "URL for the translations platform.")
-set(Launcher_TRANSLATION_FILES_URL "https://i18n.prismlauncher.org/" CACHE STRING "URL for the translations files.")
+set(Launcher_TRANSLATIONS_URL "${Launcher_TRANSLATIONS_URL}" CACHE STRING "URL for the translations platform.")
+set(Launcher_TRANSLATION_FILES_URL "${Launcher_TRANSLATION_FILES_URL}" CACHE STRING "URL for the translations files.")
 
 # Matrix Space
 #set(Launcher_MATRIX_URL "https://prismlauncher.org/matrix" CACHE STRING "URL to the Matrix Space")
 
 # Discord URL
-set(Launcher_DISCORD_URL "https://discord.gg/5kcBCvnbTp" CACHE STRING "URL for the Discord guild.")
+set(Launcher_DISCORD_URL "${Launcher_DISCORD_URL}" CACHE STRING "URL for the Discord guild.")
 
 # Subreddit URL
 #set(Launcher_SUBREDDIT_URL "https://prismlauncher.org/reddit" CACHE STRING "URL for the subreddit.")
 
 # Builds
-set(Launcher_QT_VERSION_MAJOR "6" CACHE STRING "Major Qt version to build against")
+set(Launcher_QT_VERSION_MAJOR "${Launcher_QT_VERSION_MAJOR}" CACHE STRING "Major Qt version to build against")
 
 option(Launcher_USE_PCH "Use precompiled headers where possible" ON)
 
@@ -240,13 +241,13 @@ endif()
 # Java downloader
 option(Launcher_ENABLE_JAVA_DOWNLOADER "Build the java downloader feature" ${Launcher_ENABLE_JAVA_DOWNLOADER_DEFAULT})
 
-# Native libraries
+# Native libraries (defaults from YAML, overridden per platform)
 if(UNIX AND APPLE)
     set(Launcher_GLFW_LIBRARY_NAME "libglfw.dylib" CACHE STRING "Name of native glfw library")
     set(Launcher_OPENAL_LIBRARY_NAME "libopenal.dylib" CACHE STRING "Name of native openal library")
 elseif(UNIX)
-    set(Launcher_GLFW_LIBRARY_NAME "libglfw.so" CACHE STRING "Name of native glfw library")
-    set(Launcher_OPENAL_LIBRARY_NAME "libopenal.so" CACHE STRING "Name of native openal library")
+    set(Launcher_GLFW_LIBRARY_NAME "${Launcher_GLFW_LIBRARY_NAME}" CACHE STRING "Name of native glfw library")
+    set(Launcher_OPENAL_LIBRARY_NAME "${Launcher_OPENAL_LIBRARY_NAME}" CACHE STRING "Name of native openal library")
 elseif(WIN32)
     set(Launcher_GLFW_LIBRARY_NAME "glfw.dll" CACHE STRING "Name of native glfw library")
     set(Launcher_OPENAL_LIBRARY_NAME "OpenAL.dll" CACHE STRING "Name of native openal library")
@@ -279,7 +280,7 @@ set(Launcher_COMPILER_TARGET_SYSTEM ${CMAKE_SYSTEM_NAME})
 set(Launcher_COMPILER_TARGET_SYSTEM_VERSION ${CMAKE_SYSTEM_VERSION})
 set(Launcher_COMPILER_TARGET_PROCESSOR ${CMAKE_SYSTEM_PROCESSOR})
 
-#### Check the current Git commit and branch
+# Check the current Git commit and branch
 include(GetGitRevisionDescription)
 git_get_exact_tag(Launcher_GIT_TAG)
 get_git_head_revision(Launcher_GIT_REFSPEC Launcher_GIT_COMMIT)
@@ -291,7 +292,7 @@ message(STATUS "Git refspec: ${Launcher_GIT_REFSPEC}")
 string(TIMESTAMP TODAY "%Y-%m-%d")
 set(Launcher_BUILD_TIMESTAMP "${TODAY}")
 
-################################ 3rd Party Libs ################################
+# 3rd Party Libs
 
 # Find the required Qt parts
 if(Launcher_QT_VERSION_MAJOR EQUAL 6)
@@ -348,12 +349,12 @@ find_package(ZLIB REQUIRED)
 
 include(ECMQtDeclareLoggingCategory)
 
-####################################### Program Info #######################################
+# Program Info
 
 set(Launcher_APP_BINARY_NAME "launcher" CACHE STRING "Name of the Launcher binary")
-add_subdirectory(program_info)
+add_subdirectory(res)
 
-####################################### Install layout #######################################
+# Install layout
 
 set(Launcher_ENABLE_UPDATER NO)
 set(Launcher_BUILD_UPDATER NO)
@@ -414,7 +415,7 @@ if(UNIX AND APPLE)
         endif()
 
         if(XCODE_VERSION VERSION_GREATER_EQUAL 26.0)
-            set(ASSETS_OUT_DIR "${CMAKE_BINARY_DIR}/program_info")
+            set(ASSETS_OUT_DIR "${CMAKE_BINARY_DIR}/res")
             set(GENERATED_ASSETS_CAR "${ASSETS_OUT_DIR}/Assets.car")
             set(ICON_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}/${Launcher_Branding_MAC_ICON}")
 
@@ -460,7 +461,7 @@ elseif(UNIX)
     install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${Launcher_PNG_256} DESTINATION "${KDE_INSTALL_ICONDIR}/hicolor/256x256/apps" RENAME "${Launcher_AppID}.png")
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${Launcher_MIMEInfo} DESTINATION ${KDE_INSTALL_MIMEDIR})
 
-    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/launcher/qtlogging.ini" DESTINATION "share/${Launcher_Name}")
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/qtlogging.ini" DESTINATION "share/${Launcher_Name}")
 
     set(PLUGIN_DEST_DIR "plugins")
     set(BUNDLE_DEST_DIR ".")
@@ -471,7 +472,7 @@ elseif(UNIX)
     endif()
 
     # Install basic runner script if component "portable" is selected
-    configure_file(launcher/Launcher.in "${CMAKE_CURRENT_BINARY_DIR}/LauncherScript" @ONLY)
+    configure_file(src/Launcher.in "${CMAKE_CURRENT_BINARY_DIR}/LauncherScript" @ONLY)
     install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/LauncherScript" DESTINATION "." RENAME ${Launcher_Name} COMPONENT portable EXCLUDE_FROM_ALL)
 
 elseif(WIN32)
@@ -486,7 +487,7 @@ endif()
 
 
 
-################################ Included Libs ################################
+# Included Libs
 
 include(ExternalProject)
 set_directory_properties(PROPERTIES EP_BASE External)
@@ -504,7 +505,9 @@ add_subdirectory(libraries/LocalPeer) # fork of a library from Qt solutions
 add_subdirectory(libraries/murmur2) # Hash for usage with the CurseForge API
 add_subdirectory(libraries/qdcss) # css parser
 
-############################### Built Artifacts ###############################
+add_subdirectory(core) # Rust core library
+
+# Built Artifacts
 
 add_subdirectory(buildconfig)
 
@@ -512,4 +515,4 @@ if(BUILD_TESTING)
     add_subdirectory(tests)
 endif()
 # NOTE: this must always be last to appease the CMake deity of quirky install command evaluation order.
-add_subdirectory(launcher)
+add_subdirectory(src)

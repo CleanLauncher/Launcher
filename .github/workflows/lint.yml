@@ -65,5 +65,5 @@ jobs:
             --suppressions-list=.cppcheck-suppressions \
             --inline-suppr \
             -I libraries/ \
-            -I launcher/ \
-            launcher/ libraries/
+            -I src/ \
+            src/ libraries/

@@ -92,8 +92,8 @@ RUN cppcheck \
   --error-exitcode=1 \
   --suppressions-list=.cppcheck-suppressions \
   --inline-suppr \
-  -I libraries/ -I launcher/ \
-  launcher/ libraries/
+  -I libraries/ -I src/ \
+  src/ libraries/
 
 RUN markdownlint --dot .
 
@@ -112,7 +112,7 @@ COPY . /src
 WORKDIR /src
 
 RUN codespell \
-  --skip='./libraries,./build,./.git,./.mimocode,*.lock,*.json,*.nix,*.ui,./tests/testdata,./launcher/resources,./cmake,./scripts,./program_info' \
+  --skip='./libraries,./build,./.git,./.mimocode,./core/target,./docs,*.lock,*.json,*.nix,*.ui,./tests/testdata,./src/resources,./cmake,./scripts,./res' \
   --ignore-words .codespell-ignore-words \
   --quiet-level=2
 

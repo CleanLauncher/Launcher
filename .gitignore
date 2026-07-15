@@ -62,3 +62,12 @@ flatbuild
 
 # Snap
 *.snap
+
+# MiMoCode
+.mimocode/
+
+# Rust build artifacts
+core/target/
+
+# Logs
+aqtinstall.log
