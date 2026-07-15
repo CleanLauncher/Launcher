@@ -128,33 +128,31 @@ runs:
         sudo apt-get -y install rpm
 
         RPM_SPEC="/tmp/launcher.spec"
-        cat > "$RPM_SPEC" <<EOF
-        Name:           launcher
-        Version:        ${VERSION}
-        Release:        1
-        Summary:        Minecraft Launcher
-        License:        GPL-3.0-only
-        Group:          Amusements/Games
-        URL:            https://github.com/CleanLauncher/Launcher
-        Requires:       mesa-libGL glib2 libxcb libxkbcommon
-
-        %description
-        Clean and maintained Minecraft launcher.
-
-        %install
-        mkdir -p %{buildroot}/opt/launcher
-        cp -a ${GITHUB_WORKSPACE}/build/install/* %{buildroot}/opt/launcher/
-
-        %files
-        /opt/launcher/*
-
-        %post
-        update-desktop-database /usr/share/applications 2>/dev/null || true
-        EOF
+        printf 'Name:           launcher\n' > "$RPM_SPEC"
+        printf 'Version:        %s\n' "$VERSION" >> "$RPM_SPEC"
+        printf 'Release:        1\n' >> "$RPM_SPEC"
+        printf 'Summary:        Minecraft Launcher\n' >> "$RPM_SPEC"
+        printf 'License:        GPL-3.0-only\n' >> "$RPM_SPEC"
+        printf 'Group:          Amusements/Games\n' >> "$RPM_SPEC"
+        printf 'URL:            https://github.com/CleanLauncher/Launcher\n' >> "$RPM_SPEC"
+        printf 'Requires:       mesa-libGL glib2 libxcb libxkbcommon\n' >> "$RPM_SPEC"
+        printf '\n' >> "$RPM_SPEC"
+        printf '%%description\n' >> "$RPM_SPEC"
+        printf 'Clean and maintained Minecraft launcher.\n' >> "$RPM_SPEC"
+        printf '\n' >> "$RPM_SPEC"
+        printf '%%install\n' >> "$RPM_SPEC"
+        printf 'mkdir -p %%{buildroot}/opt/launcher\n' >> "$RPM_SPEC"
+        printf 'cp -a ${GITHUB_WORKSPACE}/build/install/* %%{buildroot}/opt/launcher/\n' >> "$RPM_SPEC"
+        printf '\n' >> "$RPM_SPEC"
+        printf '%%files\n' >> "$RPM_SPEC"
+        printf '/opt/launcher/*\n' >> "$RPM_SPEC"
+        printf '\n' >> "$RPM_SPEC"
+        printf '%%post\n' >> "$RPM_SPEC"
+        printf 'update-desktop-database /usr/share/applications 2>/dev/null || true\n' >> "$RPM_SPEC"
 
         rpmbuild -bb "$RPM_SPEC" --define "_topdir /tmp/rpmbuild" \
           --define "version $VERSION" \
-          --buildarch "$RPM_ARCH"
+          --target "$RPM_ARCH"
 
     - name: Package portable tarball
       shell: bash
