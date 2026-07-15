@@ -135,6 +135,5 @@ jobs:
           gh release create "${{ github.ref_name }}" \
             --repo "${{ github.repository }}" \
             --title "Launcher ${{ env.VERSION }}" \
-            --draft \
             --generate-notes \
             $ASSETS
