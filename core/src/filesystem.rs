@@ -93,7 +93,8 @@ pub fn normalize_path(path: &str) -> String {
 }
 
 pub fn remove_invalid_filename_chars(input_string: &str, replace_with: char) -> String {
-    input_string.chars()
+    input_string
+        .chars()
         .map(|c| {
             if c == '<'
                 || c == '>'
@@ -114,7 +115,8 @@ pub fn remove_invalid_filename_chars(input_string: &str, replace_with: char) -> 
 }
 
 pub fn remove_invalid_path_chars(input_string: &str, replace_with: char) -> String {
-    input_string.chars()
+    input_string
+        .chars()
         .map(|c| {
             if c == '<' || c == '>' || c == '"' || c == '|' || c == '?' || c == '*' {
                 replace_with

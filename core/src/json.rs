@@ -20,7 +20,11 @@ pub fn to_string_pretty(value: &Value) -> Result<String> {
 
 pub fn is_binary_json(input_bytes: &[u8]) -> bool {
     // Binary JSON format starts with 0x00 0xBF 0x00 0xBF
-    input_bytes.len() >= 4 && input_bytes[0] == 0x00 && input_bytes[1] == 0xBF && input_bytes[2] == 0x00 && input_bytes[3] == 0xBF
+    input_bytes.len() >= 4
+        && input_bytes[0] == 0x00
+        && input_bytes[1] == 0xBF
+        && input_bytes[2] == 0x00
+        && input_bytes[3] == 0xBF
 }
 
 pub fn require_document(input_bytes: &[u8], what: &str) -> Result<Value> {
