@@ -1,6 +1,6 @@
 ## Launcher
 
-     Launcher - Minecraft Launcher
+     Launcher: Minecraft Launcher
      Copyright (C) 2025-2026 Launcher Contributors
 
      This program is free software: you can redistribute it and/or modify
@@ -17,7 +17,7 @@
 
 ## Prism Launcher
 
-     Prism Launcher - Minecraft Launcher
+     Prism Launcher: Minecraft Launcher
      Copyright (C) 2022-2026 Prism Launcher Contributors
 
      This program is free software: you can redistribute it and/or modify
@@ -51,7 +51,7 @@
 
 ## PolyMC
 
-     PolyMC - Minecraft Launcher
+     PolyMC: Minecraft Launcher
      Copyright (C) 2021-2022 PolyMC Contributors
 
      This program is free software: you can redistribute it and/or modify
@@ -134,7 +134,7 @@
 
 ## libnbt++
 
-    libnbt++ - A library for the Minecraft Named Binary Tag format.
+    libnbt++: A library for the Minecraft Named Binary Tag format.
     Copyright (C) 2013, 2015  ljfa-ag
 
     libnbt++ is free software: you can redistribute it and/or modify
@@ -231,7 +231,7 @@
 
 ## launcher (`libraries/launcher`)
 
-     PolyMC - Minecraft Launcher
+     PolyMC: Minecraft Launcher
      Copyright (C) 2021-2022 PolyMC Contributors
 
      This program is free software: you can redistribute it and/or modify
