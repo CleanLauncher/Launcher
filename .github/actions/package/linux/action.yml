@@ -101,24 +101,20 @@ runs:
         mkdir -p "$INSTALL_DEB_DIR/opt/launcher"
         cp -a /opt/launcher/* "$INSTALL_DEB_DIR/opt/launcher/"
 
-        cat > "$INSTALL_DEB_DIR/DEBIAN/control" <<EOF
-Package: launcher
-Version: ${VERSION}
-Section: games
-Priority: optional
-Architecture: ${DEB_ARCH}
-Depends: libgl1-mesa-glx | libgl1, libglib2.0-0, libxcb-cursor0, libxcb1, libxkbcommon0
-Recommends: libgamemode0
-Maintainer: Clean Launcher Team <launcher@example.com>
-Description: Clean Launcher: Minecraft Launcher
- Clean and maintained Minecraft launcher.
-EOF
+        printf 'Package: launcher\n' > "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Version: %s\n' "$VERSION" >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Section: games\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Priority: optional\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Architecture: %s\n' "$DEB_ARCH" >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Depends: libgl1-mesa-glx | libgl1, libglib2.0-0, libxcb-cursor0, libxcb1, libxkbcommon0\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Recommends: libgamemode0\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Maintainer: Clean Launcher Team <launcher@example.com>\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Description: Clean Launcher: Minecraft Launcher\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf ' Clean and maintained Minecraft launcher.\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
 
-        cat > "$INSTALL_DEB_DIR/DEBIAN/postinst" <<'EOF'
-#!/bin/bash
-update-desktop-database /usr/share/applications 2>/dev/null || true
-update-mime-database /usr/share/mime 2>/dev/null || true
-EOF
+        printf '#!/bin/bash\n' > "$INSTALL_DEB_DIR/DEBIAN/postinst"
+        printf 'update-desktop-database /usr/share/applications 2>/dev/null || true\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
+        printf 'update-mime-database /usr/share/mime 2>/dev/null || true\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
         chmod 755 "$INSTALL_DEB_DIR/DEBIAN/postinst"
 
         dpkg-deb --root-owner-group --build "$INSTALL_DEB_DIR" "$DEB_PKG"
