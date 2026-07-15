@@ -17,8 +17,88 @@ jobs:
       build-type: Release
     secrets: inherit
 
+  build_snap:
+    name: Build Snap
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Install snapcraft
+        run: sudo snap install snapcraft --classic
+
+      - name: Build snap
+        run: snapcraft --verbose
+        env:
+          SNAPCRAFT_BUILD_ENVIRONMENT: host
+
+      - name: Upload snap
+        uses: actions/upload-artifact@v7
+        with:
+          name: Launcher-snap
+          path: "*.snap"
+
+  build_flatpak:
+    name: Build Flatpak
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Build flatpak
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: flatpak/io.github.launcher.Launcher.yml
+          bundle: launcher.flatpak
+          cache-key: flatpak-builder-${{ github.sha }}
+
+      - name: Upload flatpak
+        uses: actions/upload-artifact@v7
+        with:
+          name: Launcher-flatpak
+          path: "*.flatpak"
+
+  build_nix:
+    name: Build Nix
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Build nix package
+        run: |
+          nix-build nix/launcher.nix -o result-nix
+          cp result-nix/bin/launcher Launcher-nix
+          chmod +x Launcher-nix
+
+      - name: Upload nix binary
+        uses: actions/upload-artifact@v7
+        with:
+          name: Launcher-nix
+          path: Launcher-nix
+
   create_release:
-    needs: build_release
+    needs: [build_release, build_snap, build_flatpak, build_nix]
     permissions:
       contents: write
     runs-on: ubuntu-24.04
@@ -53,6 +133,15 @@ jobs:
           find . -name '*.deb' -exec mv {} Launcher-${{ env.VERSION }}.deb \; 2>/dev/null || true
           find . -name '*.rpm' -exec mv {} Launcher-${{ env.VERSION }}.rpm \; 2>/dev/null || true
 
+          # .snap
+          find . -name '*.snap' -exec cp {} Launcher-${{ env.VERSION }}.snap \; 2>/dev/null || true
+
+          # .flatpak
+          find . -name '*.flatpak' -exec cp {} Launcher-${{ env.VERSION }}.flatpak \; 2>/dev/null || true
+
+          # .nix
+          test -f Launcher-nix && cp Launcher-nix Launcher-${{ env.VERSION }}-nix || true
+
           # macOS
           mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip 2>/dev/null || true
           mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg 2>/dev/null || true
@@ -60,23 +149,13 @@ jobs:
           # Windows
           for d in Launcher-Windows-MinGW-w64*; do
             cd "${d}" || continue
-            INST="$(echo -n ${d} | grep -o Setup || true)"
-            PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="Launcher-Windows-MinGW-w64"
-            test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" * 2>/dev/null || true
+            test -f Launcher-*.exe && mv Launcher-*.exe ../Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
             cd ..
           done
 
           for d in Launcher-Windows-MinGW-arm64*; do
             cd "${d}" || continue
-            INST="$(echo -n ${d} | grep -o Setup || true)"
-            PORT="$(echo -n ${d} | grep -o Portable || true)"
-            NAME="Launcher-Windows-MinGW-arm64"
-            test -z "${PORT}" || NAME="${NAME}-Portable"
-            test -z "${INST}" || mv Launcher-*.exe ../${NAME}-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
-            test -n "${INST}" || zip -r -9 "../${NAME}-${{ env.VERSION }}.zip" * 2>/dev/null || true
+            test -f Launcher-*.exe && mv Launcher-*.exe ../Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
             cd ..
           done
 
@@ -98,21 +177,15 @@ jobs:
             "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
             "Launcher-${{ env.VERSION }}.deb" \
             "Launcher-${{ env.VERSION }}.rpm" \
-            "Launcher-Windows-MinGW-w64-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MinGW-w64-Portable-${{ env.VERSION }}.zip" \
+            "Launcher-${{ env.VERSION }}.snap" \
+            "Launcher-${{ env.VERSION }}.flatpak" \
+            "Launcher-${{ env.VERSION }}-nix" \
             "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
-            "Launcher-Windows-MinGW-arm64-${{ env.VERSION }}.zip" \
-            "Launcher-Windows-MinGW-arm64-Portable-${{ env.VERSION }}.zip" \
             "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-macOS-${{ env.VERSION }}.zip" \
             "Launcher-macOS-${{ env.VERSION }}.dmg" \
             "Launcher-${{ env.VERSION }}.tar.gz"
           do
-            test -f "$f" && ASSETS="$ASSETS $f"
-          done
-
-          # Packaging artifacts: .snap / .nix / .flatpak
-          for f in $(find . \( -name '*.snap' -o -name '*.nix' -o -name '*.flatpak' \) -type f 2>/dev/null); do
             test -f "$f" && ASSETS="$ASSETS $f"
           done
 

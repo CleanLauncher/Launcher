@@ -46,6 +46,8 @@ parts:
     override-build: |
       craftctl default
       mkdir -p $CRAFT_PART_INSTALL/bin
+      cp $CRAFT_PART_BUILD/build/bin/Release/launcher $CRAFT_PART_INSTALL/bin/launcher 2>/dev/null || \
+      cp $CRAFT_PART_BUILD/build/bin/launcher $CRAFT_PART_INSTALL/bin/launcher 2>/dev/null || \
       cp $CRAFT_PART_BUILD/build/launcher $CRAFT_PART_INSTALL/bin/launcher
 apps:
   launcher:

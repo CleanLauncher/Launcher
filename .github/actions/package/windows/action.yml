@@ -109,18 +109,6 @@ runs:
         cd "${{ github.workspace }}/${{ env.INSTALL_DIR }}"
         makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/res/win_install.nsi"
 
-    - name: Upload binary zip
-      uses: actions/upload-artifact@v7
-      with:
-        name: Launcher-${{ inputs.artifact-name }}-${{ inputs.version }}-${{ inputs.build-type }}
-        path: install/**
-
-    - name: Upload portable zip
-      uses: actions/upload-artifact@v7
-      with:
-        name: Launcher-${{ inputs.artifact-name }}-Portable-${{ inputs.version }}-${{ inputs.build-type }}
-        path: install-portable/**
-
     - name: Upload installer
       uses: actions/upload-artifact@v7
       with:
