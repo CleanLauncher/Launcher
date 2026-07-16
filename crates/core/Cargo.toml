@@ -1,0 +1,19 @@
+[package]
+name = "core"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-only"
+
+[lib]
+name = "core"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+error = { path = "../error" }
+archive = { path = "../archive" }
+filesystem = { path = "../filesystem" }
+gzip = { path = "../gzip" }
+hashing = { path = "../hashing" }
+json = { path = "../json" }
+markdown = { path = "../markdown" }
+string_utils = { path = "../string_utils" }

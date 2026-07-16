@@ -47,6 +47,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "archive"
+version = "0.1.0"
+dependencies = [
+ "error",
+ "flate2",
+ "tar",
+ "zip",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -145,6 +155,20 @@ name = "constant_time_eq"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
+
+[[package]]
+name = "core"
+version = "0.1.0"
+dependencies = [
+ "archive",
+ "error",
+ "filesystem",
+ "gzip",
+ "hashing",
+ "json",
+ "markdown",
+ "string_utils",
+]
 
 [[package]]
 name = "core-foundation-sys"
@@ -263,6 +287,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "error"
+version = "0.1.0"
+dependencies = [
+ "serde_json",
+ "thiserror",
+ "toml 1.1.3+spec-1.1.0",
+]
+
+[[package]]
+name = "filesystem"
+version = "0.1.0"
+dependencies = [
+ "error",
+]
+
+[[package]]
 name = "filetime"
 version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -357,10 +397,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "gzip"
+version = "0.1.0"
+dependencies = [
+ "error",
+ "flate2",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.17.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a"
+
+[[package]]
+name = "hashing"
+version = "0.1.0"
+dependencies = [
+ "digest",
+ "error",
+ "md-5",
+ "sha2",
+]
 
 [[package]]
 name = "hmac"
@@ -442,88 +500,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "launcher_archive"
+name = "json"
 version = "0.1.0"
 dependencies = [
- "flate2",
- "launcher_error",
- "tar",
- "zip",
-]
-
-[[package]]
-name = "launcher_core"
-version = "0.1.0"
-dependencies = [
- "launcher_archive",
- "launcher_error",
- "launcher_filesystem",
- "launcher_gzip",
- "launcher_hashing",
- "launcher_json",
- "launcher_markdown",
- "launcher_string_utils",
-]
-
-[[package]]
-name = "launcher_error"
-version = "0.1.0"
-dependencies = [
- "serde_json",
- "thiserror",
- "toml 1.1.3+spec-1.1.0",
-]
-
-[[package]]
-name = "launcher_filesystem"
-version = "0.1.0"
-dependencies = [
- "launcher_error",
-]
-
-[[package]]
-name = "launcher_gzip"
-version = "0.1.0"
-dependencies = [
- "flate2",
- "launcher_error",
-]
-
-[[package]]
-name = "launcher_hashing"
-version = "0.1.0"
-dependencies = [
- "digest",
- "launcher_error",
- "md-5",
- "sha2",
-]
-
-[[package]]
-name = "launcher_json"
-version = "0.1.0"
-dependencies = [
- "launcher_error",
+ "error",
  "serde",
  "serde_json",
  "toml 0.8.23",
- "uuid",
-]
-
-[[package]]
-name = "launcher_markdown"
-version = "0.1.0"
-dependencies = [
- "launcher_error",
- "pulldown-cmark",
-]
-
-[[package]]
-name = "launcher_string_utils"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "regex",
  "uuid",
 ]
 
@@ -564,6 +547,14 @@ dependencies = [
  "cc",
  "libc",
  "pkg-config",
+]
+
+[[package]]
+name = "markdown"
+version = "0.1.0"
+dependencies = [
+ "error",
+ "pulldown-cmark",
 ]
 
 [[package]]
@@ -838,6 +829,15 @@ name = "slab"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
+
+[[package]]
+name = "string_utils"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "regex",
+ "uuid",
+]
 
 [[package]]
 name = "subtle"

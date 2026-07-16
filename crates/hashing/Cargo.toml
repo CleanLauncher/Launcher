@@ -1,0 +1,10 @@
+[package]
+name = "hashing"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+sha2 = "0.10"
+md-5 = "0.10"
+digest = "0.10"
+error = { path = "../error" }

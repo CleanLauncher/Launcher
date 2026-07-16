@@ -1,8 +1,0 @@
-[package]
-name = "launcher_markdown"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-pulldown-cmark = "0.13"
-launcher_error = { path = "../launcher_error" }

@@ -13,8 +13,8 @@ else()
 endif()
 
 # Determine library names
-set(RUST_STATIC_LIB "${CARGO_BUILD_DIR}/liblauncher_core.a")
-set(RUST_SHARED_LIB "${CARGO_BUILD_DIR}/liblauncher_core.so")
+set(RUST_STATIC_LIB "${CARGO_BUILD_DIR}/libcore.a")
+set(RUST_SHARED_LIB "${CARGO_BUILD_DIR}/libcore.so")
 
 # Custom command to build Rust library
 add_custom_command(
