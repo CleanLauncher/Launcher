@@ -12,7 +12,6 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
 pub extern "C" fn launcher_gzip_unzip(
