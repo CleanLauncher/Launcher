@@ -80,10 +80,7 @@ bool BrightTheme::hasStyleSheet()
     return true;
 }
 
-QString BrightTheme::appStyleSheet()
-{
-    return MinimalTheme::appStyleSheet();
-}
+
 QString BrightTheme::tooltip()
 {
     return QString();
