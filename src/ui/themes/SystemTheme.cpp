@@ -132,3 +132,9 @@ bool SystemTheme::hasStyleSheet()
 {
     return false;
 }
+
+bool SystemTheme::isDark()
+{
+    QColor windowColor = m_colorPalette.color(QPalette::Window);
+    return windowColor.lightnessF() < 0.5;
+}

@@ -203,14 +203,23 @@ void ThemeManager::setApplicationTheme(const QString& name, bool initial)
 void ThemeManager::applyCurrentlySelectedTheme(bool initial)
 {
     auto settings = APPLICATION->settings();
-    setIconTheme(settings->get("IconTheme").toString());
-    themeDebugLog() << "<> Icon theme set.";
     auto applicationTheme = settings->get("ApplicationTheme").toString();
     if (applicationTheme == "") {
         applicationTheme = m_defaultStyle;
     }
     setApplicationTheme(applicationTheme, initial);
-    themeDebugLog() << "<> Application theme set.";
+
+    auto themeIter = m_themes.find(applicationTheme);
+    QString iconTheme;
+    if (themeIter != m_themes.end() && themeIter->second->isDark()) {
+        iconTheme = "breeze_dark";
+    } else {
+        iconTheme = "breeze_light";
+    }
+    setIconTheme(iconTheme);
+    settings->set("IconTheme", iconTheme);
+
+    themeDebugLog() << "<> Theme applied: widget=" << applicationTheme << "icons=" << iconTheme;
 }
 
 void ThemeManager::refresh()

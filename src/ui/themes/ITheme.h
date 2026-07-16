@@ -59,6 +59,7 @@ class ITheme {
     virtual QPalette colorScheme() = 0;
     virtual QColor fadeColor() = 0;
     virtual double fadeAmount() = 0;
+    virtual bool isDark() { return false; }
     virtual LogColors logColorScheme() { return defaultLogColors(colorScheme()); }
     virtual QStringList searchPaths() { return {}; }
 

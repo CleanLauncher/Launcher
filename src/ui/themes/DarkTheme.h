@@ -48,4 +48,5 @@ class DarkTheme : public FusionTheme {
     QPalette colorScheme() override;
     double fadeAmount() override;
     QColor fadeColor() override;
+    bool isDark() override { return true; }
 };
