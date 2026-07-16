@@ -15,6 +15,17 @@ parts:
     build-packages:
       - build-essential
       - qt6-base-dev
+      - extra-cmake-modules
+      - pkg-config
+      - scdoc
+      - libcmark-dev
+      - libarchive-dev
+      - libqrencode-dev
+      - zlib1g-dev
+      - libxcb-cursor-dev
+      - libtomlplusplus-dev
+      - libgl1-mesa-dev
+      - libglvnd-dev
     stage-packages:
       - libqt6core6
       - libqt6gui6

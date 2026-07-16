@@ -10,6 +10,44 @@ finish-args:
   - --share=network
   - --device=dri
 modules:
+  - name: cmark
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMARK_TESTS=OFF
+      - -DCMARK_SHARED=ON
+      - -DCMARK_STATIC=OFF
+    sources:
+      - type: archive
+        url: https://github.com/commonmark/cmark/archive/refs/tags/0.31.0.tar.gz
+        sha256: 052eeb173e4db93bc71bd4ba69c3a3cb0a5522e845ebaa0a6c024ddf311df2dd
+  - name: tomlplusplus
+    buildsystem: meson
+    sources:
+      - type: archive
+        url: https://github.com/marzer/tomlplusplus/archive/refs/tags/v3.4.0.tar.gz
+        sha256: 37bb68079ed9485cdad8a1133379ecfbfd4d62b101683d7caeb67f130b925b39
+  - name: libarchive
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DENABLE_TEST=OFF
+      - -DENABLE_TAR=OFF
+      - -DENABLE_CPIO=OFF
+      - -DENABLE_CAT=OFF
+      - -DENABLE_ACL=OFF
+      - -DENABLE_XATTR=OFF
+      - -DENABLE_ICONV=OFF
+    sources:
+      - type: archive
+        url: https://github.com/libarchive/libarchive/releases/download/v3.7.4/libarchive-3.7.4.tar.gz
+        sha256: 3b94a86b5952c10b754cd10e964ca4bba0270a6c62c2f6d610dfb0b9dc70bd11
+  - name: qrencode
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DWITHOUT_TOOLS=ON
+    sources:
+      - type: archive
+        url: https://github.com/fukuchi/libqrencode/archive/refs/tags/v4.1.1.tar.gz
+        sha256: 5385bc1b8c2f20f3b91d258bf8ccc8cf62023935df2d2676b5b67049f31a049c
   - name: launcher
     buildsystem: cmake-ninja
     sources:

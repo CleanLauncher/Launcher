@@ -80,7 +80,6 @@ bool BrightTheme::hasStyleSheet()
     return true;
 }
 
-
 QString BrightTheme::tooltip()
 {
     return QString();
