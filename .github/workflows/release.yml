@@ -95,7 +95,7 @@ jobs:
 
           # .nix
           while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}-nix"
+            cp "$f" "Launcher-${{ env.VERSION }}.nix"
           done < <(find . -name 'Launcher-nix' -type f 2>/dev/null)
 
           # macOS
@@ -118,10 +118,12 @@ jobs:
           # Source tarball
           tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
 
-          # Metadata folders
+          # Metadata folders and manifests
           cd "Launcher-${{ env.VERSION }}"
           tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-nix-config.tar.gz nix/
           tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-res.tar.gz res/
+          cp flatpak/com.cleanlauncher.Launcher.yml ../com.cleanlauncher.Launcher.yml 2>/dev/null || true
+          cp snap/snapcraft.yaml ../snapcraft.yaml 2>/dev/null || true
           cd ..
 
       - name: Create release
@@ -139,7 +141,9 @@ jobs:
             "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
             "Launcher-${{ env.VERSION }}.deb" \
             "Launcher-${{ env.VERSION }}.rpm" \
-            "Launcher-${{ env.VERSION }}-nix" \
+            "Launcher-${{ env.VERSION }}.nix" \
+            "com.cleanlauncher.Launcher.yml" \
+            "snapcraft.yaml" \
             "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-macOS-${{ env.VERSION }}.zip" \
