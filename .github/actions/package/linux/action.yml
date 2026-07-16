@@ -96,13 +96,14 @@ runs:
       run: |
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "/opt/launcher"
 
-        DEB_PKG="launcher_${VERSION}_${DEB_ARCH}.deb"
+        DEB_VERSION="${VERSION#v}"
+        DEB_PKG="launcher_${DEB_VERSION}_${DEB_ARCH}.deb"
         mkdir -p "$INSTALL_DEB_DIR/DEBIAN"
         mkdir -p "$INSTALL_DEB_DIR/opt/launcher"
         cp -a /opt/launcher/* "$INSTALL_DEB_DIR/opt/launcher/"
 
         printf 'Package: launcher\n' > "$INSTALL_DEB_DIR/DEBIAN/control"
-        printf 'Version: %s\n' "$VERSION" >> "$INSTALL_DEB_DIR/DEBIAN/control"
+        printf 'Version: %s\n' "$DEB_VERSION" >> "$INSTALL_DEB_DIR/DEBIAN/control"
         printf 'Section: games\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
         printf 'Priority: optional\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
         printf 'Architecture: %s\n' "$DEB_ARCH" >> "$INSTALL_DEB_DIR/DEBIAN/control"
@@ -127,9 +128,10 @@ runs:
       run: |
         sudo apt-get -y install rpm
 
+        RPM_VERSION="${VERSION#v}"
         RPM_SPEC="/tmp/launcher.spec"
         printf 'Name:           launcher\n' > "$RPM_SPEC"
-        printf 'Version:        %s\n' "$VERSION" >> "$RPM_SPEC"
+        printf 'Version:        %s\n' "$RPM_VERSION" >> "$RPM_SPEC"
         printf 'Release:        1\n' >> "$RPM_SPEC"
         printf 'Summary:        Minecraft Launcher\n' >> "$RPM_SPEC"
         printf 'License:        GPL-3.0-only\n' >> "$RPM_SPEC"
@@ -151,7 +153,7 @@ runs:
         printf 'update-desktop-database /usr/share/applications 2>/dev/null || true\n' >> "$RPM_SPEC"
 
         rpmbuild -bb "$RPM_SPEC" --define "_topdir /tmp/rpmbuild" \
-          --define "version $VERSION" \
+          --define "version $RPM_VERSION" \
           --target "$RPM_ARCH"
 
     - name: Package portable tarball
