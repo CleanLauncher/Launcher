@@ -6,7 +6,7 @@ The goal is to migrate all non-UI logic from C++ to Rust. The C++ layer will be 
 
 ## Current State
 
-The Rust core already handles compression, JSON processing, filesystem operations, string utilities, and markdown rendering. These modules are exposed to C++ via FFI bindings in `ffi.rs`.
+The Rust core handles compression, JSON processing, filesystem operations, string utilities, markdown rendering, cryptographic hashing, and archive processing. These modules are exposed to C++ via FFI bindings in `ffi.rs`.
 
 ## Phase 1: Foundation
 
@@ -16,11 +16,15 @@ Hashing is the most pervasive dependency in the codebase. Every download, every 
 
 The module provides SHA-256, SHA-512, and MD5 computation over byte slices, file streams, and async readers. It integrates with the existing FFI layer so C++ callers can verify downloads without managing memory manually.
 
+Status: Complete. Unit tests cover SHA-256/512, MD5, file hashing, incremental reader, and hash verification.
+
 ### Archive Processing
 
 Zip and tar extraction currently lives in C++ libarchive wrappers. Rust's `zip` and `tar` crates are memory safe by construction and handle edge cases that libarchive silently corrupts.
 
 The archive module reads zip, tar.gz, and tar.xz archives. It exposes streaming extraction that writes directly to disk without buffering entire archives in memory. This is critical for modpack installation where archives can exceed 500 MB.
+
+Status: Complete. ZIP listing, single file extraction, directory extraction, merge, creation, TAR.GZ listing and extraction, and path traversal protection. Unit tests cover all operations.
 
 ## Phase 2: Network Layer
 

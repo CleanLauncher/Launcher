@@ -68,6 +68,35 @@ char* launcher_hash_sha256_file(const char* path);
 // Verify SHA-256 hash of data against expected hash. Returns true on match.
 bool launcher_verify_sha256(const uint8_t* data, size_t len, const char* expected);
 
+// List all entry names in a ZIP archive.
+// Returns null on error. Caller must free with launcher_free_string_list.
+char** launcher_zip_entry_names(const char* archive_path, size_t* out_count);
+
+// Free a string list returned by launcher_zip_entry_names or launcher_zip_extract_dir.
+void launcher_free_string_list(char** ptr, size_t count);
+
+// Read a single entry from a ZIP archive into memory.
+// Returns null on error. Caller must free with launcher_free_buffer.
+uint8_t* launcher_zip_read_entry(const char* archive_path, const char* entry_name, size_t* out_len);
+
+// Extract a single file from a ZIP archive to disk. Returns true on success.
+bool launcher_zip_extract_file(const char* archive_path, const char* entry_name, const char* target_path);
+
+// Extract a directory from a ZIP archive to disk. Returns extracted file count, or -1 on error.
+// Caller must free result names with launcher_free_string_list.
+char** launcher_zip_extract_dir(const char* archive_path, const char* subdir_prefix, const char* target_dir, size_t* out_count);
+
+// Check if an entry exists in a ZIP archive. Returns true if found.
+bool launcher_zip_entry_exists(const char* archive_path, const char* entry_name);
+
+// List entries in a TAR.GZ archive.
+// Returns null on error. Caller must free with launcher_free_string_list.
+char** launcher_tar_entry_names(const char* archive_path, size_t* out_count);
+
+// Extract a TAR.GZ archive to disk. Returns extracted file count, or -1 on error.
+// Caller must free result names with launcher_free_string_list.
+char** launcher_tar_extract_dir(const char* archive_path, const char* target_dir, size_t* out_count);
+
 #ifdef __cplusplus
 }
 #endif

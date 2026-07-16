@@ -4,7 +4,7 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-use crate::{filesystem, gzip, hashing, json, markdown, string_utils};
+use crate::{archive, filesystem, gzip, hashing, json, markdown, string_utils};
 
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
@@ -297,4 +297,244 @@ pub extern "C" fn launcher_verify_sha256(
         Err(_) => return false,
     };
     hashing::verify_sha256(input_bytes, expected)
+}
+
+/// List all entry names in a ZIP archive. Returns null on error. Caller must free with launcher_free_string_list.
+#[no_mangle]
+pub extern "C" fn launcher_zip_entry_names(
+    archive_path_ptr: *const c_char,
+    out_count: *mut usize,
+) -> *mut *mut c_char {
+    if archive_path_ptr.is_null() || out_count.is_null() {
+        return std::ptr::null_mut();
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let entry_names = match archive::zip_entry_names(archive_path) {
+        Ok(names) => names,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let count = entry_names.len();
+    unsafe {
+        *out_count = count;
+    }
+    let c_string_vec: Vec<*mut c_char> = entry_names
+        .into_iter()
+        .filter_map(|name| CString::new(name).ok().map(|cs| cs.into_raw()))
+        .collect();
+    let mut boxed_slice = c_string_vec.into_boxed_slice();
+    let raw_ptr = boxed_slice.as_mut_ptr();
+    Box::leak(boxed_slice);
+    raw_ptr
+}
+
+/// Free a string list returned by launcher_zip_entry_names.
+#[no_mangle]
+pub extern "C" fn launcher_free_string_list(ptr: *mut *mut c_char, count: usize) {
+    if ptr.is_null() {
+        return;
+    }
+    unsafe {
+        let slice = std::slice::from_raw_parts_mut(ptr, count);
+        for item in slice.iter_mut() {
+            if !item.is_null() {
+                let _ = CString::from_raw(*item);
+            }
+        }
+        let _ = Box::from_raw(std::ptr::slice_from_raw_parts_mut(ptr, count));
+    }
+}
+
+/// Read a single entry from a ZIP archive into a buffer. Returns null on error. Caller must free with launcher_free_buffer.
+#[no_mangle]
+pub extern "C" fn launcher_zip_read_entry(
+    archive_path_ptr: *const c_char,
+    entry_name_ptr: *const c_char,
+    out_len: *mut usize,
+) -> *mut u8 {
+    if archive_path_ptr.is_null() || entry_name_ptr.is_null() || out_len.is_null() {
+        return std::ptr::null_mut();
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let entry_name = match unsafe { CStr::from_ptr(entry_name_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    match archive::zip_read_entry(archive_path, entry_name) {
+        Ok(entry_data) => {
+            unsafe {
+                *out_len = entry_data.len();
+            }
+            let mut boxed_buffer = entry_data.into_boxed_slice();
+            let raw_ptr = boxed_buffer.as_mut_ptr();
+            Box::leak(boxed_buffer);
+            raw_ptr
+        }
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Extract a single file from a ZIP archive to disk. Returns true on success.
+#[no_mangle]
+pub extern "C" fn launcher_zip_extract_file(
+    archive_path_ptr: *const c_char,
+    entry_name_ptr: *const c_char,
+    target_path_ptr: *const c_char,
+) -> bool {
+    if archive_path_ptr.is_null() || entry_name_ptr.is_null() || target_path_ptr.is_null() {
+        return false;
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    let entry_name = match unsafe { CStr::from_ptr(entry_name_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    let target_path = match unsafe { CStr::from_ptr(target_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    archive::zip_extract_file(archive_path, entry_name, target_path).is_ok()
+}
+
+/// Extract a directory from a ZIP archive to disk. Returns extracted file count, or -1 on error.
+/// Caller must free result names with launcher_free_string_list.
+#[no_mangle]
+pub extern "C" fn launcher_zip_extract_dir(
+    archive_path_ptr: *const c_char,
+    subdir_prefix_ptr: *const c_char,
+    target_dir_ptr: *const c_char,
+    out_count: *mut usize,
+) -> *mut *mut c_char {
+    if archive_path_ptr.is_null() || target_dir_ptr.is_null() || out_count.is_null() {
+        return std::ptr::null_mut();
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let subdir_prefix = if subdir_prefix_ptr.is_null() {
+        ""
+    } else {
+        match unsafe { CStr::from_ptr(subdir_prefix_ptr) }.to_str() {
+            Ok(text) => text,
+            Err(_) => return std::ptr::null_mut(),
+        }
+    };
+    let target_dir = match unsafe { CStr::from_ptr(target_dir_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let extracted = match archive::zip_extract_dir(archive_path, subdir_prefix, target_dir) {
+        Ok(files) => files,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let count = extracted.len();
+    unsafe {
+        *out_count = count;
+    }
+    let c_string_vec: Vec<*mut c_char> = extracted
+        .into_iter()
+        .filter_map(|name| CString::new(name).ok().map(|cs| cs.into_raw()))
+        .collect();
+    let mut boxed_slice = c_string_vec.into_boxed_slice();
+    let raw_ptr = boxed_slice.as_mut_ptr();
+    Box::leak(boxed_slice);
+    raw_ptr
+}
+
+/// Check if an entry exists in a ZIP archive. Returns true if found.
+#[no_mangle]
+pub extern "C" fn launcher_zip_entry_exists(
+    archive_path_ptr: *const c_char,
+    entry_name_ptr: *const c_char,
+) -> bool {
+    if archive_path_ptr.is_null() || entry_name_ptr.is_null() {
+        return false;
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    let entry_name = match unsafe { CStr::from_ptr(entry_name_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    archive::zip_entry_exists(archive_path, entry_name).unwrap_or(false)
+}
+
+/// List entries in a TAR.GZ archive. Returns null on error. Caller must free with launcher_free_string_list.
+#[no_mangle]
+pub extern "C" fn launcher_tar_entry_names(
+    archive_path_ptr: *const c_char,
+    out_count: *mut usize,
+) -> *mut *mut c_char {
+    if archive_path_ptr.is_null() || out_count.is_null() {
+        return std::ptr::null_mut();
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let entries = match archive::tar_list_entries(archive_path) {
+        Ok(entry_list) => entry_list,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let name_list: Vec<String> = entries.into_iter().map(|e| e.entry_name).collect();
+    let count = name_list.len();
+    unsafe {
+        *out_count = count;
+    }
+    let c_string_vec: Vec<*mut c_char> = name_list
+        .into_iter()
+        .filter_map(|name| CString::new(name).ok().map(|cs| cs.into_raw()))
+        .collect();
+    let mut boxed_slice = c_string_vec.into_boxed_slice();
+    let raw_ptr = boxed_slice.as_mut_ptr();
+    Box::leak(boxed_slice);
+    raw_ptr
+}
+
+/// Extract a TAR.GZ archive to disk. Returns extracted file count, or -1 on error.
+/// Caller must free result names with launcher_free_string_list.
+#[no_mangle]
+pub extern "C" fn launcher_tar_extract_dir(
+    archive_path_ptr: *const c_char,
+    target_dir_ptr: *const c_char,
+    out_count: *mut usize,
+) -> *mut *mut c_char {
+    if archive_path_ptr.is_null() || target_dir_ptr.is_null() || out_count.is_null() {
+        return std::ptr::null_mut();
+    }
+    let archive_path = match unsafe { CStr::from_ptr(archive_path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let target_dir = match unsafe { CStr::from_ptr(target_dir_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let extracted = match archive::tar_extract_dir(archive_path, target_dir) {
+        Ok(files) => files,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    let count = extracted.len();
+    unsafe {
+        *out_count = count;
+    }
+    let c_string_vec: Vec<*mut c_char> = extracted
+        .into_iter()
+        .filter_map(|name| CString::new(name).ok().map(|cs| cs.into_raw()))
+        .collect();
+    let mut boxed_slice = c_string_vec.into_boxed_slice();
+    let raw_ptr = boxed_slice.as_mut_ptr();
+    Box::leak(boxed_slice);
+    raw_ptr
 }

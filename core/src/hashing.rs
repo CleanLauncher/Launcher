@@ -137,7 +137,10 @@ mod tests {
 
     #[test]
     fn verify_sha256_incorrect() {
-        assert!(!verify_sha256(b"hello world", "0000000000000000000000000000000000000000000000000000000000000000"));
+        assert!(!verify_sha256(
+            b"hello world",
+            "0000000000000000000000000000000000000000000000000000000000000000"
+        ));
     }
 
     #[test]
