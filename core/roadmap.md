@@ -104,9 +104,4 @@ Each Rust module includes unit tests that run in `cargo test`. Integration tests
 
 ## Completion Criteria
 
-The migration is complete when:
-- All business logic lives in Rust
-- C++ contains only Qt UI code and FFI wrappers
-- No C++ code directly manipulates raw memory from Rust allocations
-- Every Rust module has >90% test coverage
-- The binary size does not increase by more than 5% from static linking
+The migration is complete when all business logic lives in Rust. C++ contains only Qt UI code and FFI wrappers. No C++ code directly manipulates raw memory from Rust allocations. Every Rust module has >90% test coverage. The binary size does not increase by more than 5% from static linking.
