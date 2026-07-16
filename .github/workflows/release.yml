@@ -38,6 +38,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: true
+      - uses: bilelmoussaoui/flatpak-github-actions/setup-flatpak@v6
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: Launcher.flatpak

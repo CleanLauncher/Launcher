@@ -104,6 +104,7 @@ runs:
       run: |
         $pfxPath = "$env:TEMP\cert.pfx"
         $certPassword = "ci-password"
+        $isSelfSigned = $false
         if ($env:CERT_BASE64) {
             [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
             $certPassword = $env:CERT_PASSWORD
@@ -112,15 +113,23 @@ runs:
             $cert = New-SelfSignedCertificate -Subject "CN=CleanLauncher" -Type CodeSigningCert -CertStoreLocation "Cert:\CurrentUser\My"
             $securePassword = ConvertTo-SecureString -String $certPassword -Force -AsPlainText
             Export-PfxCertificate -Cert $cert -FilePath $pfxPath -Password $securePassword
+            $isSelfSigned = $true
         }
         echo "ACTIVE_CERT_PASSWORD=$certPassword" >> $env:GITHUB_ENV
+        if ($isSelfSigned) {
+            echo "IS_SELF_SIGNED=true" >> $env:GITHUB_ENV
+        }
         
         $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
         if (-not $signtool) { Write-Error "signtool.exe not found"; exit 1 }
         $filesToSign = Get-ChildItem -Path "$env:INSTALL_DIR" -Include *.exe,*.dll -Recurse | Select-Object -ExpandProperty FullName
         foreach ($file in $filesToSign) {
             Write-Host "Signing $file..."
-            & $signtool sign /fd SHA256 /f $pfxPath /p $certPassword /tr http://timestamp.digicert.com /td SHA256 $file
+            if ($isSelfSigned) {
+                & $signtool sign /fd SHA256 /f $pfxPath /p $certPassword $file
+            } else {
+                & $signtool sign /fd SHA256 /f $pfxPath /p $certPassword /tr http://timestamp.digicert.com /td SHA256 $file
+            }
         }
 
     - name: Package (installer)
@@ -149,7 +158,11 @@ runs:
         $pfxPath = "$env:TEMP\cert.pfx"
         $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
         Write-Host "Signing Launcher-Setup.exe..."
-        & $signtool sign /fd SHA256 /f $pfxPath /p $env:ACTIVE_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 "Launcher-Setup.exe"
+        if ($env:IS_SELF_SIGNED -eq "true") {
+            & $signtool sign /fd SHA256 /f $pfxPath /p $env:ACTIVE_CERT_PASSWORD "Launcher-Setup.exe"
+        } else {
+            & $signtool sign /fd SHA256 /f $pfxPath /p $env:ACTIVE_CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 "Launcher-Setup.exe"
+        }
 
     - name: Upload installer
       uses: actions/upload-artifact@v7

@@ -11,7 +11,7 @@ confinement: strict
 parts:
   launcher:
     plugin: cmake
-    source: ..
+    source: .
     build-packages:
       - build-essential
       - qt6-base-dev
