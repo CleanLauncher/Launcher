@@ -1,0 +1,33 @@
+name: Antivirus Scan
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - "master"
+      - "develop"
+      - "release-*"
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  scan:
+    name: ClamAV Scan
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install ClamAV
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav clamav-daemon
+          sudo freshclam || true
+
+      - name: Scan Repository
+        run: clamscan -r -i .
