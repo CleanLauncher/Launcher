@@ -1,6 +1,6 @@
 use pulldown_cmark::{html, Options, Parser};
 
-use crate::error::Result;
+use launcher_error::Result;
 
 pub fn markdown_to_html(markdown: &str) -> Result<String> {
     let mut render_options = Options::empty();

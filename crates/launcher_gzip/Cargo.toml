@@ -1,0 +1,8 @@
+[package]
+name = "launcher_gzip"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+flate2 = "1"
+launcher_error = { path = "../launcher_error" }

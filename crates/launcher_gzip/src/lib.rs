@@ -3,7 +3,7 @@ use flate2::write::{DeflateEncoder, GzEncoder};
 use flate2::Compression;
 use std::io::{Read, Write};
 
-use crate::error::{CoreError, Result};
+use launcher_error::{CoreError, Result};
 
 pub fn unzip(compressed_input: &[u8]) -> Result<Vec<u8>> {
     if compressed_input.is_empty() {

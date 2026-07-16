@@ -1,0 +1,10 @@
+[package]
+name = "launcher_archive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zip = "2"
+tar = "0.4"
+flate2 = "1"
+launcher_error = { path = "../launcher_error" }

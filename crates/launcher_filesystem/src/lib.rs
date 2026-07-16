@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::error::Result;
+use launcher_error::Result;
 
 pub fn read(path: impl AsRef<Path>) -> Result<Vec<u8>> {
     Ok(fs::read(path)?)

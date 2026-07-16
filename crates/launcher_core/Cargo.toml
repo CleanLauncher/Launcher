@@ -1,0 +1,19 @@
+[package]
+name = "launcher_core"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0-only"
+
+[lib]
+name = "launcher_core"
+crate-type = ["cdylib", "staticlib"]
+
+[dependencies]
+launcher_error = { path = "../launcher_error" }
+launcher_archive = { path = "../launcher_archive" }
+launcher_filesystem = { path = "../launcher_filesystem" }
+launcher_gzip = { path = "../launcher_gzip" }
+launcher_hashing = { path = "../launcher_hashing" }
+launcher_json = { path = "../launcher_json" }
+launcher_markdown = { path = "../launcher_markdown" }
+launcher_string_utils = { path = "../launcher_string_utils" }

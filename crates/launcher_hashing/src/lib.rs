@@ -2,7 +2,7 @@ use digest::Digest;
 use md5::Md5;
 use sha2::{Sha256, Sha512};
 
-use crate::error::{CoreError, Result};
+use launcher_error::{CoreError, Result};
 
 /// Computes SHA-256 hash of input bytes, returned as lowercase hex string.
 pub fn sha256(input_bytes: &[u8]) -> String {

@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::error::{CoreError, Result};
+use launcher_error::{CoreError, Result};
 
 pub fn parse(input_bytes: &[u8]) -> Result<Value> {
     serde_json::from_slice(input_bytes).map_err(CoreError::Json)

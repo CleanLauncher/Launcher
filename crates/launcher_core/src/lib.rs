@@ -1,10 +1,17 @@
 #![allow(clippy::not_unsafe_ptr_arg_deref)]
 
+use launcher_archive as archive;
+use launcher_filesystem as filesystem;
+use launcher_gzip as gzip;
+use launcher_hashing as hashing;
+use launcher_json as json;
+use launcher_markdown as markdown;
+use launcher_string_utils as string_utils;
+
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-use crate::{archive, filesystem, gzip, hashing, json, markdown, string_utils};
 
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]

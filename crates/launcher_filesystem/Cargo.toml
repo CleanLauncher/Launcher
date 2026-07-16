@@ -1,0 +1,7 @@
+[package]
+name = "launcher_filesystem"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+launcher_error = { path = "../launcher_error" }

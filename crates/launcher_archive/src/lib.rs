@@ -9,7 +9,7 @@ use zip::read::ZipArchive;
 use zip::write::SimpleFileOptions;
 use zip::ZipWriter;
 
-use crate::error::{CoreError, Result};
+use launcher_error::{CoreError, Result};
 
 pub struct ZipEntryInfo {
     pub entry_name: String,
