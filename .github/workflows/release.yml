@@ -134,17 +134,27 @@ jobs:
           mv Launcher-*.AppImage.zsync/Launcher-*-aarch64.AppImage.zsync Launcher-Linux-aarch64.AppImage.zsync 2>/dev/null || true
 
           # .deb and .rpm
-          find . -name '*.deb' -exec mv {} Launcher-${{ env.VERSION }}.deb \; 2>/dev/null || true
-          find . -name '*.rpm' -exec mv {} Launcher-${{ env.VERSION }}.rpm \; 2>/dev/null || true
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}.deb"
+          done < <(find . -name '*.deb' -type f 2>/dev/null)
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}.rpm"
+          done < <(find . -name '*.rpm' -type f 2>/dev/null)
 
           # .snap
-          find . -name '*.snap' -exec cp {} Launcher-${{ env.VERSION }}.snap \; 2>/dev/null || true
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}.snap"
+          done < <(find . -name '*.snap' -type f 2>/dev/null)
 
           # .flatpak
-          find . -name '*.flatpak' -exec cp {} Launcher-${{ env.VERSION }}.flatpak \; 2>/dev/null || true
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}.flatpak"
+          done < <(find . -name '*.flatpak' -type f 2>/dev/null)
 
           # .nix
-          test -f Launcher-nix && cp Launcher-nix Launcher-${{ env.VERSION }}-nix || true
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}-nix"
+          done < <(find . -name 'Launcher-nix' -type f 2>/dev/null)
 
           # macOS
           mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip 2>/dev/null || true
@@ -165,6 +175,14 @@ jobs:
 
           # Source tarball
           tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
+
+          # Metadata folders
+          cd "Launcher-${{ env.VERSION }}"
+          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-flatpak.tar.gz flatpak/
+          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-snap.tar.gz snap/
+          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-nix-config.tar.gz nix/
+          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-res.tar.gz res/
+          cd ..
 
       - name: Create release
         id: create_release
@@ -188,7 +206,11 @@ jobs:
             "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-macOS-${{ env.VERSION }}.zip" \
             "Launcher-macOS-${{ env.VERSION }}.dmg" \
-            "Launcher-${{ env.VERSION }}.tar.gz"
+            "Launcher-${{ env.VERSION }}.tar.gz" \
+            "Launcher-${{ env.VERSION }}-flatpak.tar.gz" \
+            "Launcher-${{ env.VERSION }}-snap.tar.gz" \
+            "Launcher-${{ env.VERSION }}-nix-config.tar.gz" \
+            "Launcher-${{ env.VERSION }}-res.tar.gz"
           do
             test -f "$f" && ASSETS="$ASSETS $f"
           done
