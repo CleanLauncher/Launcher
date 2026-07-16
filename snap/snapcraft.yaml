@@ -15,6 +15,7 @@ parts:
     build-packages:
       - build-essential
       - qt6-base-dev
+      - libqt6networkauth6-dev
       - extra-cmake-modules
       - pkg-config
       - scdoc
@@ -30,6 +31,7 @@ parts:
       - libqt6core6
       - libqt6gui6
       - libqt6widgets6
+      - libqt6networkauth6
 
 apps:
   launcher:

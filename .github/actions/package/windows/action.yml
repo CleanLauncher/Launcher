@@ -120,7 +120,7 @@ runs:
             "IS_SELF_SIGNED=true" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
         }
         
-        $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+        $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -First 1).FullName
         if (-not $signtool) { Write-Error "signtool.exe not found"; exit 1 }
         $filesToSign = Get-ChildItem -Path "$env:INSTALL_DIR" -Include *.exe,*.dll -Recurse | Select-Object -ExpandProperty FullName
         foreach ($file in $filesToSign) {
