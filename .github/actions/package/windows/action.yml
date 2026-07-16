@@ -15,6 +15,12 @@ inputs:
   msystem:
     description: MSYS2 subsystem to use
     required: false
+  certificate-base64:
+    description: Base64 encoded PFX certificate for code signing
+    required: false
+  certificate-password:
+    description: Password for the PFX certificate
+    required: false
 
 runs:
   using: composite
@@ -89,6 +95,24 @@ runs:
           ForEach-Object { $_.TrimStart('.\').TrimStart("$env:INSTALL_PORTABLE_DIR").TrimStart('\') } |
           Out-File -FilePath "$env:INSTALL_PORTABLE_DIR/manifest.txt"
 
+    - name: Sign binaries
+      if: ${{ inputs.certificate-base64 != '' }}
+      shell: pwsh
+      env:
+        CERT_BASE64: ${{ inputs.certificate-base64 }}
+        CERT_PASSWORD: ${{ inputs.certificate-password }}
+        INSTALL_DIR: install
+      run: |
+        $pfxPath = "$env:TEMP\cert.pfx"
+        [IO.File]::WriteAllBytes($pfxPath, [Convert]::FromBase64String($env:CERT_BASE64))
+        $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+        if (-not $signtool) { Write-Error "signtool.exe not found"; exit 1 }
+        $filesToSign = Get-ChildItem -Path "$env:INSTALL_DIR" -Include *.exe,*.dll -Recurse | Select-Object -ExpandProperty FullName
+        foreach ($file in $filesToSign) {
+            Write-Host "Signing $file..."
+            & $signtool sign /fd SHA256 /f $pfxPath /p $env:CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 $file
+        }
+
     - name: Package (installer)
       shell: pwsh
       env:
@@ -108,6 +132,18 @@ runs:
 
         cd "${{ github.workspace }}/${{ env.INSTALL_DIR }}"
         makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/res/win_install.nsi"
+
+    - name: Sign installer
+      if: ${{ inputs.certificate-base64 != '' }}
+      shell: pwsh
+      env:
+        CERT_BASE64: ${{ inputs.certificate-base64 }}
+        CERT_PASSWORD: ${{ inputs.certificate-password }}
+      run: |
+        $pfxPath = "$env:TEMP\cert.pfx"
+        $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+        Write-Host "Signing Launcher-Setup.exe..."
+        & $signtool sign /fd SHA256 /f $pfxPath /p $env:CERT_PASSWORD /tr http://timestamp.digicert.com /td SHA256 "Launcher-Setup.exe"
 
     - name: Upload installer
       uses: actions/upload-artifact@v7

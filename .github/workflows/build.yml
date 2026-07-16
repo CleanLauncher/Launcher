@@ -190,3 +190,5 @@ jobs:
           build-type: ${{ steps.setup-dependencies.outputs.build-type }}
           artifact-name: ${{ matrix.artifact-name }}
           msystem: ${{ matrix.msystem }}
+          certificate-base64: ${{ secrets.WINDOWS_SIGNING_CERT_BASE64 }}
+          certificate-password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
