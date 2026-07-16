@@ -19,7 +19,7 @@ modules:
     sources:
       - type: archive
         url: https://github.com/commonmark/cmark/archive/refs/tags/0.31.0.tar.gz
-        sha256: 052eeb173e4db93bc71bd4ba69c3a3cb0a5522e845ebaa0a6c024ddf311df2dd
+        sha256: bbcb8f8c03b5af33fcfcf11a74e9499f20a9043200b8552f78a6e8ba76e04d11
   - name: tomlplusplus
     buildsystem: meson
     sources:
