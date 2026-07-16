@@ -34,9 +34,9 @@
  */
 #pragma once
 
-#include "FusionTheme.h"
+#include "MinimalTheme.h"
 
-class DarkTheme : public FusionTheme {
+class DarkTheme : public MinimalTheme {
    public:
     virtual ~DarkTheme() {}
 

@@ -94,7 +94,7 @@ QString SystemTheme::tooltip()
         return QObject::tr("Windows 9x inspired widget style");
     } else if (m_themeName.toLower() == "windows11") {
         return QObject::tr("WinUI 3 inspired Qt widget style");
-    } else if (m_themeName.toLower() == "fusion") {
+    } else if (m_themeName.toLower() == "minimal") {
         return QObject::tr("The default Qt widget style");
     } else if (m_themeName.toLower() == "system") {
         return QObject::tr("Your current system theme");

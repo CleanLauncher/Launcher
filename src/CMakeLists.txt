@@ -822,8 +822,8 @@ SET(LAUNCHER_SOURCES
     ui/setupwizard/LoginWizardPage.cpp
     ui/setupwizard/LoginWizardPage.h
 
-    ui/themes/FusionTheme.cpp
-    ui/themes/FusionTheme.h
+    ui/themes/MinimalTheme.cpp
+    ui/themes/MinimalTheme.h
     ui/themes/BrightTheme.cpp
     ui/themes/BrightTheme.h
     ui/themes/CustomTheme.cpp

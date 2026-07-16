@@ -77,12 +77,12 @@ QColor BrightTheme::fadeColor()
 
 bool BrightTheme::hasStyleSheet()
 {
-    return false;
+    return true;
 }
 
 QString BrightTheme::appStyleSheet()
 {
-    return QString();
+    return MinimalTheme::appStyleSheet();
 }
 QString BrightTheme::tooltip()
 {
