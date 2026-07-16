@@ -17,54 +17,6 @@ jobs:
       build-type: Release
     secrets: inherit
 
-  build_snap:
-    name: Build Snap
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          submodules: true
-
-      - name: Build snap
-        uses: snapcore/action-build@v1
-        id: snapcraft
-
-      - name: Upload snap
-        uses: actions/upload-artifact@v7
-        with:
-          name: Launcher-snap
-          path: ${{ steps.snapcraft.outputs.snap }}
-
-  build_flatpak:
-    name: Build Flatpak
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    container:
-      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
-      options: --privileged
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-        with:
-          submodules: true
-
-      - name: Build flatpak
-        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
-        with:
-          manifest-path: flatpak/io.github.launcher.Launcher.yml
-          bundle: launcher.flatpak
-          cache-key: flatpak-builder-${{ github.sha }}
-
-      - name: Upload flatpak
-        uses: actions/upload-artifact@v7
-        with:
-          name: Launcher-flatpak
-          path: "*.flatpak"
-
   build_nix:
     name: Build Nix
     runs-on: ubuntu-24.04
@@ -141,16 +93,6 @@ jobs:
             cp "$f" "Launcher-${{ env.VERSION }}.rpm"
           done < <(find . -name '*.rpm' -type f 2>/dev/null)
 
-          # .snap
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.snap"
-          done < <(find . -name '*.snap' -type f 2>/dev/null)
-
-          # .flatpak
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.flatpak"
-          done < <(find . -name '*.flatpak' -type f 2>/dev/null)
-
           # .nix
           while IFS= read -r f; do
             cp "$f" "Launcher-${{ env.VERSION }}-nix"
@@ -178,8 +120,6 @@ jobs:
 
           # Metadata folders
           cd "Launcher-${{ env.VERSION }}"
-          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-flatpak.tar.gz flatpak/
-          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-snap.tar.gz snap/
           tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-nix-config.tar.gz nix/
           tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-res.tar.gz res/
           cd ..
@@ -199,16 +139,12 @@ jobs:
             "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
             "Launcher-${{ env.VERSION }}.deb" \
             "Launcher-${{ env.VERSION }}.rpm" \
-            "Launcher-${{ env.VERSION }}.snap" \
-            "Launcher-${{ env.VERSION }}.flatpak" \
             "Launcher-${{ env.VERSION }}-nix" \
             "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
             "Launcher-macOS-${{ env.VERSION }}.zip" \
             "Launcher-macOS-${{ env.VERSION }}.dmg" \
             "Launcher-${{ env.VERSION }}.tar.gz" \
-            "Launcher-${{ env.VERSION }}-flatpak.tar.gz" \
-            "Launcher-${{ env.VERSION }}-snap.tar.gz" \
             "Launcher-${{ env.VERSION }}-nix-config.tar.gz" \
             "Launcher-${{ env.VERSION }}-res.tar.gz"
           do
