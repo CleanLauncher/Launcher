@@ -14,15 +14,15 @@ Use `: ` instead of ` — ` in documentation and comments. Example: `CoreError: 
 
 ## Project layout (C++ standard)
 
-`src/` for main C++ application source. `libraries/` for helper libraries and submodules. `core/` for the Rust core library (name is `core`, NOT `launcher-core`). `res/` for resources like icons, desktop files, and config. `cmake/` for CMake modules. `buildconfig/` for build configuration. `tests/` for test files. `flatpak/` and `snap/` for packaging manifests.
+`src/` for main C++ application source. `libraries/` for helper libraries and submodules. `crates/` for the Rust core library (name is `crates`, NOT `launcher-core`). `res/` for resources like icons, desktop files, and config. `cmake/` for CMake modules. `buildconfig/` for build configuration. `tests/` for test files. `flatpak/` and `snap/` for packaging manifests.
 
 ## Data vs code separation
 
 All configuration data lives in `res/launcher-config.yaml`. Loaded at build time via `cmake/ParseLauncherConfig.cmake`. Never hardcode URLs or config values in source files. Runtime data goes in `.yaml` or `.ini` files.
 
-## Rust core (`core/`)
+## Rust core (`crates/`)
 
-Variable names must be semantic: `compressed_data`, `output_buffer`, `file_size_human`. Never use generic names like `data`, `result`, `buf`, `s`, `tmp`. CI job named exactly `core` (not `launcher-core`). Triggers only on `core/**` path changes.
+Variable names must be semantic: `compressed_data`, `output_buffer`, `file_size_human`. Never use generic names like `data`, `result`, `buf`, `s`, `tmp`. CI jobs named `rust-fmt`, `rust-clippy`, `rust-test` (not `launcher-core`). Trigger only on `crates/**` path changes.
 
 ## CI/CD
 

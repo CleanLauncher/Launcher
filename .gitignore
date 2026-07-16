@@ -67,7 +67,7 @@ flatbuild
 .mimocode/
 
 # Rust build artifacts
-core/target/
+crates/target/
 
 # Logs
 aqtinstall.log

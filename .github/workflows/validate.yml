@@ -148,7 +148,7 @@ jobs:
 
       - name: Run codespell
         run: |
-          codespell --skip='./libraries,./build,./.git,./.mimocode,./core/target,./docs,*.lock,*.json,*.nix,*.ui,./tests/testdata,./src/resources,./cmake,./scripts,./res' \
+          codespell --skip='./libraries,./build,./.git,./.mimocode,./crates/target,./docs,*.lock,*.json,*.nix,*.ui,./tests/testdata,./src/resources,./cmake,./scripts,./res' \
             --ignore-words .codespell-ignore-words \
             --quiet-level=2
 

@@ -156,6 +156,11 @@ jobs:
             test -f "$f" && ASSETS="$ASSETS $f"
           done
 
+          if gh release view "${{ github.ref_name }}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "Release ${{ github.ref_name }} already exists, deleting to recreate."
+            gh release delete "${{ github.ref_name }}" --repo "${{ github.repository }}" --yes
+          fi
+
           gh release create "${{ github.ref_name }}" \
             --repo "${{ github.repository }}" \
             --title "Launcher ${{ env.VERSION }}" \

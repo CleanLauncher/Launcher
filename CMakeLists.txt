@@ -505,7 +505,7 @@ add_subdirectory(libraries/LocalPeer) # fork of a library from Qt solutions
 add_subdirectory(libraries/murmur2) # Hash for usage with the CurseForge API
 add_subdirectory(libraries/qdcss) # css parser
 
-add_subdirectory(core) # Rust core library
+add_subdirectory(crates) # Rust core library
 
 # Built Artifacts
 
