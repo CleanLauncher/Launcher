@@ -10,9 +10,9 @@ app:
   binary_name: launcher
 
 version:
-  major: 12
+  major: 111
   minor: 0
-  patch: 0
+  patch: 2
 
 urls:
   news_rss: https://prismlauncher.org/feed/feed.xml

@@ -499,7 +499,7 @@ mod tests {
         assert_eq!(content_a, b"aaa");
         let content_b = zip_read_entry(target.to_str().unwrap(), "b.txt").unwrap();
         assert_eq!(content_b, b"bbb");
-        assert!(zip_entry_exists(target.to_str().unwrap(), "shared.txt").is_err() || true);
+        assert!(!zip_entry_exists(target.to_str().unwrap(), "shared.txt").unwrap());
 
         fs::remove_dir_all(&temp_dir).unwrap();
     }
