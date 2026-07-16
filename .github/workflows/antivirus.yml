@@ -27,7 +27,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clamav clamav-daemon
-          sudo freshclam || true
+          sudo systemctl stop clamav-freshclam || true
+          sudo freshclam
+
 
       - name: Scan Repository
         run: clamscan -r -i .
