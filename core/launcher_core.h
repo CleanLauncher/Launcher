@@ -53,6 +53,21 @@ bool launcher_fs_delete_path(const char* path);
 // Caller must free with launcher_free_string.
 char* launcher_fs_remove_invalid_filename_chars(const char* input, char replace_with);
 
+// Compute SHA-256 hash of data. Returns hex string. Caller must free with launcher_free_string.
+char* launcher_hash_sha256(const uint8_t* data, size_t len);
+
+// Compute SHA-512 hash of data. Returns hex string. Caller must free with launcher_free_string.
+char* launcher_hash_sha512(const uint8_t* data, size_t len);
+
+// Compute MD5 hash of data. Returns hex string. Caller must free with launcher_free_string.
+char* launcher_hash_md5(const uint8_t* data, size_t len);
+
+// Compute SHA-256 hash of a file. Returns hex string. Caller must free with launcher_free_string.
+char* launcher_hash_sha256_file(const char* path);
+
+// Verify SHA-256 hash of data against expected hash. Returns true on match.
+bool launcher_verify_sha256(const uint8_t* data, size_t len, const char* expected);
+
 #ifdef __cplusplus
 }
 #endif

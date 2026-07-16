@@ -4,7 +4,7 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-use crate::{filesystem, gzip, json, markdown, string_utils};
+use crate::{filesystem, gzip, hashing, json, markdown, string_utils};
 
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
@@ -227,4 +227,74 @@ pub extern "C" fn launcher_fs_remove_invalid_filename_chars(
     let sanitized =
         filesystem::remove_invalid_filename_chars(input_text, replace_with as u8 as char);
     CString::new(sanitized).unwrap_or_default().into_raw()
+}
+
+/// Compute SHA-256 hash of input bytes. Returns hex string. Caller must free with `launcher_free_string`.
+#[no_mangle]
+pub extern "C" fn launcher_hash_sha256(data_ptr: *const u8, data_len: usize) -> *mut c_char {
+    if data_ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
+    CString::new(hashing::sha256(input_bytes))
+        .unwrap_or_default()
+        .into_raw()
+}
+
+/// Compute SHA-512 hash of input bytes. Returns hex string. Caller must free with `launcher_free_string`.
+#[no_mangle]
+pub extern "C" fn launcher_hash_sha512(data_ptr: *const u8, data_len: usize) -> *mut c_char {
+    if data_ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
+    CString::new(hashing::sha512(input_bytes))
+        .unwrap_or_default()
+        .into_raw()
+}
+
+/// Compute MD5 hash of input bytes. Returns hex string. Caller must free with `launcher_free_string`.
+#[no_mangle]
+pub extern "C" fn launcher_hash_md5(data_ptr: *const u8, data_len: usize) -> *mut c_char {
+    if data_ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
+    CString::new(hashing::md5(input_bytes))
+        .unwrap_or_default()
+        .into_raw()
+}
+
+/// Compute SHA-256 hash of a file. Returns hex string. Caller must free with `launcher_free_string`.
+#[no_mangle]
+pub extern "C" fn launcher_hash_sha256_file(path_ptr: *const c_char) -> *mut c_char {
+    if path_ptr.is_null() {
+        return std::ptr::null_mut();
+    }
+    let path_text = match unsafe { CStr::from_ptr(path_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return std::ptr::null_mut(),
+    };
+    match hashing::sha256_file(path_text) {
+        Ok(hash) => CString::new(hash).unwrap_or_default().into_raw(),
+        Err(_) => std::ptr::null_mut(),
+    }
+}
+
+/// Verify SHA-256 hash of input bytes against expected hash. Returns true on match.
+#[no_mangle]
+pub extern "C" fn launcher_verify_sha256(
+    data_ptr: *const u8,
+    data_len: usize,
+    expected_ptr: *const c_char,
+) -> bool {
+    if data_ptr.is_null() || expected_ptr.is_null() {
+        return false;
+    }
+    let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
+    let expected = match unsafe { CStr::from_ptr(expected_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return false,
+    };
+    hashing::verify_sha256(input_bytes, expected)
 }
