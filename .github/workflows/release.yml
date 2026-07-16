@@ -29,45 +29,35 @@ jobs:
           submodules: true
 
       - name: Build snap
-        run: |
-          sudo snap install snapcraft --classic
-          snapcraft --destructive-mode --verbose
-        env:
-          SNAPCRAFT_ENABLE_MANIFEST: "false"
+        uses: snapcore/action-build@v1
+        id: snapcraft
 
       - name: Upload snap
         uses: actions/upload-artifact@v7
         with:
           name: Launcher-snap
-          path: "*.snap"
+          path: ${{ steps.snapcraft.outputs.snap }}
 
   build_flatpak:
     name: Build Flatpak
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:freedesktop-24.08
+      options: --privileged
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           submodules: true
 
-      - name: Install flatpak dependencies
-        run: |
-          sudo add-apt-repository -y ppa:flatpak/ppa
-          sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder xvfb
-
-      - name: Setup flatpak
-        run: |
-          flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          flatpak install -y flathub org.kde.Platform//6.8 org.kde.Sdk//6.8 || true
-
       - name: Build flatpak
-        run: |
-          xvfb-run flatpak-builder --force-clean build-dir flatpak/io.github.launcher.Launcher.yml
-          find build-dir -name '*.flatpak' -exec cp {} launcher.flatpak \; || \
-          flatpak build-bundle build-dir launcher.flatpak io.github.launcher.Launcher || true
+        uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          manifest-path: flatpak/io.github.launcher.Launcher.yml
+          bundle: launcher.flatpak
+          cache-key: flatpak-builder-${{ github.sha }}
 
       - name: Upload flatpak
         uses: actions/upload-artifact@v7
@@ -111,7 +101,8 @@ jobs:
           path: Launcher-nix
 
   create_release:
-    needs: [build_release, build_snap, build_flatpak, build_nix]
+    needs: [build_release, build_nix]
+    if: always() && needs.build_release.result == 'success'
     permissions:
       contents: write
     runs-on: ubuntu-24.04
