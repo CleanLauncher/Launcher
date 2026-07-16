@@ -10,14 +10,12 @@ pkgs.stdenv.mkDerivation {
     ninja
     pkg-config
     extra-cmake-modules
-    wrapQtAppsHook
   ];
 
   buildInputs = with pkgs; [
     qt6.qtbase
     qt6.qtdeclarative
     qt6.qtnetworkauth
-    qt6.qtbase.qtdeclarative
     cmark
     libarchive
     libqrencode
@@ -25,20 +23,10 @@ pkgs.stdenv.mkDerivation {
     zlib
   ];
 
+  dontWrapQtApps = true;
+
   cmakeFlags = [
     "-DCMAKE_BUILD_TYPE=Release"
-    "-DCMAKE_INSTALL_PREFIX=/"
+    "-DCMAKE_INSTALL_PREFIX=\${out}"
   ];
-
-  postFixup = ''
-    wrapProgram $out/bin/launcher \
-      --prefix QT_PLUGIN_PATH : ${pkgs.qt6.qtbase}/lib/qt-6/plugins
-  '';
-
-  meta = with pkgs.lib; {
-    description = "Clean and maintained Minecraft launcher";
-    homepage = "https://github.com/CleanLauncher/Launcher";
-    license = licenses.gpl3Only;
-    platforms = platforms.linux;
-  };
 }
