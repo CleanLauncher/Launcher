@@ -17,43 +17,39 @@ jobs:
       build-type: Release
     secrets: inherit
 
-  build_nix:
-    name: Build Nix
+  build_snap:
+    name: Build Snap
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           submodules: true
-
-      - name: Install Nix
-        uses: cachix/install-nix-action@v27
+      - uses: snapcore/action-build@v1
+        id: build
+      - uses: actions/upload-artifact@v4
         with:
-          nix_path: nixpkgs=channel:nixos-24.05
+          name: snap
+          path: ${{ steps.build.outputs.snap }}
 
-      - name: Build nix package
-        run: |
-          nix-build nix/launcher.nix -o result-nix 2>&1 || true
-          if [ -d result-nix/bin ]; then
-            cp result-nix/bin/launcher Launcher-nix
-            chmod +x Launcher-nix
-          else
-            echo "Nix build failed, creating placeholder"
-            echo "#!/bin/sh" > Launcher-nix
-            echo "echo 'Nix build not available for this platform'" >> Launcher-nix
-            chmod +x Launcher-nix
-          fi
-
-      - name: Upload nix binary
-        uses: actions/upload-artifact@v7
+  build_flatpak:
+    name: Build Flatpak
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
         with:
-          name: Launcher-nix
-          path: Launcher-nix
+          submodules: true
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: Launcher.flatpak
+          manifest-path: flatpak/com.cleanlauncher.Launcher.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: flatpak
+          path: Launcher.flatpak
 
   create_release:
-    needs: [build_release, build_nix]
+    needs: [build_release, build_snap, build_flatpak]
     if: always() && needs.build_release.result == 'success'
     permissions:
       contents: write
@@ -93,10 +89,18 @@ jobs:
             cp "$f" "Launcher-${{ env.VERSION }}.rpm"
           done < <(find . -name '*.rpm' -type f 2>/dev/null)
 
-          # .nix
+          # .nix script
+          cp Launcher-${{ env.VERSION }}/nix/launcher.nix launcher.nix 2>/dev/null || true
+
+          # Flatpak
           while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.nix"
-          done < <(find . -name 'Launcher-nix' -type f 2>/dev/null)
+            cp "$f" "Launcher-${{ env.VERSION }}.flatpak"
+          done < <(find . -name '*.flatpak' -type f 2>/dev/null)
+
+          # Snap
+          while IFS= read -r f; do
+            cp "$f" "Launcher-${{ env.VERSION }}.snap"
+          done < <(find . -name '*.snap' -type f 2>/dev/null)
 
           # macOS
           mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip 2>/dev/null || true
@@ -141,7 +145,9 @@ jobs:
             "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
             "Launcher-${{ env.VERSION }}.deb" \
             "Launcher-${{ env.VERSION }}.rpm" \
-            "Launcher-${{ env.VERSION }}.nix" \
+            "launcher.nix" \
+            "Launcher-${{ env.VERSION }}.flatpak" \
+            "Launcher-${{ env.VERSION }}.snap" \
             "com.cleanlauncher.Launcher.yml" \
             "snapcraft.yaml" \
             "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
