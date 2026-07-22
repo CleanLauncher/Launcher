@@ -24,9 +24,7 @@ pub fn zip_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
 
     let mut entry_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
-        let zip_file = zip_archive
-            .by_index(index)
-            ?;
+        let zip_file = zip_archive.by_index(index)?;
         entry_list.push(ZipEntryInfo {
             entry_name: zip_file.name().to_string(),
             is_directory: zip_file.is_dir(),
@@ -128,9 +126,7 @@ pub fn zip_entry_names(archive_path: &str) -> Result<Vec<String>> {
 
     let mut name_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
-        let zip_file = zip_archive
-            .by_index(index)
-            ?;
+        let zip_file = zip_archive.by_index(index)?;
         name_list.push(zip_file.name().to_string());
     }
     Ok(name_list)
@@ -145,13 +141,9 @@ pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]
 
     for (entry_name, entry_data) in entries {
         if entry_name.ends_with('/') {
-            zip_writer
-                .add_directory(entry_name, write_options)
-                ?;
+            zip_writer.add_directory(entry_name, write_options)?;
         } else {
-            zip_writer
-                .start_file(entry_name, write_options)
-                ?;
+            zip_writer.start_file(entry_name, write_options)?;
             zip_writer.write_all(entry_data)?;
         }
     }
@@ -176,9 +168,7 @@ pub fn zip_merge_archives(
         let mut source_archive = ZipArchive::new(source_file)?;
 
         for index in 0..source_archive.len() {
-            let mut source_entry = source_archive
-                .by_index(index)
-                ?;
+            let mut source_entry = source_archive.by_index(index)?;
             let entry_name = source_entry.name().to_string();
 
             if exclude_set.contains(&entry_name) {
@@ -186,9 +176,7 @@ pub fn zip_merge_archives(
             }
 
             if source_entry.is_dir() {
-                zip_writer
-                    .add_directory(&entry_name, write_options)
-                    ?;
+                zip_writer.add_directory(&entry_name, write_options)?;
             } else {
                 let mut entry_buffer = Vec::with_capacity(source_entry.size() as usize);
                 source_entry.read_to_end(&mut entry_buffer)?;
