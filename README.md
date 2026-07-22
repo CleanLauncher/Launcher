@@ -32,4 +32,4 @@ If you have questions or want to discuss changes, please open a GitHub Issue.
 
 ## License
 
-All launcher code is available under the GPL-3.0-only license. See [COPYING.md](COPYING.md) for full details including third-party license notices.
+All launcher code is available under the GPL-3.0-only license. See [licenses/](licenses/) for full details including third-party license notices.

@@ -69,6 +69,11 @@ jobs:
           submodules: "true"
           path: "Launcher-source"
 
+      - name: Configure git user
+        run: |
+          git config --global user.name "Alessio Attilio"
+          git config --global user.email "attilio.alessio@protonmail.com"
+
       - name: Download artifacts
         uses: actions/download-artifact@v8
 
@@ -141,7 +146,7 @@ jobs:
       - name: Create release
         id: create_release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
         run: |
           ASSETS=""
           for f in \

@@ -2,18 +2,27 @@
 
 This directory contains the licenses for all third-party components used in this project.
 
-- **GPL-3.0** — Main project (Launcher, launcher/*, tests/*)
-- **GPL-3.0-only** — libraries/launcher (Java launcher, with classpath exception)
-- **LGPL-3.0** — libraries/libnbtplusplus
-- **LGPL-3.0-only** — libraries/qdcss
-- **LGPL-2.1** — libraries/rainbow (KDE Community)
-- **Apache-2.0** — Dual-licensed source files (MultiMC/PolyMC lineage), cmake/vcpkg-ports/vcpkg-tool-meson
-- **BSD-3-Clause** — libraries/LocalPeer (Qt Solutions), Gamemode (Feral Interactive), cmark
-- **MIT** — tomlplusplus, vcpkg, lionshead
-- **Unlicense** — libraries/murmur2 (SMHasher), libraries/javacheck
-- **Zlib** — zlib
-- **OFL-1.1** — Material Design Icons
-- **CC-BY-SA-4.0** — program_info/ logos and branding
-- **Batch-Icons** — Batch icon set
+Each file is named after the project or library it covers.
 
-For the full attribution text, see [COPYING.md](../COPYING.md).
+- **CleanLauncher** — GPL-3.0 (main project)
+- **PrismLauncher** — GPL-3.0 + Apache-2.0 (MultiMC lineage)
+- **PolyMC** — GPL-3.0 + Apache-2.0 (MultiMC lineage)
+- **launcher** — GPL-3.0 with classpath exception (libraries/launcher)
+- **libnbtplusplus** — LGPL-3.0 (libraries/libnbtplusplus)
+- **rainbow** — LGPL-2.1 (KDE Community)
+- **cmark** — BSD-2-Clause
+- **Gamemode** — BSD-3-Clause (Feral Interactive)
+- **Qt6** — LGPL-3.0
+- **MinGW-w64** — MinGW-w64 runtime license
+- **MaterialDesignIcons** — OFL-1.1
+- **Batch-Icons** — Custom permissive
+- **lionshead** — MIT
+- **tomlplusplus** — MIT
+- **vcpkg** — MIT (Microsoft)
+- **BreezeIcons** — LGPL-3.0
+- **OxygenIcons** — LGPL-3.0
+- **libqrencode** — LGPL-2.1
+- **Apache-2.0** — Dual-licensed source files
+- **CC-BY-SA-4.0** — Program logos and branding
+
+License type files (Apache-2.0, MIT, etc.) contain the full license text for reference.

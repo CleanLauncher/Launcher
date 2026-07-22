@@ -22,7 +22,7 @@ on:
       - "res/**"
       - "tests/**"
       - "CMakeLists.txt"
-      - "COPYING.md"
+      - "licenses/**"
       - ".github/workflows/build.yml"
       - ".github/actions/package/**"
       - ".github/actions/setup-dependencies/**"
