@@ -4,14 +4,6 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-use archive;
-use filesystem;
-use gzip;
-use hashing;
-use json;
-use markdown;
-use string_utils;
-
 // ============================================================================
 // FFI helper macros
 // ============================================================================
