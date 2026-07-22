@@ -19,16 +19,14 @@ pub struct ZipEntryInfo {
 }
 
 pub fn zip_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
 
     let mut entry_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
-        let zip_file = zip_archive.by_index(index).map_err(|zip_error| {
-            CoreError::InvalidData(format!("Failed to read ZIP entry {}: {}", index, zip_error))
-        })?;
+        let zip_file = zip_archive
+            .by_index(index)
+            .map_err(CoreError::Zip)?;
         entry_list.push(ZipEntryInfo {
             entry_name: zip_file.name().to_string(),
             is_directory: zip_file.is_dir(),
@@ -40,52 +38,39 @@ pub fn zip_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
 }
 
 pub fn zip_entry_exists(archive_path: &str, entry_name: &str) -> Result<bool> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
     let found = zip_archive.by_name(entry_name).is_ok();
     Ok(found)
 }
 
 pub fn zip_read_entry(archive_path: &str, entry_name: &str) -> Result<Vec<u8>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
-    let mut zip_file = zip_archive.by_name(entry_name).map_err(|zip_error| {
-        CoreError::InvalidData(format!(
-            "Entry '{}' not found in archive: {}",
-            entry_name, zip_error
-        ))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_file = zip_archive
+        .by_name(entry_name)
+        .map_err(CoreError::Zip)?;
     let mut entry_buffer = Vec::with_capacity(zip_file.size() as usize);
     zip_file
-        .read_to_end(&mut entry_buffer)
-        .map_err(CoreError::Io)?;
+        .read_to_end(&mut entry_buffer)?;
     Ok(entry_buffer)
 }
 
 pub fn zip_extract_file(archive_path: &str, entry_name: &str, target_path: &str) -> Result<()> {
     validate_path_safety(entry_name)?;
 
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
-    let mut zip_file = zip_archive.by_name(entry_name).map_err(|zip_error| {
-        CoreError::InvalidData(format!(
-            "Entry '{}' not found in archive: {}",
-            entry_name, zip_error
-        ))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_file = zip_archive
+        .by_name(entry_name)
+        .map_err(CoreError::Zip)?;
 
     let target_file_path = PathBuf::from(target_path);
     if let Some(parent_directory) = target_file_path.parent() {
-        fs::create_dir_all(parent_directory).map_err(CoreError::Io)?;
+        fs::create_dir_all(parent_directory)?;
     }
-    let mut output_file = fs::File::create(&target_file_path).map_err(CoreError::Io)?;
-    std::io::copy(&mut zip_file, &mut output_file).map_err(CoreError::Io)?;
+    let mut output_file = fs::File::create(&target_file_path)?;
+    std::io::copy(&mut zip_file, &mut output_file)?;
     Ok(())
 }
 
@@ -94,19 +79,17 @@ pub fn zip_extract_dir(
     subdir_prefix: &str,
     target_dir: &str,
 ) -> Result<Vec<String>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
 
     let mut extracted_files = Vec::new();
     let target_root = PathBuf::from(target_dir);
-    fs::create_dir_all(&target_root).map_err(CoreError::Io)?;
+    fs::create_dir_all(&target_root)?;
 
     for index in 0..zip_archive.len() {
-        let mut zip_file = zip_archive.by_index(index).map_err(|zip_error| {
-            CoreError::InvalidData(format!("Failed to read ZIP entry: {}", zip_error))
-        })?;
+        let mut zip_file = zip_archive
+            .by_index(index)
+            .map_err(CoreError::Zip)?;
 
         let entry_full_name = zip_file.name().to_string();
         let entry_relative_path = if subdir_prefix.is_empty() {
@@ -125,38 +108,36 @@ pub fn zip_extract_dir(
         let output_path = target_root.join(&entry_relative_path);
 
         if zip_file.is_dir() {
-            fs::create_dir_all(&output_path).map_err(CoreError::Io)?;
+            fs::create_dir_all(&output_path)?;
             continue;
         }
 
         if let Some(parent_directory) = output_path.parent() {
-            fs::create_dir_all(parent_directory).map_err(CoreError::Io)?;
+            fs::create_dir_all(parent_directory)?;
         }
-        let mut output_file = fs::File::create(&output_path).map_err(CoreError::Io)?;
-        std::io::copy(&mut zip_file, &mut output_file).map_err(CoreError::Io)?;
+        let mut output_file = fs::File::create(&output_path)?;
+        std::io::copy(&mut zip_file, &mut output_file)?;
         extracted_files.push(entry_full_name);
     }
     Ok(extracted_files)
 }
 
 pub fn zip_entry_names(archive_path: &str) -> Result<Vec<String>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(|zip_error| {
-        CoreError::InvalidData(format!("Invalid ZIP archive: {}", zip_error))
-    })?;
+    let file_handle = fs::File::open(archive_path)?;
+    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
 
     let mut name_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
-        let zip_file = zip_archive.by_index(index).map_err(|zip_error| {
-            CoreError::InvalidData(format!("Failed to read ZIP entry: {}", zip_error))
-        })?;
+        let zip_file = zip_archive
+            .by_index(index)
+            .map_err(CoreError::Zip)?;
         name_list.push(zip_file.name().to_string());
     }
     Ok(name_list)
 }
 
 pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]) -> Result<()> {
-    let output_file = fs::File::create(archive_path).map_err(CoreError::Io)?;
+    let output_file = fs::File::create(archive_path)?;
     let mut zip_writer = ZipWriter::new(output_file);
     let write_options = SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
@@ -166,22 +147,18 @@ pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]
         if entry_name.ends_with('/') {
             zip_writer
                 .add_directory(entry_name, write_options)
-                .map_err(|zip_error| {
-                    CoreError::InvalidData(format!("Failed to add directory entry: {}", zip_error))
-                })?;
+                .map_err(CoreError::Zip)?;
         } else {
             zip_writer
                 .start_file(entry_name, write_options)
-                .map_err(|zip_error| {
-                    CoreError::InvalidData(format!("Failed to start file entry: {}", zip_error))
-                })?;
-            zip_writer.write_all(entry_data).map_err(CoreError::Io)?;
+                .map_err(CoreError::Zip)?;
+            zip_writer.write_all(entry_data)?;
         }
     }
 
-    zip_writer.finish().map_err(|zip_error| {
-        CoreError::InvalidData(format!("Failed to finalize ZIP: {}", zip_error))
-    })?;
+    zip_writer
+        .finish()
+        .map_err(CoreError::Zip)?;
     Ok(())
 }
 
@@ -190,25 +167,20 @@ pub fn zip_merge_archives(
     target_path: &str,
     exclude_set: &HashSet<String>,
 ) -> Result<()> {
-    let output_file = fs::File::create(target_path).map_err(CoreError::Io)?;
+    let output_file = fs::File::create(target_path)?;
     let mut zip_writer = ZipWriter::new(output_file);
     let write_options = SimpleFileOptions::default()
         .compression_method(zip::CompressionMethod::Deflated)
         .compression_level(Some(6));
 
     for source_path in source_paths {
-        let source_file = fs::File::open(source_path).map_err(CoreError::Io)?;
-        let mut source_archive = ZipArchive::new(source_file).map_err(|zip_error| {
-            CoreError::InvalidData(format!(
-                "Invalid ZIP archive '{}': {}",
-                source_path, zip_error
-            ))
-        })?;
+        let source_file = fs::File::open(source_path)?;
+        let mut source_archive = ZipArchive::new(source_file).map_err(CoreError::Zip)?;
 
         for index in 0..source_archive.len() {
-            let mut source_entry = source_archive.by_index(index).map_err(|zip_error| {
-                CoreError::InvalidData(format!("Failed to read entry: {}", zip_error))
-            })?;
+            let mut source_entry = source_archive
+                .by_index(index)
+                .map_err(CoreError::Zip)?;
             let entry_name = source_entry.name().to_string();
 
             if exclude_set.contains(&entry_name) {
@@ -218,55 +190,44 @@ pub fn zip_merge_archives(
             if source_entry.is_dir() {
                 zip_writer
                     .add_directory(&entry_name, write_options)
-                    .map_err(|zip_error| {
-                        CoreError::InvalidData(format!("Failed to add directory: {}", zip_error))
-                    })?;
+                    .map_err(CoreError::Zip)?;
             } else {
                 let mut entry_buffer = Vec::with_capacity(source_entry.size() as usize);
                 source_entry
-                    .read_to_end(&mut entry_buffer)
-                    .map_err(CoreError::Io)?;
+                    .read_to_end(&mut entry_buffer)?;
                 zip_writer
                     .start_file(&entry_name, write_options)
-                    .map_err(|zip_error| {
-                        CoreError::InvalidData(format!("Failed to start file entry: {}", zip_error))
-                    })?;
-                zip_writer.write_all(&entry_buffer).map_err(CoreError::Io)?;
+                    .map_err(CoreError::Zip)?;
+                zip_writer.write_all(&entry_buffer)?;
             }
         }
     }
 
-    zip_writer.finish().map_err(|zip_error| {
-        CoreError::InvalidData(format!("Failed to finalize ZIP: {}", zip_error))
-    })?;
+    zip_writer
+        .finish()
+        .map_err(CoreError::Zip)?;
     Ok(())
 }
 
 pub fn tar_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
+    let file_handle = fs::File::open(archive_path)?;
     let gz_decoder = GzDecoder::new(file_handle);
     let mut tar_archive = TarArchive::new(gz_decoder);
 
     let mut entry_list = Vec::new();
-    let tar_entries = tar_archive.entries().map_err(|tar_error| {
-        CoreError::InvalidData(format!("Failed to read TAR entries: {}", tar_error))
-    })?;
+    let tar_entries = tar_archive
+        .entries()
+        .map_err(CoreError::Tar)?;
 
     for tar_entry_result in tar_entries {
-        let tar_entry = tar_entry_result.map_err(|tar_error| {
-            CoreError::InvalidData(format!("Failed to read TAR entry: {}", tar_error))
-        })?;
+        let tar_entry = tar_entry_result.map_err(CoreError::Tar)?;
         let entry_path = tar_entry
             .path()
-            .map_err(|tar_error| {
-                CoreError::InvalidData(format!("Failed to get TAR entry path: {}", tar_error))
-            })?
+            .map_err(CoreError::Tar)?
             .into_owned();
         let entry_header = tar_entry.header();
 
-        let entry_size = entry_header.size().map_err(|tar_error| {
-            CoreError::InvalidData(format!("Failed to get TAR entry size: {}", tar_error))
-        })?;
+        let entry_size = entry_header.size().map_err(CoreError::Tar)?;
         let is_directory = entry_header.entry_type() == tar::EntryType::Directory;
         entry_list.push(ZipEntryInfo {
             entry_name: entry_path.to_string_lossy().to_string(),
@@ -279,28 +240,24 @@ pub fn tar_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
 }
 
 pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<String>> {
-    let file_handle = fs::File::open(archive_path).map_err(CoreError::Io)?;
+    let file_handle = fs::File::open(archive_path)?;
     let gz_decoder = GzDecoder::new(file_handle);
     let mut tar_archive = TarArchive::new(gz_decoder);
 
     let target_root = PathBuf::from(target_dir);
-    fs::create_dir_all(&target_root).map_err(CoreError::Io)?;
+    fs::create_dir_all(&target_root)?;
 
     let mut extracted_files = Vec::new();
-    let tar_entries = tar_archive.entries().map_err(|tar_error| {
-        CoreError::InvalidData(format!("Failed to read TAR entries: {}", tar_error))
-    })?;
+    let tar_entries = tar_archive
+        .entries()
+        .map_err(CoreError::Tar)?;
 
     for tar_entry_result in tar_entries {
-        let mut tar_entry = tar_entry_result.map_err(|tar_error| {
-            CoreError::InvalidData(format!("Failed to read TAR entry: {}", tar_error))
-        })?;
+        let mut tar_entry = tar_entry_result.map_err(CoreError::Tar)?;
 
         let entry_path = tar_entry
             .path()
-            .map_err(|tar_error| {
-                CoreError::InvalidData(format!("Failed to get TAR entry path: {}", tar_error))
-            })?
+            .map_err(CoreError::Tar)?
             .into_owned();
 
         let entry_path_string = entry_path.to_string_lossy().to_string();
@@ -309,16 +266,16 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
         let output_path = target_root.join(&entry_path);
 
         if tar_entry.header().entry_type() == tar::EntryType::Directory {
-            fs::create_dir_all(&output_path).map_err(CoreError::Io)?;
+            fs::create_dir_all(&output_path)?;
             continue;
         }
 
         if let Some(parent_directory) = output_path.parent() {
-            fs::create_dir_all(parent_directory).map_err(CoreError::Io)?;
+            fs::create_dir_all(parent_directory)?;
         }
-        tar_entry.unpack_in(&target_root).map_err(|tar_error| {
-            CoreError::InvalidData(format!("Failed to extract TAR entry: {}", tar_error))
-        })?;
+        tar_entry
+            .unpack_in(&target_root)
+            .map_err(CoreError::Tar)?;
         extracted_files.push(entry_path_string);
     }
     Ok(extracted_files)
@@ -339,10 +296,7 @@ fn validate_path_safety(entry_name: &str) -> Result<()> {
             depth_counter += 1;
         }
         if depth_counter < 0 {
-            return Err(CoreError::InvalidData(format!(
-                "Path traversal detected in entry: {}",
-                entry_name
-            )));
+            return Err(CoreError::PathTraversal(entry_name.to_string()));
         }
     }
     Ok(())

@@ -3,7 +3,7 @@ use flate2::write::{DeflateEncoder, GzEncoder};
 use flate2::Compression;
 use std::io::{Read, Write};
 
-use error::{CoreError, Result};
+use error::Result;
 
 pub fn unzip(compressed_input: &[u8]) -> Result<Vec<u8>> {
     if compressed_input.is_empty() {
@@ -12,9 +12,7 @@ pub fn unzip(compressed_input: &[u8]) -> Result<Vec<u8>> {
 
     let mut decoder = GzDecoder::new(compressed_input);
     let mut decompressed_output = Vec::new();
-    decoder
-        .read_to_end(&mut decompressed_output)
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))?;
+    decoder.read_to_end(&mut decompressed_output)?;
     Ok(decompressed_output)
 }
 
@@ -24,12 +22,9 @@ pub fn zip(raw_input: &[u8]) -> Result<Vec<u8>> {
     }
 
     let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
-    encoder
-        .write_all(raw_input)
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))?;
-    encoder
-        .finish()
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))
+    encoder.write_all(raw_input)?;
+    let result = encoder.finish()?;
+    Ok(result)
 }
 
 pub fn inflate_raw(compressed_input: &[u8]) -> Result<Vec<u8>> {
@@ -39,9 +34,7 @@ pub fn inflate_raw(compressed_input: &[u8]) -> Result<Vec<u8>> {
 
     let mut decoder = DeflateDecoder::new(compressed_input);
     let mut decompressed_output = Vec::new();
-    decoder
-        .read_to_end(&mut decompressed_output)
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))?;
+    decoder.read_to_end(&mut decompressed_output)?;
     Ok(decompressed_output)
 }
 
@@ -51,12 +44,9 @@ pub fn deflate_raw(raw_input: &[u8]) -> Result<Vec<u8>> {
     }
 
     let mut encoder = DeflateEncoder::new(Vec::new(), Compression::default());
-    encoder
-        .write_all(raw_input)
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))?;
-    encoder
-        .finish()
-        .map_err(|io_error| CoreError::Compression(io_error.to_string()))
+    encoder.write_all(raw_input)?;
+    let result = encoder.finish()?;
+    Ok(result)
 }
 
 pub fn read_gz_by_blocks<Reader, BlockHandler>(
@@ -70,9 +60,7 @@ where
     let mut decoder = GzDecoder::new(reader);
     let mut read_buffer = [0u8; 16384];
     loop {
-        let bytes_read = decoder
-            .read(&mut read_buffer)
-            .map_err(|io_error| CoreError::Compression(io_error.to_string()))?;
+        let bytes_read = decoder.read(&mut read_buffer)?;
         if bytes_read == 0 {
             break;
         }
