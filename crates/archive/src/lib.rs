@@ -20,13 +20,13 @@ pub struct ZipEntryInfo {
 
 pub fn zip_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
 
     let mut entry_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
         let zip_file = zip_archive
             .by_index(index)
-            .map_err(CoreError::Zip)?;
+            ?;
         entry_list.push(ZipEntryInfo {
             entry_name: zip_file.name().to_string(),
             is_directory: zip_file.is_dir(),
@@ -39,17 +39,17 @@ pub fn zip_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
 
 pub fn zip_entry_exists(archive_path: &str, entry_name: &str) -> Result<bool> {
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
     let found = zip_archive.by_name(entry_name).is_ok();
     Ok(found)
 }
 
 pub fn zip_read_entry(archive_path: &str, entry_name: &str) -> Result<Vec<u8>> {
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
     let mut zip_file = zip_archive
         .by_name(entry_name)
-        .map_err(CoreError::Zip)?;
+        ?;
     let mut entry_buffer = Vec::with_capacity(zip_file.size() as usize);
     zip_file
         .read_to_end(&mut entry_buffer)?;
@@ -60,10 +60,10 @@ pub fn zip_extract_file(archive_path: &str, entry_name: &str, target_path: &str)
     validate_path_safety(entry_name)?;
 
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
     let mut zip_file = zip_archive
         .by_name(entry_name)
-        .map_err(CoreError::Zip)?;
+        ?;
 
     let target_file_path = PathBuf::from(target_path);
     if let Some(parent_directory) = target_file_path.parent() {
@@ -80,7 +80,7 @@ pub fn zip_extract_dir(
     target_dir: &str,
 ) -> Result<Vec<String>> {
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
 
     let mut extracted_files = Vec::new();
     let target_root = PathBuf::from(target_dir);
@@ -89,7 +89,7 @@ pub fn zip_extract_dir(
     for index in 0..zip_archive.len() {
         let mut zip_file = zip_archive
             .by_index(index)
-            .map_err(CoreError::Zip)?;
+            ?;
 
         let entry_full_name = zip_file.name().to_string();
         let entry_relative_path = if subdir_prefix.is_empty() {
@@ -124,13 +124,13 @@ pub fn zip_extract_dir(
 
 pub fn zip_entry_names(archive_path: &str) -> Result<Vec<String>> {
     let file_handle = fs::File::open(archive_path)?;
-    let mut zip_archive = ZipArchive::new(file_handle).map_err(CoreError::Zip)?;
+    let mut zip_archive = ZipArchive::new(file_handle)?;
 
     let mut name_list = Vec::with_capacity(zip_archive.len());
     for index in 0..zip_archive.len() {
         let zip_file = zip_archive
             .by_index(index)
-            .map_err(CoreError::Zip)?;
+            ?;
         name_list.push(zip_file.name().to_string());
     }
     Ok(name_list)
@@ -147,18 +147,18 @@ pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]
         if entry_name.ends_with('/') {
             zip_writer
                 .add_directory(entry_name, write_options)
-                .map_err(CoreError::Zip)?;
+                ?;
         } else {
             zip_writer
                 .start_file(entry_name, write_options)
-                .map_err(CoreError::Zip)?;
+                ?;
             zip_writer.write_all(entry_data)?;
         }
     }
 
     zip_writer
         .finish()
-        .map_err(CoreError::Zip)?;
+        ?;
     Ok(())
 }
 
@@ -175,12 +175,12 @@ pub fn zip_merge_archives(
 
     for source_path in source_paths {
         let source_file = fs::File::open(source_path)?;
-        let mut source_archive = ZipArchive::new(source_file).map_err(CoreError::Zip)?;
+        let mut source_archive = ZipArchive::new(source_file)?;
 
         for index in 0..source_archive.len() {
             let mut source_entry = source_archive
                 .by_index(index)
-                .map_err(CoreError::Zip)?;
+                ?;
             let entry_name = source_entry.name().to_string();
 
             if exclude_set.contains(&entry_name) {
@@ -190,14 +190,14 @@ pub fn zip_merge_archives(
             if source_entry.is_dir() {
                 zip_writer
                     .add_directory(&entry_name, write_options)
-                    .map_err(CoreError::Zip)?;
+                    ?;
             } else {
                 let mut entry_buffer = Vec::with_capacity(source_entry.size() as usize);
                 source_entry
                     .read_to_end(&mut entry_buffer)?;
                 zip_writer
                     .start_file(&entry_name, write_options)
-                    .map_err(CoreError::Zip)?;
+                    ?;
                 zip_writer.write_all(&entry_buffer)?;
             }
         }
@@ -205,7 +205,7 @@ pub fn zip_merge_archives(
 
     zip_writer
         .finish()
-        .map_err(CoreError::Zip)?;
+        ?;
     Ok(())
 }
 
@@ -217,17 +217,17 @@ pub fn tar_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
     let mut entry_list = Vec::new();
     let tar_entries = tar_archive
         .entries()
-        .map_err(CoreError::Tar)?;
+        ?;
 
     for tar_entry_result in tar_entries {
-        let tar_entry = tar_entry_result.map_err(CoreError::Tar)?;
+        let tar_entry = tar_entry_result?;
         let entry_path = tar_entry
             .path()
-            .map_err(CoreError::Tar)?
+            ?
             .into_owned();
         let entry_header = tar_entry.header();
 
-        let entry_size = entry_header.size().map_err(CoreError::Tar)?;
+        let entry_size = entry_header.size()?;
         let is_directory = entry_header.entry_type() == tar::EntryType::Directory;
         entry_list.push(ZipEntryInfo {
             entry_name: entry_path.to_string_lossy().to_string(),
@@ -250,14 +250,14 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
     let mut extracted_files = Vec::new();
     let tar_entries = tar_archive
         .entries()
-        .map_err(CoreError::Tar)?;
+        ?;
 
     for tar_entry_result in tar_entries {
-        let mut tar_entry = tar_entry_result.map_err(CoreError::Tar)?;
+        let mut tar_entry = tar_entry_result?;
 
         let entry_path = tar_entry
             .path()
-            .map_err(CoreError::Tar)?
+            ?
             .into_owned();
 
         let entry_path_string = entry_path.to_string_lossy().to_string();
@@ -275,7 +275,7 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
         }
         tar_entry
             .unpack_in(&target_root)
-            .map_err(CoreError::Tar)?;
+            ?;
         extracted_files.push(entry_path_string);
     }
     Ok(extracted_files)
