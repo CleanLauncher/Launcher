@@ -156,9 +156,7 @@ pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]
         }
     }
 
-    zip_writer
-        .finish()
-        ?;
+    zip_writer.finish()?;
     Ok(())
 }
 
@@ -193,19 +191,14 @@ pub fn zip_merge_archives(
                     ?;
             } else {
                 let mut entry_buffer = Vec::with_capacity(source_entry.size() as usize);
-                source_entry
-                    .read_to_end(&mut entry_buffer)?;
-                zip_writer
-                    .start_file(&entry_name, write_options)
-                    ?;
+                source_entry.read_to_end(&mut entry_buffer)?;
+                zip_writer.start_file(&entry_name, write_options)?;
                 zip_writer.write_all(&entry_buffer)?;
             }
         }
     }
 
-    zip_writer
-        .finish()
-        ?;
+    zip_writer.finish()?;
     Ok(())
 }
 
@@ -215,16 +208,11 @@ pub fn tar_list_entries(archive_path: &str) -> Result<Vec<ZipEntryInfo>> {
     let mut tar_archive = TarArchive::new(gz_decoder);
 
     let mut entry_list = Vec::new();
-    let tar_entries = tar_archive
-        .entries()
-        ?;
+    let tar_entries = tar_archive.entries()?;
 
     for tar_entry_result in tar_entries {
         let tar_entry = tar_entry_result?;
-        let entry_path = tar_entry
-            .path()
-            ?
-            .into_owned();
+        let entry_path = tar_entry.path()?.into_owned();
         let entry_header = tar_entry.header();
 
         let entry_size = entry_header.size()?;
@@ -248,17 +236,12 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
     fs::create_dir_all(&target_root)?;
 
     let mut extracted_files = Vec::new();
-    let tar_entries = tar_archive
-        .entries()
-        ?;
+    let tar_entries = tar_archive.entries()?;
 
     for tar_entry_result in tar_entries {
         let mut tar_entry = tar_entry_result?;
 
-        let entry_path = tar_entry
-            .path()
-            ?
-            .into_owned();
+        let entry_path = tar_entry.path()?.into_owned();
 
         let entry_path_string = entry_path.to_string_lossy().to_string();
         validate_path_safety(&entry_path_string)?;
@@ -273,9 +256,7 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
         if let Some(parent_directory) = output_path.parent() {
             fs::create_dir_all(parent_directory)?;
         }
-        tar_entry
-            .unpack_in(&target_root)
-            ?;
+        tar_entry.unpack_in(&target_root)?;
         extracted_files.push(entry_path_string);
     }
     Ok(extracted_files)
