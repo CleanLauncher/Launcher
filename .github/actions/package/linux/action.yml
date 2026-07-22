@@ -97,6 +97,9 @@ runs:
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "/opt/launcher"
 
         DEB_VERSION="${VERSION#v}"
+        if ! [[ "$DEB_VERSION" =~ ^[0-9] ]]; then
+          DEB_VERSION="0~git${DEB_VERSION}"
+        fi
         DEB_PKG="launcher_${DEB_VERSION}_${DEB_ARCH}.deb"
         mkdir -p "$INSTALL_DEB_DIR/DEBIAN"
         mkdir -p "$INSTALL_DEB_DIR/opt/launcher"
@@ -129,6 +132,9 @@ runs:
         sudo apt-get -y install rpm
 
         RPM_VERSION="${VERSION#v}"
+        if ! [[ "$RPM_VERSION" =~ ^[0-9] ]]; then
+          RPM_VERSION="0.git.${RPM_VERSION}"
+        fi
         RPM_SPEC="/tmp/launcher.spec"
         printf 'Name:           launcher\n' > "$RPM_SPEC"
         printf 'Version:        %s\n' "$RPM_VERSION" >> "$RPM_SPEC"
