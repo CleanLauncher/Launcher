@@ -45,12 +45,9 @@ pub fn zip_entry_exists(archive_path: &str, entry_name: &str) -> Result<bool> {
 pub fn zip_read_entry(archive_path: &str, entry_name: &str) -> Result<Vec<u8>> {
     let file_handle = fs::File::open(archive_path)?;
     let mut zip_archive = ZipArchive::new(file_handle)?;
-    let mut zip_file = zip_archive
-        .by_name(entry_name)
-        ?;
+    let mut zip_file = zip_archive.by_name(entry_name)?;
     let mut entry_buffer = Vec::with_capacity(zip_file.size() as usize);
-    zip_file
-        .read_to_end(&mut entry_buffer)?;
+    zip_file.read_to_end(&mut entry_buffer)?;
     Ok(entry_buffer)
 }
 
@@ -59,9 +56,7 @@ pub fn zip_extract_file(archive_path: &str, entry_name: &str, target_path: &str)
 
     let file_handle = fs::File::open(archive_path)?;
     let mut zip_archive = ZipArchive::new(file_handle)?;
-    let mut zip_file = zip_archive
-        .by_name(entry_name)
-        ?;
+    let mut zip_file = zip_archive.by_name(entry_name)?;
 
     let target_file_path = PathBuf::from(target_path);
     if let Some(parent_directory) = target_file_path.parent() {
@@ -85,9 +80,7 @@ pub fn zip_extract_dir(
     fs::create_dir_all(&target_root)?;
 
     for index in 0..zip_archive.len() {
-        let mut zip_file = zip_archive
-            .by_index(index)
-            ?;
+        let mut zip_file = zip_archive.by_index(index)?;
 
         let entry_full_name = zip_file.name().to_string();
         let entry_relative_path = if subdir_prefix.is_empty() {
