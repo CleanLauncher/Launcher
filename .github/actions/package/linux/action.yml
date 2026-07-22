@@ -63,17 +63,62 @@ runs:
         cp "${{ github.workspace }}/res/io.github.launcher.Launcher_256.png" "$INSTALL_APPIMAGE_DIR/io.github.launcher.Launcher.png"
         cp "${{ github.workspace }}/res/io.github.launcher.Launcher.svg" "$INSTALL_APPIMAGE_DIR/io.github.launcher.Launcher.svg"
 
+        # Bundle all shared library dependencies via sharun
         sharun lib4bin \
           --hard-links \
           --with-hooks \
           --dst-dir "$INSTALL_APPIMAGE_DIR" \
-          "$INSTALL_APPIMAGE_DIR"/bin/* "$QT_PLUGIN_PATH"/*/*.so
+          "$INSTALL_APPIMAGE_DIR"/bin/* \
+          "$QT_PLUGIN_PATH"/*/*.so \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libGL*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libX*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libxcb*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libxkb*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libEGL*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libvulkan*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libwayland*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libdrm*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgbm*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libfontconfig*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libfreetype*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libharfbuzz*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libpng*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libjpeg*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libtiff*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libwebp*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libzstd*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libcrypto*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libssl*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libffi*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libpcre*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libexpat*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libuuid*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libbz2*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libz*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libstdc++.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so* || true
+
+        # Bundle Qt platform plugins explicitly
+        for plugin_dir in "$QT_PLUGIN_PATH"/platforms "$QT_PLUGIN_PATH"/platformthemes "$QT_PLUGIN_PATH"/styles "$QT_PLUGIN_PATH"/imageformats "$QT_PLUGIN_PATH"/iconengines "$QT_PLUGIN_PATH"/tls; do
+          if [ -d "$plugin_dir" ]; then
+            mkdir -p "$INSTALL_APPIMAGE_DIR/$(basename "$plugin_dir")"
+            cp -a "$plugin_dir"/* "$INSTALL_APPIMAGE_DIR/$(basename "$plugin_dir")/" 2>/dev/null || true
+          fi
+        done
+
+        # Bundle fonts if available
+        if [ -d "/usr/share/fonts" ]; then
+          mkdir -p "$INSTALL_APPIMAGE_DIR/fonts"
+          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_APPIMAGE_DIR/fonts/" 2>/dev/null || true
+        fi
 
         cp ~/bin/AppImageUpdate.AppImage "$INSTALL_APPIMAGE_DIR"/bin/
         find "$INSTALL_APPIMAGE_DIR" -name '*gamemode*' -exec rm {} +
 
         echo "LAUNCHER_DISABLE_GLVULKAN=1" >> "$INSTALL_APPIMAGE_DIR"/.env
         echo "QT_QPA_PLATFORMTHEME=xdgdesktopportal" >> "$INSTALL_APPIMAGE_DIR"/.env
+        echo "QT_PLUGIN_PATH=\$APPDIR/plugins" >> "$INSTALL_APPIMAGE_DIR"/.env
+        echo "LD_LIBRARY_PATH=\$APPDIR/lib:\$APPDIR/plugins:\$LD_LIBRARY_PATH" >> "$INSTALL_APPIMAGE_DIR"/.env
         mv "$INSTALL_APPIMAGE_DIR"/{sharun,AppRun}
 
         if [[ "${{ github.ref_type }}" == "tag" ]]; then
@@ -171,13 +216,67 @@ runs:
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "$INSTALL_PORTABLE_DIR"
         cmake --install "$BUILD_DIR" --config "${{ inputs.build-type }}" --prefix "$INSTALL_PORTABLE_DIR" --component portable
 
+        # Bundle all shared library dependencies via sharun
         sharun lib4bin \
           --with-hooks \
           --hard-links \
           --dst-dir "$INSTALL_PORTABLE_DIR" \
-          "$INSTALL_PORTABLE_DIR"/bin/* "$QT_PLUGIN_PATH"/*/*.so
+          "$INSTALL_PORTABLE_DIR"/bin/* \
+          "$QT_PLUGIN_PATH"/*/*.so \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libGL*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libX*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libxcb*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libxkb*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libEGL*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libvulkan*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libwayland*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libdrm*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgbm*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libfontconfig*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libfreetype*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libharfbuzz*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libpng*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libjpeg*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libtiff*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libwebp*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libzstd*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libcrypto*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libssl*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libffi*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libpcre*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libexpat*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libuuid*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libbz2*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libz*.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libstdc++.so* \
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so* || true
+
+        # Bundle Qt platform plugins explicitly
+        for plugin_dir in "$QT_PLUGIN_PATH"/platforms "$QT_PLUGIN_PATH"/platformthemes "$QT_PLUGIN_PATH"/styles "$QT_PLUGIN_PATH"/imageformats "$QT_PLUGIN_PATH"/iconengines "$QT_PLUGIN_PATH"/tls; do
+          if [ -d "$plugin_dir" ]; then
+            mkdir -p "$INSTALL_PORTABLE_DIR/$(basename "$plugin_dir")"
+            cp -a "$plugin_dir"/* "$INSTALL_PORTABLE_DIR/$(basename "$plugin_dir")/" 2>/dev/null || true
+          fi
+        done
+
+        # Bundle fonts if available
+        if [ -d "/usr/share/fonts" ]; then
+          mkdir -p "$INSTALL_PORTABLE_DIR/fonts"
+          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_PORTABLE_DIR/fonts/" 2>/dev/null || true
+        fi
 
         find "$INSTALL_PORTABLE_DIR" -name '*gamemode*' -exec rm {} +
+
+        # Create launcher script
+        cat > "$INSTALL_PORTABLE_DIR/launcher.sh" << 'LAUNCHER'
+#!/bin/bash
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+export LD_LIBRARY_PATH="$SCRIPT_DIR/lib:$SCRIPT_DIR/plugins:${LD_LIBRARY_PATH:-}"
+export QT_PLUGIN_PATH="$SCRIPT_DIR/plugins"
+export QT_QPA_PLATFORMTHEME=xdgdesktopportal
+exec "$SCRIPT_DIR/bin/launcher" "$@"
+LAUNCHER
+        chmod +x "$INSTALL_PORTABLE_DIR/launcher.sh"
 
         for l in $(find "$INSTALL_PORTABLE_DIR" -type f -o -type l); do
           l="${l#$(pwd)/}"
