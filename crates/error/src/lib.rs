@@ -55,9 +55,3 @@ impl From<flate2::CompressError> for CoreError {
         CoreError::Compression(err.to_string())
     }
 }
-
-impl From<tar::Error> for CoreError {
-    fn from(err: tar::Error) -> Self {
-        CoreError::Tar(err.to_string())
-    }
-}
