@@ -5,7 +5,6 @@ use std::os::raw::c_char;
 use std::slice;
 
 use archive;
-use error::CoreError;
 use filesystem;
 use gzip;
 use hashing;
@@ -166,9 +165,17 @@ pub extern "C" fn launcher_natural_compare(
     right_ptr: *const c_char,
     case_insensitive: bool,
 ) -> i32 {
-    ffi_false_check!(left_ptr, right_ptr);
-    let left_str = ffi_cstr_to_str_false!(left_ptr);
-    let right_str = ffi_cstr_to_str_false!(right_ptr);
+    if left_ptr.is_null() || right_ptr.is_null() {
+        return 0;
+    }
+    let left_str = match unsafe { CStr::from_ptr(left_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return 0,
+    };
+    let right_str = match unsafe { CStr::from_ptr(right_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return 0,
+    };
     match string_utils::natural_compare(left_str, right_str, case_insensitive) {
         std::cmp::Ordering::Less => -1,
         std::cmp::Ordering::Equal => 0,
