@@ -58,7 +58,7 @@ jobs:
 
   create_release:
     needs: [build_release, build_snap, build_flatpak]
-    if: always() && needs.build_release.result == 'success'
+    if: always()
     permissions:
       contents: write
     runs-on: ubuntu-24.04
