@@ -39,8 +39,9 @@
 #include <QList>
 #include <QString>
 
-class Config {
-   public:
+class Config
+{
+public:
     Config();
     QString LAUNCHER_NAME;
     QString LAUNCHER_APP_BINARY_NAME;
@@ -61,7 +62,7 @@ class Config {
 
     QString VERSION_CHANNEL;
 
-    bool UPDATER_ENABLED = false;
+    bool UPDATER_ENABLED         = false;
     bool JAVA_DOWNLOADER_ENABLED = false;
 
     QString BUILD_PLATFORM;
@@ -124,8 +125,8 @@ class Config {
     QString SUBREDDIT_URL;
 
     QString DEFAULT_RESOURCE_BASE = "https://resources.download.minecraft.net/";
-    QString LIBRARY_BASE = "https://libraries.minecraft.net/";
-    QString IMGUR_BASE_URL = "https://api.imgur.com/3/";
+    QString LIBRARY_BASE          = "https://libraries.minecraft.net/";
+    QString IMGUR_BASE_URL        = "https://api.imgur.com/3/";
     QString LEGACY_FMLLIBS_BASE_URL;
     QString TRANSLATION_FILES_URL;
 
@@ -134,18 +135,18 @@ class Config {
     QString LEGACY_FTB_CDN_BASE_URL = "https://dist.creeper.host/FTB2/";
 
     QString ATL_DOWNLOAD_SERVER_URL = "https://download.nodecdn.net/containers/atl/";
-    QString ATL_API_BASE_URL = "https://api.atlauncher.com/v1/";
+    QString ATL_API_BASE_URL        = "https://api.atlauncher.com/v1/";
 
     QString TECHNIC_API_BASE_URL = "https://api.technicpack.net/";
 
     QString TECHNIC_API_BUILD = "multimc";
 
-    QString MODRINTH_STAGING_URL = "https://staging-api.modrinth.com/v2";
-    QString MODRINTH_PROD_URL = "https://api.modrinth.com/v2";
-    QStringList MODRINTH_MRPACK_HOSTS{ "cdn.modrinth.com", "github.com", "raw.githubusercontent.com", "gitlab.com" };
-    QString MODRINTH_DOWNLOAD_HOST = "cdn.modrinth.com";
+    QString     MODRINTH_STAGING_URL = "https://staging-api.modrinth.com/v2";
+    QString     MODRINTH_PROD_URL    = "https://api.modrinth.com/v2";
+    QStringList MODRINTH_MRPACK_HOSTS{"cdn.modrinth.com", "github.com", "raw.githubusercontent.com", "gitlab.com"};
+    QString     MODRINTH_DOWNLOAD_HOST = "cdn.modrinth.com";
 
-    QString FLAME_BASE_URL = "https://api.curseforge.com/v1";
+    QString FLAME_BASE_URL      = "https://api.curseforge.com/v1";
     QString FLAME_DOWNLOAD_HOST = "edge.forgecdn.net";
 
     QString versionString() const;
