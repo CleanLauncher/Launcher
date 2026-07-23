@@ -132,6 +132,8 @@ jobs:
       - name: Smoke test (non-MinGW)
         if: ${{ matrix.msystem == '' }}
         shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1)
           if [ -z "$BINARY" ]; then
