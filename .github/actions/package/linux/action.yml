@@ -268,14 +268,7 @@ runs:
         find "$INSTALL_PORTABLE_DIR" -name '*gamemode*' -exec rm {} +
 
         # Create launcher script
-        cat > "$INSTALL_PORTABLE_DIR/launcher.sh" << 'LAUNCHER'
-#!/bin/bash
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-export LD_LIBRARY_PATH="$SCRIPT_DIR/lib:$SCRIPT_DIR/plugins:${LD_LIBRARY_PATH:-}"
-export QT_PLUGIN_PATH="$SCRIPT_DIR/plugins"
-export QT_QPA_PLATFORMTHEME=xdgdesktopportal
-exec "$SCRIPT_DIR/bin/launcher" "$@"
-LAUNCHER
+        printf '#!/bin/bash\nSCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"\nexport LD_LIBRARY_PATH="$SCRIPT_DIR/lib:$SCRIPT_DIR/plugins:${LD_LIBRARY_PATH:-}"\nexport QT_PLUGIN_PATH="$SCRIPT_DIR/plugins"\nexport QT_QPA_PLATFORMTHEME=xdgdesktopportal\nexec "$SCRIPT_DIR/bin/launcher" "$@"\n' > "$INSTALL_PORTABLE_DIR/launcher.sh"
         chmod +x "$INSTALL_PORTABLE_DIR/launcher.sh"
 
         for l in $(find "$INSTALL_PORTABLE_DIR" -type f -o -type l); do
