@@ -27,35 +27,36 @@
 
 class ResourceFolderModel;
 
-class ResourceDownloadTask : public SequentialTask {
+class ResourceDownloadTask : public SequentialTask
+{
     Q_OBJECT
-   public:
+public:
     explicit ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
-                                  ModPlatform::IndexedVersion version,
-                                  ResourceFolderModel* packs,
-                                  bool isIndexed = true,
-                                  QString downloadReason = "standalone");
-    const QString& getFilename() const { return m_pack_version.fileName; }
-    const QVariant& getVersionID() const { return m_pack_version.fileId; }
-    const ModPlatform::IndexedVersion& getVersion() const { return m_pack_version; }
+                                  ModPlatform::IndexedVersion   version,
+                                  ResourceFolderModel*          packs,
+                                  bool                          isIndexed      = true,
+                                  QString                       downloadReason = "standalone");
+    const QString&                       getFilename() const { return m_pack_version.fileName; }
+    const QVariant&                      getVersionID() const { return m_pack_version.fileId; }
+    const ModPlatform::IndexedVersion&   getVersion() const { return m_pack_version; }
     const ModPlatform::ResourceProvider& getProvider() const { return m_pack->provider; }
-    const QString& getName() const { return m_pack->name; }
-    ModPlatform::IndexedPack::Ptr getPack() { return m_pack; }
+    const QString&                       getName() const { return m_pack->name; }
+    ModPlatform::IndexedPack::Ptr        getPack() { return m_pack; }
 
-   private:
+private:
     ModPlatform::IndexedPack::Ptr m_pack;
-    ModPlatform::IndexedVersion m_pack_version;
-    ResourceFolderModel* m_pack_model;
+    ModPlatform::IndexedVersion   m_pack_version;
+    ResourceFolderModel*          m_pack_model;
 
-    NetJob::Ptr m_filesNetJob;
+    NetJob::Ptr                  m_filesNetJob;
     LocalResourceUpdateTask::Ptr m_update_task;
 
     void downloadProgressChanged(qint64 current, qint64 total);
     void downloadFailed(QString reason);
     void downloadSucceeded();
 
-    std::tuple<QString, QString> to_delete{ "", "" };
+    std::tuple<QString, QString> to_delete{"", ""};
 
-   private slots:
+private slots:
     void hasOldResource(const QString& name, const QString& filename);
 };

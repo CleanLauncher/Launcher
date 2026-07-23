@@ -50,14 +50,15 @@
 #include "minecraft/mod/tasks/LocalModParseTask.h"
 #include "modplatform/ModIndex.h"
 
-namespace {
+namespace
+{
 
 int compareVersionLists(const QStringList& leftVersions, const QStringList& rightVersions)
 {
     const qsizetype commonSize = std::min(leftVersions.size(), rightVersions.size());
 
     for (qsizetype i = 0; i < commonSize; i++) {
-        const auto leftVersion = Version(leftVersions.at(i).trimmed());
+        const auto leftVersion  = Version(leftVersions.at(i).trimmed());
         const auto rightVersion = Version(rightVersions.at(i).trimmed());
 
         if (leftVersion > rightVersion)
@@ -95,59 +96,59 @@ int Mod::compare(const Resource& other, SortType type) const
         return Resource::compare(other, type);
 
     switch (type) {
-        default:
-        case SortType::Enabled:
-        case SortType::Name:
-        case SortType::Date:
-        case SortType::Size:
-            return Resource::compare(other, type);
-        case SortType::Version: {
-            auto this_ver = Version(version());
-            auto other_ver = Version(cast_other->version());
-            if (this_ver > other_ver)
-                return 1;
-            if (this_ver < other_ver)
-                return -1;
-            break;
-        }
-        case SortType::Side: {
-            auto compare_result = QString::compare(side(), cast_other->side(), Qt::CaseInsensitive);
-            if (compare_result != 0)
-                return compare_result;
-            break;
-        }
-        case SortType::McVersions: {
-            auto compare_result = compareVersionLists(mcVersions(), cast_other->mcVersions());
-            if (compare_result != 0)
-                return compare_result;
-            break;
-        }
-        case SortType::Loaders: {
-            auto compare_result = QString::compare(loaders(), cast_other->loaders(), Qt::CaseInsensitive);
-            if (compare_result != 0)
-                return compare_result;
-            break;
-        }
-        case SortType::ReleaseType: {
-            auto compare_result = QString::compare(releaseType(), cast_other->releaseType(), Qt::CaseInsensitive);
-            if (compare_result != 0)
-                return compare_result;
-            break;
-        }
-        case SortType::RequiredBy: {
-            if (requiredByCount() > cast_other->requiredByCount())
-                return 1;
-            if (requiredByCount() < cast_other->requiredByCount())
-                return -1;
-            break;
-        }
-        case SortType::Requires: {
-            if (requiresCount() > cast_other->requiresCount())
-                return 1;
-            if (requiresCount() < cast_other->requiresCount())
-                return -1;
-            break;
-        }
+    default:
+    case SortType::Enabled:
+    case SortType::Name:
+    case SortType::Date:
+    case SortType::Size:
+        return Resource::compare(other, type);
+    case SortType::Version: {
+        auto this_ver  = Version(version());
+        auto other_ver = Version(cast_other->version());
+        if (this_ver > other_ver)
+            return 1;
+        if (this_ver < other_ver)
+            return -1;
+        break;
+    }
+    case SortType::Side: {
+        auto compare_result = QString::compare(side(), cast_other->side(), Qt::CaseInsensitive);
+        if (compare_result != 0)
+            return compare_result;
+        break;
+    }
+    case SortType::McVersions: {
+        auto compare_result = compareVersionLists(mcVersions(), cast_other->mcVersions());
+        if (compare_result != 0)
+            return compare_result;
+        break;
+    }
+    case SortType::Loaders: {
+        auto compare_result = QString::compare(loaders(), cast_other->loaders(), Qt::CaseInsensitive);
+        if (compare_result != 0)
+            return compare_result;
+        break;
+    }
+    case SortType::ReleaseType: {
+        auto compare_result = QString::compare(releaseType(), cast_other->releaseType(), Qt::CaseInsensitive);
+        if (compare_result != 0)
+            return compare_result;
+        break;
+    }
+    case SortType::RequiredBy: {
+        if (requiredByCount() > cast_other->requiredByCount())
+            return 1;
+        if (requiredByCount() < cast_other->requiredByCount())
+            return -1;
+        break;
+    }
+    case SortType::Requires: {
+        if (requiresCount() > cast_other->requiresCount())
+            return 1;
+        if (requiresCount() < cast_other->requiresCount())
+            return -1;
+        break;
+    }
     }
     return 0;
 }
@@ -208,7 +209,7 @@ auto Mod::loaders() const -> QString
 {
     if (metadata()) {
         QStringList loaders;
-        auto modLoaders = metadata()->loaders;
+        auto        modLoaders = metadata()->loaders;
         for (auto loader : ModPlatform::modLoaderTypesToList(modLoaders)) {
             loaders << getModLoaderAsString(loader);
         }
@@ -260,7 +261,7 @@ auto Mod::authors() const -> QStringList
 void Mod::finishResolvingWithDetails(ModDetails&& details)
 {
     m_is_resolving = false;
-    m_is_resolved = true;
+    m_is_resolved  = true;
 
     m_local_details = std::move(details);
     if (!iconPath().isEmpty()) {
@@ -287,11 +288,10 @@ QPixmap Mod::setIcon(QImage new_image) const
     if (m_packImageCacheKey.key.isValid())
         PixmapCache::remove(m_packImageCacheKey.key);
 
-    auto pixmap =
-        QPixmap::fromImage(new_image.scaled({ 64, 64 }, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    auto pixmap = QPixmap::fromImage(new_image.scaled({64, 64}, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
-    m_packImageCacheKey.key = PixmapCache::insert(pixmap);
-    m_packImageCacheKey.wasEverUsed = true;
+    m_packImageCacheKey.key            = PixmapCache::insert(pixmap);
+    m_packImageCacheKey.wasEverUsed    = true;
     m_packImageCacheKey.wasReadAttempt = true;
     return pixmap;
 }

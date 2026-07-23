@@ -35,36 +35,38 @@
 
 #pragma once
 
+#include "InstanceTask.h"
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QUrl>
-#include "InstanceTask.h"
 
-class InstanceImportTask : public InstanceTask {
+class InstanceImportTask : public InstanceTask
+{
     Q_OBJECT
-   public:
+public:
     explicit InstanceImportTask(const QUrl& sourceUrl, QWidget* parent = nullptr, QMap<QString, QString>&& extra_info = {});
     virtual ~InstanceImportTask() = default;
     bool abort() override;
 
-   protected:
+protected:
     virtual void executeTask() override;
 
-   private:
+private:
     void processMultiMC();
     void processTechnic();
     void processFlame();
     void processModrinth();
 
-   private slots:
+private slots:
     void processZipPack();
     void extractFinished();
 
-   private:
-    QUrl m_sourceUrl;
-    QString m_archivePath;
+private:
+    QUrl      m_sourceUrl;
+    QString   m_archivePath;
     Task::Ptr m_task;
-    enum class ModpackType {
+    enum class ModpackType
+    {
         Unknown,
         MultiMC,
         Technic,
@@ -75,5 +77,5 @@ class InstanceImportTask : public InstanceTask {
     QMap<QString, QString> m_extra_info;
 
     QWidget* m_parent;
-    void downloadFromUrl();
+    void     downloadFromUrl();
 };

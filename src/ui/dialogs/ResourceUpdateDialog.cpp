@@ -29,27 +29,24 @@
 
 #include <optional>
 
-namespace {
+namespace
+{
 std::vector<Version> mcVersions(BaseInstance* inst)
 {
-    return { static_cast<MinecraftInstance*>(inst)->getPackProfile()->getComponent("net.minecraft")->getVersion() };
+    return {static_cast<MinecraftInstance*>(inst)->getPackProfile()->getComponent("net.minecraft")->getVersion()};
 }
 }  // namespace
 
-ResourceUpdateDialog::ResourceUpdateDialog(QWidget* parent,
-                                           BaseInstance* instance,
-                                           ResourceFolderModel* resourceModel,
-                                           QList<Resource*>& searchFor,
-                                           bool includeDeps,
+ResourceUpdateDialog::ResourceUpdateDialog(QWidget*                          parent,
+                                           BaseInstance*                     instance,
+                                           ResourceFolderModel*              resourceModel,
+                                           QList<Resource*>&                 searchFor,
+                                           bool                              includeDeps,
                                            QList<ModPlatform::ModLoaderType> loadersList)
-    : ReviewMessageBox(parent, tr("Confirm resources to update"), "")
-    , m_parent(parent)
-    , m_resourceModel(resourceModel)
-    , m_candidates(searchFor)
-    , m_secondTryMetadata(new ConcurrentTask("Second Metadata Search", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt()))
-    , m_instance(instance)
-    , m_includeDeps(includeDeps)
-    , m_loadersList(std::move(loadersList))
+    : ReviewMessageBox(parent, tr("Confirm resources to update"), ""), m_parent(parent), m_resourceModel(resourceModel),
+      m_candidates(searchFor),
+      m_secondTryMetadata(new ConcurrentTask("Second Metadata Search", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt())),
+      m_instance(instance), m_includeDeps(includeDeps), m_loadersList(std::move(loadersList))
 {
     ReviewMessageBox::setGeometry(0, 0, 800, 600);
 
@@ -68,12 +65,13 @@ void ResourceUpdateDialog::checkCandidates()
     if (!m_failedMetadata.empty()) {
         QString text;
         for (const auto& failed : m_failedMetadata) {
-            const auto& mod = std::get<0>(failed);
+            const auto& mod    = std::get<0>(failed);
             const auto& reason = std::get<1>(failed);
             text += tr("Mod name: %1<br>File name: %2<br>Reason: %3<br><br>").arg(mod->name(), mod->fileinfo().fileName(), reason);
         }
 
-        ScrollMessageBox messageDialog(m_parent, tr("Metadata generation failed"),
+        ScrollMessageBox messageDialog(m_parent,
+                                       tr("Metadata generation failed"),
                                        tr("Could not generate metadata for the following resources:<br>"
                                           "Do you wish to proceed without those resources?"),
                                        text);
@@ -91,24 +89,29 @@ void ResourceUpdateDialog::checkCandidates()
 
     if (!m_modrinthToUpdate.empty()) {
         m_modrinthCheckTask.reset(new ModrinthCheckUpdate(m_modrinthToUpdate, versions, m_loadersList, m_resourceModel));
-        connect(m_modrinthCheckTask.get(), &CheckUpdateTask::checkFailed, this,
+        connect(m_modrinthCheckTask.get(),
+                &CheckUpdateTask::checkFailed,
+                this,
                 [this](Resource* resource, const QString& reason, const QUrl& recoverUrl) {
-                    m_failedCheckUpdate.append({ resource, reason, recoverUrl });
+                    m_failedCheckUpdate.append({resource, reason, recoverUrl});
                 });
         checkTask.addTask(m_modrinthCheckTask);
     }
 
     if (!m_flameToUpdate.empty()) {
         m_flameCheckTask.reset(new FlameCheckUpdate(m_flameToUpdate, versions, m_loadersList, m_resourceModel));
-        connect(m_flameCheckTask.get(), &CheckUpdateTask::checkFailed, this,
+        connect(m_flameCheckTask.get(),
+                &CheckUpdateTask::checkFailed,
+                this,
                 [this](Resource* resource, const QString& reason, const QUrl& recoverUrl) {
-                    m_failedCheckUpdate.append({ resource, reason, recoverUrl });
+                    m_failedCheckUpdate.append({resource, reason, recoverUrl});
                 });
         checkTask.addTask(m_flameCheckTask);
     }
 
-    connect(&checkTask, &Task::failed, this,
-            [this](const QString& reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+    connect(&checkTask, &Task::failed, this, [this](const QString& reason) {
+        CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+    });
 
     connect(&checkTask, &Task::succeeded, this, [this, &checkTask]() {
         QStringList warnings = checkTask.warnings();
@@ -155,8 +158,8 @@ void ResourceUpdateDialog::checkCandidates()
     if (!m_failedCheckUpdate.empty()) {
         QString text;
         for (const auto& failed : m_failedCheckUpdate) {
-            const auto& mod = std::get<0>(failed);
-            const auto& reason = std::get<1>(failed);
+            const auto& mod        = std::get<0>(failed);
+            const auto& reason     = std::get<1>(failed);
             const auto& recoverUrl = std::get<2>(failed);
 
             qDebug() << mod->name() << "failed to check for updates!";
@@ -172,10 +175,12 @@ void ResourceUpdateDialog::checkCandidates()
             text += "<br>";
         }
 
-        ScrollMessageBox messageDialog(m_parent, tr("Failed to check for updates"),
+        ScrollMessageBox messageDialog(m_parent,
+                                       tr("Failed to check for updates"),
                                        tr("Could not check or get the following resources for updates:<br>"
                                           "Do you wish to proceed without those resources?"),
-                                       text, "Disable unavailable mods");
+                                       text,
+                                       "Disable unavailable mods");
         messageDialog.setModal(true);
         if (messageDialog.exec() == QDialog::Rejected) {
             m_aborted = true;
@@ -231,11 +236,16 @@ void ResourceUpdateDialog::checkCandidates()
                     changelog = s_api.getModFileChangelog(dep->version.addonId.toInt(), dep->version.fileId.toInt());
                 }
                 auto downloadTask = makeShared<ResourceDownloadTask>(dep->pack, dep->version, m_resourceModel, true, "dependency");
-                auto extraInfo = dependencyExtraInfo.value(dep->version.addonId.toString());
-                CheckUpdateTask::Update updatable = {
-                    dep->pack->name, dep->version.hash,   tr("Not installed"), dep->version.version,      dep->version.version_type,
-                    changelog,       dep->pack->provider, downloadTask,        !extraInfo.maybe_installed
-                };
+                auto extraInfo    = dependencyExtraInfo.value(dep->version.addonId.toString());
+                CheckUpdateTask::Update updatable = {dep->pack->name,
+                                                     dep->version.hash,
+                                                     tr("Not installed"),
+                                                     dep->version.version,
+                                                     dep->version.version_type,
+                                                     changelog,
+                                                     dep->pack->provider,
+                                                     downloadTask,
+                                                     !extraInfo.maybe_installed};
 
                 appendResource(updatable, extraInfo.required_by);
                 m_tasks.insert(updatable.name, updatable.download);
@@ -267,22 +277,22 @@ auto ResourceUpdateDialog::ensureMetadata() -> bool
     SequentialTask seq(tr("Looking for metadata"));
 
     QHash<QString, bool> shouldTryOthers;
-    QList<Resource*> modrinthTmp;
-    QList<Resource*> flameTmp;
+    QList<Resource*>     modrinthTmp;
+    QList<Resource*>     flameTmp;
 
-    bool confirmRest = false;
-    bool tryOthersRest = false;
-    bool skipRest = false;
-    ModPlatform::ResourceProvider providerRest = ModPlatform::ResourceProvider::MODRINTH;
+    bool                          confirmRest   = false;
+    bool                          tryOthersRest = false;
+    bool                          skipRest      = false;
+    ModPlatform::ResourceProvider providerRest  = ModPlatform::ResourceProvider::MODRINTH;
 
     auto addToTmp = [&modrinthTmp, &flameTmp](Resource* resource, ModPlatform::ResourceProvider p) {
         switch (p) {
-            case ModPlatform::ResourceProvider::MODRINTH:
-                modrinthTmp.push_back(resource);
-                break;
-            case ModPlatform::ResourceProvider::FLAME:
-                flameTmp.push_back(resource);
-                break;
+        case ModPlatform::ResourceProvider::MODRINTH:
+            modrinthTmp.push_back(resource);
+            break;
+        case ModPlatform::ResourceProvider::FLAME:
+            flameTmp.push_back(resource);
+            break;
         }
     };
 
@@ -319,8 +329,8 @@ auto ResourceUpdateDialog::ensureMetadata() -> bool
             skipRest = true;
         }
         if (response.confirm_all) {
-            confirmRest = true;
-            providerRest = response.chosen;
+            confirmRest   = true;
+            providerRest  = response.chosen;
             tryOthersRest = response.try_others;
         }
 
@@ -337,8 +347,9 @@ auto ResourceUpdateDialog::ensureMetadata() -> bool
         connect(modrinthTask.get(), &EnsureMetadataTask::metadataFailed, [this, &shouldTryOthers](Resource* candidate) {
             onMetadataFailed(candidate, shouldTryOthers.find(candidate->internalId()).value(), ModPlatform::ResourceProvider::MODRINTH);
         });
-        connect(modrinthTask.get(), &EnsureMetadataTask::failed,
-                [this](const QString& reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+        connect(modrinthTask.get(), &EnsureMetadataTask::failed, [this](const QString& reason) {
+            CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+        });
 
         if (modrinthTask->getHashingTask()) {
             seq.addTask(modrinthTask->getHashingTask());
@@ -353,8 +364,9 @@ auto ResourceUpdateDialog::ensureMetadata() -> bool
         connect(flameTask.get(), &EnsureMetadataTask::metadataFailed, [this, &shouldTryOthers](Resource* candidate) {
             onMetadataFailed(candidate, shouldTryOthers.find(candidate->internalId()).value(), ModPlatform::ResourceProvider::FLAME);
         });
-        connect(flameTask.get(), &EnsureMetadataTask::failed,
-                [this](const QString& reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+        connect(flameTask.get(), &EnsureMetadataTask::failed, [this](const QString& reason) {
+            CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+        });
 
         if (flameTask->getHashingTask()) {
             seq.addTask(flameTask->getHashingTask());
@@ -380,22 +392,22 @@ void ResourceUpdateDialog::onMetadataEnsured(Resource* resource)
     }
 
     switch (resource->metadata()->provider) {
-        case ModPlatform::ResourceProvider::MODRINTH:
-            m_modrinthToUpdate.push_back(resource);
-            break;
-        case ModPlatform::ResourceProvider::FLAME:
-            m_flameToUpdate.push_back(resource);
-            break;
+    case ModPlatform::ResourceProvider::MODRINTH:
+        m_modrinthToUpdate.push_back(resource);
+        break;
+    case ModPlatform::ResourceProvider::FLAME:
+        m_flameToUpdate.push_back(resource);
+        break;
     }
 }
 
 ModPlatform::ResourceProvider next(ModPlatform::ResourceProvider p)
 {
     switch (p) {
-        case ModPlatform::ResourceProvider::MODRINTH:
-            return ModPlatform::ResourceProvider::FLAME;
-        case ModPlatform::ResourceProvider::FLAME:
-            return ModPlatform::ResourceProvider::MODRINTH;
+    case ModPlatform::ResourceProvider::MODRINTH:
+        return ModPlatform::ResourceProvider::FLAME;
+    case ModPlatform::ResourceProvider::FLAME:
+        return ModPlatform::ResourceProvider::MODRINTH;
     }
 
     return ModPlatform::ResourceProvider::FLAME;
@@ -409,8 +421,9 @@ void ResourceUpdateDialog::onMetadataFailed(Resource* resource, bool tryOthers, 
         auto task = makeShared<EnsureMetadataTask>(resource, indexDir2, next(firstChoice));
         connect(task.get(), &EnsureMetadataTask::metadataReady, [this](Resource* candidate) { onMetadataEnsured(candidate); });
         connect(task.get(), &EnsureMetadataTask::metadataFailed, [this](Resource* candidate) { onMetadataFailed(candidate, false); });
-        connect(task.get(), &EnsureMetadataTask::failed,
-                [this](const QString& reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+        connect(task.get(), &EnsureMetadataTask::failed, [this](const QString& reason) {
+            CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+        });
         if (task->getHashingTask()) {
             auto seq = makeShared<SequentialTask>();
             seq->addTask(task->getHashingTask());
@@ -420,9 +433,9 @@ void ResourceUpdateDialog::onMetadataFailed(Resource* resource, bool tryOthers, 
             m_secondTryMetadata->addTask(task);
         }
     } else {
-        QString reason{ tr("Couldn't find a valid version on the selected mod provider(s)") };
+        QString reason{tr("Couldn't find a valid version on the selected mod provider(s)")};
 
-        m_failedMetadata.append({ resource, reason });
+        m_failedMetadata.append({resource, reason});
     }
 }
 
@@ -436,7 +449,7 @@ void ResourceUpdateDialog::appendResource(const CheckUpdateTask::Update& info, Q
     itemTop->setText(0, info.name);
     itemTop->setExpanded(true);
 
-    auto* providerItem = new QTreeWidgetItem(itemTop);
+    auto*   providerItem = new QTreeWidgetItem(itemTop);
     QString providerName = ModPlatform::ProviderCapabilities::readableName(info.provider);
     providerItem->setText(0, tr("Provider: %1").arg(providerName));
     providerItem->setData(0, Qt::UserRole, providerName);
@@ -475,7 +488,7 @@ void ResourceUpdateDialog::appendResource(const CheckUpdateTask::Update& info, Q
     auto* changelogItem = new QTreeWidgetItem(itemTop);
     changelogItem->setText(0, tr("Changelog of the latest version"));
 
-    auto* changelog = new QTreeWidgetItem(changelogItem);
+    auto* changelog     = new QTreeWidgetItem(changelogItem);
     auto* changelogArea = new QTextBrowser();
 
     QString text = info.changelog;

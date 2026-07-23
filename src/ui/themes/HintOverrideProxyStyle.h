@@ -21,13 +21,14 @@
 #include <QProxyStyle>
 #include <iostream>
 
-class HintOverrideProxyStyle : public QProxyStyle {
+class HintOverrideProxyStyle : public QProxyStyle
+{
     Q_OBJECT
-   public:
+public:
     explicit HintOverrideProxyStyle(QStyle* style);
 
-    int styleHint(QStyle::StyleHint hint,
-                  const QStyleOption* option = nullptr,
-                  const QWidget* widget = nullptr,
-                  QStyleHintReturn* returnData = nullptr) const override;
+    int styleHint(QStyle::StyleHint   hint,
+                  const QStyleOption* option     = nullptr,
+                  const QWidget*      widget     = nullptr,
+                  QStyleHintReturn*   returnData = nullptr) const override;
 };

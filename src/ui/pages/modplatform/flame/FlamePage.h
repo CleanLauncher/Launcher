@@ -37,34 +37,37 @@
 
 #include <QWidget>
 
-#include <QTimer>
 #include "modplatform/ModIndex.h"
 #include "ui/pages/modplatform/ModpackProviderBasePage.h"
 #include "ui/widgets/ModFilterWidget.h"
 #include "ui/widgets/ProgressWidget.h"
+#include <QTimer>
 
-namespace Ui {
+namespace Ui
+{
 class FlamePage;
 }
 
 class NewInstanceDialog;
 
-namespace Flame {
+namespace Flame
+{
 class ListModel;
 }
 
-class FlamePage : public QWidget, public ModpackProviderBasePage {
+class FlamePage : public QWidget, public ModpackProviderBasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit FlamePage(NewInstanceDialog* dialog, QWidget* parent = 0);
     virtual ~FlamePage();
     virtual QString displayName() const override { return "CurseForge"; }
-    virtual QIcon icon() const override { return QIcon::fromTheme("flame"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("flame"); }
     virtual QString id() const override { return "flame"; }
     virtual QString helpPage() const override { return "Flame-platform"; }
-    virtual bool shouldDisplay() const override;
-    void retranslate() override;
+    virtual bool    shouldDisplay() const override;
+    void            retranslate() override;
 
     void updateUi();
 
@@ -76,19 +79,19 @@ class FlamePage : public QWidget, public ModpackProviderBasePage {
 
     virtual QString getSerachTerm() const override;
 
-   private:
+private:
     void suggestCurrent();
 
-   private slots:
+private slots:
     void triggerSearch();
     void onSelectionChanged(QModelIndex first, QModelIndex second);
     void onVersionSelectionChanged(int index);
     void createFilterWidget();
 
-   private:
-    Ui::FlamePage* m_ui = nullptr;
-    NewInstanceDialog* m_dialog = nullptr;
-    Flame::ListModel* m_listModel = nullptr;
+private:
+    Ui::FlamePage*                m_ui        = nullptr;
+    NewInstanceDialog*            m_dialog    = nullptr;
+    Flame::ListModel*             m_listModel = nullptr;
     ModPlatform::IndexedPack::Ptr m_current;
 
     int m_selected_version_index = -1;
@@ -98,6 +101,6 @@ class FlamePage : public QWidget, public ModpackProviderBasePage {
     QTimer m_search_timer;
 
     std::unique_ptr<ModFilterWidget> m_filterWidget;
-    Task::Ptr m_categoriesTask;
-    Task::Ptr m_job;
+    Task::Ptr                        m_categoriesTask;
+    Task::Ptr                        m_job;
 };

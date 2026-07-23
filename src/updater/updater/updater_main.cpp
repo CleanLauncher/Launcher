@@ -36,15 +36,15 @@ int main(int argc, char* argv[])
     UpdaterApp wUpApp(argc, argv);
 
     switch (wUpApp.status()) {
-        case UpdaterApp::Starting:
-        case UpdaterApp::Initialized: {
-            return wUpApp.exec();
-        }
-        case UpdaterApp::Failed:
-            return 1;
-        case UpdaterApp::Succeeded:
-            return 0;
-        default:
-            return -1;
+    case UpdaterApp::Starting:
+    case UpdaterApp::Initialized: {
+        return wUpApp.exec();
+    }
+    case UpdaterApp::Failed:
+        return 1;
+    case UpdaterApp::Succeeded:
+        return 0;
+    default:
+        return -1;
     }
 }

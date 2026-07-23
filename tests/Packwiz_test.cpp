@@ -17,22 +17,23 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "modplatform/ModIndex.h"
 #include <QTemporaryDir>
 #include <QTest>
-#include "modplatform/ModIndex.h"
 
 #include <modplatform/packwiz/Packwiz.h>
 
-class PackwizTest : public QObject {
+class PackwizTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
 
     void loadFromFile_Modrinth()
     {
         QString source = QFINDTESTDATA("testdata/Packwiz");
 
-        QDir index_dir(source);
+        QDir    index_dir(source);
         QString slug_mod("borderless-mining");
         QString file_name = slug_mod + ".pw.toml";
         QVERIFY(index_dir.entryList().contains(file_name));
@@ -60,7 +61,7 @@ class PackwizTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/Packwiz");
 
-        QDir index_dir(source);
+        QDir    index_dir(source);
         QString name_mod("screenshot-to-clipboard-fabric.pw.toml");
         QVERIFY(index_dir.entryList().contains(name_mod));
 

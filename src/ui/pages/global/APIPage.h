@@ -41,26 +41,28 @@
 
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class APIPage;
 }
 
-class APIPage : public QWidget, public BasePage {
+class APIPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit APIPage(QWidget* parent = 0);
     ~APIPage();
 
-    QString displayName() const override { return tr("Services"); }
-    QIcon icon() const override { return QIcon::fromTheme("worlds"); }
-    QString id() const override { return "apis"; }
-    QString helpPage() const override { return "APIs"; }
+    QString      displayName() const override { return tr("Services"); }
+    QIcon        icon() const override { return QIcon::fromTheme("worlds"); }
+    QString      id() const override { return "apis"; }
+    QString      helpPage() const override { return "APIs"; }
     virtual bool apply() override;
-    void retranslate() override;
+    void         retranslate() override;
 
-   private:
-    int baseURLPasteType;
+private:
+    int  baseURLPasteType;
     void resetBaseURLNote();
     void updateBaseURLNote(int index);
     void updateBaseURLPlaceholder(int index);
@@ -68,6 +70,6 @@ class APIPage : public QWidget, public BasePage {
     void loadSettings();
     void applySettings();
 
-   private:
+private:
     Ui::APIPage* ui;
 };

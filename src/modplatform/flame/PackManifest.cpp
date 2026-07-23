@@ -4,13 +4,13 @@
 static void loadFileV1(Flame::File& f, QJsonObject& file)
 {
     f.projectId = Json::requireInteger(file, "projectID");
-    f.fileId = Json::requireInteger(file, "fileID");
-    f.required = file["required"].toBool(true);
+    f.fileId    = Json::requireInteger(file, "fileID");
+    f.required  = file["required"].toBool(true);
 }
 
 static void loadModloaderV1(Flame::Modloader& m, QJsonObject& modLoader)
 {
-    m.id = Json::requireString(modLoader, "id");
+    m.id      = Json::requireString(modLoader, "id");
     m.primary = modLoader["primary"].toBool();
 }
 
@@ -19,9 +19,9 @@ static void loadMinecraftV1(Flame::Minecraft& m, QJsonObject& minecraft)
     m.version = Json::requireString(minecraft, "version");
 
     m.libraries = minecraft["libraries"].toString();
-    auto arr = minecraft["modLoaders"].toArray();
+    auto arr    = minecraft["modLoaders"].toArray();
     for (QJsonValueRef item : arr) {
-        auto obj = Json::requireObject(item);
+        auto             obj = Json::requireObject(item);
         Flame::Modloader loader;
         loadModloaderV1(loader, obj);
         m.modLoaders.append(loader);
@@ -35,9 +35,9 @@ static void loadManifestV1(Flame::Manifest& pack, QJsonObject& manifest)
 
     loadMinecraftV1(pack.minecraft, mc);
 
-    pack.name = manifest["name"].toString("Unnamed");
+    pack.name    = manifest["name"].toString("Unnamed");
     pack.version = manifest["version"].toString();
-    pack.author = manifest["author"].toString("Anonymous");
+    pack.author  = manifest["author"].toString("Anonymous");
 
     auto arr = manifest["files"].toArray();
     for (auto item : arr) {
@@ -56,8 +56,8 @@ static void loadManifestV1(Flame::Manifest& pack, QJsonObject& manifest)
 
 void Flame::loadManifest(Flame::Manifest& m, const QString& filepath)
 {
-    auto doc = Json::requireDocument(filepath);
-    auto obj = Json::requireObject(doc);
+    auto doc       = Json::requireDocument(filepath);
+    auto obj       = Json::requireObject(doc);
     m.manifestType = Json::requireString(obj, "manifestType");
     if (m.manifestType != "minecraftModpack") {
         throw JSONValidationError("Not a modpack manifest!");

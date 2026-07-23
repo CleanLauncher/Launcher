@@ -43,7 +43,8 @@
 
 class QIdentityProxyModel;
 class QItemSelection;
-namespace Ui {
+namespace Ui
+{
 class ScreenshotsPage;
 }
 
@@ -53,30 +54,34 @@ struct ScreenShot;
 class ScreenshotList;
 class ImgurAlbumCreation;
 
-class ScreenshotsPage : public QMainWindow, public BasePage {
+class ScreenshotsPage : public QMainWindow, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ScreenshotsPage(QString path, QWidget* parent = 0);
     virtual ~ScreenshotsPage();
 
     void openedImpl() override;
     void closedImpl() override;
 
-    enum { NothingDone = 0x42 };
+    enum
+    {
+        NothingDone = 0x42
+    };
 
-    virtual bool eventFilter(QObject*, QEvent*) override;
+    virtual bool    eventFilter(QObject*, QEvent*) override;
     virtual QString displayName() const override { return tr("Screenshots"); }
-    virtual QIcon icon() const override { return QIcon::fromTheme("screenshots"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("screenshots"); }
     virtual QString id() const override { return "screenshots"; }
     virtual QString helpPage() const override { return "Screenshots-management"; }
-    virtual bool apply() override { return !m_uploadActive; }
-    void retranslate() override;
+    virtual bool    apply() override { return !m_uploadActive; }
+    void            retranslate() override;
 
-   protected:
+protected:
     QMenu* createPopupMenu() override;
 
-   private slots:
+private slots:
     void on_actionUpload_triggered();
     void on_actionCopy_Image_triggered() const;
     void on_actionCopy_File_s_triggered() const;
@@ -87,13 +92,13 @@ class ScreenshotsPage : public QMainWindow, public BasePage {
     void onCurrentSelectionChanged(const QItemSelection& selected) const;
     void showContextMenu(const QPoint& pos);
 
-   private:
-    Ui::ScreenshotsPage* ui;
-    std::shared_ptr<ScreenshotsFSModel> m_model;
+private:
+    Ui::ScreenshotsPage*                 ui;
+    std::shared_ptr<ScreenshotsFSModel>  m_model;
     std::shared_ptr<QIdentityProxyModel> m_filterModel;
-    QString m_folder;
-    bool m_valid = false;
-    bool m_uploadActive = false;
+    QString                              m_folder;
+    bool                                 m_valid        = false;
+    bool                                 m_uploadActive = false;
 
     std::shared_ptr<Setting> m_wide_bar_setting = nullptr;
 };

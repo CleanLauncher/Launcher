@@ -53,7 +53,10 @@
 #include <FileSystem.h>
 #include <QSaveFile>
 
-enum AccountListVersion { MojangMSA = 3 };
+enum AccountListVersion
+{
+    MojangMSA = 3
+};
 
 AccountList::AccountList(QObject* parent) : QAbstractListModel(parent)
 {
@@ -127,7 +130,7 @@ void AccountList::addAccount(const MinecraftAccountPtr account)
             qDebug() << "Replacing old account with a new one with the same profile ID!";
 
             MinecraftAccountPtr existingAccountPtr = m_accounts[existingAccount];
-            m_accounts[existingAccount] = account;
+            m_accounts[existingAccount]            = account;
             if (m_defaultAccount == existingAccountPtr) {
                 m_defaultAccount = account;
             }
@@ -169,7 +172,7 @@ void AccountList::removeAccount(QModelIndex index)
 
 void AccountList::moveAccount(QModelIndex index, int delta)
 {
-    const int row = index.row();
+    const int row    = index.row();
     const int newRow = row + delta;
     if (index.isValid() && row < m_accounts.size() && newRow >= 0 && newRow < m_accounts.size()) {
         const int modelDestinationRow = (newRow > row) ? newRow + 1 : newRow;
@@ -194,9 +197,9 @@ MinecraftAccountPtr AccountList::defaultAccount() const
 void AccountList::setDefaultAccount(MinecraftAccountPtr newAccount)
 {
     if (!newAccount && m_defaultAccount) {
-        int idx = 0;
+        int  idx                    = 0;
         auto previousDefaultAccount = m_defaultAccount;
-        m_defaultAccount = nullptr;
+        m_defaultAccount            = nullptr;
         for (MinecraftAccountPtr account : m_accounts) {
             if (account == previousDefaultAccount) {
                 emit dataChanged(index(idx), index(idx, columnCount(QModelIndex()) - 1));
@@ -205,14 +208,14 @@ void AccountList::setDefaultAccount(MinecraftAccountPtr newAccount)
         }
         onDefaultAccountChanged();
     } else {
-        auto currentDefaultAccount = m_defaultAccount;
-        int currentDefaultAccountIdx = -1;
-        auto newDefaultAccount = m_defaultAccount;
-        int newDefaultAccountIdx = -1;
-        int idx = 0;
+        auto currentDefaultAccount    = m_defaultAccount;
+        int  currentDefaultAccountIdx = -1;
+        auto newDefaultAccount        = m_defaultAccount;
+        int  newDefaultAccountIdx     = -1;
+        int  idx                      = 0;
         for (MinecraftAccountPtr account : m_accounts) {
             if (account == newAccount) {
-                newDefaultAccount = account;
+                newDefaultAccount    = account;
                 newDefaultAccountIdx = idx;
             }
             if (currentDefaultAccount == account) {
@@ -237,7 +240,7 @@ void AccountList::accountChanged()
 void AccountList::accountActivityChanged(bool active)
 {
     MinecraftAccount* account = qobject_cast<MinecraftAccount*>(sender());
-    bool found = false;
+    bool              found   = false;
     for (int i = 0; i < count(); i++) {
         if (at(i).get() == account) {
             emit dataChanged(index(i), index(i, columnCount(QModelIndex()) - 1));
@@ -280,24 +283,24 @@ int AccountList::count() const
 QString getAccountStatus(AccountState status)
 {
     switch (status) {
-        case AccountState::Unchecked:
-            return QObject::tr("Unchecked", "Account status");
-        case AccountState::Offline:
-            return QObject::tr("Offline", "Account status");
-        case AccountState::Online:
-            return QObject::tr("Ready", "Account status");
-        case AccountState::Working:
-            return QObject::tr("Working", "Account status");
-        case AccountState::Errored:
-            return QObject::tr("Errored", "Account status");
-        case AccountState::Expired:
-            return QObject::tr("Expired", "Account status");
-        case AccountState::Disabled:
-            return QObject::tr("Disabled", "Account status");
-        case AccountState::Gone:
-            return QObject::tr("Gone", "Account status");
-        default:
-            return QObject::tr("Unknown", "Account status");
+    case AccountState::Unchecked:
+        return QObject::tr("Unchecked", "Account status");
+    case AccountState::Offline:
+        return QObject::tr("Offline", "Account status");
+    case AccountState::Online:
+        return QObject::tr("Ready", "Account status");
+    case AccountState::Working:
+        return QObject::tr("Working", "Account status");
+    case AccountState::Errored:
+        return QObject::tr("Errored", "Account status");
+    case AccountState::Expired:
+        return QObject::tr("Expired", "Account status");
+    case AccountState::Disabled:
+        return QObject::tr("Disabled", "Account status");
+    case AccountState::Gone:
+        return QObject::tr("Gone", "Account status");
+    default:
+        return QObject::tr("Unknown", "Account status");
     }
 }
 
@@ -312,90 +315,90 @@ QVariant AccountList::data(const QModelIndex& index, int role) const
     MinecraftAccountPtr account = at(index.row());
 
     switch (role) {
-        case Qt::SizeHintRole:
-            if (index.column() == ProfileNameColumn) {
-                return QSize(0, 30);
+    case Qt::SizeHintRole:
+        if (index.column() == ProfileNameColumn) {
+            return QSize(0, 30);
+        }
+
+        return QVariant();
+    case Qt::DecorationRole:
+        if (index.column() == ProfileNameColumn) {
+            auto face = account->getFace(24, 24);
+
+            if (!face.isNull()) {
+                return face;
+            } else {
+                return QIcon::fromTheme("noaccount").pixmap(24, 24);
             }
+        }
 
-            return QVariant();
-        case Qt::DecorationRole:
-            if (index.column() == ProfileNameColumn) {
-                auto face = account->getFace(24, 24);
-
-                if (!face.isNull()) {
-                    return face;
-                } else {
-                    return QIcon::fromTheme("noaccount").pixmap(24, 24);
-                }
+        return QVariant();
+    case Qt::DisplayRole:
+        switch (index.column()) {
+        case ProfileNameColumn:
+            return account->profileName();
+        case TypeColumn: {
+            switch (account->accountType()) {
+            case AccountType::MSA: {
+                return tr("MSA", "Account type");
             }
-
-            return QVariant();
-        case Qt::DisplayRole:
-            switch (index.column()) {
-                case ProfileNameColumn:
-                    return account->profileName();
-                case TypeColumn: {
-                    switch (account->accountType()) {
-                        case AccountType::MSA: {
-                            return tr("MSA", "Account type");
-                        }
-                        case AccountType::Ely: {
-                            return tr("Ely.by", "Account type");
-                        }
-                        case AccountType::Offline: {
-                            return tr("Offline", "Account type");
-                        }
-                    }
-                    return tr("Unknown", "Account type");
-                }
-                case StatusColumn:
-                    return getAccountStatus(account->accountState());
-                default:
-                    return QVariant();
+            case AccountType::Ely: {
+                return tr("Ely.by", "Account type");
             }
-
-        case PointerRole:
-            return QVariant::fromValue(account);
-
-        case Qt::CheckStateRole:
-            if (index.column() == ProfileNameColumn)
-                return account == m_defaultAccount ? Qt::Checked : Qt::Unchecked;
-            return QVariant();
-
+            case AccountType::Offline: {
+                return tr("Offline", "Account type");
+            }
+            }
+            return tr("Unknown", "Account type");
+        }
+        case StatusColumn:
+            return getAccountStatus(account->accountState());
         default:
             return QVariant();
+        }
+
+    case PointerRole:
+        return QVariant::fromValue(account);
+
+    case Qt::CheckStateRole:
+        if (index.column() == ProfileNameColumn)
+            return account == m_defaultAccount ? Qt::Checked : Qt::Unchecked;
+        return QVariant();
+
+    default:
+        return QVariant();
     }
 }
 
 QVariant AccountList::headerData(int section, [[maybe_unused]] Qt::Orientation orientation, int role) const
 {
     switch (role) {
-        case Qt::DisplayRole:
-            switch (section) {
-                case ProfileNameColumn:
-                    return tr("Username");
-                case TypeColumn:
-                    return tr("Type");
-                case StatusColumn:
-                    return tr("Status");
-                default:
-                    return QVariant();
-            }
-
-        case Qt::ToolTipRole:
-            switch (section) {
-                case ProfileNameColumn:
-                    return tr("Minecraft username associated with the account.");
-                case TypeColumn:
-                    return tr("Type of the account (MSA or Offline)");
-                case StatusColumn:
-                    return tr("Current status of the account.");
-                default:
-                    return QVariant();
-            }
-
+    case Qt::DisplayRole:
+        switch (section) {
+        case ProfileNameColumn:
+            return tr("Username");
+        case TypeColumn:
+            return tr("Type");
+        case StatusColumn:
+            return tr("Status");
         default:
             return QVariant();
+        }
+
+    case Qt::ToolTipRole:
+        switch (section) {
+        case ProfileNameColumn:
+            return tr("Minecraft username associated with the account.");
+        case TypeColumn:
+            return tr("Type of the account (MSA or Offline)");
+        case StatusColumn:
+            return tr("Current status of the account.");
+        default:
+            return QVariant();
+        }
+
+    default:
+        return QVariant();
     }
 }
 
@@ -454,7 +457,7 @@ bool AccountList::loadList()
     file.close();
 
     QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
         qCritical() << QString("Failed to parse account list file: %1 at offset %2")
@@ -486,8 +489,8 @@ bool AccountList::loadV3(QJsonObject& root)
     beginResetModel();
     QJsonArray accounts = root.value("accounts").toArray();
     for (QJsonValue accountVal : accounts) {
-        QJsonObject accountObj = accountVal.toObject();
-        MinecraftAccountPtr account = MinecraftAccount::loadFromJsonV3(accountObj);
+        QJsonObject         accountObj = accountVal.toObject();
+        MinecraftAccountPtr account    = MinecraftAccount::loadFromJsonV3(accountObj);
         if (account.get() != nullptr) {
             auto profileId = account->profileId();
             if (profileId.size()) {
@@ -569,7 +572,7 @@ bool AccountList::saveList()
 void AccountList::setListFilePath(QString path, bool autosave)
 {
     m_listFilePath = path;
-    m_autosave = autosave;
+    m_autosave     = autosave;
 }
 
 bool AccountList::anyAccountIsValid()

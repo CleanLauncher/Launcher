@@ -53,15 +53,15 @@ void ChooseProviderDialog::skipAll()
 
 void ChooseProviderDialog::confirmOne()
 {
-    m_response.chosen = getSelectedProvider();
+    m_response.chosen     = getSelectedProvider();
     m_response.try_others = ui->tryOthersCheckbox->isChecked();
     accept();
 }
 void ChooseProviderDialog::confirmAll()
 {
-    m_response.chosen = getSelectedProvider();
+    m_response.chosen      = getSelectedProvider();
     m_response.confirm_all = true;
-    m_response.try_others = ui->tryOthersCheckbox->isChecked();
+    m_response.try_others  = ui->tryOthersCheckbox->isChecked();
     accept();
 }
 
@@ -72,10 +72,10 @@ auto ChooseProviderDialog::getSelectedProvider() const -> ModPlatform::ResourceP
 
 void ChooseProviderDialog::addProviders()
 {
-    int btn_index = 0;
+    int           btn_index = 0;
     QRadioButton* btn;
 
-    for (auto& provider : { ModPlatform::ResourceProvider::MODRINTH, ModPlatform::ResourceProvider::FLAME }) {
+    for (auto& provider : {ModPlatform::ResourceProvider::MODRINTH, ModPlatform::ResourceProvider::FLAME}) {
         btn = new QRadioButton(ModPlatform::ProviderCapabilities::readableName(provider), this);
         m_providers.addButton(btn, btn_index++);
         ui->providersLayout->addWidget(btn);

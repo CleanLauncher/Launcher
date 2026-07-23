@@ -40,13 +40,13 @@
 #include <QDirIterator>
 #include <QString>
 
+#include "GZip.h"
 #include <FileSystem.h>
 #include <MMCZip.h>
 #include <io/stream_reader.h>
+#include <sstream>
 #include <tag_primitive.h>
 #include <tag_string.h>
-#include <sstream>
-#include "GZip.h"
 
 #include <QCoreApplication>
 
@@ -65,36 +65,36 @@ GameType::GameType(std::optional<int> original) : original(original)
         return;
     }
     switch (*original) {
-        case 0:
-            type = GameType::Survival;
-            break;
-        case 1:
-            type = GameType::Creative;
-            break;
-        case 2:
-            type = GameType::Adventure;
-            break;
-        case 3:
-            type = GameType::Spectator;
-            break;
-        default:
-            break;
+    case 0:
+        type = GameType::Survival;
+        break;
+    case 1:
+        type = GameType::Creative;
+        break;
+    case 2:
+        type = GameType::Adventure;
+        break;
+    case 3:
+        type = GameType::Spectator;
+        break;
+    default:
+        break;
     }
 }
 
 QString GameType::toTranslatedString() const
 {
     switch (type) {
-        case GameType::Survival:
-            return QCoreApplication::translate("GameType", "Survival");
-        case GameType::Creative:
-            return QCoreApplication::translate("GameType", "Creative");
-        case GameType::Adventure:
-            return QCoreApplication::translate("GameType", "Adventure");
-        case GameType::Spectator:
-            return QCoreApplication::translate("GameType", "Spectator");
-        default:
-            break;
+    case GameType::Survival:
+        return QCoreApplication::translate("GameType", "Survival");
+    case GameType::Creative:
+        return QCoreApplication::translate("GameType", "Creative");
+    case GameType::Adventure:
+        return QCoreApplication::translate("GameType", "Adventure");
+    case GameType::Spectator:
+        return QCoreApplication::translate("GameType", "Spectator");
+    default:
+        break;
     }
     if (original) {
         return QCoreApplication::translate("GameType", "Unknown (%1)").arg(*original);
@@ -105,16 +105,16 @@ QString GameType::toTranslatedString() const
 QString GameType::toLogString() const
 {
     switch (type) {
-        case GameType::Survival:
-            return "Survival";
-        case GameType::Creative:
-            return "Creative";
-        case GameType::Adventure:
-            return "Adventure";
-        case GameType::Spectator:
-            return "Spectator";
-        default:
-            break;
+    case GameType::Survival:
+        return "Survival";
+    case GameType::Creative:
+        return "Creative";
+    case GameType::Adventure:
+        return "Adventure";
+    case GameType::Spectator:
+        return "Spectator";
+    default:
+        break;
     }
     if (original) {
         return QString("Unknown (%1)").arg(*original);
@@ -219,7 +219,7 @@ World::World(const QFileInfo& file)
 void World::repath(const QFileInfo& file)
 {
     m_containerFile = file;
-    m_folderName = file.fileName();
+    m_folderName    = file.fileName();
     if (file.isFile() && file.suffix() == "zip") {
         m_iconFile = QString();
         readFromZip(file);
@@ -270,14 +270,14 @@ void World::readFromZip(const QFileInfo& file)
     m_isValid = false;
     r.parse([this](MMCZip::ArchiveReader::File* file, bool& stop) {
         const QString levelDat = "level.dat";
-        auto filePath = file->filename();
-        QFileInfo fi(filePath);
+        auto          filePath = file->filename();
+        QFileInfo     fi(filePath);
         if (fi.fileName().compare(levelDat, Qt::CaseInsensitive) == 0) {
             m_containerOffsetPath = filePath.chopped(levelDat.length());
-            m_levelDatTime = file->dateTime();
+            m_levelDatTime        = file->dateTime();
             loadFromLevelDat(file->readAll());
             m_isValid = true;
-            stop = true;
+            stop      = true;
         }
         return true;
     });
@@ -295,12 +295,12 @@ bool World::install(const QString& to, const QString& name)
         ok = !MMCZip::extractSubDir(&zip, m_containerOffsetPath, finalPath);
     } else if (m_containerFile.isDir()) {
         QString from = m_containerFile.filePath();
-        ok = FS::copy(from, finalPath)();
+        ok           = FS::copy(from, finalPath)();
     }
 
     if (ok && !name.isEmpty() && m_actualName != name) {
         QFileInfo finalPathInfo(finalPath);
-        World newWorld(finalPathInfo);
+        World     newWorld(finalPathInfo);
         if (newWorld.isValid()) {
             newWorld.rename(name);
         }
@@ -338,13 +338,14 @@ bool World::rename(const QString& newName)
     QDir parentDir(m_containerFile.absoluteFilePath());
     parentDir.cdUp();
     QFile container(m_containerFile.absoluteFilePath());
-    auto dirName = FS::DirNameFromString(m_actualName, parentDir.absolutePath());
+    auto  dirName = FS::DirNameFromString(m_actualName, parentDir.absolutePath());
     container.rename(parentDir.absoluteFilePath(dirName));
 
     return true;
 }
 
-namespace {
+namespace
+{
 
 optional<QString> read_string(nbt::value& parent, const char* name)
 {
@@ -424,8 +425,7 @@ int64_t loadSeed(QByteArray data)
 
     try {
         return read_long(val, "seed").value_or(0);
-    } catch (const std::out_of_range&) {
-    }
+    } catch (const std::out_of_range&) {}
     return 0;
 }
 
@@ -451,20 +451,19 @@ void World::loadFromLevelDat(QByteArray data)
     if (!m_isValid)
         return;
 
-    auto name = read_string(val, "LevelName");
+    auto name    = read_string(val, "LevelName");
     m_actualName = name ? *name : m_folderName;
 
     auto timestamp = read_long(val, "LastPlayed");
-    m_lastPlayed = timestamp ? QDateTime::fromMSecsSinceEpoch(*timestamp) : m_levelDatTime;
+    m_lastPlayed   = timestamp ? QDateTime::fromMSecsSinceEpoch(*timestamp) : m_levelDatTime;
 
     m_gameType = read_gametype(val, "GameType");
 
     optional<int64_t> randomSeed;
     try {
         auto& WorldGen_val = val.at("WorldGenSettings");
-        randomSeed = read_long(WorldGen_val, "seed");
-    } catch (const std::out_of_range&) {
-    }
+        randomSeed         = read_long(WorldGen_val, "seed");
+    } catch (const std::out_of_range&) {}
     if (!randomSeed) {
         randomSeed = read_long(val, "RandomSeed");
     }
@@ -521,7 +520,7 @@ bool World::isSymLinkUnder(const QString& instPath) const
 
     auto instDir = QDir(instPath);
 
-    auto relAbsPath = instDir.relativeFilePath(m_containerFile.absoluteFilePath());
+    auto relAbsPath   = instDir.relativeFilePath(m_containerFile.absoluteFilePath());
     auto relCanonPath = instDir.relativeFilePath(m_containerFile.canonicalFilePath());
 
     return relAbsPath != relCanonPath;

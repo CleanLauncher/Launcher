@@ -12,7 +12,8 @@
 
 #include <QRegularExpression>
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 DataPackResourcePage::DataPackResourcePage(DataPackDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance) {}
 

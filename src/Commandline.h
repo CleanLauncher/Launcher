@@ -20,7 +20,8 @@
 #include <QString>
 #include <QStringList>
 
-namespace Commandline {
+namespace Commandline
+{
 
 QStringList splitArgs(QString args);
 }

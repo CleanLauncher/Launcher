@@ -47,15 +47,15 @@ FileLinkApp::FileLinkApp(int& argc, char** argv) : QCoreApplication(argc, argv),
     QCommandLineParser parser;
     parser.setApplicationDescription(QObject::tr("a batch MKLINK program for windows to be used with launcher"));
 
-    parser.addOptions({ { { "s", "server" }, "Join the specified server on launch", "pipe name" },
-                        { { "H", "hard" }, "use hard links instead of symbolic", "true/false" } });
+    parser.addOptions({{{"s", "server"}, "Join the specified server on launch", "pipe name"},
+                       {{"H", "hard"}, "use hard links instead of symbolic", "true/false"}});
     parser.addHelpOption();
     parser.addVersionOption();
 
     parser.process(arguments());
 
     QString serverToJoin = parser.value("server");
-    m_useHardLinks = QVariant(parser.value("hard")).toBool();
+    m_useHardLinks       = QVariant(parser.value("hard")).toBool();
 
     qDebug() << "link program launched";
 
@@ -82,24 +82,22 @@ void FileLinkApp::joinServer(QString server)
     connect(&socket, &QLocalSocket::errorOccurred, this, [this](QLocalSocket::LocalSocketError socketError) {
         m_status = Failed;
         switch (socketError) {
-            case QLocalSocket::ServerNotFoundError:
-                qDebug()
-                    << ("The host was not found. Please make sure "
-                        "that the server is running and that the "
-                        "server name is correct.");
-                break;
-            case QLocalSocket::ConnectionRefusedError:
-                qDebug()
-                    << ("The connection was refused by the peer. "
-                        "Make sure the server is running, "
-                        "and check that the server name "
-                        "is correct.");
-                break;
-            case QLocalSocket::PeerClosedError:
-                qDebug() << ("The connection was closed by the peer. ");
-                break;
-            default:
-                qDebug() << "The following error occurred:" << socket.errorString();
+        case QLocalSocket::ServerNotFoundError:
+            qDebug() << ("The host was not found. Please make sure "
+                         "that the server is running and that the "
+                         "server name is correct.");
+            break;
+        case QLocalSocket::ConnectionRefusedError:
+            qDebug() << ("The connection was refused by the peer. "
+                         "Make sure the server is running, "
+                         "and check that the server name "
+                         "is correct.");
+            break;
+        case QLocalSocket::PeerClosedError:
+            qDebug() << ("The connection was closed by the peer. ");
+            break;
+        default:
+            qDebug() << "The following error occurred:" << socket.errorString();
         }
     });
 
@@ -141,10 +139,10 @@ void FileLinkApp::runLink()
             qDebug() << "Error category:" << os_err.category().name();
             qDebug() << "Error code:" << os_err.value();
 
-            FS::LinkResult result = { src_path, dst_path, QString::fromStdString(os_err.message()), os_err.value() };
+            FS::LinkResult result = {src_path, dst_path, QString::fromStdString(os_err.message()), os_err.value()};
             m_path_results.append(result);
         } else {
-            FS::LinkResult result = { src_path, dst_path, "", 0 };
+            FS::LinkResult result = {src_path, dst_path, "", 0};
             m_path_results.append(result);
         }
     }
@@ -155,7 +153,7 @@ void FileLinkApp::runLink()
 
 void FileLinkApp::sendResults()
 {
-    QByteArray block;
+    QByteArray  block;
     QDataStream out(&block, QIODevice::WriteOnly);
 
     qint32 blocksize = quint32(sizeof(quint32));
@@ -177,7 +175,7 @@ void FileLinkApp::sendResults()
     }
 
     qint64 byteswritten = socket.write(block);
-    bool bytesflushed = socket.flush();
+    bool   bytesflushed = socket.flush();
     qDebug() << "block flushed" << byteswritten << bytesflushed;
 }
 

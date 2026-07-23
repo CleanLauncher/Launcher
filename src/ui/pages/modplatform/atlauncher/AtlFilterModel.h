@@ -18,31 +18,34 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
-namespace Atl {
+namespace Atl
+{
 
-class FilterModel : public QSortFilterProxyModel {
+class FilterModel : public QSortFilterProxyModel
+{
     Q_OBJECT
-   public:
+public:
     FilterModel(QObject* parent = Q_NULLPTR);
-    enum Sorting {
+    enum Sorting
+    {
         ByPopularity,
         ByGameVersion,
         ByName,
     };
     const QMap<QString, Sorting> getAvailableSortings();
-    QString translateCurrentSorting();
-    void setSorting(Sorting sorting);
-    Sorting getCurrentSorting();
-    void setSearchTerm(QString term);
+    QString                      translateCurrentSorting();
+    void                         setSorting(Sorting sorting);
+    Sorting                      getCurrentSorting();
+    void                         setSearchTerm(QString term);
 
-   protected:
+protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
-   private:
+private:
     QMap<QString, Sorting> sortings;
-    Sorting currentSorting;
-    QString searchTerm;
+    Sorting                currentSorting;
+    QString                searchTerm;
 };
 
 }  // namespace Atl

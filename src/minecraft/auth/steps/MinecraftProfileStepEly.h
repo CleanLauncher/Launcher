@@ -19,10 +19,11 @@
 #pragma once
 #include "MinecraftProfileStep.h"
 
-class MinecraftProfileStepEly : public MinecraftProfileStep {
+class MinecraftProfileStepEly : public MinecraftProfileStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit MinecraftProfileStepEly(AccountData* data);
     virtual ~MinecraftProfileStepEly() noexcept = default;
 };

@@ -26,12 +26,13 @@
 
 #include "ui/instanceview/InstanceDelegate.h"
 
-#include <DesktopServices.h>
 #include "icons/IconList.h"
 #include "icons/IconUtils.h"
+#include <DesktopServices.h>
 
-class IconProxyModel : public QSortFilterProxyModel {
-   public:
+class IconProxyModel : public QSortFilterProxyModel
+{
+public:
     explicit IconProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) {}
 
     void setCategory(IconPickerDialog::IconPickerCategory category)
@@ -42,7 +43,7 @@ class IconProxyModel : public QSortFilterProxyModel {
         invalidateFilter();
     }
 
-   protected:
+protected:
     bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override
     {
         if (!QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent))
@@ -51,17 +52,17 @@ class IconProxyModel : public QSortFilterProxyModel {
         if (m_category == IconPickerDialog::Any)
             return true;
 
-        auto model = static_cast<IconList*>(sourceModel());
-        QModelIndex index = model->index(source_row, 0, source_parent);
-        QString key = model->data(index, Qt::UserRole).toString();
-        const MMCIcon* icon = model->icon(key);
+        auto           model = static_cast<IconList*>(sourceModel());
+        QModelIndex    index = model->index(source_row, 0, source_parent);
+        QString        key   = model->data(index, Qt::UserRole).toString();
+        const MMCIcon* icon  = model->icon(key);
 
         if (!icon)
             return false;
 
         bool isModpack = false;
         bool isBuiltin = icon->isBuiltIn();
-        bool isLegacy = isBuiltin && icon->name().endsWith("_legacy", Qt::CaseInsensitive);
+        bool isLegacy  = isBuiltin && icon->name().endsWith("_legacy", Qt::CaseInsensitive);
 
         if (!isBuiltin) {
             const QString& name = icon->name();
@@ -73,20 +74,20 @@ class IconProxyModel : public QSortFilterProxyModel {
         }
 
         switch (m_category) {
-            case IconPickerDialog::Legacy:
-                return isBuiltin && isLegacy;
-            case IconPickerDialog::Modpacks:
-                return isModpack;
-            case IconPickerDialog::Modern:
-                return isBuiltin && !isLegacy;
-            case IconPickerDialog::Custom:
-                return !isBuiltin && !isModpack;
-            default:
-                return true;
+        case IconPickerDialog::Legacy:
+            return isBuiltin && isLegacy;
+        case IconPickerDialog::Modpacks:
+            return isModpack;
+        case IconPickerDialog::Modern:
+            return isBuiltin && !isLegacy;
+        case IconPickerDialog::Custom:
+            return !isBuiltin && !isModpack;
+        default:
+            return true;
         }
     }
 
-   private:
+private:
     IconPickerDialog::IconPickerCategory m_category = IconPickerDialog::Any;
 };
 
@@ -96,10 +97,18 @@ IconPickerDialog::IconPickerDialog(QWidget* parent) : QDialog(parent), ui(new Ui
     setWindowModality(Qt::WindowModal);
 
     static const QString context_text[] = {
-        tr("All"), tr("Modern"), tr("Legacy"), tr("Modpacks"), tr("Custom"),
+        tr("All"),
+        tr("Modern"),
+        tr("Legacy"),
+        tr("Modpacks"),
+        tr("Custom"),
     };
     static const IconPickerCategory context_id[] = {
-        Any, Modern, Legacy, Modpacks, Custom,
+        Any,
+        Modern,
+        Legacy,
+        Modpacks,
+        Custom,
     };
     const int cnt = sizeof(context_text) / sizeof(context_text[0]);
     for (int i = 0; i < cnt; ++i) {
@@ -137,7 +146,7 @@ IconPickerDialog::IconPickerDialog(QWidget* parent) : QDialog(parent), ui(new Ui
     contentsWidget->setModel(proxyModel);
 
     auto buttonAdd = ui->buttonBox->addButton(tr("Add Icon"), QDialogButtonBox::ResetRole);
-    buttonRemove = ui->buttonBox->addButton(tr("Remove Icon"), QDialogButtonBox::ResetRole);
+    buttonRemove   = ui->buttonBox->addButton(tr("Remove Icon"), QDialogButtonBox::ResetRole);
 
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
@@ -169,14 +178,14 @@ bool IconPickerDialog::eventFilter(QObject* obj, QEvent* evt)
     }
     QKeyEvent* keyEvent = static_cast<QKeyEvent*>(evt);
     switch (keyEvent->key()) {
-        case Qt::Key_Delete:
-            removeSelectedIcon();
-            return true;
-        case Qt::Key_Plus:
-            addNewIcon();
-            return true;
-        default:
-            break;
+    case Qt::Key_Delete:
+        removeSelectedIcon();
+        return true;
+    case Qt::Key_Plus:
+        addNewIcon();
+        return true;
+    default:
+        break;
     }
     return QDialog::eventFilter(obj, evt);
 }
@@ -185,7 +194,7 @@ void IconPickerDialog::addNewIcon()
 {
     QString selectIcons = tr("Select Icons");
 
-    auto filter = IconUtils::getIconFilter();
+    auto        filter    = IconUtils::getIconFilter();
     QStringList fileNames = QFileDialog::getOpenFileNames(this, selectIcons, QString(), tr("Icons %1").arg(filter));
     APPLICATION->icons()->installIcons(fileNames);
 }
@@ -218,11 +227,11 @@ void IconPickerDialog::selectionChanged(QItemSelection selected, QItemSelection 
 
 int IconPickerDialog::execWithSelection(QString selection)
 {
-    auto list = APPLICATION->icons();
+    auto list           = APPLICATION->icons();
     auto contentsWidget = ui->iconView;
-    selectedIconKey = selection;
+    selectedIconKey     = selection;
 
-    int index_nr = list->getIconIndex(selection);
+    int  index_nr    = list->getIconIndex(selection);
     auto model_index = list->index(index_nr);
     contentsWidget->selectionModel()->select(model_index, QItemSelectionModel::Current | QItemSelectionModel::Select);
 

@@ -15,33 +15,51 @@
 
 #pragma once
 
+#include "BaseInstance.h"
+#include "minecraft/World.h"
 #include <QAbstractListModel>
 #include <QDir>
 #include <QList>
 #include <QMimeData>
 #include <QString>
-#include "BaseInstance.h"
-#include "minecraft/World.h"
 
 class QFileSystemWatcher;
 
-class WorldList : public QAbstractListModel {
+class WorldList : public QAbstractListModel
+{
     Q_OBJECT
-   public:
-    enum Columns { NameColumn, GameModeColumn, LastPlayedColumn, SizeColumn, InfoColumn };
+public:
+    enum Columns
+    {
+        NameColumn,
+        GameModeColumn,
+        LastPlayedColumn,
+        SizeColumn,
+        InfoColumn
+    };
 
-    enum Roles { ObjectRole = Qt::UserRole + 1, FolderRole, SeedRole, NameRole, GameModeRole, LastPlayedRole, SizeRole, IconFileRole };
+    enum Roles
+    {
+        ObjectRole = Qt::UserRole + 1,
+        FolderRole,
+        SeedRole,
+        NameRole,
+        GameModeRole,
+        LastPlayedRole,
+        SizeRole,
+        IconFileRole
+    };
 
     WorldList(const QString& dir, BaseInstance* instance);
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
 
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const { return parent.isValid() ? 0 : static_cast<int>(size()); };
+    virtual int      rowCount(const QModelIndex& parent = QModelIndex()) const { return parent.isValid() ? 0 : static_cast<int>(size()); };
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    virtual int columnCount(const QModelIndex& parent) const;
+    virtual int      columnCount(const QModelIndex& parent) const;
 
     size_t size() const { return m_worlds.size(); };
-    bool empty() const { return size() == 0; }
+    bool   empty() const { return size() == 0; }
     World& operator[](size_t index) { return m_worlds[index]; }
 
     virtual bool update();
@@ -77,17 +95,17 @@ class WorldList : public QAbstractListModel {
 
     const QList<World>& allWorlds() const { return m_worlds; }
 
-   private slots:
+private slots:
     void directoryChanged(QString path);
     void loadWorldsAsync();
 
-   signals:
+signals:
     void changed();
 
-   protected:
-    BaseInstance* m_instance;
+protected:
+    BaseInstance*       m_instance;
     QFileSystemWatcher* m_watcher;
-    bool m_isWatching;
-    QDir m_dir;
-    QList<World> m_worlds;
+    bool                m_isWatching;
+    QDir                m_dir;
+    QList<World>        m_worlds;
 };

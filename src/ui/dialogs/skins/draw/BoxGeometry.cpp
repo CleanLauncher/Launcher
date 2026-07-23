@@ -23,7 +23,8 @@
 #include <QVector2D>
 #include <QVector3D>
 
-struct VertexData {
+struct VertexData
+{
     QVector4D position;
     QVector2D texCoord;
     VertexData(const QVector4D& pos, const QVector2D& tex) : position(pos), texCoord(tex) {}
@@ -81,31 +82,31 @@ static const QList<QVector4D> vertices = {
 
 };
 
-static const QList<GLushort> indices = { 0,  1,  2,  3,  3,
+static const QList<GLushort> indices = {0,  1,  2,  3,  3,
 
-                                         4,  4,  5,  6,  7,  7,
+                                        4,  4,  5,  6,  7,  7,
 
-                                         8,  8,  9,  10, 11, 11,
+                                        8,  8,  9,  10, 11, 11,
 
-                                         12, 12, 13, 14, 15, 15,
+                                        12, 12, 13, 14, 15, 15,
 
-                                         16, 16, 17, 18, 19, 19,
+                                        16, 16, 17, 18, 19, 19,
 
-                                         20, 20, 21, 22, 23
+                                        20, 20, 21, 22, 23
 
 };
 
 static const QList<VertexData> planeVertices = {
-    { QVector4D(-1.0f, -1.0f, -0.5f, 1.0f), QVector2D(0.0f, 0.0f) },
+    {QVector4D(-1.0f, -1.0f, -0.5f, 1.0f), QVector2D(0.0f, 0.0f)},
 
-    { QVector4D(1.0f, -1.0f, -0.5f, 1.0f), QVector2D(1.0f, 0.0f) },
+    {QVector4D(1.0f, -1.0f, -0.5f, 1.0f), QVector2D(1.0f, 0.0f)},
 
-    { QVector4D(-1.0f, 1.0f, -0.5f, 1.0f), QVector2D(0.0f, 1.0f) },
+    {QVector4D(-1.0f, 1.0f, -0.5f, 1.0f), QVector2D(0.0f, 1.0f)},
 
-    { QVector4D(1.0f, 1.0f, -0.5f, 1.0f), QVector2D(1.0f, 1.0f) },
+    {QVector4D(1.0f, 1.0f, -0.5f, 1.0f), QVector2D(1.0f, 1.0f)},
 
 };
-static const QList<GLushort> planeIndices = { 0, 1, 2, 3, 3
+static const QList<GLushort> planeIndices = {0, 1, 2, 3, 3
 
 };
 
@@ -136,12 +137,12 @@ QList<QVector2D> getCubeUVs(float u, float v, float width, float height, float d
         };
     };
 
-    auto top = toFaceVertices(u + depth, v, u + width + depth, v + depth);
+    auto top    = toFaceVertices(u + depth, v, u + width + depth, v + depth);
     auto bottom = toFaceVertices(u + width + depth, v, u + width * 2 + depth, v + depth);
-    auto left = toFaceVertices(u, v + depth, u + depth, v + depth + height);
-    auto front = toFaceVertices(u + depth, v + depth, u + width + depth, v + depth + height);
-    auto right = toFaceVertices(u + width + depth, v + depth, u + width + depth * 2, v + height + depth);
-    auto back = toFaceVertices(u + width + depth * 2, v + depth, u + width * 2 + depth * 2, v + height + depth);
+    auto left   = toFaceVertices(u, v + depth, u + depth, v + depth + height);
+    auto front  = toFaceVertices(u + depth, v + depth, u + width + depth, v + depth + height);
+    auto right  = toFaceVertices(u + width + depth, v + depth, u + width + depth * 2, v + height + depth);
+    auto back   = toFaceVertices(u + width + depth * 2, v + depth, u + width * 2 + depth * 2, v + height + depth);
 
     auto uvRight = {
         right[0],
@@ -183,14 +184,15 @@ QList<QVector2D> getCubeUVs(float u, float v, float width, float height, float d
     QList<QVector2D> uvData;
     uvData.reserve(24);
 
-    for (const auto& uvArray : { uvFront, uvRight, uvBack, uvLeft, uvBottom, uvTop }) {
+    for (const auto& uvArray : {uvFront, uvRight, uvBack, uvLeft, uvBottom, uvTop}) {
         uvData.append(uvArray);
     }
 
     return uvData;
 }
 
-namespace opengl {
+namespace opengl
+{
 BoxGeometry::BoxGeometry(QVector3D size, QVector3D position)
     : QOpenGLFunctions(), m_indexBuf(QOpenGLBuffer::IndexBuffer), m_size(size), m_position(position)
 {

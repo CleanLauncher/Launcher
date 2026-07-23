@@ -44,15 +44,17 @@
 class ModPage;
 class Version;
 
-namespace Modrinth {
+namespace Modrinth
+{
 
-using LogoMap = QMap<QString, QIcon>;
+using LogoMap      = QMap<QString, QIcon>;
 using LogoCallback = std::function<void(QString)>;
 
-class ModpackListModel : public QAbstractListModel {
+class ModpackListModel : public QAbstractListModel
+{
     Q_OBJECT
 
-   public:
+public:
     ModpackListModel(ModrinthPage* parent);
     ~ModpackListModel() override = default;
 
@@ -71,7 +73,7 @@ class ModpackListModel : public QAbstractListModel {
     void refresh();
     void searchWithTerm(const QString& term, int sort, std::shared_ptr<ModFilterWidget::Filter> filter, bool filterChanged);
 
-    bool hasActiveSearchJob() const { return m_jobPtr && m_jobPtr->isRunning(); }
+    bool      hasActiveSearchJob() const { return m_jobPtr && m_jobPtr->isRunning(); }
     Task::Ptr activeSearchJob() { return hasActiveSearchJob() ? m_jobPtr : nullptr; }
 
     void getLogo(const QString& logo, const QString& logoUrl, LogoCallback callback);
@@ -81,43 +83,49 @@ class ModpackListModel : public QAbstractListModel {
         return parent.isValid() ? false : m_searchState == CanPossiblyFetchMore;
     };
 
-   public slots:
+public slots:
     void searchRequestFinished(QList<ModPlatform::IndexedPack::Ptr>& doc_all);
     void searchRequestFailed(QString reason, int network_error_code);
     void searchRequestForOneSucceeded(ModPlatform::IndexedPack::Ptr);
 
-   protected slots:
+protected slots:
 
     void logoFailed(QString logo);
     void logoLoaded(QString logo, QIcon out);
 
     void performPaginatedSearch();
 
-   protected:
+protected:
     void requestLogo(QString file, QString url);
 
     inline auto getMineVersions() const -> std::vector<Version>;
 
-   protected:
+protected:
     ModrinthPage* m_parent;
 
     QList<ModPlatform::IndexedPack::Ptr> m_modpacks;
 
-    LogoMap m_logoMap;
+    LogoMap                     m_logoMap;
     QMap<QString, LogoCallback> m_waitingCallbacks;
-    QStringList m_failedLogos;
-    QStringList m_loadingLogos;
+    QStringList                 m_failedLogos;
+    QStringList                 m_loadingLogos;
 
-    QString m_currentSearchTerm;
-    QString m_currentSort;
+    QString                                  m_currentSearchTerm;
+    QString                                  m_currentSort;
     std::shared_ptr<ModFilterWidget::Filter> m_filter;
-    int m_nextSearchOffset = 0;
-    enum SearchState { None, CanPossiblyFetchMore, ResetRequested, Finished } m_searchState = None;
+    int                                      m_nextSearchOffset = 0;
+    enum SearchState
+    {
+        None,
+        CanPossiblyFetchMore,
+        ResetRequested,
+        Finished
+    } m_searchState = None;
 
     Task::Ptr m_jobPtr;
 
     std::shared_ptr<QByteArray> m_allResponse = std::make_shared<QByteArray>();
-    QByteArray m_specific_response;
+    QByteArray                  m_specific_response;
 
     int m_modpacks_per_page = 20;
 };

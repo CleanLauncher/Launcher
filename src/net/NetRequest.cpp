@@ -56,7 +56,8 @@
 #include "MMCTime.h"
 #include "StringUtils.h"
 
-namespace Net {
+namespace Net
+{
 
 NetRequest::NetRequest() : Task()
 {
@@ -82,24 +83,24 @@ void NetRequest::executeTask()
     QNetworkRequest request(m_url);
     m_state = m_sink->init(request);
     switch (m_state) {
-        case State::Succeeded:
-            qCDebug(logCat) << getUid().toString() << "Request cache hit" << m_url.toString();
-            emit succeeded();
-            emit finished();
-            return;
-        case State::Running:
-            qCDebug(logCat) << getUid().toString() << "Running" << m_url.toString();
-            break;
-        case State::Inactive:
-        case State::Failed:
-            m_failReason = m_sink->failReason();
-            emit failed(m_sink->failReason());
-            emit finished();
-            return;
-        case State::AbortedByUser:
-            emit aborted();
-            emit finished();
-            return;
+    case State::Succeeded:
+        qCDebug(logCat) << getUid().toString() << "Request cache hit" << m_url.toString();
+        emit succeeded();
+        emit finished();
+        return;
+    case State::Running:
+        qCDebug(logCat) << getUid().toString() << "Running" << m_url.toString();
+        break;
+    case State::Inactive:
+    case State::Failed:
+        m_failReason = m_sink->failReason();
+        emit failed(m_sink->failReason());
+        emit finished();
+        return;
+    case State::AbortedByUser:
+        emit aborted();
+        emit finished();
+        return;
     }
 
 #if defined(LAUNCHER_APPLICATION)
@@ -124,7 +125,7 @@ void NetRequest::executeTask()
 
     request.setAttribute(QNetworkRequest::Http2AllowedAttribute, false);
 
-    m_last_progress_time = m_clock.now();
+    m_last_progress_time  = m_clock.now();
     m_last_progress_bytes = 0;
 
     auto rep = getReply(request);
@@ -142,13 +143,13 @@ void NetRequest::executeTask()
 
 void NetRequest::onProgress(qint64 bytesReceived, qint64 bytesTotal)
 {
-    auto now = m_clock.now();
+    auto now     = m_clock.now();
     auto elapsed = now - m_last_progress_time;
 
-    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
+    auto elapsed_ms           = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed);
     auto bytes_received_since = bytesReceived - m_last_progress_bytes;
-    auto dl_speed_bps = (double)bytes_received_since / elapsed_ms.count() * 1000;
-    auto remaining_time_s = (bytesTotal - bytesReceived) / dl_speed_bps;
+    auto dl_speed_bps         = (double)bytes_received_since / elapsed_ms.count() * 1000;
+    auto remaining_time_s     = (bytesTotal - bytesReceived) / dl_speed_bps;
 
     QString dl_progress =
         tr("%1 / %2").arg(StringUtils::humanReadableFileSize(bytesReceived)).arg(StringUtils::humanReadableFileSize(bytesTotal));
@@ -179,8 +180,8 @@ void NetRequest::downloadError(QNetworkReply::NetworkError error)
             auto retryAfter = m_reply->rawHeader("Retry-After");
             if (retryAfter.trimmed().endsWith("GMT")) {
                 auto afterTimestamp = QDateTime::fromString(QString::fromUtf8(retryAfter.trimmed()), "ddd, dd MMM yyyy HH:mm:ss 'GMT'");
-                auto now = QDateTime::currentDateTime();
-                delay = now.secsTo(afterTimestamp);
+                auto now            = QDateTime::currentDateTime();
+                delay               = now.secsTo(afterTimestamp);
             } else {
                 delay = retryAfter.toLong();
             }
@@ -259,7 +260,7 @@ void NetRequest::handleAutoRetry(int64_t delay)
 {
     m_retryCount++;
     if (delay > 60 || m_retryCount > 4) {
-        m_state = State::Failed;
+        m_state         = State::Failed;
         auto retryAfter = QDateTime::currentDateTime().addSecs(delay);
         emitFailed(tr("Request Rate Limited for %n second(s): Retry After %1", "seconds", delay)
                        .arg(retryAfter.toLocalTime().toString(QLocale::system().dateTimeFormat(QLocale::ShortFormat))));
@@ -341,7 +342,7 @@ void NetRequest::downloadReadyRead()
 {
     if (m_state == State::Running) {
         auto data = m_reply->readAll();
-        m_state = m_sink->write(data);
+        m_state   = m_sink->write(data);
         if (replyStatusCode() >= 400) {
             m_errorResponse.append(data);
         }

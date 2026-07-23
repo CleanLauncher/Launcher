@@ -36,20 +36,21 @@
  */
 
 #include "ExportInstanceDialog.h"
-#include <BaseInstance.h>
-#include <MMCZip.h>
-#include <QFileDialog>
-#include <QFileSystemModel>
-#include <QMessageBox>
 #include "FileIgnoreProxy.h"
 #include "QObjectPtr.h"
 #include "archive/ExportToZipTask.h"
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui/dialogs/ProgressDialog.h"
 #include "ui_ExportInstanceDialog.h"
+#include <BaseInstance.h>
+#include <MMCZip.h>
+#include <QFileDialog>
+#include <QFileSystemModel>
+#include <QMessageBox>
 
+#include "Application.h"
+#include "SeparatorPrefixTree.h"
 #include <FileSystem.h>
-#include <icons/IconList.h>
 #include <QDebug>
 #include <QFileInfo>
 #include <QPushButton>
@@ -57,8 +58,7 @@
 #include <QSortFilterProxyModel>
 #include <QStack>
 #include <functional>
-#include "Application.h"
-#include "SeparatorPrefixTree.h"
+#include <icons/IconList.h>
 
 ExportInstanceDialog::ExportInstanceDialog(BaseInstance* instance, QWidget* parent)
     : QDialog(parent), m_ui(new Ui::ExportInstanceDialog), m_instance(instance)
@@ -66,14 +66,14 @@ ExportInstanceDialog::ExportInstanceDialog(BaseInstance* instance, QWidget* pare
     m_ui->setupUi(this);
     auto model = new QFileSystemModel(this);
     model->setIconProvider(&m_icons);
-    auto root = instance->instanceRoot();
+    auto root    = instance->instanceRoot();
     m_proxyModel = new FileIgnoreProxy(root, this);
     m_proxyModel->setSourceModel(model);
     auto prefix = QDir(instance->instanceRoot()).relativeFilePath(instance->gameRoot());
-    for (auto path : { "logs", "crash-reports", ".cache", ".fabric", ".quilt" }) {
+    for (auto path : {"logs", "crash-reports", ".cache", ".fabric", ".quilt"}) {
         m_proxyModel->ignoreFilesWithPath().insert(FS::PathCombine(prefix, path));
     }
-    m_proxyModel->ignoreFilesWithName().append({ ".DS_Store", "thumbs.db", "Thumbs.db" });
+    m_proxyModel->ignoreFilesWithName().append({".DS_Store", "thumbs.db", "Thumbs.db"});
     m_proxyModel->loadBlockedPathsFromFile(ignoreFileName());
 
     m_ui->treeView->setModel(m_proxyModel);
@@ -99,9 +99,9 @@ ExportInstanceDialog::~ExportInstanceDialog()
 
 void SaveIcon(BaseInstance* m_instance)
 {
-    auto iconKey = m_instance->iconKey();
+    auto iconKey  = m_instance->iconKey();
     auto iconList = APPLICATION->icons();
-    auto mmcIcon = iconList->icon(iconKey);
+    auto mmcIcon  = iconList->icon(iconKey);
     if (!mmcIcon || mmcIcon->isBuiltIn()) {
         return;
     }
@@ -112,12 +112,12 @@ void SaveIcon(BaseInstance* m_instance)
         return;
     }
     auto& image = mmcIcon->m_images[mmcIcon->type()];
-    auto& icon = image.icon;
-    auto sizes = icon.availableSizes();
+    auto& icon  = image.icon;
+    auto  sizes = icon.availableSizes();
     if (sizes.size() == 0) {
         return;
     }
-    auto areaOf = [](QSize size) { return size.width() * size.height(); };
+    auto  areaOf  = [](QSize size) { return size.width() * size.height(); };
     QSize largest = sizes[0];
 
     for (auto size : sizes) {
@@ -133,8 +133,8 @@ void ExportInstanceDialog::doExport()
 {
     auto name = FS::RemoveInvalidFilenameChars(m_instance->name());
 
-    const QString output = QFileDialog::getSaveFileName(this, tr("Export %1").arg(m_instance->name()),
-                                                        FS::PathCombine(QDir::homePath(), name + ".zip"), "Zip (*.zip)", nullptr);
+    const QString output = QFileDialog::getSaveFileName(
+        this, tr("Export %1").arg(m_instance->name()), FS::PathCombine(QDir::homePath(), name + ".zip"), "Zip (*.zip)", nullptr);
     if (output.isEmpty()) {
         QDialog::done(QDialog::Rejected);
         return;
@@ -143,8 +143,8 @@ void ExportInstanceDialog::doExport()
     SaveIcon(m_instance);
 
     auto files = QFileInfoList();
-    if (!MMCZip::collectFileListRecursively(m_instance->instanceRoot(), nullptr, &files,
-                                            std::bind(&FileIgnoreProxy::filterFile, m_proxyModel, std::placeholders::_1))) {
+    if (!MMCZip::collectFileListRecursively(
+            m_instance->instanceRoot(), nullptr, &files, std::bind(&FileIgnoreProxy::filterFile, m_proxyModel, std::placeholders::_1))) {
         QMessageBox::warning(this, tr("Error"), tr("Unable to export instance"));
         QDialog::done(QDialog::Rejected);
         return;
@@ -152,8 +152,9 @@ void ExportInstanceDialog::doExport()
 
     auto task = makeShared<MMCZip::ExportToZipTask>(output, m_instance->instanceRoot(), files, "", true);
 
-    connect(task.get(), &Task::failed, this,
-            [this, output](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+    connect(task.get(), &Task::failed, this, [this, output](QString reason) {
+        CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+    });
     connect(task.get(), &Task::finished, this, [task] { task->deleteLater(); });
 
     ProgressDialog progress(this);

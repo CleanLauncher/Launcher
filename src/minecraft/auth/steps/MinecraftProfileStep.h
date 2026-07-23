@@ -5,10 +5,11 @@
 #include "net/Download.h"
 #include "net/NetJob.h"
 
-class MinecraftProfileStep : public AuthStep {
+class MinecraftProfileStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit MinecraftProfileStep(AccountData* data);
     virtual ~MinecraftProfileStep() noexcept = default;
 
@@ -16,13 +17,13 @@ class MinecraftProfileStep : public AuthStep {
 
     QString describe() override;
 
-   protected:
+protected:
     QUrl m_profileUrl = QUrl("https://api.minecraftservices.com/minecraft/profile");
 
-   private slots:
+private slots:
     void onRequestDone(QByteArray* response);
 
-   private:
+private:
     Net::Download::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr        m_task;
 };

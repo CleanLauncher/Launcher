@@ -13,7 +13,8 @@
 
 #include <QRegularExpression>
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 ShaderPackResourcePage::ShaderPackResourcePage(ShaderPackDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance) {}
 
@@ -40,9 +41,9 @@ QMap<QString, QString> ShaderPackResourcePage::urlHandlers() const
 }
 
 void ShaderPackResourcePage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
-                                               ModPlatform::IndexedVersion& version,
-                                               ResourceFolderModel* baseModel,
-                                               QString downloadReason)
+                                               ModPlatform::IndexedVersion&  version,
+                                               ResourceFolderModel*          baseModel,
+                                               QString                       downloadReason)
 {
     bool isIndexed = !APPLICATION->settings()->get("ModMetadataDisabled").toBool();
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);

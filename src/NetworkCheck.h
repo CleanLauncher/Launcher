@@ -20,11 +20,18 @@
 
 #include <QNetworkAccessManager>
 
-class NetworkCheck : public QObject {
+class NetworkCheck : public QObject
+{
     Q_OBJECT
 
-   public:
-    enum class Result : std::uint8_t { UsePrimary, UseNewFallback, UseOldFallback, Offline };
+public:
+    enum class Result : std::uint8_t
+    {
+        UsePrimary,
+        UseNewFallback,
+        UseOldFallback,
+        Offline
+    };
     Q_ENUM(Result)
 
     explicit NetworkCheck(QNetworkAccessManager* network);
@@ -35,18 +42,18 @@ class NetworkCheck : public QObject {
     static QMap<Result, QString> newsUrls();
     static QMap<Result, QString> translationsUrls();
 
-   signals:
+signals:
     void shouldReloadNews(QString newUrl);
 
-   private:
+private:
     void launchRequest(const QUrl& url, Result ifSuccess);
 
     bool handleUrlOverride(const QString& overrideName, const QMap<Result, QString>& urlMap) const;
     void finished();
 
-   private:
-    QNetworkAccessManager* m_network = nullptr;
-    Result m_result = Result::Offline;
-    int m_pendingRequests = 0;
-    bool m_finished = false;
+private:
+    QNetworkAccessManager* m_network         = nullptr;
+    Result                 m_result          = Result::Offline;
+    int                    m_pendingRequests = 0;
+    bool                   m_finished        = false;
 };

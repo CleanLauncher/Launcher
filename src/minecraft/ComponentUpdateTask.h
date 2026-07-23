@@ -8,34 +8,39 @@
 class PackProfile;
 struct ComponentUpdateTaskData;
 
-class ComponentUpdateTask : public Task {
+class ComponentUpdateTask : public Task
+{
     Q_OBJECT
-   public:
-    enum class Mode { Launch, Resolution };
+public:
+    enum class Mode
+    {
+        Launch,
+        Resolution
+    };
 
-   public:
+public:
     explicit ComponentUpdateTask(Mode mode, Net::Mode netmode, PackProfile* list);
     virtual ~ComponentUpdateTask();
 
-    bool canAbort() const override;
-    bool abort() override;
+    bool      canAbort() const override;
+    bool      abort() override;
     Net::Mode netMode();
 
-   protected:
+protected:
     void executeTask() override;
 
-   private:
+private:
     void loadComponents();
 
     QList<ComponentPtr> collectTreeLinked(const QString& uid);
-    void resolveDependencies(bool checkOnly);
-    void performUpdateActions();
-    void finalizeComponents();
+    void                resolveDependencies(bool checkOnly);
+    void                performUpdateActions();
+    void                finalizeComponents();
 
     void remoteLoadSucceeded(size_t index);
     void remoteLoadFailed(size_t index, const QString& msg);
     void checkIfAllFinished();
 
-   private:
+private:
     std::unique_ptr<ComponentUpdateTaskData> d;
 };

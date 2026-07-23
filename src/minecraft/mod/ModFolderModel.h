@@ -51,10 +51,12 @@
 class BaseInstance;
 class QFileSystemWatcher;
 
-class ModFolderModel : public ResourceFolderModel {
+class ModFolderModel : public ResourceFolderModel
+{
     Q_OBJECT
-   public:
-    enum Columns : std::uint8_t {
+public:
+    enum Columns : std::uint8_t
+    {
         ActiveColumn = 0,
         ImageColumn,
         NameColumn,
@@ -78,10 +80,10 @@ class ModFolderModel : public ResourceFolderModel {
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    int columnCount(const QModelIndex& parent) const override;
+    int      columnCount(const QModelIndex& parent) const override;
 
     [[nodiscard]] Resource* createResource(const QFileInfo& file) override { return new Mod(file); }
-    [[nodiscard]] Task* createParseTask(Resource&) override;
+    [[nodiscard]] Task*     createParseTask(Resource&) override;
 
     bool isValid();
 
@@ -92,15 +94,15 @@ class ModFolderModel : public ResourceFolderModel {
 
     RESOURCE_HELPERS(Mod)
 
-   public:
+public:
     QStringList requiresList(const QString& id);
     QStringList requiredByList(const QString& id);
 
-   private slots:
+private slots:
     void onParseSucceeded(int ticket, const QString& resourceId) override;
     void onParseFinished();
 
-   private:
+private:
     QHash<QString, QSet<Mod*>> m_requiredBy;
     QHash<QString, QSet<Mod*>> m_requires;
 };

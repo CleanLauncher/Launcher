@@ -34,16 +34,17 @@
  */
 
 #include "AboutDialog.h"
-#include <QIcon>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "Markdown.h"
 #include "StringUtils.h"
 #include "ui_AboutDialog.h"
+#include <QIcon>
 
 #include <net/NetJob.h>
 
-namespace {
+namespace
+{
 QString getCreditsHtml()
 {
     QFile dataFile(":/documents/credits.html");
@@ -54,7 +55,9 @@ QString getCreditsHtml()
     QString fileContent = QString::fromUtf8(dataFile.readAll());
     dataFile.close();
 
-    return fileContent.arg(QObject::tr("Launcher Developers"), QObject::tr("MultiMC Developers"), QObject::tr("With special thanks to"),
+    return fileContent.arg(QObject::tr("Launcher Developers"),
+                           QObject::tr("MultiMC Developers"),
+                           QObject::tr("With special thanks to"),
                            QObject::tr("%1 Developers").arg(BuildConfig.LAUNCHER_DISPLAYNAME));
 }
 

@@ -40,12 +40,12 @@
 
 #include <settings/Setting.h>
 
-#include <QDebug>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "FileSystem.h"
 #include "java/JavaInstallList.h"
 #include "java/JavaUtils.h"
+#include <QDebug>
 
 #define IBUS "@im=ibus"
 
@@ -59,7 +59,7 @@ QString stripVariableEntries(QString name, QString target, QString remove)
 #endif
 
     auto targetItems = target.split(delimiter);
-    auto toRemove = remove.split(delimiter);
+    auto toRemove    = remove.split(delimiter);
 
     for (QString item : toRemove) {
         bool removed = targetItems.removeOne(item);
@@ -74,15 +74,16 @@ QProcessEnvironment CleanEnviroment()
     QProcessEnvironment rawenv = QProcessEnvironment::systemEnvironment();
     QProcessEnvironment env;
 
-    QStringList ignored = { "JAVA_ARGS", "CLASSPATH",     "CONFIGPATH",   "JAVA_HOME",
-                            "JRE_HOME",  "_JAVA_OPTIONS", "JAVA_OPTIONS", "JAVA_TOOL_OPTIONS" };
+    QStringList ignored = {
+        "JAVA_ARGS", "CLASSPATH", "CONFIGPATH", "JAVA_HOME", "JRE_HOME", "_JAVA_OPTIONS", "JAVA_OPTIONS", "JAVA_TOOL_OPTIONS"};
 
     QStringList stripped = {
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
-        "LD_LIBRARY_PATH", "LD_PRELOAD",
+        "LD_LIBRARY_PATH",
+        "LD_PRELOAD",
 #endif
-        "QT_PLUGIN_PATH", "QT_FONTPATH"
-    };
+        "QT_PLUGIN_PATH",
+        "QT_FONTPATH"};
     for (auto key : rawenv.keys()) {
         auto value = rawenv.value(key);
 
@@ -127,7 +128,7 @@ JavaInstallPtr JavaUtils::MakeJavaPtr(QString path, QString id, QString arch)
 {
     JavaInstallPtr javaVersion(new JavaInstall());
 
-    javaVersion->id = id;
+    javaVersion->id   = id;
     javaVersion->arch = arch;
     javaVersion->path = path;
 
@@ -138,7 +139,7 @@ JavaInstallPtr JavaUtils::GetDefaultJava()
 {
     JavaInstallPtr javaVersion(new JavaInstall());
 
-    javaVersion->id = "java";
+    javaVersion->id   = "java";
     javaVersion->arch = "unknown";
 #if defined(Q_OS_WIN32)
     javaVersion->path = "javaw";
@@ -155,7 +156,7 @@ QStringList addJavasFromEnv(QList<QString> javas)
 #if defined(Q_OS_WIN32)
     QList<QString> javaPaths = env.replace("\\", "/").split(QLatin1String(";"));
 
-    auto envPath = qEnvironmentVariable("PATH");
+    auto           envPath           = qEnvironmentVariable("PATH");
     QList<QString> javaPathsfromPath = envPath.replace("\\", "/").split(QLatin1String(";"));
     for (QString string : javaPathsfromPath) {
         javaPaths.append(string + "/javaw.exe");
@@ -180,7 +181,7 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
     else if (keyType == KEY_WOW64_32KEY)
         archType = "32";
 
-    for (HKEY baseRegistry : { HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE }) {
+    for (HKEY baseRegistry : {HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE}) {
         HKEY jreKey;
         if (RegOpenKeyExW(baseRegistry, keyName.toStdWString().c_str(), 0, KEY_READ | keyType | KEY_ENUMERATE_SUB_KEYS, &jreKey) ==
             ERROR_SUCCESS) {
@@ -191,8 +192,8 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
 
             if (numSubKeys > 0) {
                 for (DWORD i = 0; i < numSubKeys; i++) {
-                    subKeyNameSize = 255;
-                    retCode = RegEnumKeyExW(jreKey, i, subKeyName, &subKeyNameSize, NULL, NULL, NULL, NULL);
+                    subKeyNameSize        = 255;
+                    retCode               = RegEnumKeyExW(jreKey, i, subKeyName, &subKeyNameSize, NULL, NULL, NULL, NULL);
                     QString newSubkeyName = QString::fromWCharArray(subKeyName);
                     if (retCode == ERROR_SUCCESS) {
                         QString newKeyName = keyName + "\\" + newSubkeyName + subkeySuffix;
@@ -210,7 +211,7 @@ QList<JavaInstallPtr> JavaUtils::FindJavaFromRegistryKey(DWORD keyType, QString 
 
                                 JavaInstallPtr javaVersion(new JavaInstall());
 
-                                javaVersion->id = newSubkeyName;
+                                javaVersion->id   = newSubkeyName;
                                 javaVersion->arch = archType;
                                 javaVersion->path = QDir(FS::PathCombine(newValue, "bin")).absoluteFilePath("javaw.exe");
                                 javas.append(javaVersion);
@@ -341,13 +342,13 @@ QList<QString> JavaUtils::FindJavaPaths()
     javas.append("/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java/bin/java");
     javas.append("/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java");
     javas.append("/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java");
-    QDir libraryJVMDir("/Library/Java/JavaVirtualMachines/");
+    QDir        libraryJVMDir("/Library/Java/JavaVirtualMachines/");
     QStringList libraryJVMJavas = libraryJVMDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : libraryJVMJavas) {
         javas.append(libraryJVMDir.absolutePath() + "/" + java + "/Contents/Home/bin/java");
         javas.append(libraryJVMDir.absolutePath() + "/" + java + "/Contents/Home/jre/bin/java");
     }
-    QDir systemLibraryJVMDir("/System/Library/Java/JavaVirtualMachines/");
+    QDir        systemLibraryJVMDir("/System/Library/Java/JavaVirtualMachines/");
     QStringList systemLibraryJVMJavas = systemLibraryJVMDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : systemLibraryJVMJavas) {
         javas.append(systemLibraryJVMDir.absolutePath() + "/" + java + "/Contents/Home/bin/java");
@@ -356,21 +357,21 @@ QList<QString> JavaUtils::FindJavaPaths()
 
     auto home = qEnvironmentVariable("HOME");
 
-    QString sdkmanDir = qEnvironmentVariable("SDKMAN_DIR", FS::PathCombine(home, ".sdkman"));
-    QDir sdkmanJavaDir(FS::PathCombine(sdkmanDir, "candidates/java"));
+    QString     sdkmanDir = qEnvironmentVariable("SDKMAN_DIR", FS::PathCombine(home, ".sdkman"));
+    QDir        sdkmanJavaDir(FS::PathCombine(sdkmanDir, "candidates/java"));
     QStringList sdkmanJavas = sdkmanJavaDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : sdkmanJavas) {
         javas.append(sdkmanJavaDir.absolutePath() + "/" + java + "/bin/java");
     }
 
-    QString asdfDataDir = qEnvironmentVariable("ASDF_DATA_DIR", FS::PathCombine(home, ".asdf"));
-    QDir asdfJavaDir(FS::PathCombine(asdfDataDir, "installs/java"));
+    QString     asdfDataDir = qEnvironmentVariable("ASDF_DATA_DIR", FS::PathCombine(home, ".asdf"));
+    QDir        asdfJavaDir(FS::PathCombine(asdfDataDir, "installs/java"));
     QStringList asdfJavas = asdfJavaDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : asdfJavas) {
         javas.append(asdfJavaDir.absolutePath() + "/" + java + "/bin/java");
     }
 
-    QDir userLibraryJVMDir(FS::PathCombine(home, "Library/Java/JavaVirtualMachines/"));
+    QDir        userLibraryJVMDir(FS::PathCombine(home, "Library/Java/JavaVirtualMachines/"));
     QStringList userLibraryJVMJavas = userLibraryJVMDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (const QString& java : userLibraryJVMJavas) {
         javas.append(userLibraryJVMDir.absolutePath() + "/" + java + "/Contents/Home/bin/java");
@@ -390,7 +391,7 @@ QList<QString> JavaUtils::FindJavaPaths()
     QList<QString> javas;
     javas.append(this->GetDefaultJava()->path);
     auto scanJavaDir = [&javas](
-                           const QString& dirPath,
+                           const QString&                               dirPath,
                            const std::function<bool(const QFileInfo&)>& filter = [](const QFileInfo&) { return true; }) {
         QDir dir(dirPath);
         if (!dir.exists())
@@ -407,7 +408,7 @@ QList<QString> JavaUtils::FindJavaPaths()
         }
     };
 
-    auto snap = qEnvironmentVariable("SNAP");
+    auto snap         = qEnvironmentVariable("SNAP");
     auto scanJavaDirs = [scanJavaDir, snap](const QString& dirPath) {
         scanJavaDir(dirPath);
         if (!snap.isNull()) {
@@ -510,7 +511,7 @@ QStringList getMinecraftJavaBundle()
         QDir dir(dirPath);
         if (!dir.exists())
             continue;
-        auto entries = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
+        auto entries  = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
         auto binFound = false;
         for (auto& entry : entries) {
             if (entry.baseName() == "bin") {

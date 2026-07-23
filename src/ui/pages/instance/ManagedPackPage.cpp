@@ -3,12 +3,12 @@
 // SPDX-License-Identifier: GPL-3.0-only
 
 #include "ManagedPackPage.h"
+#include "modplatform/ModIndex.h"
+#include "ui_ManagedPackPage.h"
 #include <QDesktopServices>
 #include <QLineEdit>
 #include <QUrl>
 #include <QUrlQuery>
-#include "modplatform/ModIndex.h"
-#include "ui_ManagedPackPage.h"
 
 #include <QFileDialog>
 #include <QListView>
@@ -31,10 +31,11 @@
 
 #include "net/ApiDownload.h"
 
-class NoBigComboBoxStyle : public QProxyStyle {
+class NoBigComboBoxStyle : public QProxyStyle
+{
     Q_OBJECT
 
-   public:
+public:
     // clang-format off
     int styleHint(QStyle::StyleHint hint, const QStyleOption* option = nullptr, const QWidget* widget = nullptr, QStyleHintReturn* returnData = nullptr) const override
     {
@@ -45,15 +46,15 @@ class NoBigComboBoxStyle : public QProxyStyle {
     }
     // clang-format on
 
-   public:
+public:
     static NoBigComboBoxStyle* getInstance(QStyle* style)
     {
         static QHash<QStyle*, NoBigComboBoxStyle*> s_singleton_instances_ = {};
-        static std::mutex s_singleton_instances_mutex_;
+        static std::mutex                          s_singleton_instances_mutex_;
 
         std::lock_guard<std::mutex> lock(s_singleton_instances_mutex_);
-        auto inst_iter = s_singleton_instances_.constFind(style);
-        NoBigComboBoxStyle* inst = nullptr;
+        auto                        inst_iter = s_singleton_instances_.constFind(style);
+        NoBigComboBoxStyle*         inst      = nullptr;
         if (inst_iter == s_singleton_instances_.constEnd() || *inst_iter == nullptr) {
             inst = new NoBigComboBoxStyle(style);
             inst->setParent(APPLICATION);
@@ -65,7 +66,7 @@ class NoBigComboBoxStyle : public QProxyStyle {
         return inst;
     }
 
-   private:
+private:
     NoBigComboBoxStyle(QStyle* style) : QProxyStyle(style) {}
 };
 
@@ -108,7 +109,7 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
             auto querry = QUrlQuery(url.query()).queryItemValue("remoteUrl", QUrl::FullyDecoded);
 
             auto decoded = QUrl::fromPercentEncoding(querry.toUtf8());
-            auto newUrl = QUrl(decoded);
+            auto newUrl  = QUrl(decoded);
             if (newUrl.isValid() && (newUrl.scheme() == "http" || newUrl.scheme() == "https"))
                 QDesktopServices ::openUrl(newUrl);
             return;
@@ -116,8 +117,8 @@ ManagedPackPage::ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_wi
         QDesktopServices::openUrl(url);
     });
 
-    connect(ui->urlLine, &QLineEdit::textChanged, this,
-            [this](QString text) { m_inst->settings()->set("ManagedPackURL", text.trimmed()); });
+    connect(
+        ui->urlLine, &QLineEdit::textChanged, this, [this](QString text) { m_inst->settings()->set("ManagedPackURL", text.trimmed()); });
 }
 
 ManagedPackPage::~ManagedPackPage()
@@ -191,8 +192,9 @@ bool ManagedPackPage::runUpdateTask(InstanceTask* task)
 
     unique_qobject_ptr<Task> wrapped_task(APPLICATION->instances()->wrapInstanceTask(task));
 
-    connect(wrapped_task.get(), &Task::failed,
-            [this](const QString& reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+    connect(wrapped_task.get(), &Task::failed, [this](const QString& reason) {
+        CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+    });
     connect(wrapped_task.get(), &Task::succeeded, [this, task]() {
         QStringList warnings = task->warnings();
         if (warnings.count()) {
@@ -256,10 +258,10 @@ void ModrinthManagedPackPage::parseManagedPack()
     }
 
     ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
-    m_pack = { .addonId = m_inst->getManagedPackID() };
+    m_pack = {.addonId = m_inst->getManagedPackID()};
 
     callbacks.on_succeed = [this](auto& doc) {
-        m_pack.versions = doc;
+        m_pack.versions       = doc;
         m_pack.versionsLoaded = true;
 
         ui->versionsComboBox->blockSignals(true);
@@ -280,13 +282,13 @@ void ModrinthManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString&, int) { setFailState(); };
+    callbacks.on_fail  = [this](const QString&, int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
-    m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
-                                             .mcVersions = {},
-                                             .loaders = {},
-                                             .resourceType = ModPlatform::ResourceType::Modpack,
-                                             .includeChangelog = true },
+    m_fetch_job        = m_api.getProjectVersions({.pack             = std::make_shared<ModPlatform::IndexedPack>(m_pack),
+                                                   .mcVersions       = {},
+                                                   .loaders          = {},
+                                                   .resourceType     = ModPlatform::ResourceType::Modpack,
+                                                   .includeChangelog = true},
                                            std::move(callbacks));
 
     ui->changelogTextBrowser->setText(tr("Fetching changelogs..."));
@@ -319,13 +321,15 @@ void ManagedPackPage::onUpdateTaskCompleted(bool did_succeed) const
         if (m_instance_window != nullptr)
             m_instance_window->close();
 
-        CustomMessageBox::selectable(nullptr, tr("Update Successful"),
+        CustomMessageBox::selectable(nullptr,
+                                     tr("Update Successful"),
                                      tr("The instance updated to pack version %1 successfully.").arg(m_inst->getManagedPackVersionName()),
                                      QMessageBox::Information)
             ->show();
     } else {
         CustomMessageBox::selectable(
-            nullptr, tr("Update Failed"),
+            nullptr,
+            tr("Update Failed"),
             tr("The instance failed to update to pack version %1. Please check launcher logs for more information.")
                 .arg(m_inst->getManagedPackVersionName()),
             QMessageBox::Critical)
@@ -398,12 +402,12 @@ void FlameManagedPackPage::parseManagedPack()
     }
 
     QString id = m_inst->getManagedPackID();
-    m_pack = { .addonId = id };
+    m_pack     = {.addonId = id};
 
     ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
     callbacks.on_succeed = [this](auto& doc) {
-        m_pack.versions = doc;
+        m_pack.versions       = doc;
         m_pack.versionsLoaded = true;
 
         ui->versionsComboBox->blockSignals(true);
@@ -424,13 +428,13 @@ void FlameManagedPackPage::parseManagedPack()
 
         m_loaded = true;
     };
-    callbacks.on_fail = [this](const QString&, int) { setFailState(); };
+    callbacks.on_fail  = [this](const QString&, int) { setFailState(); };
     callbacks.on_abort = [this]() { setFailState(); };
-    m_fetch_job = m_api.getProjectVersions({ .pack = std::make_shared<ModPlatform::IndexedPack>(m_pack),
-                                             .mcVersions = {},
-                                             .loaders = {},
-                                             .resourceType = ModPlatform::ResourceType::Modpack,
-                                             .includeChangelog = true },
+    m_fetch_job        = m_api.getProjectVersions({.pack             = std::make_shared<ModPlatform::IndexedPack>(m_pack),
+                                                   .mcVersions       = {},
+                                                   .loaders          = {},
+                                                   .resourceType     = ModPlatform::ResourceType::Modpack,
+                                                   .includeChangelog = true},
                                            std::move(callbacks));
 
     m_fetch_job->start();

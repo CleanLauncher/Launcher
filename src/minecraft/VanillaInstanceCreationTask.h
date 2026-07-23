@@ -4,18 +4,19 @@
 
 #include <utility>
 
-class VanillaCreationTask final : public InstanceCreationTask {
+class VanillaCreationTask final : public InstanceCreationTask
+{
     Q_OBJECT
-   public:
+public:
     explicit VanillaCreationTask(BaseVersion::Ptr version) : m_version(std::move(version)) {}
     VanillaCreationTask(BaseVersion::Ptr version, QString loader, BaseVersion::Ptr loaderVersion);
 
     std::unique_ptr<MinecraftInstance> createInstance() override;
 
-   private:
+private:
     BaseVersion::Ptr m_version;
 
-    bool m_using_loader = false;
-    QString m_loader;
+    bool             m_using_loader = false;
+    QString          m_loader;
     BaseVersion::Ptr m_loader_version;
 };

@@ -38,9 +38,9 @@
 **
 ****************************************************************************/
 
-#include <qt_windows.h>
-#include <QFileInfo>
 #include "LockedFile.h"
+#include <QFileInfo>
+#include <qt_windows.h>
 
 #define MUTEX_PREFIX "QtLockedFile mutex "
 
@@ -79,14 +79,14 @@ bool LockedFile::waitMutex(Qt::HANDLE mutex, bool doBlock)
     Q_ASSERT(mutex);
     DWORD res = WaitForSingleObject(mutex, doBlock ? INFINITE : 0);
     switch (res) {
-        case WAIT_OBJECT_0:
-        case WAIT_ABANDONED:
-            return true;
-            break;
-        case WAIT_TIMEOUT:
-            break;
-        default:
-            qErrnoWarning("QtLockedFile::lock(): WaitForSingleObject failed");
+    case WAIT_OBJECT_0:
+    case WAIT_ABANDONED:
+        return true;
+        break;
+    case WAIT_TIMEOUT:
+        break;
+    default:
+        qErrnoWarning("QtLockedFile::lock(): WaitForSingleObject failed");
     }
     return false;
 }
@@ -125,7 +125,7 @@ bool LockedFile::lock(LockMode mode, bool block)
         if (idx >= MAX_READERS) {
             qWarning("QtLockedFile::lock(): too many readers");
             rmutex = 0;
-            ok = false;
+            ok     = false;
         } else if (!rmutex) {
             rmutex = getMutexHandle(idx, true);
             if (!rmutex || !waitMutex(rmutex, false))

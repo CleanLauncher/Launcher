@@ -27,9 +27,9 @@ NetworkCheck::NetworkCheck(QNetworkAccessManager* network)
     m_network = network;
 
     static auto s_urlToResult = std::array{
-        std::pair{ QUrl("https://prismlauncher.org"), Result::UsePrimary },
-        std::pair{ QUrl("https://prismlauncher.org"), Result::UseNewFallback },
-        std::pair{ QUrl("https://prismlauncher.org"), Result::UseOldFallback },
+        std::pair{QUrl("https://prismlauncher.org"), Result::UsePrimary},
+        std::pair{QUrl("https://prismlauncher.org"), Result::UseNewFallback},
+        std::pair{QUrl("https://prismlauncher.org"), Result::UseOldFallback},
     };
     for (auto& [url, result] : s_urlToResult) {
         launchRequest(url, result);
@@ -39,36 +39,36 @@ NetworkCheck::NetworkCheck(QNetworkAccessManager* network)
 QMap<NetworkCheck::Result, QString> NetworkCheck::metaUrls()
 {
     return {
-        { Result::UsePrimary, "" },
-        { Result::UseNewFallback, "https://prismlauncher.org/meta/v1/" },
-        { Result::UseOldFallback, "https://prismlauncher.org/meta/v1/" },
+        {Result::UsePrimary, ""},
+        {Result::UseNewFallback, "https://prismlauncher.org/meta/v1/"},
+        {Result::UseOldFallback, "https://prismlauncher.org/meta/v1/"},
     };
 }
 
 QMap<NetworkCheck::Result, QString> NetworkCheck::fmlLibsUrls()
 {
     return {
-        { Result::UsePrimary, "" },
-        { Result::UseNewFallback, "https://prismlauncher.org/files/fmllibs/" },
-        { Result::UseOldFallback, "https://prismlauncher.org/files/fmllibs/" },
+        {Result::UsePrimary, ""},
+        {Result::UseNewFallback, "https://prismlauncher.org/files/fmllibs/"},
+        {Result::UseOldFallback, "https://prismlauncher.org/files/fmllibs/"},
     };
 }
 
 QMap<NetworkCheck::Result, QString> NetworkCheck::newsUrls()
 {
     return {
-        { Result::UsePrimary, "" },
-        { Result::UseNewFallback, "https://prismlauncher.org/feed/feed.xml" },
-        { Result::UseOldFallback, "https://prismlauncher.org/feed/feed.xml" },
+        {Result::UsePrimary, ""},
+        {Result::UseNewFallback, "https://prismlauncher.org/feed/feed.xml"},
+        {Result::UseOldFallback, "https://prismlauncher.org/feed/feed.xml"},
     };
 }
 
 QMap<NetworkCheck::Result, QString> NetworkCheck::translationsUrls()
 {
     return {
-        { Result::UsePrimary, "" },
-        { Result::UseNewFallback, "https://prismlauncher.org/i18n" },
-        { Result::UseOldFallback, "https://prismlauncher.org/i18n" },
+        {Result::UsePrimary, ""},
+        {Result::UseNewFallback, "https://prismlauncher.org/i18n"},
+        {Result::UseOldFallback, "https://prismlauncher.org/i18n"},
     };
 }
 
@@ -106,7 +106,7 @@ bool NetworkCheck::handleUrlOverride(const QString& overrideName, const QMap<Res
     }
     const QString newOverride = urlMap.value(m_result);
 
-    auto* settings = APPLICATION->settings();
+    auto*      settings        = APPLICATION->settings();
     const auto currentOverride = settings->get(overrideName).toString();
     if (currentOverride == newOverride) {
         return false;

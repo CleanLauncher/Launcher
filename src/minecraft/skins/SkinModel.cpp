@@ -29,7 +29,7 @@ static void setAlpha(QImage& image, const QRect& region, const int alpha)
         QRgb* line = reinterpret_cast<QRgb*>(image.scanLine(y));
         for (int x = region.left(); x < region.right(); ++x) {
             QRgb pixel = line[x];
-            line[x] = qRgba(qRed(pixel), qGreen(pixel), qBlue(pixel), alpha);
+            line[x]    = qRgba(qRed(pixel), qGreen(pixel), qBlue(pixel), alpha);
         }
     }
 }
@@ -45,13 +45,13 @@ static void doNotchTransparencyHack(QImage& image)
         }
     }
 
-    setAlpha(image, { 32, 0, 32, 32 }, 0);
+    setAlpha(image, {32, 0, 32, 32}, 0);
 }
 
 static QImage improveSkin(QImage skin)
 {
     int height = skin.height();
-    int width = skin.width();
+    int width  = skin.width();
     if (width != 64 || (height != 32 && height != 64)) {
         return skin;
     }
@@ -70,11 +70,12 @@ static QImage improveSkin(QImage skin)
 
         auto copyRect = [&p, &newSkin](int startX, int startY, int offsetX, int offsetY, int sizeX, int sizeY) {
             QImage region = newSkin.copy(startX, startY, sizeX, sizeY);
-            region = region.mirrored(true, false);
+            region        = region.mirrored(true, false);
 
             p.drawImage(startX + offsetX, startY + offsetY, region);
         };
-        static const struct {
+        static const struct
+        {
             int x;
             int y;
             int offsetX;
@@ -82,9 +83,18 @@ static QImage improveSkin(QImage skin)
             int width;
             int height;
         } faces[] = {
-            { 4, 16, 16, 32, 4, 4 },  { 8, 16, 16, 32, 4, 4 },   { 0, 20, 24, 32, 4, 12 },   { 4, 20, 16, 32, 4, 12 },
-            { 8, 20, 8, 32, 4, 12 },  { 12, 20, 16, 32, 4, 12 }, { 44, 16, -8, 32, 4, 4 },   { 48, 16, -8, 32, 4, 4 },
-            { 40, 20, 0, 32, 4, 12 }, { 44, 20, -8, 32, 4, 12 }, { 48, 20, -16, 32, 4, 12 }, { 52, 20, -8, 32, 4, 12 },
+            {4, 16, 16, 32, 4, 4},
+            {8, 16, 16, 32, 4, 4},
+            {0, 20, 24, 32, 4, 12},
+            {4, 20, 16, 32, 4, 12},
+            {8, 20, 8, 32, 4, 12},
+            {12, 20, 16, 32, 4, 12},
+            {44, 16, -8, 32, 4, 4},
+            {48, 16, -8, 32, 4, 4},
+            {40, 20, 0, 32, 4, 12},
+            {44, 20, -8, 32, 4, 12},
+            {48, 20, -16, 32, 4, 12},
+            {52, 20, -8, 32, 4, 12},
         };
 
         for (const auto& face : faces) {
@@ -94,9 +104,9 @@ static QImage improveSkin(QImage skin)
         skin = newSkin;
     }
     static const QRect opaqueParts[] = {
-        { 0, 0, 32, 16 },
-        { 0, 16, 64, 16 },
-        { 16, 48, 32, 16 },
+        {0, 0, 32, 16},
+        {0, 16, 64, 16},
+        {16, 48, 32, 16},
     };
 
     for (const auto& p : opaqueParts) {
@@ -129,7 +139,7 @@ static QImage generatePreviews(QImage texture, bool slim)
     paint.drawImage(8, 22, texture.copy(4, 52, 4, 12));
 
     auto armWidth = slim ? 3 : 4;
-    auto armPosX = slim ? 1 : 0;
+    auto armPosX  = slim ? 1 : 0;
 
     paint.drawImage(armPosX, 10, texture.copy(44, 20, armWidth, 12));
     paint.drawImage(armPosX, 10, texture.copy(44, 36, armWidth, 12));
@@ -170,7 +180,7 @@ SkinModel::SkinModel(QDir skinDir, QJsonObject obj)
     if (auto model = obj["model"].toString(); model == "SLIM") {
         m_model = Model::SLIM;
     }
-    m_path = skinDir.absoluteFilePath(name) + ".png";
+    m_path    = skinDir.absoluteFilePath(name) + ".png";
     m_texture = getSkin(m_path);
     m_preview = generatePreviews(m_texture, m_model == Model::SLIM);
 }
@@ -182,7 +192,7 @@ QString SkinModel::name() const
 
 bool SkinModel::rename(QString newName)
 {
-    auto info = QFileInfo(m_path);
+    auto info     = QFileInfo(m_path);
     auto new_path = FS::PathCombine(info.absolutePath(), newName + ".png");
     if (QFileInfo::exists(new_path)) {
         return false;
@@ -194,20 +204,20 @@ bool SkinModel::rename(QString newName)
 QJsonObject SkinModel::toJSON() const
 {
     QJsonObject obj;
-    obj["name"] = name();
+    obj["name"]   = name();
     obj["capeId"] = m_capeId;
-    obj["url"] = m_url;
-    obj["model"] = getModelString();
+    obj["url"]    = m_url;
+    obj["model"]  = getModelString();
     return obj;
 }
 
 QString SkinModel::getModelString() const
 {
     switch (m_model) {
-        case CLASSIC:
-            return "CLASSIC";
-        case SLIM:
-            return "SLIM";
+    case CLASSIC:
+        return "CLASSIC";
+    case SLIM:
+        return "SLIM";
     }
     return {};
 }
@@ -223,6 +233,6 @@ void SkinModel::refresh()
 }
 void SkinModel::setModel(Model model)
 {
-    m_model = model;
+    m_model   = model;
     m_preview = generatePreviews(m_texture, m_model == Model::SLIM);
 }

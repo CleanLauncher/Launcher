@@ -5,10 +5,11 @@
 #include "net/NetJob.h"
 #include "net/Upload.h"
 
-class XboxAuthorizationStep : public AuthStep {
+class XboxAuthorizationStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit XboxAuthorizationStep(AccountData* data, Token* token, QString relyingParty, QString authorizationKind);
     virtual ~XboxAuthorizationStep() noexcept = default;
 
@@ -16,17 +17,17 @@ class XboxAuthorizationStep : public AuthStep {
 
     QString describe() override;
 
-   private:
+private:
     bool processSTSError(const QByteArray& response);
 
-   private slots:
+private slots:
     void onRequestDone(QByteArray* response);
 
-   private:
-    Token* m_token;
+private:
+    Token*  m_token;
     QString m_relyingParty;
     QString m_authorizationKind;
 
     Net::Upload::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr      m_task;
 };

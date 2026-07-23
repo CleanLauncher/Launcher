@@ -34,11 +34,11 @@
  *      limitations under the License.
  */
 #include "ITheme.h"
-#include <QDir>
-#include <QStyleFactory>
 #include "Application.h"
 #include "HintOverrideProxyStyle.h"
 #include "rainbow.h"
+#include <QDir>
+#include <QStyleFactory>
 
 void ITheme::apply(bool)
 {
@@ -52,7 +52,7 @@ void ITheme::apply(bool)
 QPalette ITheme::fadeInactive(QPalette in, qreal bias, QColor color)
 {
     auto blend = [&in, bias, color](QPalette::ColorRole role) {
-        QColor from = in.color(QPalette::Active, role);
+        QColor from    = in.color(QPalette::Active, role);
         QColor blended = Rainbow::mix(from, color, bias);
         in.setColor(QPalette::Disabled, role, blended);
     };
@@ -90,10 +90,10 @@ LogColors ITheme::defaultLogColors(const QPalette& palette)
     result.background[MessageLevel::Fatal] = Qt::black;
 
     result.foreground[MessageLevel::Launcher] = blend(QColor("purple"));
-    result.foreground[MessageLevel::Debug] = blend(QColor("green"));
-    result.foreground[MessageLevel::Warning] = blend(QColor("orange"));
-    result.foreground[MessageLevel::Error] = blend(QColor("red"));
-    result.foreground[MessageLevel::Fatal] = blend(QColor("red"));
+    result.foreground[MessageLevel::Debug]    = blend(QColor("green"));
+    result.foreground[MessageLevel::Warning]  = blend(QColor("orange"));
+    result.foreground[MessageLevel::Error]    = blend(QColor("red"));
+    result.foreground[MessageLevel::Fatal]    = blend(QColor("red"));
 
     return result;
 }

@@ -25,7 +25,8 @@
 #include "java/JavaMetadata.h"
 #include "meta/VersionList.h"
 
-namespace Java {
+namespace Java
+{
 
 VersionList::VersionList(Meta::Version::Ptr version, QObject* parent) : BaseVersionList(parent), m_version(version)
 {
@@ -65,43 +66,43 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
 
     auto version = (m_vlist[index.row()]);
     switch (role) {
-        case SortRole:
-            return -index.row();
-        case VersionPointerRole:
-            return QVariant::fromValue(std::dynamic_pointer_cast<BaseVersion>(m_vlist[index.row()]));
-        case VersionIdRole:
-            return version->descriptor();
-        case VersionRole:
-            return version->version.toString();
-        case RecommendedRole:
-            return false;
+    case SortRole:
+        return -index.row();
+    case VersionPointerRole:
+        return QVariant::fromValue(std::dynamic_pointer_cast<BaseVersion>(m_vlist[index.row()]));
+    case VersionIdRole:
+        return version->descriptor();
+    case VersionRole:
+        return version->version.toString();
+    case RecommendedRole:
+        return false;
 
-        case JavaNameRole:
-            return version->name();
-        case JavaMajorRole: {
-            auto major = version->version.toString();
-            if (major.startsWith("java")) {
-                major = "Java " + major.mid(4);
-            }
-            return major;
+    case JavaNameRole:
+        return version->name();
+    case JavaMajorRole: {
+        auto major = version->version.toString();
+        if (major.startsWith("java")) {
+            major = "Java " + major.mid(4);
         }
-        case TypeRole:
-            return version->packageType;
-        case Meta::VersionList::TimeRole:
-            return version->releaseTime;
-        default:
-            return QVariant();
+        return major;
+    }
+    case TypeRole:
+        return version->packageType;
+    case Meta::VersionList::TimeRole:
+        return version->releaseTime;
+    default:
+        return QVariant();
     }
 }
 
 BaseVersionList::RoleList VersionList::providesRoles() const
 {
-    return { VersionPointerRole, VersionIdRole, VersionRole, RecommendedRole, JavaNameRole, TypeRole, Meta::VersionList::TimeRole };
+    return {VersionPointerRole, VersionIdRole, VersionRole, RecommendedRole, JavaNameRole, TypeRole, Meta::VersionList::TimeRole};
 }
 
 bool sortJavas(BaseVersion::Ptr left, BaseVersion::Ptr right)
 {
-    auto rleft = std::dynamic_pointer_cast<Java::Metadata>(right);
+    auto rleft  = std::dynamic_pointer_cast<Java::Metadata>(right);
     auto rright = std::dynamic_pointer_cast<Java::Metadata>(left);
     return (*rleft) < (*rright);
 }
@@ -113,10 +114,11 @@ void VersionList::sortVersions()
     QString versionStr = SysInfo::getSupportedJavaArchitecture();
     beginResetModel();
     auto runtimes = m_version->data()->runtimes;
-    m_vlist = {};
+    m_vlist       = {};
     if (!versionStr.isEmpty() && !runtimes.isEmpty()) {
-        std::copy_if(runtimes.begin(), runtimes.end(), std::back_inserter(m_vlist),
-                     [versionStr](Java::MetadataPtr val) { return val->runtimeOS == versionStr; });
+        std::copy_if(runtimes.begin(), runtimes.end(), std::back_inserter(m_vlist), [versionStr](Java::MetadataPtr val) {
+            return val->runtimeOS == versionStr;
+        });
         std::sort(m_vlist.begin(), m_vlist.end(), sortJavas);
     } else {
         qWarning() << "No Java versions found for your operating system:" << SysInfo::currentSystem() << SysInfo::useQTForArch();

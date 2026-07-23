@@ -18,11 +18,6 @@
 
 #include "ModrinthPackExportTask.h"
 
-#include <QCoreApplication>
-#include <QCryptographicHash>
-#include <QFileInfo>
-#include <QMessageBox>
-#include <QtConcurrentRun>
 #include "Json.h"
 #include "MMCZip.h"
 #include "archive/ExportToZipTask.h"
@@ -32,26 +27,24 @@
 #include "modplatform/ModIndex.h"
 #include "modplatform/helpers/HashUtils.h"
 #include "tasks/Task.h"
+#include <QCoreApplication>
+#include <QCryptographicHash>
+#include <QFileInfo>
+#include <QMessageBox>
+#include <QtConcurrentRun>
 
-const QStringList ModrinthPackExportTask::PREFIXES({ "mods/", "coremods/", "resourcepacks/", "texturepacks/", "shaderpacks/" });
-const QStringList ModrinthPackExportTask::FILE_EXTENSIONS({ "jar", "litemod", "zip" });
+const QStringList ModrinthPackExportTask::PREFIXES({"mods/", "coremods/", "resourcepacks/", "texturepacks/", "shaderpacks/"});
+const QStringList ModrinthPackExportTask::FILE_EXTENSIONS({"jar", "litemod", "zip"});
 
-ModrinthPackExportTask::ModrinthPackExportTask(const QString& name,
-                                               const QString& version,
-                                               const QString& summary,
-                                               bool optionalFiles,
-                                               BaseInstance* instance,
-                                               const QString& output,
+ModrinthPackExportTask::ModrinthPackExportTask(const QString&             name,
+                                               const QString&             version,
+                                               const QString&             summary,
+                                               bool                       optionalFiles,
+                                               BaseInstance*              instance,
+                                               const QString&             output,
                                                MMCZip::FilterFileFunction filter)
-    : name(name)
-    , version(version)
-    , summary(summary)
-    , optionalFiles(optionalFiles)
-    , instance(instance)
-    , mcInstance(dynamic_cast<MinecraftInstance*>(instance))
-    , gameRoot(instance->gameRoot())
-    , output(output)
-    , filter(filter)
+    : name(name), version(version), summary(summary), optionalFiles(optionalFiles), instance(instance),
+      mcInstance(dynamic_cast<MinecraftInstance*>(instance)), gameRoot(instance->gameRoot()), output(output), filter(filter)
 {}
 
 void ModrinthPackExportTask::executeTask()
@@ -131,7 +124,7 @@ void ModrinthPackExportTask::collectHashes()
 
                     auto sha1 = Hashing::hash(data, Hashing::Algorithm::Sha1);
 
-                    ResolvedFile resolvedFile{ sha1, sha512, url.toEncoded(), openFile.size(), mod->metadata()->side };
+                    ResolvedFile resolvedFile{sha1, sha512, url.toEncoded(), openFile.size(), mod->metadata()->side};
                     resolvedFiles[relative] = resolvedFile;
 
                     continue;
@@ -154,7 +147,7 @@ void ModrinthPackExportTask::makeApiRequest()
     else {
         setStatus(tr("Finding versions for hashes..."));
         auto [versionsTask, response] = api.currentVersions(pendingHashes.values(), "sha512");
-        task = versionsTask;
+        task                          = versionsTask;
         connect(task.get(), &Task::succeeded, [this, response]() { parseApiResponse(response); });
         connect(task.get(), &Task::failed, this, &ModrinthPackExportTask::emitFailed);
         connect(task.get(), &Task::aborted, this, &ModrinthPackExportTask::emitAborted);
@@ -178,12 +171,14 @@ void ModrinthPackExportTask::parseApiResponse(QByteArray* response)
                 continue;
 
             const QJsonArray files_array = obj["files"].toArray();
-            if (auto fileIter = std::find_if(files_array.begin(), files_array.end(),
+            if (auto fileIter = std::find_if(files_array.begin(),
+                                             files_array.end(),
                                              [&iterator](const QJsonValue& file) { return file["hashes"]["sha512"] == iterator.value(); });
                 fileIter != files_array.end()) {
-                resolvedFiles[iterator.key()] =
-                    ResolvedFile{ fileIter->toObject()["hashes"].toObject()["sha1"].toString(), iterator.value(),
-                                  fileIter->toObject()["url"].toString(), fileIter->toObject()["size"].toInt() };
+                resolvedFiles[iterator.key()] = ResolvedFile{fileIter->toObject()["hashes"].toObject()["sha1"].toString(),
+                                                             iterator.value(),
+                                                             fileIter->toObject()["url"].toString(),
+                                                             fileIter->toObject()["size"].toInt()};
             }
         }
     } catch (const Json::JsonException& e) {
@@ -234,9 +229,9 @@ QByteArray ModrinthPackExportTask::generateIndex()
 {
     QJsonObject out;
     out["formatVersion"] = 1;
-    out["game"] = "minecraft";
-    out["name"] = name;
-    out["versionId"] = version;
+    out["game"]          = "minecraft";
+    out["name"]          = name;
+    out["versionId"]     = version;
     if (!summary.isEmpty())
         out["summary"] = summary;
 
@@ -244,10 +239,10 @@ QByteArray ModrinthPackExportTask::generateIndex()
         auto profile = mcInstance->getPackProfile();
 
         const ComponentPtr minecraft = profile->getComponent("net.minecraft");
-        const ComponentPtr quilt = profile->getComponent("org.quiltmc.quilt-loader");
-        const ComponentPtr fabric = profile->getComponent("net.fabricmc.fabric-loader");
-        const ComponentPtr forge = profile->getComponent("net.minecraftforge");
-        const ComponentPtr neoForge = profile->getComponent("net.neoforged");
+        const ComponentPtr quilt     = profile->getComponent("org.quiltmc.quilt-loader");
+        const ComponentPtr fabric    = profile->getComponent("net.fabricmc.fabric-loader");
+        const ComponentPtr forge     = profile->getComponent("net.minecraftforge");
+        const ComponentPtr neoForge  = profile->getComponent("net.neoforged");
 
         QJsonObject dependencies;
         if (minecraft != nullptr)
@@ -268,14 +263,14 @@ QByteArray ModrinthPackExportTask::generateIndex()
     for (auto iterator = resolvedFiles.constBegin(); iterator != resolvedFiles.constEnd(); iterator++) {
         QJsonObject fileOut;
 
-        QString path = iterator.key();
+        QString             path  = iterator.key();
         const ResolvedFile& value = iterator.value();
 
         QJsonObject env;
 
         const QFileInfo pathInfo(path);
         if (optionalFiles && pathInfo.suffix() == "disabled") {
-            path = pathInfo.dir().filePath(pathInfo.completeBaseName());
+            path          = pathInfo.dir().filePath(pathInfo.completeBaseName());
             env["client"] = "optional";
             env["server"] = "optional";
         } else {
@@ -288,12 +283,12 @@ QByteArray ModrinthPackExportTask::generateIndex()
 
         fileOut["env"] = env;
 
-        fileOut["path"] = path;
-        fileOut["downloads"] = QJsonArray{ iterator->url };
+        fileOut["path"]      = path;
+        fileOut["downloads"] = QJsonArray{iterator->url};
 
         QJsonObject hashes;
-        hashes["sha1"] = value.sha1;
-        hashes["sha512"] = value.sha512;
+        hashes["sha1"]    = value.sha1;
+        hashes["sha512"]  = value.sha512;
         fileOut["hashes"] = hashes;
 
         fileOut["fileSize"] = value.size;

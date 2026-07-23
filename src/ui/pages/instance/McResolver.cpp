@@ -1,7 +1,7 @@
-#include <QtNetwork/qtcpsocket.h>
 #include <QDnsLookup>
 #include <QHostInfo>
 #include <QObject>
+#include <QtNetwork/qtcpsocket.h>
 
 #include "McResolver.h"
 
@@ -37,8 +37,8 @@ void McResolver::pingWithDomainSRV(QString domain, int port)
         }
 
         const auto& firstRecord = records.at(0);
-        QString newDomain = firstRecord.target();
-        int newPort = firstRecord.port();
+        QString     newDomain   = firstRecord.target();
+        int         newPort     = firstRecord.port();
         pingWithDomainA(newDomain, newPort);
     });
 

@@ -2,7 +2,8 @@
 
 #include <QStyledItemDelegate>
 
-enum UserDataTypes {
+enum UserDataTypes
+{
     TITLE = 257,
 
     DESCRIPTION = 258,
@@ -11,19 +12,20 @@ enum UserDataTypes {
 
 };
 
-class ProjectItemDelegate final : public QStyledItemDelegate {
+class ProjectItemDelegate final : public QStyledItemDelegate
+{
     Q_OBJECT
 
-   public:
+public:
     ProjectItemDelegate(QWidget* parent);
 
     void paint(QPainter*, const QStyleOptionViewItem&, const QModelIndex&) const override;
 
     bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index) override;
 
-   signals:
+signals:
     void checkboxClicked(const QModelIndex& index);
 
-   private:
+private:
     QStyleOptionViewItem makeCheckboxStyleOption(const QStyleOptionViewItem& opt, const QStyle* style) const;
 };

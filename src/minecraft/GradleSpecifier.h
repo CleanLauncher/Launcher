@@ -39,25 +39,25 @@
 #include <QString>
 #include <QStringList>
 
-struct GradleSpecifier {
+struct GradleSpecifier
+{
     GradleSpecifier() { m_valid = false; }
     GradleSpecifier(const QString& value)
     {
-        static const QRegularExpression s_matcher(
-            QRegularExpression::anchoredPattern("([^:@]+):([^:@]+):([^:@]+)"
-                                                "(?::([^:@]+))?"
-                                                "(?:@([^:@]+))?"));
-        QRegularExpressionMatch match = s_matcher.match(value);
-        m_valid = match.hasMatch();
+        static const QRegularExpression s_matcher(QRegularExpression::anchoredPattern("([^:@]+):([^:@]+):([^:@]+)"
+                                                                                      "(?::([^:@]+))?"
+                                                                                      "(?:@([^:@]+))?"));
+        QRegularExpressionMatch         match = s_matcher.match(value);
+        m_valid                               = match.hasMatch();
         if (!m_valid) {
             m_invalidValue = value;
             return;
         }
         auto elements = match.captured();
-        m_groupId = match.captured(1);
-        m_artifactId = match.captured(2);
-        m_version = match.captured(3);
-        m_classifier = match.captured(4);
+        m_groupId     = match.captured(1);
+        m_artifactId  = match.captured(2);
+        m_version     = match.captured(3);
+        m_classifier  = match.captured(4);
         if (match.lastCapturedIndex() >= 5) {
             m_extension = match.captured(5);
         }
@@ -104,26 +104,26 @@ struct GradleSpecifier {
         path += '/' + m_artifactId + '/' + m_version + '/' + filename;
         return path;
     }
-    inline bool valid() const { return m_valid; }
-    inline QString version() const { return m_version; }
-    inline QString groupId() const { return m_groupId; }
-    inline QString artifactId() const { return m_artifactId; }
-    inline void setClassifier(const QString& classifier) { m_classifier = classifier; }
-    inline QString classifier() const { return m_classifier; }
+    inline bool                   valid() const { return m_valid; }
+    inline QString                version() const { return m_version; }
+    inline QString                groupId() const { return m_groupId; }
+    inline QString                artifactId() const { return m_artifactId; }
+    inline void                   setClassifier(const QString& classifier) { m_classifier = classifier; }
+    inline QString                classifier() const { return m_classifier; }
     inline std::optional<QString> extension() const { return m_extension; }
-    inline QString artifactPrefix() const { return m_groupId + ":" + m_artifactId; }
-    bool matchName(const GradleSpecifier& other) const
+    inline QString                artifactPrefix() const { return m_groupId + ":" + m_artifactId; }
+    bool                          matchName(const GradleSpecifier& other) const
     {
         return other.artifactId() == artifactId() && other.groupId() == groupId() && other.classifier() == classifier();
     }
     bool operator==(const GradleSpecifier& other) const = default;
 
-   private:
-    QString m_invalidValue;
-    QString m_groupId;
-    QString m_artifactId;
-    QString m_version;
-    QString m_classifier;
+private:
+    QString                m_invalidValue;
+    QString                m_groupId;
+    QString                m_artifactId;
+    QString                m_version;
+    QString                m_classifier;
     std::optional<QString> m_extension;
-    bool m_valid = false;
+    bool                   m_valid = false;
 };

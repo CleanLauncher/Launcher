@@ -26,9 +26,10 @@
 struct RuntimeContext;
 class MinecraftInstance;
 
-class ElyPatchTask : public Task {
+class ElyPatchTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     ElyPatchTask(MinecraftInstance* inst, RuntimeContext& context, Net::Mode mode);
     virtual ~ElyPatchTask() = default;
 
@@ -36,19 +37,19 @@ class ElyPatchTask : public Task {
 
     bool canAbort() const override;
 
-   public slots:
+public slots:
     bool abort() override;
 
-   private:
+private:
     void resolveAuthlib(QString version);
     void resolveAuthlibInjector();
 
     void applyMetaVersion(Meta::Version::Ptr metaVersion);
     void applyAuthlib(Meta::Version::Ptr metaVersion);
 
-   private:
+private:
     MinecraftInstance* m_inst;
-    RuntimeContext& m_runtimeContext;
-    Net::Mode m_netMode;
-    Task::Ptr m_currentTask;
+    RuntimeContext&    m_runtimeContext;
+    Net::Mode          m_netMode;
+    Task::Ptr          m_currentTask;
 };

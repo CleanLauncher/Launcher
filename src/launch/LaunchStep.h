@@ -21,23 +21,24 @@
 #include <QStringList>
 
 class LaunchTask;
-class LaunchStep : public Task {
+class LaunchStep : public Task
+{
     Q_OBJECT
-   public:
+public:
     explicit LaunchStep(LaunchTask* parent);
     virtual ~LaunchStep() = default;
 
-   signals:
+signals:
     void logLines(QStringList lines, MessageLevel level);
     void logLine(QString line, MessageLevel level);
     void readyForLaunch();
     void progressReportingRequest();
 
-   public slots:
+public slots:
     virtual void proceed() {};
 
     virtual void finalize() {};
 
-   protected:
+protected:
     LaunchTask* m_parent;
 };

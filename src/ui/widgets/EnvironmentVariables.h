@@ -21,23 +21,25 @@
 #include <QMap>
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class EnvironmentVariables;
 }
 
-class EnvironmentVariables : public QWidget {
+class EnvironmentVariables : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     explicit EnvironmentVariables(QWidget* state = nullptr);
     ~EnvironmentVariables() override;
     void initialize(bool instance, bool override, const QMap<QString, QVariant>& value);
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    void retranslate();
-    bool override() const;
+    void                    retranslate();
+    bool                    override() const;
     QMap<QString, QVariant> value() const;
 
-   private:
+private:
     Ui::EnvironmentVariables* ui;
 };

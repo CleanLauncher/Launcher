@@ -34,20 +34,20 @@
  */
 
 #include "ui/themes/CatPack.h"
+#include "FileSystem.h"
+#include "Json.h"
 #include <QDate>
 #include <QDir>
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QImageReader>
 #include <QRandomGenerator>
-#include "FileSystem.h"
-#include "Json.h"
 
 QString BasicCatPack::path() const
 {
-    const auto now = QDate::currentDate();
-    const auto birthday = QDate(now.year(), 11, 1);
-    const auto xmas = QDate(now.year(), 12, 25);
+    const auto now       = QDate::currentDate();
+    const auto birthday  = QDate(now.year(), 11, 1);
+    const auto xmas      = QDate(now.year(), 12, 25);
     const auto halloween = QDate(now.year(), 10, 31);
 
     QString cat = QString(":/backgrounds/%1").arg(m_id);
@@ -73,22 +73,22 @@ JsonCatPack::PartialDate partialDate(QJsonObject date)
         day = 31;
     else if (day <= 0)
         day = 1;
-    return { month, day };
+    return {month, day};
 };
 
 JsonCatPack::JsonCatPack(QFileInfo& manifestInfo) : BasicCatPack(manifestInfo.dir().dirName())
 {
-    QString path = manifestInfo.path();
-    auto doc = Json::requireDocument(manifestInfo.absoluteFilePath(), "CatPack JSON file");
+    QString    path = manifestInfo.path();
+    auto       doc  = Json::requireDocument(manifestInfo.absoluteFilePath(), "CatPack JSON file");
     const auto root = doc.object();
-    m_name = Json::requireString(root, "name", "Catpack name");
-    m_default_path = FS::PathCombine(path, Json::requireString(root, "default", "Default Cat"));
-    auto variants = root["variants"].toArray();
+    m_name          = Json::requireString(root, "name", "Catpack name");
+    m_default_path  = FS::PathCombine(path, Json::requireString(root, "default", "Default Cat"));
+    auto variants   = root["variants"].toArray();
     for (auto v : variants) {
         auto variant = v.toObject();
-        m_variants << Variant{ FS::PathCombine(path, Json::requireString(variant, "path", "Variant path")),
-                               partialDate(Json::requireObject(variant, "startTime", "Variant startTime")),
-                               partialDate(Json::requireObject(variant, "endTime", "Variant endTime")) };
+        m_variants << Variant{FS::PathCombine(path, Json::requireString(variant, "path", "Variant path")),
+                              partialDate(Json::requireObject(variant, "startTime", "Variant startTime")),
+                              partialDate(Json::requireObject(variant, "endTime", "Variant endTime"))};
     }
 }
 
@@ -109,7 +109,7 @@ QString JsonCatPack::path(QDate now) const
 {
     for (auto var : m_variants) {
         QDate startDate = ensureDay(now.year(), var.startTime.month, var.startTime.day);
-        QDate endDate = ensureDay(now.year(), var.endTime.month, var.endTime.day);
+        QDate endDate   = ensureDay(now.year(), var.endTime.month, var.endTime.day);
         if (startDate > endDate) {
             if (endDate < now)
 
@@ -134,7 +134,7 @@ QString JsonCatPack::path(QDate now) const
     auto files = QDir(m_default_path).entryInfoList(supportedImageFormats, QDir::Files, QDir::Name);
     if (files.length() == 0)
         return "";
-    auto idx = (now.dayOfYear() - 1) % files.length();
+    auto idx      = (now.dayOfYear() - 1) % files.length();
     auto isRandom = dInfo.fileName().compare("random", Qt::CaseInsensitive) == 0;
     if (isRandom)
         idx = QRandomGenerator::global()->bounded(0, files.length());

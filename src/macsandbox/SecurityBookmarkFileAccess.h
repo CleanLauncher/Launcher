@@ -32,30 +32,30 @@ class QByteArray;
 class QUrl;
 
 class SecurityBookmarkFileAccess {
-    NSMutableDictionary* m_bookmarks;
+    NSMutableDictionary *m_bookmarks;
 
-    NSMutableDictionary* m_paths;
+    NSMutableDictionary *m_paths;
 
-    NSMutableSet* m_activeURLs;
+    NSMutableSet *m_activeURLs;
 
     bool m_readOnly;
 
-    NSURL* securityScopedBookmarkToNSURL(QByteArray& bookmark, bool& isStale);
+    NSURL *securityScopedBookmarkToNSURL(QByteArray &bookmark, bool &isStale);
 
-   public:
+  public:
     SecurityBookmarkFileAccess(bool readOnly = false);
     ~SecurityBookmarkFileAccess();
 
-    QByteArray urlToSecurityScopedBookmark(const QUrl& url);
+    QByteArray urlToSecurityScopedBookmark(const QUrl &url);
 
-    QByteArray pathToSecurityScopedBookmark(const QString& path);
+    QByteArray pathToSecurityScopedBookmark(const QString &path);
 
-    QUrl securityScopedBookmarkToURL(QByteArray& bookmark, bool& isStale);
+    QUrl securityScopedBookmarkToURL(QByteArray &bookmark, bool &isStale);
 
-    bool startUsingSecurityScopedBookmark(QByteArray& bookmark, bool& isStale);
-    void stopUsingSecurityScopedBookmark(QByteArray& bookmark);
+    bool startUsingSecurityScopedBookmark(QByteArray &bookmark, bool &isStale);
+    void stopUsingSecurityScopedBookmark(QByteArray &bookmark);
 
-    bool isAccessingPath(const QString& path);
+    bool isAccessingPath(const QString &path);
 };
 
 #endif

@@ -43,28 +43,31 @@
 #include "ui/pages/modplatform/ModpackProviderBasePage.h"
 #include "ui/widgets/ProgressWidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class TechnicPage;
 }
 
 class NewInstanceDialog;
 
-namespace Technic {
+namespace Technic
+{
 class ListModel;
 }
 
-class TechnicPage : public QWidget, public ModpackProviderBasePage {
+class TechnicPage : public QWidget, public ModpackProviderBasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit TechnicPage(NewInstanceDialog* dialog, QWidget* parent = 0);
     virtual ~TechnicPage();
     virtual QString displayName() const override { return "Technic"; }
-    virtual QIcon icon() const override { return QIcon::fromTheme("technic"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("technic"); }
     virtual QString id() const override { return "technic"; }
     virtual QString helpPage() const override { return "Technic-platform"; }
-    virtual bool shouldDisplay() const override;
-    void retranslate() override;
+    virtual bool    shouldDisplay() const override;
+    void            retranslate() override;
 
     void openedImpl() override;
 
@@ -74,24 +77,24 @@ class TechnicPage : public QWidget, public ModpackProviderBasePage {
 
     virtual QString getSerachTerm() const override;
 
-   private:
+private:
     void suggestCurrent();
     void metadataLoaded();
     void selectVersion();
 
-   private slots:
+private slots:
     void triggerSearch();
     void onSelectionChanged(QModelIndex first, QModelIndex second);
     void onSolderLoaded(QByteArray* responsePtr);
     void onVersionSelectionChanged(QString data);
 
-   private:
-    Ui::TechnicPage* ui = nullptr;
-    NewInstanceDialog* dialog = nullptr;
-    Technic::ListModel* model = nullptr;
+private:
+    Ui::TechnicPage*    ui     = nullptr;
+    NewInstanceDialog*  dialog = nullptr;
+    Technic::ListModel* model  = nullptr;
 
     Technic::Modpack current;
-    QString selectedVersion;
+    QString          selectedVersion;
 
     NetJob::Ptr jobPtr;
 

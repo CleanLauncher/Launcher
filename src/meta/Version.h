@@ -29,12 +29,14 @@
 
 #include "JsonFormat.h"
 
-namespace Meta {
+namespace Meta
+{
 
-class Version : public QObject, public BaseVersion, public BaseEntity {
+class Version : public QObject, public BaseVersion, public BaseEntity
+{
     Q_OBJECT
 
-   public:
+public:
     using Ptr = std::shared_ptr<Version>;
 
     explicit Version(const QString& uid, const QString& version);
@@ -44,15 +46,15 @@ class Version : public QObject, public BaseVersion, public BaseEntity {
     QString name() const override;
     QString typeString() const override;
 
-    QString uid() const { return m_uid; }
-    QString version() const { return m_version; }
-    QString type() const { return m_type; }
-    QDateTime time() const;
-    qint64 rawTime() const { return m_time; }
+    QString                 uid() const { return m_uid; }
+    QString                 version() const { return m_version; }
+    QString                 type() const { return m_type; }
+    QDateTime               time() const;
+    qint64                  rawTime() const { return m_time; }
     const Meta::RequireSet& requiredSet() const { return m_requires; }
-    VersionFilePtr data() const { return m_data; }
-    bool isRecommended() const { return m_recommended; }
-    bool isLoaded() const { return m_data != nullptr && BaseEntity::isLoaded(); }
+    VersionFilePtr          data() const { return m_data; }
+    bool                    isRecommended() const { return m_recommended; }
+    bool                    isLoaded() const { return m_data != nullptr && BaseEntity::isLoaded(); }
 
     void merge(const Version::Ptr& other);
     void mergeFromList(const Version::Ptr& other);
@@ -62,7 +64,7 @@ class Version : public QObject, public BaseVersion, public BaseEntity {
 
     ::Version toComparableVersion() const;
 
-   public:
+public:
     void setType(const QString& type);
     void setTime(qint64 time);
     void setRequires(const Meta::RequireSet& reqs, const Meta::RequireSet& conflicts);
@@ -71,23 +73,23 @@ class Version : public QObject, public BaseVersion, public BaseEntity {
     void setProvidesRecommendations();
     void setData(const VersionFilePtr& data);
 
-   signals:
+signals:
     void typeChanged();
     void timeChanged();
     void requiresChanged();
 
-   private:
-    bool m_providesRecommendations = false;
-    bool m_recommended = false;
-    QString m_name;
-    QString m_uid;
-    QString m_version;
-    QString m_type;
-    qint64 m_time = 0;
+private:
+    bool             m_providesRecommendations = false;
+    bool             m_recommended             = false;
+    QString          m_name;
+    QString          m_uid;
+    QString          m_version;
+    QString          m_type;
+    qint64           m_time = 0;
     Meta::RequireSet m_requires;
     Meta::RequireSet m_conflicts;
-    bool m_volatile = false;
-    VersionFilePtr m_data;
+    bool             m_volatile = false;
+    VersionFilePtr   m_data;
 };
 }  // namespace Meta
 

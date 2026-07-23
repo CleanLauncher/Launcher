@@ -50,7 +50,7 @@ FtbPage::FtbPage(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), 
     m_ui->setupUi(this);
 
     m_filterModel = new Ftb::FilterModel(this);
-    m_listModel = new Ftb::ListModel(this);
+    m_listModel   = new Ftb::ListModel(this);
     m_filterModel->setSourceModel(m_listModel);
     m_ui->packView->setModel(m_filterModel);
     m_ui->packView->setSortingEnabled(true);
@@ -135,8 +135,9 @@ void FtbPage::suggestCurrent()
     for (auto art : m_selected.art) {
         if (art.type == "square") {
             auto editedLogoName = "ftb_" + m_selected.safeName;
-            m_listModel->getLogo(m_selected.safeName, art.url,
-                                 [this, editedLogoName](QString logo) { m_dialog->setSuggestedIconFromFile(logo, editedLogoName); });
+            m_listModel->getLogo(m_selected.safeName, art.url, [this, editedLogoName](QString logo) {
+                m_dialog->setSuggestedIconFromFile(logo, editedLogoName);
+            });
         }
     }
 }

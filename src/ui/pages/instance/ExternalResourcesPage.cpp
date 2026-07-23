@@ -145,7 +145,7 @@ void ExternalResourcesPage::openedImpl()
     m_model->startWatching();
 
     const auto setting_name = QString("WideBarVisibility_%1").arg(id());
-    m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+    m_wide_bar_setting      = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->actionsToolbar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 }
@@ -182,14 +182,14 @@ bool ExternalResourcesPage::shouldDisplay() const
 bool ExternalResourcesPage::listFilter(QKeyEvent* keyEvent)
 {
     switch (keyEvent->key()) {
-        case Qt::Key_Delete:
-            removeItem();
-            return true;
-        case Qt::Key_Plus:
-            addItem();
-            return true;
-        default:
-            break;
+    case Qt::Key_Delete:
+        removeItem();
+        return true;
+    case Qt::Key_Plus:
+        addItem();
+        return true;
+    default:
+        break;
     }
     return QWidget::eventFilter(ui->treeView, keyEvent);
 }
@@ -209,8 +209,11 @@ bool ExternalResourcesPage::eventFilter(QObject* obj, QEvent* ev)
 void ExternalResourcesPage::addItem()
 {
     auto list = GuiUtil::BrowseForFiles(
-        helpPage(), tr("Select %1", "Select whatever type of files the page contains. Example: 'Loader Mods'").arg(displayName()),
-        m_fileSelectionFilter.arg(displayName()), APPLICATION->settings()->get("CentralModsDir").toString(), this->parentWidget());
+        helpPage(),
+        tr("Select %1", "Select whatever type of files the page contains. Example: 'Loader Mods'").arg(displayName()),
+        m_fileSelectionFilter.arg(displayName()),
+        APPLICATION->settings()->get("CentralModsDir").toString(),
+        this->parentWidget());
 
     if (!list.isEmpty()) {
         for (auto filename : list) {
@@ -223,7 +226,7 @@ void ExternalResourcesPage::removeItem()
 {
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection());
 
-    int count = 0;
+    int  count  = 0;
     bool folder = false;
     for (auto& i : selection.indexes()) {
         if (i.column() == 0) {
@@ -235,7 +238,7 @@ void ExternalResourcesPage::removeItem()
     }
 
     QString text;
-    bool multiple = count > 1;
+    bool    multiple = count > 1;
 
     if (multiple) {
         text = tr("You are about to remove %1 items.\n"
@@ -250,8 +253,8 @@ void ExternalResourcesPage::removeItem()
     }
 
     if (!text.isEmpty()) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"), text, QMessageBox::Warning,
-                                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+        auto response = CustomMessageBox::selectable(
+                            this, tr("Confirm Removal"), text, QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes)
@@ -264,10 +267,13 @@ void ExternalResourcesPage::removeItem()
 void ExternalResourcesPage::removeItems(const QItemSelection& selection)
 {
     if (m_instance != nullptr && m_instance->isRunning()) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Delete"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Delete"),
                                                      tr("If you remove this resource while the game is running it may crash your game.\n"
                                                         "Are you sure you want to do this?"),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes)
@@ -310,8 +316,8 @@ void ExternalResourcesPage::viewFolder()
 
 void ExternalResourcesPage::updateActions()
 {
-    const bool hasSelection = ui->treeView->selectionModel()->hasSelection();
-    const QModelIndexList selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    const bool             hasSelection      = ui->treeView->selectionModel()->hasSelection();
+    const QModelIndexList  selection         = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     const QList<Resource*> selectedResources = m_model->selectedResources(selection);
 
     ui->actionUpdateItem->setEnabled(!m_model->empty());
@@ -323,16 +329,17 @@ void ExternalResourcesPage::updateActions()
     ui->actionEnableItem->setEnabled(hasSelection);
     ui->actionDisableItem->setEnabled(hasSelection);
 
-    ui->actionViewHomepage->setEnabled(hasSelection && std::any_of(selectedResources.begin(), selectedResources.end(),
+    ui->actionViewHomepage->setEnabled(hasSelection && std::any_of(selectedResources.begin(),
+                                                                   selectedResources.end(),
                                                                    [](Resource* resource) { return !resource->homepage().isEmpty(); }));
     ui->actionExportMetadata->setEnabled(!m_model->empty());
 }
 
 void ExternalResourcesPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
-    int row = sourceCurrent.row();
-    const Resource& resource = m_model->at(row);
+    auto            sourceCurrent = m_filterModel->mapToSource(current);
+    int             row           = sourceCurrent.row();
+    const Resource& resource      = m_model->at(row);
     ui->frame->updateWithResource(resource);
 }
 

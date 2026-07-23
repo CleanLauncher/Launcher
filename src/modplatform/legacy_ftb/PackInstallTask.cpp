@@ -50,11 +50,12 @@
 
 #include "net/ApiDownload.h"
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
 PackInstallTask::PackInstallTask(QNetworkAccessManager* network, const Modpack& pack, QString version)
 {
-    m_pack = pack;
+    m_pack    = pack;
     m_version = version;
     m_network = network;
 }
@@ -70,7 +71,7 @@ void PackInstallTask::downloadPack()
     setProgress(1, 4);
     setAbortable(false);
 
-    auto path = QString("%1/%2/%3").arg(m_pack.dir, m_version.replace(".", "_"), m_pack.file);
+    auto path  = QString("%1/%2/%3").arg(m_pack.dir, m_version.replace(".", "_"), m_pack.file);
     auto entry = APPLICATION->metacache()->resolveEntry("FTBPacks", path);
     entry->setStale(true);
     archivePath = entry->getFullPath();
@@ -102,7 +103,9 @@ void PackInstallTask::unzip()
 
     QDir extractDir(m_stagingPath);
 
-    m_extractFuture = QtConcurrent::run(QThreadPool::globalInstance(), QOverload<QString, QString>::of(MMCZip::extractDir), archivePath,
+    m_extractFuture = QtConcurrent::run(QThreadPool::globalInstance(),
+                                        QOverload<QString, QString>::of(MMCZip::extractDir),
+                                        archivePath,
                                         extractDir.absolutePath() + "/unzip");
     connect(&m_extractFutureWatcher, &QFutureWatcher<QStringList>::finished, this, &PackInstallTask::onUnzipFinished);
     connect(&m_extractFutureWatcher, &QFutureWatcher<QStringList>::canceled, this, &PackInstallTask::onUnzipCanceled);
@@ -131,7 +134,7 @@ void PackInstallTask::install()
         }
     }
 
-    QString instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
+    QString           instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
     MinecraftInstance instance(m_globalSettings, std::make_unique<INISettingsObject>(instanceConfigPath), m_stagingPath);
     {
         SettingsObject::Lock lock(instance.settings());
@@ -143,7 +146,7 @@ void PackInstallTask::install()
         bool fallback = true;
 
         QFile packJson(m_stagingPath + "/minecraft/pack.json");
-        QDir jarmodDir = QDir(m_stagingPath + "/unzip/instMods");
+        QDir  jarmodDir = QDir(m_stagingPath + "/unzip/instMods");
         if (packJson.exists()) {
             if (packJson.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 QJsonDocument doc = QJsonDocument::fromJson(packJson.readAll());

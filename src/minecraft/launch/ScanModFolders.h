@@ -18,24 +18,25 @@
 #include <launch/LaunchStep.h>
 #include <memory>
 
-class ScanModFolders : public LaunchStep {
+class ScanModFolders : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit ScanModFolders(LaunchTask* parent) : LaunchStep(parent) {};
     virtual ~ScanModFolders() {};
 
     virtual void executeTask() override;
     virtual bool canAbort() const override { return false; }
-   private slots:
+private slots:
     void coreModsDone();
     void modsDone();
     void nilModsDone();
 
-   private:
+private:
     void checkDone();
 
-   private:
-    bool m_modsDone = false;
-    bool m_nilModsDone = false;
+private:
+    bool m_modsDone     = false;
+    bool m_nilModsDone  = false;
     bool m_coreModsDone = false;
 };

@@ -3,15 +3,30 @@
 #include "settings/SettingsObject.h"
 #include "tasks/Task.h"
 
-enum class InstanceNameChange { ShouldChange, ShouldKeep };
+enum class InstanceNameChange
+{
+    ShouldChange,
+    ShouldKeep
+};
 [[nodiscard]] InstanceNameChange askForChangingInstanceName(QWidget* parent, const QString& old_name, const QString& new_name);
-enum class ShouldUpdate { Update, SkipUpdating, Cancel };
+enum class ShouldUpdate
+{
+    Update,
+    SkipUpdating,
+    Cancel
+};
 [[nodiscard]] ShouldUpdate askIfShouldUpdate(QWidget* parent, QString original_version_name);
-enum class ShouldDeleteSaves { NotAsked, Yes, No };
+enum class ShouldDeleteSaves
+{
+    NotAsked,
+    Yes,
+    No
+};
 [[nodiscard]] ShouldDeleteSaves askIfShouldDeleteSaves(QWidget* parent);
 
-struct InstanceName {
-   public:
+struct InstanceName
+{
+public:
     InstanceName() = default;
     InstanceName(QString name, QString version) : m_original_name(std::move(name)), m_original_version(std::move(version)) {}
 
@@ -23,16 +38,17 @@ struct InstanceName {
     void setName(QString name) { m_modified_name = name; }
     void setName(InstanceName& other);
 
-   protected:
+protected:
     QString m_original_name;
     QString m_original_version;
 
     QString m_modified_name;
 };
 
-class InstanceTask : public Task, public InstanceName {
+class InstanceTask : public Task, public InstanceName
+{
     Q_OBJECT
-   public:
+public:
     InstanceTask();
     ~InstanceTask() override = default;
 
@@ -42,7 +58,7 @@ class InstanceTask : public Task, public InstanceName {
 
     void setIcon(const QString& icon) { m_instIcon = icon; }
 
-    void setGroup(const QString& group) { m_instGroup = group; }
+    void    setGroup(const QString& group) { m_instGroup = group; }
     QString group() const { return m_instGroup; }
 
     bool shouldConfirmUpdate() const { return m_confirm_update; }
@@ -52,7 +68,7 @@ class InstanceTask : public Task, public InstanceName {
 
     QString originalInstanceID() const { return m_original_instance_id; };
 
-   protected:
+protected:
     void setOverride(bool override, QString instance_id_to_override = {})
     {
         m_override_existing = override;
@@ -60,14 +76,14 @@ class InstanceTask : public Task, public InstanceName {
             m_original_instance_id = instance_id_to_override;
     }
 
-   protected:
+protected:
     SettingsObject* m_globalSettings;
-    QString m_instIcon;
-    QString m_instGroup;
-    QString m_stagingPath;
+    QString         m_instIcon;
+    QString         m_instGroup;
+    QString         m_stagingPath;
 
     bool m_override_existing = false;
-    bool m_confirm_update = true;
+    bool m_confirm_update    = true;
 
     QString m_original_instance_id;
 };

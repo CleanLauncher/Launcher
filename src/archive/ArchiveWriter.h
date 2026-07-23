@@ -17,15 +17,17 @@
  */
 #pragma once
 
+#include "archive/ArchiveReader.h"
 #include <QByteArray>
 #include <QFileDevice>
-#include "archive/ArchiveReader.h"
 
 struct archive;
-namespace MMCZip {
+namespace MMCZip
+{
 
-class ArchiveWriter {
-   public:
+class ArchiveWriter
+{
+public:
     ArchiveWriter(const QString& archiveName);
     virtual ~ArchiveWriter();
 
@@ -38,9 +40,9 @@ class ArchiveWriter {
 
     static std::unique_ptr<archive, void (*)(archive*)> createDiskWriter();
 
-   private:
+private:
     struct archive* m_archive = nullptr;
-    QString m_filename;
-    QString m_format = "zip";
+    QString         m_filename;
+    QString         m_format = "zip";
 };
 }  // namespace MMCZip

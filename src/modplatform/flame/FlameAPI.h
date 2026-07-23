@@ -4,24 +4,25 @@
 
 #pragma once
 
-#include <QList>
-#include <cstdint>
 #include "BuildConfig.h"
 #include "Json.h"
 #include "Version.h"
 #include "modplatform/ModIndex.h"
 #include "modplatform/ResourceAPI.h"
 #include "modplatform/flame/FlameModIndex.h"
+#include <QList>
+#include <cstdint>
 
-class FlameAPI : public ResourceAPI {
-   public:
+class FlameAPI : public ResourceAPI
+{
+public:
     QString getModFileChangelog(int modId, int fileId);
     QString getModDescription(int modId);
 
     std::optional<ModPlatform::IndexedVersion> getLatestVersion(QList<ModPlatform::IndexedVersion> versions,
-                                                                QList<ModPlatform::ModLoaderType> instanceLoaders,
-                                                                ModPlatform::ModLoaderTypes fallback,
-                                                                bool checkLoaders);
+                                                                QList<ModPlatform::ModLoaderType>  instanceLoaders,
+                                                                ModPlatform::ModLoaderTypes        fallback,
+                                                                bool                               checkLoaders);
 
     std::pair<Task::Ptr, QByteArray*> getProjects(QStringList addonIds) const override;
     std::pair<Task::Ptr, QByteArray*> matchFingerprints(const QList<uint>& fingerprints);
@@ -30,7 +31,7 @@ class FlameAPI : public ResourceAPI {
 
     static std::pair<Task::Ptr, QByteArray*> getCategories(ModPlatform::ResourceType type);
     static std::pair<Task::Ptr, QByteArray*> getModCategories();
-    static QList<ModPlatform::Category> loadModCategories(const QByteArray& response);
+    static QList<ModPlatform::Category>      loadModCategories(const QByteArray& response);
 
     QList<ResourceAPI::SortingMethod> getSortingMethods() const override;
 
@@ -39,47 +40,47 @@ class FlameAPI : public ResourceAPI {
         return loaders & (ModPlatform::NeoForge | ModPlatform::Forge | ModPlatform::Fabric | ModPlatform::Quilt);
     }
 
-   private:
+private:
     static int getClassId(ModPlatform::ResourceType type)
     {
         switch (type) {
-            default:
-            case ModPlatform::ResourceType::Mod:
-                return 6;
-            case ModPlatform::ResourceType::ResourcePack:
-                return 12;
-            case ModPlatform::ResourceType::ShaderPack:
-                return 6552;
-            case ModPlatform::ResourceType::Modpack:
-                return 4471;
-            case ModPlatform::ResourceType::DataPack:
-                return 6945;
+        default:
+        case ModPlatform::ResourceType::Mod:
+            return 6;
+        case ModPlatform::ResourceType::ResourcePack:
+            return 12;
+        case ModPlatform::ResourceType::ShaderPack:
+            return 6552;
+        case ModPlatform::ResourceType::Modpack:
+            return 4471;
+        case ModPlatform::ResourceType::DataPack:
+            return 6945;
         }
     }
 
     static int getMappedModLoader(ModPlatform::ModLoaderType loaders)
     {
         switch (loaders) {
-            case ModPlatform::Forge:
-                return 1;
-            case ModPlatform::Cauldron:
-                return 2;
-            case ModPlatform::LiteLoader:
-                return 3;
-            case ModPlatform::Fabric:
-                return 4;
-            case ModPlatform::Quilt:
-                return 5;
-            case ModPlatform::NeoForge:
-                return 6;
-            case ModPlatform::DataPack:
-            case ModPlatform::Babric:
-            case ModPlatform::BTA:
-            case ModPlatform::LegacyFabric:
-            case ModPlatform::Ornithe:
-            case ModPlatform::Rift:
-            case ModPlatform::None:
-                break;
+        case ModPlatform::Forge:
+            return 1;
+        case ModPlatform::Cauldron:
+            return 2;
+        case ModPlatform::LiteLoader:
+            return 3;
+        case ModPlatform::Fabric:
+            return 4;
+        case ModPlatform::Quilt:
+            return 5;
+        case ModPlatform::NeoForge:
+            return 6;
+        case ModPlatform::DataPack:
+        case ModPlatform::Babric:
+        case ModPlatform::BTA:
+        case ModPlatform::LegacyFabric:
+        case ModPlatform::Ornithe:
+        case ModPlatform::Rift:
+        case ModPlatform::None:
+            break;
         }
         return 0;
     }
@@ -87,7 +88,7 @@ class FlameAPI : public ResourceAPI {
     static const QStringList getModLoaderStrings(const ModPlatform::ModLoaderTypes types)
     {
         QStringList l;
-        for (auto loader : { ModPlatform::NeoForge, ModPlatform::Forge, ModPlatform::Fabric, ModPlatform::Quilt }) {
+        for (auto loader : {ModPlatform::NeoForge, ModPlatform::Forge, ModPlatform::Fabric, ModPlatform::Quilt}) {
             if (types & loader) {
                 l << QString::number(getMappedModLoader(loader));
             }
@@ -97,7 +98,7 @@ class FlameAPI : public ResourceAPI {
 
     static const QString getModLoaderFilters(ModPlatform::ModLoaderTypes types) { return "[" + getModLoaderStrings(types).join(',') + "]"; }
 
-   public:
+public:
     std::optional<QString> getSearchURL(const SearchArgs& args) const override
     {
         QStringList get_arguments;
@@ -126,8 +127,8 @@ class FlameAPI : public ResourceAPI {
 
     std::optional<QString> getVersionsURL(const VersionSearchArgs& args) const override
     {
-        auto addonId = args.pack->addonId.toString();
-        QString url = QString(BuildConfig.FLAME_BASE_URL + "/mods/%1/files?pageSize=10000").arg(addonId);
+        auto    addonId = args.pack->addonId.toString();
+        QString url     = QString(BuildConfig.FLAME_BASE_URL + "/mods/%1/files?pageSize=10000").arg(addonId);
 
         if (args.mcVersions.has_value())
             url += QString("&gameVersion=%1").arg(args.mcVersions.value().front().toString());
@@ -141,7 +142,7 @@ class FlameAPI : public ResourceAPI {
     }
 
     QJsonArray documentToArray(QJsonDocument& obj) const override { return obj.object()["data"].toArray(); }
-    void loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { FlameMod::loadIndexedPack(m, obj); }
+    void       loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { FlameMod::loadIndexedPack(m, obj); }
     ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType resourceType) const override
     {
         auto arr = FlameMod::loadIndexedPackVersion(obj);
@@ -151,15 +152,16 @@ class FlameAPI : public ResourceAPI {
 
         const auto& mc_versions = arr.mcVersion;
 
-        if (std::any_of(mc_versions.constBegin(), mc_versions.constEnd(),
-                        [](const auto& mc_version) { return Version(mc_version) <= Version("1.6"); })) {
+        if (std::any_of(mc_versions.constBegin(), mc_versions.constEnd(), [](const auto& mc_version) {
+                return Version(mc_version) <= Version("1.6");
+            })) {
             return arr;
         }
         return {};
     };
     void loadExtraPackInfo(ModPlatform::IndexedPack& m, [[maybe_unused]] QJsonObject&) const override { FlameMod::loadBody(m); }
 
-   private:
+private:
     std::optional<QString> getInfoURL(const QString& id) const override { return QString(BuildConfig.FLAME_BASE_URL + "/mods/%1").arg(id); }
     std::optional<QString> getDependencyURL(const DependencySearchArgs& args) const override
     {

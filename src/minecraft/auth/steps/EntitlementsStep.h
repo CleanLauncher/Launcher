@@ -5,10 +5,11 @@
 #include "net/Download.h"
 #include "net/NetJob.h"
 
-class EntitlementsStep : public AuthStep {
+class EntitlementsStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit EntitlementsStep(AccountData* data);
     virtual ~EntitlementsStep() noexcept = default;
 
@@ -16,11 +17,11 @@ class EntitlementsStep : public AuthStep {
 
     QString describe() override;
 
-   private slots:
+private slots:
     void onRequestDone(QByteArray* response);
 
-   private:
-    QString m_entitlements_request_id;
+private:
+    QString            m_entitlements_request_id;
     Net::Download::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr        m_task;
 };

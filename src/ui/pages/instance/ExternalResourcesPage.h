@@ -10,45 +10,47 @@
 
 class ResourceFolderModel;
 
-namespace Ui {
+namespace Ui
+{
 class ExternalResourcesPage;
 }
 
-class ExternalResourcesPage : public QMainWindow, public BasePage {
+class ExternalResourcesPage : public QMainWindow, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ExternalResourcesPage(BaseInstance* instance, ResourceFolderModel* model, QWidget* parent = nullptr);
     virtual ~ExternalResourcesPage();
 
     virtual QString displayName() const override = 0;
-    virtual QIcon icon() const override = 0;
-    virtual QString id() const override = 0;
-    virtual QString helpPage() const override = 0;
+    virtual QIcon   icon() const override        = 0;
+    virtual QString id() const override          = 0;
+    virtual QString helpPage() const override    = 0;
 
     virtual bool shouldDisplay() const override = 0;
-    QString extraHeaderInfoString();
+    QString      extraHeaderInfoString();
 
     void openedImpl() override;
     void closedImpl() override;
 
     void retranslate() override;
 
-   protected:
-    bool eventFilter(QObject* obj, QEvent* ev) override;
-    bool listFilter(QKeyEvent* ev);
+protected:
+    bool   eventFilter(QObject* obj, QEvent* ev) override;
+    bool   listFilter(QKeyEvent* ev);
     QMenu* createPopupMenu() override;
 
-   public slots:
+public slots:
     virtual void updateActions();
     virtual void updateFrame(const QModelIndex& current, const QModelIndex& previous);
 
-   protected slots:
+protected slots:
     void itemActivated(const QModelIndex& index);
     void filterTextChanged(const QString& newContents);
 
     virtual void addItem();
-    void removeItem();
+    void         removeItem();
     virtual void removeItems(const QItemSelection& selection);
 
     virtual void enableItem();
@@ -62,12 +64,12 @@ class ExternalResourcesPage : public QMainWindow, public BasePage {
     void ShowContextMenu(const QPoint& pos);
     void ShowHeaderContextMenu(const QPoint& pos);
 
-   protected:
+protected:
     BaseInstance* m_instance = nullptr;
 
     Ui::ExternalResourcesPage* ui = nullptr;
-    ResourceFolderModel* m_model;
-    QSortFilterProxyModel* m_filterModel = nullptr;
+    ResourceFolderModel*       m_model;
+    QSortFilterProxyModel*     m_filterModel = nullptr;
 
     QString m_fileSelectionFilter;
     QString m_viewFilter;

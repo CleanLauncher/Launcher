@@ -16,17 +16,17 @@ LegacyFMLLibrariesTask::LegacyFMLLibrariesTask(MinecraftInstance* inst)
 }
 void LegacyFMLLibrariesTask::executeTask()
 {
-    MinecraftInstance* inst = (MinecraftInstance*)m_inst;
-    auto components = inst->getPackProfile();
-    auto profile = components->getProfile();
+    MinecraftInstance* inst       = (MinecraftInstance*)m_inst;
+    auto               components = inst->getPackProfile();
+    auto               profile    = components->getProfile();
 
     if (!profile->hasTrait("legacyFML")) {
         emitSucceeded();
         return;
     }
 
-    QString version = components->getComponentVersion("net.minecraft");
-    auto& fmlLibsMapping = g_VersionFilterData.fmlLibsMapping;
+    QString version        = components->getComponentVersion("net.minecraft");
+    auto&   fmlLibsMapping = g_VersionFilterData.fmlLibsMapping;
     if (!fmlLibsMapping.contains(version)) {
         emitSucceeded();
         return;
@@ -53,12 +53,12 @@ void LegacyFMLLibrariesTask::executeTask()
     }
 
     setStatus(tr("Downloading FML libraries..."));
-    NetJob::Ptr dljob{ new NetJob("FML libraries", APPLICATION->network()) };
-    auto metacache = APPLICATION->metacache();
-    Net::Download::Options options = Net::Download::Option::MakeEternal;
-    const QString base = baseUrl();
+    NetJob::Ptr            dljob{new NetJob("FML libraries", APPLICATION->network())};
+    auto                   metacache = APPLICATION->metacache();
+    Net::Download::Options options   = Net::Download::Option::MakeEternal;
+    const QString          base      = baseUrl();
     for (auto& lib : fmlLibsToProcess) {
-        auto entry = metacache->resolveEntry("fmllibs", lib.filename);
+        auto    entry     = metacache->resolveEntry("fmllibs", lib.filename);
         QString urlString = base + lib.filename;
         dljob->addNetAction(Net::ApiDownload::makeCached(QUrl(urlString), entry, options));
     }
@@ -82,13 +82,13 @@ void LegacyFMLLibrariesTask::fmllibsFinished()
     downloadJob.reset();
     if (!fmlLibsToProcess.isEmpty()) {
         setStatus(tr("Copying FML libraries into the instance..."));
-        MinecraftInstance* inst = (MinecraftInstance*)m_inst;
-        auto metacache = APPLICATION->metacache();
-        int index = 0;
+        MinecraftInstance* inst      = (MinecraftInstance*)m_inst;
+        auto               metacache = APPLICATION->metacache();
+        int                index     = 0;
         for (auto& lib : fmlLibsToProcess) {
             progress(index, fmlLibsToProcess.size());
             auto entry = metacache->resolveEntry("fmllibs", lib.filename);
-            auto path = FS::PathCombine(inst->libDir(), lib.filename);
+            auto path  = FS::PathCombine(inst->libDir(), lib.filename);
             if (!FS::ensureFilePathExists(path)) {
                 emitFailed(tr("Failed creating FML library folder inside the instance."));
                 return;
@@ -105,8 +105,8 @@ void LegacyFMLLibrariesTask::fmllibsFinished()
 }
 void LegacyFMLLibrariesTask::fmllibsFailed(QString reason)
 {
-    QStringList failed = downloadJob->getFailedFiles();
-    QString failed_all = failed.join("\n");
+    QStringList failed     = downloadJob->getFailedFiles();
+    QString     failed_all = failed.join("\n");
     emitFailed(tr("Failed to download the following files:\n%1\n\nReason:%2\nPlease try again.").arg(failed_all, reason));
 }
 

@@ -36,13 +36,14 @@
 
 #include "ConcurrentTask.h"
 
-class MultipleOptionsTask : public ConcurrentTask {
+class MultipleOptionsTask : public ConcurrentTask
+{
     Q_OBJECT
-   public:
+public:
     explicit MultipleOptionsTask(const QString& task_name = "");
     ~MultipleOptionsTask() override = default;
 
-   private slots:
+private slots:
     void executeNextSubTask() override;
     void updateState() override;
 };

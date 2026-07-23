@@ -93,10 +93,10 @@ Qt::DropActions InstanceList::supportedDropActions() const
     return Qt::MoveAction;
 }
 
-bool InstanceList::canDropMimeData(const QMimeData* data,
-                                   [[maybe_unused]] Qt::DropAction action,
-                                   [[maybe_unused]] int row,
-                                   [[maybe_unused]] int column,
+bool InstanceList::canDropMimeData(const QMimeData*                    data,
+                                   [[maybe_unused]] Qt::DropAction     action,
+                                   [[maybe_unused]] int                row,
+                                   [[maybe_unused]] int                column,
                                    [[maybe_unused]] const QModelIndex& parent) const
 {
     if (data && data->hasFormat("application/x-instanceid")) {
@@ -105,10 +105,10 @@ bool InstanceList::canDropMimeData(const QMimeData* data,
     return false;
 }
 
-bool InstanceList::dropMimeData(const QMimeData* data,
-                                [[maybe_unused]] Qt::DropAction action,
-                                [[maybe_unused]] int row,
-                                [[maybe_unused]] int column,
+bool InstanceList::dropMimeData(const QMimeData*                    data,
+                                [[maybe_unused]] Qt::DropAction     action,
+                                [[maybe_unused]] int                row,
+                                [[maybe_unused]] int                column,
                                 [[maybe_unused]] const QModelIndex& parent)
 {
     if (data && data->hasFormat("application/x-instanceid")) {
@@ -165,32 +165,32 @@ QVariant InstanceList::data(const QModelIndex& index, int role) const
     }
     BaseInstance* pdata = static_cast<BaseInstance*>(index.internalPointer());
     switch (role) {
-        case InstancePointerRole: {
-            QVariant v = QVariant::fromValue((void*)pdata);
-            return v;
-        }
-        case InstanceIDRole: {
-            return pdata->id();
-        }
-        case Qt::EditRole:
-        case Qt::DisplayRole: {
-            return pdata->name();
-        }
-        case Qt::AccessibleTextRole: {
-            return tr("%1 Instance").arg(pdata->name());
-        }
-        case Qt::ToolTipRole: {
-            return pdata->instanceRoot();
-        }
-        case Qt::DecorationRole: {
-            return pdata->iconKey();
-        }
+    case InstancePointerRole: {
+        QVariant v = QVariant::fromValue((void*)pdata);
+        return v;
+    }
+    case InstanceIDRole: {
+        return pdata->id();
+    }
+    case Qt::EditRole:
+    case Qt::DisplayRole: {
+        return pdata->name();
+    }
+    case Qt::AccessibleTextRole: {
+        return tr("%1 Instance").arg(pdata->name());
+    }
+    case Qt::ToolTipRole: {
+        return pdata->instanceRoot();
+    }
+    case Qt::DecorationRole: {
+        return pdata->iconKey();
+    }
 
-        case GroupRole: {
-            return getInstanceGroup(pdata->id());
-        }
-        default:
-            break;
+    case GroupRole: {
+        return getInstanceGroup(pdata->id());
+    }
+    default:
+        break;
     }
     return QVariant();
 }
@@ -203,8 +203,8 @@ bool InstanceList::setData(const QModelIndex& index, const QVariant& value, int 
     if (role != Qt::EditRole) {
         return false;
     }
-    BaseInstance* pdata = static_cast<BaseInstance*>(index.internalPointer());
-    auto newName = value.toString();
+    BaseInstance* pdata   = static_cast<BaseInstance*>(index.internalPointer());
+    auto          newName = value.toString();
     if (pdata->name() == newName) {
         return true;
     }
@@ -246,22 +246,22 @@ void InstanceList::setInstanceGroup(const InstanceId& id, GroupId name)
     }
 
     bool changed = false;
-    auto iter = m_instanceGroupIndex.find(inst->id());
+    auto iter    = m_instanceGroupIndex.find(inst->id());
     if (iter != m_instanceGroupIndex.end()) {
         if (*iter != name) {
             decreaseGroupCount(*iter);
-            *iter = name;
+            *iter   = name;
             changed = true;
         }
     } else {
-        changed = true;
+        changed                  = true;
         m_instanceGroupIndex[id] = name;
     }
 
     if (changed) {
         increaseGroupCount(name);
         auto idx = getInstIndex(inst);
-        emit dataChanged(index(idx), index(idx), { GroupRole });
+        emit dataChanged(index(idx), index(idx), {GroupRole});
         saveGroupList();
     }
 }
@@ -279,15 +279,15 @@ void InstanceList::deleteGroup(const GroupId& name)
     bool removed = false;
     qDebug() << "Delete group" << name;
     for (auto& instance : m_instances) {
-        const QString& instID = instance->id();
-        const QString instGroupName = getInstanceGroup(instID);
+        const QString& instID        = instance->id();
+        const QString  instGroupName = getInstanceGroup(instID);
         if (instGroupName == name) {
             m_instanceGroupIndex.remove(instID);
             qDebug() << "Remove" << instID << "from group" << name;
-            removed = true;
+            removed  = true;
             auto idx = getInstIndex(instance.get());
             if (idx >= 0)
-                emit dataChanged(index(idx), index(idx), { GroupRole });
+                emit dataChanged(index(idx), index(idx), {GroupRole});
         }
     }
     if (removed)
@@ -303,8 +303,8 @@ void InstanceList::renameGroup(const QString& src, const QString& dst)
     bool modified = false;
     qDebug() << "Rename group" << src << "to" << dst;
     for (auto& instance : m_instances) {
-        const QString& instID = instance->id();
-        const QString instGroupName = getInstanceGroup(instID);
+        const QString& instID        = instance->id();
+        const QString  instGroupName = getInstanceGroup(instID);
         if (instGroupName == src) {
             m_instanceGroupIndex[instID] = dst;
             increaseGroupCount(dst);
@@ -312,7 +312,7 @@ void InstanceList::renameGroup(const QString& src, const QString& dst)
             modified = true;
             auto idx = getInstIndex(instance.get());
             if (idx >= 0)
-                emit dataChanged(index(idx), index(idx), { GroupRole });
+                emit dataChanged(index(idx), index(idx), {GroupRole});
         }
     }
     if (modified)
@@ -348,7 +348,7 @@ bool InstanceList::trashInstance(const InstanceId& id)
     }
 
     qDebug() << "Instance" << id << "has been trashed by the launcher.";
-    m_trashHistory.push({ id, inst->instanceRoot(), trashedLoc, cachedGroupId });
+    m_trashHistory.push({id, inst->instanceRoot(), trashedLoc, cachedGroupId});
 
     for (const auto& [name, filePath, target] : inst->shortcuts()) {
         if (!FS::trash(filePath, &trashedLoc)) {
@@ -363,7 +363,7 @@ bool InstanceList::trashInstance(const InstanceId& id)
             continue;
         }
         qDebug() << "Shortcut" << name << "at path" << filePath << "for instance" << id << "has been trashed by the launcher.";
-        m_trashHistory.top().shortcuts.append({ { name, filePath, target }, trashedLoc });
+        m_trashHistory.top().shortcuts.append({{name, filePath, target}, trashedLoc});
     }
 
     return true;
@@ -452,7 +452,7 @@ void InstanceList::deleteInstance(const InstanceId& id)
 static QMap<InstanceId, InstanceLocator> getIdMapping(const std::vector<std::unique_ptr<BaseInstance>>& list)
 {
     QMap<InstanceId, InstanceLocator> out;
-    int i = 0;
+    int                               i = 0;
     for (auto& item : list) {
         auto id = item->id();
         if (out.contains(id)) {
@@ -470,7 +470,7 @@ QList<InstanceId> InstanceList::discoverInstances()
     QList<InstanceId> out;
     QDirIterator iter(m_instDir, QDir::Dirs | QDir::NoDot | QDir::NoDotDot | QDir::Readable | QDir::Hidden, QDirIterator::FollowSymlinks);
     while (iter.hasNext()) {
-        QString subDir = iter.next();
+        QString   subDir = iter.next();
         QFileInfo dirInfo(subDir);
         if (!QFileInfo(FS::PathCombine(subDir, "instance.cfg")).exists())
             continue;
@@ -487,7 +487,7 @@ QList<InstanceId> InstanceList::discoverInstances()
         out.append(id);
         qInfo() << "Found instance ID" << id;
     }
-    instanceSet = QSet<QString>(out.begin(), out.end());
+    instanceSet       = QSet<QString>(out.begin(), out.end());
     m_instancesProbed = true;
     return out;
 }
@@ -511,19 +511,19 @@ InstanceList::InstListError InstanceList::loadList()
     }
 
     if (!existingIds.isEmpty()) {
-        auto deadList = existingIds.values();
+        auto deadList           = existingIds.values();
         auto orderSortPredicate = [](const InstanceLocator& a, const InstanceLocator& b) -> bool { return a.second > b.second; };
         std::sort(deadList.begin(), deadList.end(), orderSortPredicate);
 
-        int front_bookmark = -1;
-        int back_bookmark = -1;
-        int currentItem = -1;
-        auto removeNow = [this, &front_bookmark, &back_bookmark, &currentItem]() {
+        int  front_bookmark = -1;
+        int  back_bookmark  = -1;
+        int  currentItem    = -1;
+        auto removeNow      = [this, &front_bookmark, &back_bookmark, &currentItem]() {
             beginRemoveRows(QModelIndex(), front_bookmark, back_bookmark);
             m_instances.erase(m_instances.begin() + front_bookmark, m_instances.begin() + back_bookmark + 1);
             endRemoveRows();
             front_bookmark = -1;
-            back_bookmark = currentItem;
+            back_bookmark  = currentItem;
         };
         for (auto& removedItem : deadList) {
             auto instPtr = removedItem.first;
@@ -655,8 +655,8 @@ std::unique_ptr<BaseInstance> InstanceList::loadInstance(const InstanceId& id)
         loadGroupList();
     }
 
-    auto instanceRoot = FS::PathCombine(m_instDir, id);
-    auto instanceSettings = std::make_unique<INISettingsObject>(FS::PathCombine(instanceRoot, "instance.cfg"));
+    auto                          instanceRoot     = FS::PathCombine(m_instDir, id);
+    auto                          instanceSettings = std::make_unique<INISettingsObject>(FS::PathCombine(instanceRoot, "instance.cfg"));
     std::unique_ptr<BaseInstance> inst;
 
     instanceSettings->registerSetting("InstanceType", "");
@@ -703,12 +703,12 @@ void InstanceList::saveGroupList()
         qDebug() << "Group saving prevented because we don't know the full list of instances yet.";
         return;
     }
-    WatchLock foo(m_watcher, m_instDir);
-    QString groupFileName = m_instDir + "/instgroups.json";
+    WatchLock                    foo(m_watcher, m_instDir);
+    QString                      groupFileName = m_instDir + "/instgroups.json";
     QMap<QString, QSet<QString>> reverseGroupMap;
     for (auto iter = m_instanceGroupIndex.begin(); iter != m_instanceGroupIndex.end(); iter++) {
-        const QString& id = iter.key();
-        QString group = iter.value();
+        const QString& id    = iter.key();
+        QString        group = iter.value();
         if (group.isEmpty())
             continue;
         if (!instanceSet.contains(id)) {
@@ -729,10 +729,10 @@ void InstanceList::saveGroupList()
     toplevel.insert("formatVersion", QJsonValue(QString("1")));
     QJsonObject groupsArr;
     for (auto iter = reverseGroupMap.begin(); iter != reverseGroupMap.end(); iter++) {
-        auto list = iter.value();
-        auto name = iter.key();
+        auto        list = iter.value();
+        auto        name = iter.key();
         QJsonObject groupObj;
-        QJsonArray instanceArr;
+        QJsonArray  instanceArr;
         groupObj.insert("hidden", QJsonValue(m_collapsedGroups.contains(name)));
         for (auto item : list) {
             instanceArr.append(QJsonValue(item));
@@ -774,7 +774,7 @@ void InstanceList::loadGroupList()
     }
 
     QJsonParseError error;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonData, &error);
 
     if (error.error != QJsonParseError::NoError) {
         qCritical() << QString("Failed to parse instance group file: %1 at offset %2")
@@ -838,7 +838,7 @@ void InstanceList::loadGroupList()
     bool ungroupedHidden = false;
     if (rootObj.value("ungrouped").isObject()) {
         QJsonObject ungrouped = rootObj.value("ungrouped").toObject();
-        ungroupedHidden = ungrouped.value("hidden").toBool(false);
+        ungroupedHidden       = ungrouped.value("hidden").toBool(false);
     }
     if (ungroupedHidden) {
         m_collapsedGroups.insert("");
@@ -860,7 +860,7 @@ void InstanceList::on_InstFolderChanged([[maybe_unused]] const Setting& setting,
         if (m_groupsLoaded) {
             saveGroupList();
         }
-        m_instDir = newInstDir;
+        m_instDir      = newInstDir;
         m_groupsLoaded = false;
         beginRemoveRows(QModelIndex(), 0, count());
         m_instances.erase(m_instances.begin(), m_instances.end());
@@ -880,12 +880,13 @@ void InstanceList::on_GroupStateChanged(const QString& group, bool collapsed)
     saveGroupList();
 }
 
-class InstanceStaging : public Task {
+class InstanceStaging : public Task
+{
     Q_OBJECT
     const unsigned minBackoff = 1;
     const unsigned maxBackoff = 16;
 
-   public:
+public:
     InstanceStaging(InstanceList* parent, InstanceTask* child, SettingsObject* settings) : m_parent(parent), backoff(minBackoff, maxBackoff)
     {
         m_stagingPath = parent->getStagedInstancePath();
@@ -919,7 +920,7 @@ class InstanceStaging : public Task {
     }
     bool canAbort() const override { return (m_child && m_child->canAbort()); }
 
-   protected:
+protected:
     void executeTask() override
     {
         if (m_stagingPath.isNull()) {
@@ -931,7 +932,7 @@ class InstanceStaging : public Task {
     }
     QStringList warnings() const override { return m_child->warnings(); }
 
-   private slots:
+private slots:
     void childSucceeded()
     {
         unsigned sleepTime = backoff();
@@ -963,13 +964,13 @@ class InstanceStaging : public Task {
         emitAborted();
     }
 
-   private:
+private:
     InstanceList* m_parent;
 
-    ExponentialSeries backoff;
-    QString m_stagingPath;
+    ExponentialSeries             backoff;
+    QString                       m_stagingPath;
     std::unique_ptr<InstanceTask> m_child;
-    QTimer m_backoffTimer;
+    QTimer                        m_backoffTimer;
 };
 
 Task* InstanceList::wrapInstanceTask(InstanceTask* task)
@@ -982,14 +983,14 @@ QString InstanceList::getStagedInstancePath()
     const QString tempRoot = FS::PathCombine(m_instDir, ".tmp");
 
     QString result;
-    int tries = 0;
+    int     tries = 0;
 
     do {
         if (++tries > 256)
             return {};
 
         const QString key = QUuid::createUuid().toString(QUuid::Id128).left(6);
-        result = FS::PathCombine(tempRoot, key);
+        result            = FS::PathCombine(tempRoot, key);
     } while (QFileInfo::exists(result));
 
     if (!QDir::current().mkpath(result))
@@ -1000,9 +1001,9 @@ QString InstanceList::getStagedInstancePath()
     return result;
 }
 
-bool InstanceList::commitStagedInstance(const QString& path,
+bool InstanceList::commitStagedInstance(const QString&      path,
                                         const InstanceName& instanceName,
-                                        QString groupName,
+                                        QString             groupName,
                                         const InstanceTask& commiting)
 {
     if (groupName.isEmpty() && !groupName.isNull())
@@ -1022,7 +1023,7 @@ bool InstanceList::commitStagedInstance(const QString& path,
 
     {
         WatchLock lock(m_watcher, m_instDir);
-        QString destination = FS::PathCombine(m_instDir, instID);
+        QString   destination = FS::PathCombine(m_instDir, instID);
 
         if (should_override) {
             if (!FS::overrideFolder(destination, path)) {

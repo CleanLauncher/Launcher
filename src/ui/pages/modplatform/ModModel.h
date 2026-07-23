@@ -16,41 +16,43 @@
 
 class Version;
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ModPage;
 
-class ModModel : public ResourceModel {
+class ModModel : public ResourceModel
+{
     Q_OBJECT
 
-   public:
+public:
     ModModel(BaseInstance&, ResourceAPI* api, QString debugName, QString metaEntryBase);
 
     void searchWithTerm(const QString& term, unsigned int sort, bool filter_changed);
 
-    void setFilter(std::shared_ptr<ModFilterWidget::Filter> filter) { m_filter = filter; }
+    void             setFilter(std::shared_ptr<ModFilterWidget::Filter> filter) { m_filter = filter; }
     virtual QVariant getInstalledPackVersion(ModPlatform::IndexedPack::Ptr) const override;
 
     [[nodiscard]] QString debugName() const override { return m_debugName; }
     [[nodiscard]] QString metaEntryBase() const override { return m_metaEntryBase; }
 
-   public slots:
-    ResourceAPI::SearchArgs createSearchArguments() override;
+public slots:
+    ResourceAPI::SearchArgs        createSearchArguments() override;
     ResourceAPI::VersionSearchArgs createVersionsArguments(const QModelIndex&) override;
-    ResourceAPI::ProjectInfoArgs createInfoArguments(const QModelIndex&) override;
+    ResourceAPI::ProjectInfoArgs   createInfoArguments(const QModelIndex&) override;
 
-   protected:
+protected:
     virtual bool isPackInstalled(ModPlatform::IndexedPack::Ptr) const override;
 
     virtual bool checkFilters(ModPlatform::IndexedPack::Ptr) override;
     virtual bool checkVersionFilters(const ModPlatform::IndexedVersion&) override;
 
-   protected:
+protected:
     BaseInstance& m_base_instance;
 
     std::shared_ptr<ModFilterWidget::Filter> m_filter = nullptr;
 
-   private:
+private:
     QString m_debugName;
     QString m_metaEntryBase;
 };

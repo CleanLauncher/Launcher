@@ -11,7 +11,8 @@
 
 #include <QRegularExpression>
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 ResourcePackResourcePage::ResourcePackResourcePage(ResourceDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance)
 {}

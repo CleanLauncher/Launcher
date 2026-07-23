@@ -90,7 +90,7 @@ CopyInstanceDialog::CopyInstanceDialog(BaseInstance* original, QWidget* parent)
     auto detectedFS = FS::statFS(m_original->instanceRoot()).fsType;
 
     m_cloneSupported = FS::canCloneOnFS(detectedFS);
-    m_linkSupported = FS::canLinkOnFS(detectedFS);
+    m_linkSupported  = FS::canLinkOnFS(detectedFS);
 
     if (m_cloneSupported) {
         ui->cloneSupportedLabel->setText(tr("Reflinks are supported on %1").arg(FS::getFilesystemTypeName(detectedFS)));
@@ -121,7 +121,7 @@ CopyInstanceDialog::~CopyInstanceDialog()
 
 void CopyInstanceDialog::updateDialogState()
 {
-    auto allowOK = !instName().isEmpty();
+    auto allowOK  = !instName().isEmpty();
     auto OkButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     if (OkButton->isEnabled() != allowOK) {
         OkButton->setEnabled(allowOK);

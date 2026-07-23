@@ -22,28 +22,30 @@
 #include "java/JavaMetadata.h"
 #include "meta/Version.h"
 
-namespace Java {
+namespace Java
+{
 
-class VersionList : public BaseVersionList {
+class VersionList : public BaseVersionList
+{
     Q_OBJECT
 
-   public:
+public:
     explicit VersionList(Meta::Version::Ptr m_version, QObject* parent = 0);
 
-    Task::Ptr getLoadTask(bool forceReload = false) override;
-    bool isLoaded() override;
+    Task::Ptr              getLoadTask(bool forceReload = false) override;
+    bool                   isLoaded() override;
     const BaseVersion::Ptr at(int i) const override;
-    int count() const override;
-    void sortVersions() override;
+    int                    count() const override;
+    void                   sortVersions() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     RoleList providesRoles() const override;
 
-   protected slots:
+protected slots:
     void updateListData(QList<BaseVersion::Ptr>) override {}
 
-   protected:
-    Meta::Version::Ptr m_version;
+protected:
+    Meta::Version::Ptr       m_version;
     QList<Java::MetadataPtr> m_vlist;
 };
 

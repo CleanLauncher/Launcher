@@ -48,14 +48,16 @@
 class Task;
 class SequentialTask;
 
-namespace Ui {
+namespace Ui
+{
 class ProgressDialog;
 }
 
-class ProgressDialog : public QDialog {
+class ProgressDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ProgressDialog(QWidget* parent = 0);
     ~ProgressDialog();
 
@@ -69,7 +71,7 @@ class ProgressDialog : public QDialog {
 
     Task* getTask();
 
-   public slots:
+public slots:
     void onTaskStarted();
     void onTaskFailed(QString failure);
     void onTaskSucceeded();
@@ -78,24 +80,24 @@ class ProgressDialog : public QDialog {
     void changeProgress(qint64 current, qint64 total);
     void changeStepProgress(const TaskStepProgress& task_progress);
 
-   private slots:
+private slots:
     void on_skipButton_clicked(bool checked);
 
-   protected:
+protected:
     virtual void keyPressEvent(QKeyEvent* e);
     virtual void closeEvent(QCloseEvent* e);
 
-   private:
+private:
     bool handleImmediateResult(QDialog::DialogCode& result);
     void addTaskProgress(const TaskStepProgress& progress);
 
-   private:
+private:
     Ui::ProgressDialog* ui;
 
     Task* m_task;
 
     QList<QMetaObject::Connection> m_taskConnections;
 
-    bool m_is_multi_step = false;
+    bool                              m_is_multi_step = false;
     QHash<QUuid, SubTaskProgressBar*> taskProgress;
 };

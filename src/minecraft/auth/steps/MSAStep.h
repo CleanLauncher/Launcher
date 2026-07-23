@@ -39,26 +39,27 @@
 #include "minecraft/auth/AuthStep.h"
 
 #include <QtNetworkAuth/qoauth2authorizationcodeflow.h>
-class MSAStep : public AuthStep {
+class MSAStep : public AuthStep
+{
     Q_OBJECT
-   public:
+public:
     explicit MSAStep(AccountData* data,
-                     bool silent = false,
-                     QString clientId = "",
-                     QString scopes = "XboxLive.SignIn XboxLive.offline_access",
-                     QUrl authorizeUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"),
-                     QUrl tokenUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/token"));
+                     bool         silent       = false,
+                     QString      clientId     = "",
+                     QString      scopes       = "XboxLive.SignIn XboxLive.offline_access",
+                     QUrl         authorizeUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize"),
+                     QUrl         tokenUrl     = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/token"));
     virtual ~MSAStep() noexcept = default;
 
     void perform() override;
 
     QString describe() override;
 
-   signals:
+signals:
     void authorizeWithBrowser(const QUrl& url);
 
-   private:
-    bool m_silent;
-    QString m_clientId;
+private:
+    bool                         m_silent;
+    QString                      m_clientId;
     QOAuth2AuthorizationCodeFlow m_oauth2;
 };

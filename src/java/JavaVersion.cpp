@@ -28,11 +28,11 @@ JavaVersion& JavaVersion::operator=(const QString& javaVersionString)
         pattern = s_withoutOne;
     }
 
-    auto match = pattern.match(m_string);
-    m_parseable = match.hasMatch();
-    m_major = getCapturedInteger(match, "major");
-    m_minor = getCapturedInteger(match, "minor");
-    m_security = getCapturedInteger(match, "security");
+    auto match   = pattern.match(m_string);
+    m_parseable  = match.hasMatch();
+    m_major      = getCapturedInteger(match, "major");
+    m_minor      = getCapturedInteger(match, "minor");
+    m_security   = getCapturedInteger(match, "security");
     m_prerelease = match.captured("prerelease");
     return *this;
 }
@@ -65,7 +65,7 @@ bool JavaVersion::isModular() const
 bool JavaVersion::operator<(const JavaVersion& rhs) const
 {
     if (m_parseable && rhs.m_parseable) {
-        auto major = m_major;
+        auto major  = m_major;
         auto rmajor = rhs.m_major;
 
         if (major < rmajor)
@@ -82,7 +82,7 @@ bool JavaVersion::operator<(const JavaVersion& rhs) const
             return false;
 
         bool thisPre = !m_prerelease.isEmpty();
-        bool rhsPre = !rhs.m_prerelease.isEmpty();
+        bool rhsPre  = !rhs.m_prerelease.isEmpty();
         if (thisPre && !rhsPre) {
             return true;
         } else if (!thisPre && rhsPre) {

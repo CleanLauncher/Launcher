@@ -18,38 +18,40 @@
 
 #pragma once
 
-#include <QDialog>
-#include <QList>
 #include "minecraft/mod/Mod.h"
 #include "modplatform/helpers/ExportToModList.h"
+#include <QDialog>
+#include <QList>
 
-namespace Ui {
+namespace Ui
+{
 class ExportToModListDialog;
 }
 
-class ExportToModListDialog : public QDialog {
+class ExportToModListDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ExportToModListDialog(QString name, QList<Mod*> mods, QWidget* parent = nullptr);
     ~ExportToModListDialog();
 
     void done(int result) override;
 
-   protected slots:
+protected slots:
     void formatChanged(int index);
     void triggerImp();
     void trigger(int) { triggerImp(); };
     void addExtra(ExportToModList::OptionalData option);
 
-   private:
+private:
     QString extension();
-    void enableCustom(bool enabled);
+    void    enableCustom(bool enabled);
 
-    QList<Mod*> m_mods;
-    bool m_template_changed;
-    QString m_name;
-    ExportToModList::Formats m_format = ExportToModList::Formats::HTML;
-    Ui::ExportToModListDialog* ui;
+    QList<Mod*>                                           m_mods;
+    bool                                                  m_template_changed;
+    QString                                               m_name;
+    ExportToModList::Formats                              m_format = ExportToModList::Formats::HTML;
+    Ui::ExportToModListDialog*                            ui;
     static const QHash<ExportToModList::Formats, QString> exampleLines;
 };

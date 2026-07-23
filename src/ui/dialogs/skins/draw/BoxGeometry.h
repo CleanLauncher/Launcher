@@ -24,11 +24,13 @@
 #include <QOpenGLShaderProgram>
 #include <QVector3D>
 
-namespace opengl {
-class BoxGeometry : protected QOpenGLFunctions {
-   public:
+namespace opengl
+{
+class BoxGeometry : protected QOpenGLFunctions
+{
+public:
     BoxGeometry(QVector3D size, QVector3D position);
-    BoxGeometry(QVector3D size, QVector3D position, QPoint uv, QVector3D textureDim, QSize textureSize = { 64, 64 });
+    BoxGeometry(QVector3D size, QVector3D position, QPoint uv, QVector3D textureDim, QSize textureSize = {64, 64});
     static BoxGeometry* Plane();
     virtual ~BoxGeometry();
 
@@ -38,12 +40,12 @@ class BoxGeometry : protected QOpenGLFunctions {
     void rotate(float angle, const QVector3D& vector);
     void scale(const QVector3D& vector);
 
-   private:
+private:
     QOpenGLBuffer m_vertexBuf;
     QOpenGLBuffer m_indexBuf;
-    QVector3D m_size;
-    QVector3D m_position;
-    QMatrix4x4 m_matrix;
-    GLsizei m_indecesCount;
+    QVector3D     m_size;
+    QVector3D     m_position;
+    QMatrix4x4    m_matrix;
+    GLsizei       m_indecesCount;
 };
 }  // namespace opengl

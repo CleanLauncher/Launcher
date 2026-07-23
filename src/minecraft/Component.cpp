@@ -50,12 +50,11 @@
 #include <assert.h>
 
 const QMap<QString, ModloaderMapEntry> Component::KNOWN_MODLOADERS = {
-    { "net.neoforged", { ModPlatform::NeoForge, { "net.minecraftforge", "net.fabricmc.fabric-loader", "org.quiltmc.quilt-loader" } } },
-    { "net.minecraftforge", { ModPlatform::Forge, { "net.neoforged", "net.fabricmc.fabric-loader", "org.quiltmc.quilt-loader" } } },
-    { "net.fabricmc.fabric-loader", { ModPlatform::Fabric, { "net.minecraftforge", "net.neoforged", "org.quiltmc.quilt-loader" } } },
-    { "org.quiltmc.quilt-loader", { ModPlatform::Quilt, { "net.minecraftforge", "net.neoforged", "net.fabricmc.fabric-loader" } } },
-    { "com.mumfrey.liteloader", { ModPlatform::LiteLoader, {} } }
-};
+    {"net.neoforged", {ModPlatform::NeoForge, {"net.minecraftforge", "net.fabricmc.fabric-loader", "org.quiltmc.quilt-loader"}}},
+    {"net.minecraftforge", {ModPlatform::Forge, {"net.neoforged", "net.fabricmc.fabric-loader", "org.quiltmc.quilt-loader"}}},
+    {"net.fabricmc.fabric-loader", {ModPlatform::Fabric, {"net.minecraftforge", "net.neoforged", "org.quiltmc.quilt-loader"}}},
+    {"org.quiltmc.quilt-loader", {ModPlatform::Quilt, {"net.minecraftforge", "net.neoforged", "net.fabricmc.fabric-loader"}}},
+    {"com.mumfrey.liteloader", {ModPlatform::LiteLoader, {}}}};
 
 Component::Component(PackProfile* parent, const QString& uid)
 {
@@ -70,11 +69,11 @@ Component::Component(PackProfile* parent, const QString& uid, std::shared_ptr<Ve
     assert(parent);
     m_parent = parent;
 
-    m_file = file;
-    m_uid = uid;
+    m_file          = file;
+    m_uid           = uid;
     m_cachedVersion = m_file->version;
-    m_cachedName = m_file->name;
-    m_loaded = true;
+    m_cachedName    = m_file->name;
+    m_loaded        = true;
 }
 
 std::shared_ptr<Meta::Version> Component::getMeta()
@@ -127,7 +126,7 @@ int Component::getOrder()
 void Component::setOrder(int order)
 {
     m_orderOverride = true;
-    m_order = order;
+    m_order         = order;
 }
 
 QString Component::getID()
@@ -272,7 +271,7 @@ const QList<PatchProblem> Component::getProblems() const
         problems.append(m_componentProblems);
         return problems;
     }
-    return { { ProblemSeverity::Error, QObject::tr("Patch is not loaded yet.") } };
+    return {{ProblemSeverity::Error, QObject::tr("Patch is not loaded yet.")}};
 }
 
 void Component::addComponentProblem(ProblemSeverity severity, const QString& description)
@@ -280,7 +279,7 @@ void Component::addComponentProblem(ProblemSeverity severity, const QString& des
     if (severity > m_componentProblemSeverity) {
         m_componentProblemSeverity = severity;
     }
-    m_componentProblems.append({ severity, description });
+    m_componentProblems.append({severity, description});
 
     emit dataChanged();
 }
@@ -358,7 +357,7 @@ bool Component::revert()
         return true;
     }
     auto filename = getFilename();
-    bool result = true;
+    bool result   = true;
 
     if (QFile::exists(filename)) {
         result = FS::deletePath(filename);
@@ -403,23 +402,23 @@ void Component::updateCachedData()
         bool changed = false;
         if (m_cachedName != file->name) {
             m_cachedName = file->name;
-            changed = true;
+            changed      = true;
         }
         if (m_cachedVersion != file->version) {
             m_cachedVersion = file->version;
-            changed = true;
+            changed         = true;
         }
         if (m_cachedVolatile != file->m_volatile) {
             m_cachedVolatile = file->m_volatile;
-            changed = true;
+            changed          = true;
         }
         if (!deepCompare(m_cachedRequires, file->m_requires)) {
             m_cachedRequires = file->m_requires;
-            changed = true;
+            changed          = true;
         }
         if (!deepCompare(m_cachedConflicts, file->conflicts)) {
             m_cachedConflicts = file->conflicts;
-            changed = true;
+            changed           = true;
         }
         if (changed) {
             emit dataChanged();
@@ -454,7 +453,7 @@ UpdateAction Component::getUpdateAction()
 
 void Component::clearUpdateAction()
 {
-    m_updateAction = UpdateAction{ UpdateActionNone{} };
+    m_updateAction = UpdateAction{UpdateActionNone{}};
 }
 
 QDebug operator<<(QDebug d, const Component& comp)

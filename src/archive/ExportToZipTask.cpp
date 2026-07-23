@@ -21,7 +21,8 @@
 
 #include "FileSystem.h"
 
-namespace MMCZip {
+namespace MMCZip
+{
 void ExportToZipTask::executeTask()
 {
     setStatus("Adding files...");

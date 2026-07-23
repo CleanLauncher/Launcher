@@ -9,18 +9,19 @@
 #endif
 #include <windows.h>
 #else
-#include <unistd.h>
 #include <cstdio>
+#include <unistd.h>
 #endif
 
-namespace console {
+namespace console
+{
 
 inline bool isConsole()
 {
 #if defined Q_OS_WIN32
     DWORD procIDs[2];
     DWORD maxCount = 2;
-    DWORD result = GetConsoleProcessList((LPDWORD)procIDs, maxCount);
+    DWORD result   = GetConsoleProcessList((LPDWORD)procIDs, maxCount);
     return result > 1;
 #else
     if (isatty(fileno(stdout))) {

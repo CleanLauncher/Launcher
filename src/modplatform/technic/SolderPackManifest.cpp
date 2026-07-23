@@ -20,12 +20,13 @@
 
 #include "Json.h"
 
-namespace TechnicSolder {
+namespace TechnicSolder
+{
 
 void loadPack(Pack& v, QJsonObject& obj)
 {
     v.recommended = Json::requireString(obj, "recommended");
-    v.latest = Json::requireString(obj, "latest");
+    v.latest      = Json::requireString(obj, "latest");
 
     auto builds = Json::requireArray(obj, "builds");
     for (const auto buildRaw : builds) {
@@ -36,10 +37,10 @@ void loadPack(Pack& v, QJsonObject& obj)
 
 static void loadPackBuildMod(PackBuildMod& b, QJsonObject& obj)
 {
-    b.name = Json::requireString(obj, "name");
+    b.name    = Json::requireString(obj, "name");
     b.version = obj["version"].toString("");
-    b.md5 = Json::requireString(obj, "md5");
-    b.url = Json::requireString(obj, "url");
+    b.md5     = Json::requireString(obj, "md5");
+    b.url     = Json::requireString(obj, "url");
 }
 
 void loadPackBuild(PackBuild& v, QJsonObject& obj)
@@ -48,7 +49,7 @@ void loadPackBuild(PackBuild& v, QJsonObject& obj)
 
     auto mods = Json::requireArray(obj, "mods");
     for (const auto modRaw : mods) {
-        auto modObj = Json::requireObject(modRaw);
+        auto         modObj = Json::requireObject(modRaw);
         PackBuildMod mod;
         loadPackBuildMod(mod, modObj);
         v.mods.append(mod);

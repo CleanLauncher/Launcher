@@ -19,9 +19,10 @@
 #include <java/JavaChecker.h>
 #include <launch/LaunchStep.h>
 
-class TextPrint : public LaunchStep {
+class TextPrint : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit TextPrint(LaunchTask* parent, const QStringList& lines, MessageLevel level);
     explicit TextPrint(LaunchTask* parent, const QString& line, MessageLevel level);
     virtual ~TextPrint() {};
@@ -30,7 +31,7 @@ class TextPrint : public LaunchStep {
     virtual bool canAbort() const;
     virtual bool abort();
 
-   private:
-    QStringList m_lines;
+private:
+    QStringList  m_lines;
     MessageLevel m_level;
 };

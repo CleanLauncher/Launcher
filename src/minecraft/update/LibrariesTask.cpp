@@ -17,9 +17,9 @@ void LibrariesTask::executeTask()
     MinecraftInstance* inst = (MinecraftInstance*)m_inst;
 
     auto components = inst->getPackProfile();
-    auto profile = components->getProfile();
+    auto profile    = components->getProfile();
 
-    NetJob::Ptr job{ new NetJob(tr("Libraries for instance %1").arg(inst->name()), APPLICATION->network()) };
+    NetJob::Ptr job{new NetJob(tr("Libraries for instance %1").arg(inst->name()), APPLICATION->network())};
     downloadJob.reset(job);
 
     auto metacache = APPLICATION->metacache();
@@ -38,7 +38,7 @@ void LibrariesTask::executeTask()
         return true;
     };
 
-    QStringList failedLocalLibraries;
+    QStringList       failedLocalLibraries;
     QList<LibraryPtr> libArtifactPool;
     libArtifactPool.append(profile->getLibraries());
     libArtifactPool.append(profile->getNativeLibraries());

@@ -13,13 +13,14 @@
 
 static std::vector<Version> s_availableVersions = {};
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 TexturePackResourceModel::TexturePackResourceModel(const BaseInstance& inst,
-                                                   ResourceAPI* api,
-                                                   const QString& debugName,
-                                                   QString metaEntryBase)
-    : ResourcePackResourceModel(inst, api, debugName, std::move(metaEntryBase))
-    , m_version_list(APPLICATION->metadataIndex()->get("net.minecraft"))
+                                                   ResourceAPI*        api,
+                                                   const QString&      debugName,
+                                                   QString             metaEntryBase)
+    : ResourcePackResourceModel(inst, api, debugName, std::move(metaEntryBase)),
+      m_version_list(APPLICATION->metadataIndex()->get("net.minecraft"))
 {
     if (!m_version_list->isLoaded()) {
         qDebug() << "Loading version list...";
@@ -76,7 +77,7 @@ ResourceAPI::SearchArgs TexturePackResourceModel::createSearchArguments()
 
 ResourceAPI::VersionSearchArgs TexturePackResourceModel::createVersionsArguments(const QModelIndex& entry)
 {
-    auto args = ResourcePackResourceModel::createVersionsArguments(entry);
+    auto args         = ResourcePackResourceModel::createVersionsArguments(entry);
     args.resourceType = ModPlatform::ResourceType::TexturePack;
     if (!m_version_list->isLoaded()) {
         qCritical() << "The version list could not be loaded. Falling back to showing all entries.";

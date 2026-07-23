@@ -21,21 +21,22 @@
 #include <launch/LaunchStep.h>
 #include <net/Mode.h>
 
-class TaskStepWrapper : public LaunchStep {
+class TaskStepWrapper : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit TaskStepWrapper(LaunchTask* parent, Task::Ptr task) : LaunchStep(parent), m_task(task) {};
     virtual ~TaskStepWrapper() = default;
 
     void executeTask() override;
     bool canAbort() const override;
     void proceed() override;
-   public slots:
+public slots:
     bool abort() override;
 
-   private slots:
+private slots:
     void updateFinished();
 
-   private:
+private:
     Task::Ptr m_task;
 };

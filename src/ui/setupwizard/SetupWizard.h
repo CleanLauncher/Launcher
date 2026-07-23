@@ -17,26 +17,28 @@
 
 #include <QWizard>
 
-namespace Ui {
+namespace Ui
+{
 class SetupWizard;
 }
 
 class BaseWizardPage;
 
-class SetupWizard : public QWizard {
+class SetupWizard : public QWizard
+{
     Q_OBJECT
 
-   public:
+public:
     explicit SetupWizard(QWidget* parent = 0);
     virtual ~SetupWizard();
 
-    void changeEvent(QEvent* event) override;
+    void            changeEvent(QEvent* event) override;
     BaseWizardPage* getBasePage(int id);
     BaseWizardPage* getCurrentBasePage();
 
-   private slots:
+private slots:
     void pageChanged(int id);
 
-   private:
+private:
     void retranslate();
 };

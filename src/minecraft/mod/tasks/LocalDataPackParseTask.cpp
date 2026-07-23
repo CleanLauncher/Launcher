@@ -29,18 +29,19 @@
 #include <QCryptographicHash>
 #include <utility>
 
-namespace DataPackUtils {
+namespace DataPackUtils
+{
 
 bool process(DataPack* pack, ProcessingLevel level)
 {
     switch (pack->type()) {
-        case ResourceType::FOLDER:
-            return DataPackUtils::processFolder(pack, level);
-        case ResourceType::ZIPFILE:
-            return DataPackUtils::processZIP(pack, level);
-        default:
-            qWarning() << "Invalid type for data pack parse task!";
-            return false;
+    case ResourceType::FOLDER:
+        return DataPackUtils::processFolder(pack, level);
+    case ResourceType::ZIPFILE:
+        return DataPackUtils::processZIP(pack, level);
+    default:
+        qWarning() << "Invalid type for data pack parse task!";
+        return false;
     }
 }
 
@@ -106,17 +107,17 @@ bool processZIP(DataPack* pack, ProcessingLevel level)
 
     MMCZip::ArchiveReader zip(pack->fileinfo().filePath());
 
-    bool metaParsed = false;
-    bool iconParsed = false;
-    bool mcmeta_result = false;
+    bool metaParsed      = false;
+    bool iconParsed      = false;
+    bool mcmeta_result   = false;
     bool pack_png_result = false;
     if (!zip.parse(
             [&metaParsed, &iconParsed, &mcmeta_result, &pack_png_result, pack, level](MMCZip::ArchiveReader::File* f, bool& breakControl) {
                 bool skip = true;
                 if (!metaParsed && f->filename() == "pack.mcmeta") {
                     metaParsed = true;
-                    skip = false;
-                    auto data = f->readAll();
+                    skip       = false;
+                    auto data  = f->readAll();
 
                     mcmeta_result = DataPackUtils::processMCMeta(pack, std::move(data));
 
@@ -127,8 +128,8 @@ bool processZIP(DataPack* pack, ProcessingLevel level)
                 }
                 if (!iconParsed && level != ProcessingLevel::BasicInfoOnly && f->filename() == "pack.png") {
                     iconParsed = true;
-                    skip = false;
-                    auto data = f->readAll();
+                    skip       = false;
+                    auto data  = f->readAll();
 
                     pack_png_result = DataPackUtils::processPackPNG(pack, std::move(data));
                     if (!pack_png_result) {
@@ -185,7 +186,7 @@ std::pair<int, int> parseVersion(const QJsonValue& value)
 bool processMCMeta(DataPack* pack, QByteArray&& raw_data)
 {
     QJsonParseError parse_error;
-    auto json_doc = Json::parseUntilGarbage(raw_data, &parse_error);
+    auto            json_doc = Json::parseUntilGarbage(raw_data, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Failed to parse JSON:" << parse_error.errorString();
         return false;
@@ -194,7 +195,7 @@ bool processMCMeta(DataPack* pack, QByteArray&& raw_data)
     try {
         auto pack_obj = Json::requireObject(json_doc.object(), "pack", {});
 
-        int pack_format = 0;
+        int                 pack_format = 0;
         std::pair<int, int> min_format;
         std::pair<int, int> max_format;
         if (pack_obj.contains("pack_format")) {
@@ -249,7 +250,7 @@ QString processComponent(const QJsonArray& value, bool strikethrough, bool under
 
 QString processComponent(const QJsonObject& obj, bool strikethrough, bool underline)
 {
-    underline = obj["underlined"].toBool(underline);
+    underline     = obj["underlined"].toBool(underline);
     strikethrough = obj["strikethrough"].toBool(strikethrough);
 
     QString result = obj["text"].toString();
@@ -266,8 +267,8 @@ QString processComponent(const QJsonObject& obj, bool strikethrough, bool underl
     }
     if (obj.contains("clickEvent")) {
         auto click_event = obj["clickEvent"].toObject();
-        auto action = click_event["action"].toString();
-        auto value = click_event["value"].toString();
+        auto action      = click_event["action"].toString();
+        auto value       = click_event["value"].toString();
         if (action == "open_url" && !value.isEmpty()) {
             result = QString("<a href=\"%1\">%2</a>").arg(value, result);
         }
@@ -316,56 +317,56 @@ bool processPackPNG(const DataPack* pack)
     };
 
     switch (pack->type()) {
-        case ResourceType::FOLDER: {
-            QFileInfo image_file_info(FS::PathCombine(pack->fileinfo().filePath(), "pack.png"));
-            if (image_file_info.exists() && image_file_info.isFile()) {
-                QFile pack_png_file(image_file_info.filePath());
-                if (!pack_png_file.open(QIODevice::ReadOnly))
-                    return png_invalid();
-
-                auto data = pack_png_file.readAll();
-
-                bool pack_png_result = DataPackUtils::processPackPNG(pack, std::move(data));
-
-                pack_png_file.close();
-                if (!pack_png_result) {
-                    return png_invalid();
-                }
-            } else {
+    case ResourceType::FOLDER: {
+        QFileInfo image_file_info(FS::PathCombine(pack->fileinfo().filePath(), "pack.png"));
+        if (image_file_info.exists() && image_file_info.isFile()) {
+            QFile pack_png_file(image_file_info.filePath());
+            if (!pack_png_file.open(QIODevice::ReadOnly))
                 return png_invalid();
-            }
-            return false;
-        }
-        case ResourceType::ZIPFILE: {
-            MMCZip::ArchiveReader zip(pack->fileinfo().filePath());
-            auto f = zip.goToFile("pack.png");
-            if (!f) {
-                return png_invalid();
-            }
-            auto data = f->readAll();
+
+            auto data = pack_png_file.readAll();
 
             bool pack_png_result = DataPackUtils::processPackPNG(pack, std::move(data));
 
+            pack_png_file.close();
             if (!pack_png_result) {
                 return png_invalid();
             }
-            return false;
+        } else {
+            return png_invalid();
         }
-        default:
-            qWarning() << "Invalid type for data pack parse task!";
-            return false;
+        return false;
+    }
+    case ResourceType::ZIPFILE: {
+        MMCZip::ArchiveReader zip(pack->fileinfo().filePath());
+        auto                  f = zip.goToFile("pack.png");
+        if (!f) {
+            return png_invalid();
+        }
+        auto data = f->readAll();
+
+        bool pack_png_result = DataPackUtils::processPackPNG(pack, std::move(data));
+
+        if (!pack_png_result) {
+            return png_invalid();
+        }
+        return false;
+    }
+    default:
+        qWarning() << "Invalid type for data pack parse task!";
+        return false;
     }
 }
 
 bool validate(QFileInfo file)
 {
-    DataPack dp{ file };
+    DataPack dp{file};
     return DataPackUtils::process(&dp, ProcessingLevel::BasicInfoOnly) && dp.valid();
 }
 
 bool validateResourcePack(QFileInfo file)
 {
-    ResourcePack rp{ file };
+    ResourcePack rp{file};
     return DataPackUtils::process(&rp, ProcessingLevel::BasicInfoOnly) && rp.valid();
 }
 

@@ -15,22 +15,23 @@
 
 #pragma once
 
+#include "java/JavaInstall.h"
 #include <QProcess>
 #include <QStringList>
-#include "java/JavaInstall.h"
 
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
 
-QString stripVariableEntries(QString name, QString target, QString remove);
+QString             stripVariableEntries(QString name, QString target, QString remove);
 QProcessEnvironment CleanEnviroment();
-QStringList getMinecraftJavaBundle();
-QStringList getJavaBundle();
+QStringList         getMinecraftJavaBundle();
+QStringList         getJavaBundle();
 
-class JavaUtils : public QObject {
+class JavaUtils : public QObject
+{
     Q_OBJECT
-   public:
+public:
     JavaUtils();
 
     JavaInstallPtr MakeJavaPtr(QString path, QString id = "unknown", QString arch = "unknown");
@@ -41,6 +42,6 @@ class JavaUtils : public QObject {
     QList<JavaInstallPtr> FindJavaFromRegistryKey(DWORD keyType, QString keyName, QString keyJavaDir, QString subkeySuffix = "");
 #endif
 
-    static QString getJavaCheckPath();
+    static QString       getJavaCheckPath();
     static const QString javaExecutable;
 };

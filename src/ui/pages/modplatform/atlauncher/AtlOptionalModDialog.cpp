@@ -36,27 +36,27 @@
 #include "AtlOptionalModDialog.h"
 #include "ui_AtlOptionalModDialog.h"
 
-#include <QInputDialog>
-#include <QMessageBox>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "Json.h"
 #include "modplatform/atlauncher/ATLShareCode.h"
+#include <QInputDialog>
+#include <QMessageBox>
 
 #include "net/ApiDownload.h"
 
-AtlOptionalModListModel::AtlOptionalModListModel(QWidget* parent,
+AtlOptionalModListModel::AtlOptionalModListModel(QWidget*                       parent,
                                                  const ATLauncher::PackVersion& version,
-                                                 QList<ATLauncher::VersionMod> mods)
+                                                 QList<ATLauncher::VersionMod>  mods)
     : QAbstractListModel(parent), m_version(version), m_mods(mods)
 {
     for (int i = 0; i < m_mods.size(); i++) {
-        auto mod = m_mods.at(i);
+        auto mod          = m_mods.at(i);
         m_index[mod.name] = i;
     }
 
     for (int i = 0; i < m_mods.size(); i++) {
-        auto mod = m_mods.at(i);
+        auto mod              = m_mods.at(i);
         m_selection[mod.name] = false;
         setMod(mod, i, mod.selected, false);
     }
@@ -131,12 +131,12 @@ QVariant AtlOptionalModListModel::headerData(int section, Qt::Orientation orient
 {
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
-            case EnabledColumn:
-                return QString();
-            case NameColumn:
-                return QString("Name");
-            case DescriptionColumn:
-                return QString("Description");
+        case EnabledColumn:
+            return QString();
+        case NameColumn:
+            return QString("Name");
+        case DescriptionColumn:
+            return QString("Description");
         }
     }
 
@@ -155,7 +155,7 @@ Qt::ItemFlags AtlOptionalModListModel::flags(const QModelIndex& index) const
 void AtlOptionalModListModel::useShareCode(const QString& code)
 {
     m_jobPtr.reset(new NetJob("Atl::Request", APPLICATION->network()));
-    auto url = QString(BuildConfig.ATL_API_BASE_URL + "share-codes/" + code);
+    auto url                = QString(BuildConfig.ATL_API_BASE_URL + "share-codes/" + code);
     auto [action, response] = Net::ApiDownload::makeByteArray(QUrl(url));
     m_jobPtr->addNetAction(action);
 
@@ -171,7 +171,7 @@ void AtlOptionalModListModel::shareCodeSuccess(QByteArray* responsePtr)
     m_jobPtr.reset();
 
     QJsonParseError parse_error{};
-    auto doc = QJsonDocument::fromJson(responseData, &parse_error);
+    auto            doc = QJsonDocument::fromJson(responseData, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from ATL at" << parse_error.offset << "reason:" << parse_error.errorString();
         qWarning() << responseData;
@@ -264,7 +264,7 @@ void AtlOptionalModListModel::setMod(const ATLauncher::VersionMod& mod, int inde
 
     for (const auto& dependencyName : mod.depends) {
         auto dependencyIndex = m_index[dependencyName];
-        auto dependencyMod = m_mods.at(dependencyIndex);
+        auto dependencyMod   = m_mods.at(dependencyIndex);
 
         if (enable) {
             setMod(dependencyMod, dependencyIndex, true, shouldEmit);
@@ -287,7 +287,7 @@ void AtlOptionalModListModel::setMod(const ATLauncher::VersionMod& mod, int inde
         auto dependents = m_dependents[mod.name];
         for (const auto& dependencyName : dependents) {
             auto dependencyIndex = m_index[dependencyName];
-            auto dependencyMod = m_mods.at(dependencyIndex);
+            auto dependencyMod   = m_mods.at(dependencyIndex);
 
             setMod(dependencyMod, dependencyIndex, false, shouldEmit);
         }

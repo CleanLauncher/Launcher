@@ -22,7 +22,8 @@
 #include <QStringList>
 
 #if defined(Q_OS_MACOS) || defined(Q_OS_LINUX)
-namespace {
+namespace
+{
 QString afterColon(QString str)
 {
     return str.remove(0, str.indexOf(':') + 2).trimmed();
@@ -37,7 +38,7 @@ bool readFromOutput(const char* command, F function)
         return false;
     }
 
-    constexpr size_t bufferSize = 512;
+    constexpr size_t             bufferSize = 512;
     std::array<char, bufferSize> buffer{};
     while (fgets(buffer.data(), bufferSize, file) != nullptr) {
         function(buffer.data());
@@ -107,15 +108,15 @@ uint64_t HardwareInfo::availableRamMiB()
 QStringList HardwareInfo::gpuInfo()
 {
     ComPtr<IDXGIFactory6> factory;
-    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
+    HRESULT               hr = CreateDXGIFactory1(IID_PPV_ARGS(&factory));
     if (FAILED(hr)) {
         qWarning() << "Could not create DXGI factory:" << Qt::hex << hr;
-        return { "GPU discovery failed: could not create DXGI factory" };
+        return {"GPU discovery failed: could not create DXGI factory"};
     }
 
-    UINT i = 0;
+    UINT                 i = 0;
     ComPtr<IDXGIAdapter> adapter;
-    QStringList out;
+    QStringList          out;
     while (factory->EnumAdapterByGpuPreference(i, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)) != DXGI_ERROR_NOT_FOUND) {
         DXGI_ADAPTER_DESC desc;
         hr = adapter->GetDesc(&desc);
@@ -137,9 +138,9 @@ QStringList HardwareInfo::gpuInfo()
 QString HardwareInfo::cpuInfo()
 {
     std::array<char, 512> buffer{};
-    size_t bufferSize = buffer.size();
+    size_t                bufferSize = buffer.size();
     if (sysctlbyname("machdep.cpu.brand_string", &buffer, &bufferSize, nullptr, 0) == 0) {
-        return { buffer.data() };
+        return {buffer.data()};
     }
 
     qWarning() << "Could not get CPU model: sysctlbyname";
@@ -148,8 +149,8 @@ QString HardwareInfo::cpuInfo()
 
 uint64_t HardwareInfo::totalRamMiB()
 {
-    uint64_t memsize = 0;
-    size_t memsizeSize = sizeof memsize;
+    uint64_t memsize     = 0;
+    size_t   memsizeSize = sizeof memsize;
     if (sysctlbyname("hw.memsize", &memsize, &memsizeSize, nullptr, 0) == 0) {
         return memsize / 1024 / 1024;
     }
@@ -165,8 +166,8 @@ uint64_t HardwareInfo::availableRamMiB()
 
 MacOSHardwareInfo::MemoryPressureLevel MacOSHardwareInfo::memoryPressureLevel()
 {
-    uint32_t level = 0;
-    size_t levelSize = sizeof level;
+    uint32_t level     = 0;
+    size_t   levelSize = sizeof level;
     if (sysctlbyname("kern.memorystatus_vm_pressure_level", &level, &levelSize, nullptr, 0) == 0) {
         return static_cast<MemoryPressureLevel>(level);
     }
@@ -178,28 +179,28 @@ MacOSHardwareInfo::MemoryPressureLevel MacOSHardwareInfo::memoryPressureLevel()
 QString MacOSHardwareInfo::memoryPressureLevelName()
 {
     switch (memoryPressureLevel()) {
-        case MemoryPressureLevel::Normal:
-            return "Green";
-        case MemoryPressureLevel::Warning:
-            return "Yellow";
-        case MemoryPressureLevel::Critical:
-            return "Red";
-        default:
-            Q_ASSERT(false);
-            return "";
+    case MemoryPressureLevel::Normal:
+        return "Green";
+    case MemoryPressureLevel::Warning:
+        return "Yellow";
+    case MemoryPressureLevel::Critical:
+        return "Red";
+    default:
+        Q_ASSERT(false);
+        return "";
     }
 }
 
 QStringList HardwareInfo::gpuInfo()
 {
     QStringList out;
-    const bool success = readFromOutput("system_profiler SPDisplaysDataType", [&](const QString& str) {
+    const bool  success = readFromOutput("system_profiler SPDisplaysDataType", [&](const QString& str) {
         if (str.contains("Chipset Model")) {
             out << "GPU: " + afterColon(str);
         }
     });
     if (!success) {
-        return { "GPU discovery failed: could not read from system_profiler" };
+        return {"GPU discovery failed: could not read from system_profiler"};
     }
 
     return out;
@@ -221,13 +222,14 @@ QString HardwareInfo::cpuInfo()
     return "unknown";
 }
 
-namespace {
+namespace
+{
 uint64_t readMemInfo(const QString& searchTarget)
 {
     std::ifstream memin("/proc/meminfo");
     for (std::string line; std::getline(memin, line);) {
         if (const QString str = QString::fromStdString(line); str.startsWith(searchTarget)) {
-            bool ok = false;
+            bool       ok    = false;
             const uint total = str.simplified().section(' ', 1, 1).toUInt(&ok);
             if (!ok) {
                 qWarning() << "Could not read /proc/meminfo: failed to parse string:" << str;
@@ -255,10 +257,10 @@ uint64_t HardwareInfo::availableRamMiB()
 
 QStringList HardwareInfo::gpuInfo()
 {
-    bool readingGpuInfo = false;
-    QString gpu;
-    QString driverInUse = "NONE";
-    QString driversAvailable = "NONE";
+    bool        readingGpuInfo = false;
+    QString     gpu;
+    QString     driverInUse      = "NONE";
+    QString     driversAvailable = "NONE";
     QStringList out;
 
     const bool success = readFromOutput("lspci -k", [&](const QString& str) {
@@ -270,7 +272,7 @@ QStringList HardwareInfo::gpuInfo()
         } else if (!str.startsWith('\t')) {
             if (readingGpuInfo) {
                 out << QString("GPU: %1 (driver in use: %2; drivers available: %3)").arg(gpu, driverInUse, driversAvailable);
-                driverInUse = "NONE";
+                driverInUse      = "NONE";
                 driversAvailable = "NONE";
             }
             readingGpuInfo = false;
@@ -292,7 +294,7 @@ QStringList HardwareInfo::gpuInfo()
         }
     });
     if (!success) {
-        return { "GPU discovery failed: could not read from lspci" };
+        return {"GPU discovery failed: could not read from lspci"};
     }
 
     return out;
@@ -339,6 +341,6 @@ uint64_t HardwareInfo::availableRamMiB()
 
 QStringList HardwareInfo::gpuInfo()
 {
-    return { "GPU discovery failed: not implemented for this OS" };
+    return {"GPU discovery failed: not implemented for this OS"};
 }
 #endif

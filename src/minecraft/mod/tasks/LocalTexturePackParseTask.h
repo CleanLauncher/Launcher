@@ -26,9 +26,14 @@
 
 #include "tasks/Task.h"
 
-namespace TexturePackUtils {
+namespace TexturePackUtils
+{
 
-enum class ProcessingLevel { Full, BasicInfoOnly };
+enum class ProcessingLevel
+{
+    Full,
+    BasicInfoOnly
+};
 
 bool process(TexturePack& pack, ProcessingLevel level = ProcessingLevel::Full);
 
@@ -43,9 +48,10 @@ bool processPackPNG(const TexturePack& pack);
 bool validate(QFileInfo file);
 }  // namespace TexturePackUtils
 
-class LocalTexturePackParseTask : public Task {
+class LocalTexturePackParseTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LocalTexturePackParseTask(int token, TexturePack& rp);
 
     bool canAbort() const override { return true; }
@@ -55,7 +61,7 @@ class LocalTexturePackParseTask : public Task {
 
     int token() const { return m_token; }
 
-   private:
+private:
     int m_token;
 
     TexturePack& m_texture_pack;

@@ -42,17 +42,18 @@
 
 #include "BasePageContainer.h"
 
-class BasePage {
-   public:
+class BasePage
+{
+public:
     using updateExtraInfoFunc = std::function<void(QString, QString)>;
     virtual ~BasePage() {}
-    virtual QString id() const = 0;
+    virtual QString id() const          = 0;
     virtual QString displayName() const = 0;
-    virtual QIcon icon() const = 0;
-    virtual bool apply() { return true; }
-    virtual bool shouldDisplay() const { return true; }
+    virtual QIcon   icon() const        = 0;
+    virtual bool    apply() { return true; }
+    virtual bool    shouldDisplay() const { return true; }
     virtual QString helpPage() const { return QString(); }
-    void opened()
+    void            opened()
     {
         isOpened = true;
         openedImpl();
@@ -67,14 +68,14 @@ class BasePage {
     virtual void setParentContainer(BasePageContainer* container) { m_container = container; };
     virtual void retranslate() {}
 
-   public:
-    int stackIndex = -1;
-    int listIndex = -1;
+public:
+    int                 stackIndex = -1;
+    int                 listIndex  = -1;
     updateExtraInfoFunc updateExtraInfo;
 
-   protected:
+protected:
     BasePageContainer* m_container = nullptr;
-    bool isOpened = false;
+    bool               isOpened    = false;
 };
 
 using BasePagePtr = std::shared_ptr<BasePage>;

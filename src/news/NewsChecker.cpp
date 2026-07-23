@@ -38,8 +38,8 @@
 #include <QByteArray>
 #include <QDomDocument>
 
-#include <QDebug>
 #include "Application.h"
+#include <QDebug>
 
 NewsChecker::NewsChecker(QNetworkAccessManager* network, const QString& feedUrl)
 {
@@ -62,7 +62,7 @@ void NewsChecker::reloadNews(const QString& newUrl)
 
     qDebug() << "Reloading news.";
 
-    NetJob::Ptr job{ new NetJob("News RSS Feed", m_network) };
+    NetJob::Ptr job{new NetJob("News RSS Feed", m_network)};
     job->addNetAction(Net::Download::makeCached(m_feedUrl, m_entry));
     job->setAskRetry(false);
     connect(job.get(), &NetJob::succeeded, this, &NewsChecker::rssDownloadFinished);
@@ -78,9 +78,9 @@ void NewsChecker::rssDownloadFinished()
     m_newsNetJob.reset();
     QDomDocument doc;
     {
-        QString errorMsg = "Unknown error.";
-        int errorLine = -1;
-        int errorCol = -1;
+        QString errorMsg  = "Unknown error.";
+        int     errorLine = -1;
+        int     errorCol  = -1;
 
         QFile feed(m_entry->getFullPath());
 
@@ -97,7 +97,7 @@ void NewsChecker::rssDownloadFinished()
     QDomNodeList items = doc.elementsByTagName("entry");
     m_newsEntries.clear();
     for (int i = 0; i < items.length(); i++) {
-        QDomElement element = items.at(i).toElement();
+        QDomElement  element = items.at(i).toElement();
         NewsEntryPtr entry;
         entry.reset(new NewsEntry());
         QString errorMsg = "An unknown error occurred.";

@@ -8,8 +8,9 @@
 #include <settings/INISettingsObject.h>
 #include <settings/SettingsObject.h>
 
-class TestVersion : public BaseVersion {
-   public:
+class TestVersion : public BaseVersion
+{
+public:
     QString m_name;
     QString m_descriptor;
 
@@ -20,10 +21,11 @@ class TestVersion : public BaseVersion {
     QString typeString() const override { return "Release"; }
 };
 
-class InstanceCreationTest : public QObject {
+class InstanceCreationTest : public QObject
+{
     Q_OBJECT
 
-   private:
+private:
     std::unique_ptr<SettingsObject> createGlobalSettings()
     {
         auto settings = std::make_unique<INISettingsObject>("dummy.ini");
@@ -101,13 +103,13 @@ class InstanceCreationTest : public QObject {
         settings.registerSetting("maxMemory", 0);
     }
 
-   private slots:
+private slots:
     void test_inifileCreation()
     {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
 
-        QString iniPath = tempDir.path() + "/instance.cfg";
+        QString           iniPath = tempDir.path() + "/instance.cfg";
         INISettingsObject settings(iniPath);
         registerCommonSettings(settings);
 
@@ -152,7 +154,7 @@ class InstanceCreationTest : public QObject {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
 
-        QString iniPath = tempDir.path() + "/instance.cfg";
+        QString           iniPath = tempDir.path() + "/instance.cfg";
         INISettingsObject settings(iniPath);
         registerCommonSettings(settings);
 
@@ -182,7 +184,7 @@ class InstanceCreationTest : public QObject {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
 
-        QString iniPath = tempDir.path() + "/instance.cfg";
+        QString           iniPath = tempDir.path() + "/instance.cfg";
         INISettingsObject settings(iniPath);
         registerCommonSettings(settings);
 
@@ -199,7 +201,7 @@ class InstanceCreationTest : public QObject {
         QTemporaryDir tempDir;
         QVERIFY(tempDir.isValid());
 
-        QString iniPath = tempDir.path() + "/instance.cfg";
+        QString           iniPath = tempDir.path() + "/instance.cfg";
         INISettingsObject settings(iniPath);
         registerCommonSettings(settings);
 

@@ -91,8 +91,8 @@ bool VersionSelectWidget::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == search && event->type() == QEvent::KeyPress) {
         const QKeyEvent* keyEvent = (QKeyEvent*)event;
-        const bool up = keyEvent->key() == Qt::Key_Up;
-        const bool down = keyEvent->key() == Qt::Key_Down;
+        const bool       up       = keyEvent->key() == Qt::Key_Up;
+        const bool       down     = keyEvent->key() == Qt::Key_Down;
         if (up || down) {
             const QModelIndex index = listView->model()->index(listView->currentIndex().row() + (up ? -1 : 1), 0);
             if (index.row() >= 0 && index.row() < listView->model()->rowCount()) {
@@ -218,7 +218,7 @@ bool VersionSelectWidget::hasVersions() const
 BaseVersion::Ptr VersionSelectWidget::selectedVersion() const
 {
     auto currentIndex = listView->selectionModel()->currentIndex();
-    auto variant = m_proxyModel->data(currentIndex, BaseVersionList::VersionPointerRole);
+    auto variant      = m_proxyModel->data(currentIndex, BaseVersionList::VersionPointerRole);
     return variant.value<BaseVersion::Ptr>();
 }
 

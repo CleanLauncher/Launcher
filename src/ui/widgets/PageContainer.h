@@ -53,9 +53,10 @@ class QLineEdit;
 class QStackedLayout;
 class QGridLayout;
 
-class PageContainer : public QWidget, public BasePageContainer {
+class PageContainer : public QWidget, public BasePageContainer
+{
     Q_OBJECT
-   public:
+public:
     explicit PageContainer(BasePageProvider* pageProvider, QString defaultId = QString(), QWidget* parent = nullptr);
     ~PageContainer() override = default;
 
@@ -75,40 +76,40 @@ class PageContainer : public QWidget, public BasePageContainer {
         return false;
     }
 
-    bool selectPage(QString pageId) override;
-    BasePage* selectedPage() const override;
-    BasePage* getPage(QString pageId) override;
+    bool                    selectPage(QString pageId) override;
+    BasePage*               selectedPage() const override;
+    BasePage*               getPage(QString pageId) override;
     const QList<BasePage*>& getPages() const;
 
-    void refreshContainer() override;
+    void         refreshContainer() override;
     virtual void setParentContainer(BasePageContainer* container) { m_container = container; };
 
     void changeEvent(QEvent*) override;
 
     void hidePageList() { m_pageList->hide(); }
 
-   private:
+private:
     void createUI();
     void retranslate();
 
-   public slots:
+public slots:
     void help();
 
-   signals:
+signals:
 
     void selectedPageChanged(BasePage* previous, BasePage* selected);
 
-   private slots:
+private slots:
     void currentChanged(const QModelIndex& current);
     void showPage(int row);
 
-   private:
-    BasePageContainer* m_container = nullptr;
-    BasePage* m_currentPage = 0;
+private:
+    BasePageContainer*     m_container   = nullptr;
+    BasePage*              m_currentPage = 0;
     QSortFilterProxyModel* m_proxyModel;
-    PageModel* m_model;
-    QStackedLayout* m_pageStack;
-    QListView* m_pageList;
-    QLabel* m_header;
-    QGridLayout* m_layout;
+    PageModel*             m_model;
+    QStackedLayout*        m_pageStack;
+    QListView*             m_pageList;
+    QLabel*                m_header;
+    QGridLayout*           m_layout;
 };

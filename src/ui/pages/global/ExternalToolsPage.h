@@ -39,19 +39,21 @@
 
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class ExternalToolsPage;
 }
 
-class ExternalToolsPage : public QWidget, public BasePage {
+class ExternalToolsPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ExternalToolsPage(QWidget* parent = 0);
     ~ExternalToolsPage();
 
     QString displayName() const override { return tr("Tools"); }
-    QIcon icon() const override
+    QIcon   icon() const override
     {
         auto icon = QIcon::fromTheme("externaltools");
         if (icon.isNull()) {
@@ -59,19 +61,19 @@ class ExternalToolsPage : public QWidget, public BasePage {
         }
         return icon;
     }
-    QString id() const override { return "external-tools"; }
-    QString helpPage() const override { return "Tools"; }
+    QString      id() const override { return "external-tools"; }
+    QString      helpPage() const override { return "Tools"; }
     virtual bool apply() override;
-    void retranslate() override;
+    void         retranslate() override;
 
-   private:
+private:
     void loadSettings();
     void applySettings();
 
-   private:
+private:
     Ui::ExternalToolsPage* ui;
 
-   private slots:
+private slots:
     void on_jprofilerPathBtn_clicked();
     void on_jprofilerCheckBtn_clicked();
     void on_jvisualvmPathBtn_clicked();

@@ -38,15 +38,16 @@
  */
 
 #include "FlameResourcePages.h"
-#include <QList>
-#include <memory>
 #include "../ui_ResourcePage.h"
 #include "modplatform/flame/FlameAPI.h"
+#include <QList>
+#include <memory>
 
 #include "FlameResourceModels.h"
 #include "ui/dialogs/ResourceDownloadDialog.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 FlameModPage::FlameModPage(ModDownloadDialog* dialog, BaseInstance& instance) : ModPage(dialog, instance)
 {
@@ -70,7 +71,7 @@ void FlameModPage::openUrl(const QUrl& url)
 
         if (query.startsWith("remoteUrl=")) {
             query.remove(0, 10);
-            ModPage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+            ModPage::openUrl({QUrl::fromPercentEncoding(query.toUtf8())});
 
             return;
         }
@@ -102,7 +103,7 @@ void FlameResourcePackPage::openUrl(const QUrl& url)
 
         if (query.startsWith("remoteUrl=")) {
             query.remove(0, 10);
-            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+            ResourcePackResourcePage::openUrl({QUrl::fromPercentEncoding(query.toUtf8())});
 
             return;
         }
@@ -134,7 +135,7 @@ void FlameTexturePackPage::openUrl(const QUrl& url)
 
         if (query.startsWith("remoteUrl=")) {
             query.remove(0, 10);
-            ResourcePackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+            ResourcePackResourcePage::openUrl({QUrl::fromPercentEncoding(query.toUtf8())});
 
             return;
         }
@@ -150,7 +151,7 @@ void FlameDataPackPage::openUrl(const QUrl& url)
 
         if (query.startsWith("remoteUrl=")) {
             query.remove(0, 10);
-            DataPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+            DataPackResourcePage::openUrl({QUrl::fromPercentEncoding(query.toUtf8())});
 
             return;
         }
@@ -197,7 +198,7 @@ void FlameShaderPackPage::openUrl(const QUrl& url)
 
         if (query.startsWith("remoteUrl=")) {
             query.remove(0, 10);
-            ShaderPackResourcePage::openUrl({ QUrl::fromPercentEncoding(query.toUtf8()) });
+            ShaderPackResourcePage::openUrl({QUrl::fromPercentEncoding(query.toUtf8())});
 
             return;
         }
@@ -235,7 +236,7 @@ std::unique_ptr<ModFilterWidget> FlameModPage::createFilterWidget()
 void FlameModPage::prepareProviderCategories()
 {
     auto [task, response] = FlameAPI::getModCategories();
-    m_categoriesTask = task;
+    m_categoriesTask      = task;
     connect(m_categoriesTask.get(), &Task::succeeded, [this, response]() {
         auto categories = FlameAPI::loadModCategories(*response);
         m_filter_widget->setCategories(categories);

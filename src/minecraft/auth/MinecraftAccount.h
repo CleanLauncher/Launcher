@@ -55,15 +55,17 @@ class MinecraftAccount;
 using MinecraftAccountPtr = shared_qobject_ptr<MinecraftAccount>;
 Q_DECLARE_METATYPE(MinecraftAccountPtr)
 
-struct AccountProfile {
+struct AccountProfile
+{
     QString id;
     QString name;
-    bool legacy;
+    bool    legacy;
 };
 
-class MinecraftAccount : public QObject, public Usable {
+class MinecraftAccount : public QObject, public Usable
+{
     Q_OBJECT
-   public:
+public:
     explicit MinecraftAccount(const MinecraftAccount& other, QObject* parent) = delete;
 
     explicit MinecraftAccount(QObject* parent = 0);
@@ -78,14 +80,14 @@ class MinecraftAccount : public QObject, public Usable {
 
     QJsonObject saveToJson() const;
 
-   public:
+public:
     shared_qobject_ptr<AuthFlow> login(bool useDeviceCode = false);
 
     shared_qobject_ptr<AuthFlow> refresh();
 
     shared_qobject_ptr<AuthFlow> currentTask();
 
-   public:
+public:
     QString internalId() const { return data.internalId; }
 
     QString accessToken() const { return data.accessToken(); }
@@ -107,37 +109,37 @@ class MinecraftAccount : public QObject, public Usable {
     QString typeString() const
     {
         switch (data.type) {
-            case AccountType::MSA: {
-                return "msa";
-            } break;
-            case AccountType::Ely: {
-                return "msa";
+        case AccountType::MSA: {
+            return "msa";
+        } break;
+        case AccountType::Ely: {
+            return "msa";
 
-            } break;
-            case AccountType::Offline: {
-                return "offline";
-            } break;
-            default: {
-                return "unknown";
-            }
+        } break;
+        case AccountType::Offline: {
+            return "offline";
+        } break;
+        default: {
+            return "unknown";
+        }
         }
     }
 
     QString nameWithType() const
     {
         switch (data.type) {
-            case AccountType::MSA: {
-                return QString("%1 [MSA]").arg(profileName());
-            } break;
-            case AccountType::Ely: {
-                return QString("%1 [Ely]").arg(profileName());
-            } break;
-            case AccountType::Offline: {
-                return QString("%1 [Offline]").arg(profileName());
-            } break;
-            default: {
-                return profileName();
-            }
+        case AccountType::MSA: {
+            return QString("%1 [MSA]").arg(profileName());
+        } break;
+        case AccountType::Ely: {
+            return QString("%1 [Ely]").arg(profileName());
+        } break;
+        case AccountType::Offline: {
+            return QString("%1 [Offline]").arg(profileName());
+        } break;
+        default: {
+            return profileName();
+        }
         }
     }
 
@@ -153,22 +155,22 @@ class MinecraftAccount : public QObject, public Usable {
 
     QString lastError() const { return data.lastError(); }
 
-   signals:
+signals:
 
     void changed();
 
     void activityChanged(bool active);
 
-   protected:
+protected:
     AccountData data;
 
     shared_qobject_ptr<AuthFlow> m_currentTask;
 
-   protected:
+protected:
     void incrementUses() override;
     void decrementUses() override;
 
-   private slots:
+private slots:
     void authSucceeded();
     void authFailed(QString reason);
 };

@@ -37,7 +37,6 @@
  *      limitations under the License.
  */
 
-#include <Version.h>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -47,6 +46,7 @@
 #include <QSaveFile>
 #include <QTimer>
 #include <QUuid>
+#include <Version.h>
 #include <algorithm>
 #include <utility>
 
@@ -122,19 +122,19 @@ static QJsonObject componentToJsonV1(ComponentPtr component)
 
 static ComponentPtr componentFromJsonV1(PackProfile* parent, const QString& componentJsonPattern, const QJsonObject& obj)
 {
-    auto uid = Json::requireString(obj.value("uid"));
-    auto filePath = componentJsonPattern.arg(uid);
-    auto component = makeShared<Component>(parent, uid);
-    component->m_version = obj.value("version").toString();
+    auto uid                    = Json::requireString(obj.value("uid"));
+    auto filePath               = componentJsonPattern.arg(uid);
+    auto component              = makeShared<Component>(parent, uid);
+    component->m_version        = obj.value("version").toString();
     component->m_dependencyOnly = obj.value("dependencyOnly").toBool();
-    component->m_important = obj.value("important").toBool();
+    component->m_important      = obj.value("important").toBool();
 
     component->m_cachedVersion = obj.value("cachedVersion").toString();
-    component->m_cachedName = obj.value("cachedName").toString();
+    component->m_cachedName    = obj.value("cachedName").toString();
     Meta::parseRequires(obj, &component->m_cachedRequires, "cachedRequires");
     Meta::parseRequires(obj, &component->m_cachedConflicts, "cachedConflicts");
     component->m_cachedVolatile = obj.value("volatile").toBool();
-    bool disabled = obj.value("disabled").toBool();
+    bool disabled               = obj.value("disabled").toBool();
     component->setEnabled(!disabled);
     return component;
 }
@@ -165,10 +165,8 @@ static bool savePackProfile(const QString& filename, const ComponentContainer& c
     return true;
 }
 
-static PackProfile::Result loadPackProfile(PackProfile* parent,
-                                           const QString& filename,
-                                           const QString& componentJsonPattern,
-                                           ComponentContainer& container)
+static PackProfile::Result
+loadPackProfile(PackProfile* parent, const QString& filename, const QString& componentJsonPattern, ComponentContainer& container)
 {
     QFile componentsFile(filename);
     if (!componentsFile.exists()) {
@@ -184,7 +182,7 @@ static PackProfile::Result loadPackProfile(PackProfile* parent,
     }
 
     QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(componentsFile.readAll(), &error);
+    QJsonDocument   doc = QJsonDocument::fromJson(componentsFile.readAll(), &error);
     if (error.error != QJsonParseError::NoError) {
         auto message = QObject::tr("Couldn't parse %1 as json: %2").arg(componentsFile.fileName(), error.errorString());
         qCCritical(instanceProfileC) << message;
@@ -229,7 +227,7 @@ bool PackProfile::saveIsScheduled() const
 void PackProfile::buildingFromScratch()
 {
     d->loaded = true;
-    d->dirty = true;
+    d->dirty  = true;
 }
 
 void PackProfile::scheduleSave()
@@ -495,7 +493,7 @@ QVariant PackProfile::data(const QModelIndex& index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    int row = index.row();
+    int row    = index.row();
     int column = index.column();
 
     if (row < 0 || row >= d->components.size())
@@ -504,40 +502,40 @@ QVariant PackProfile::data(const QModelIndex& index, int role) const
     auto patch = d->components.at(row);
 
     switch (role) {
-        case Qt::CheckStateRole: {
-            if (column == NameColumn)
-                return patch->isEnabled() ? Qt::Checked : Qt::Unchecked;
-            return QVariant();
-        }
-        case Qt::DisplayRole: {
-            switch (column) {
-                case NameColumn:
-                    return patch->getName();
-                case VersionColumn: {
-                    if (patch->isCustom()) {
-                        return QString("%1 (Custom)").arg(patch->getVersion());
-                    } else {
-                        return patch->getVersion();
-                    }
-                }
-                default:
-                    return QVariant();
+    case Qt::CheckStateRole: {
+        if (column == NameColumn)
+            return patch->isEnabled() ? Qt::Checked : Qt::Unchecked;
+        return QVariant();
+    }
+    case Qt::DisplayRole: {
+        switch (column) {
+        case NameColumn:
+            return patch->getName();
+        case VersionColumn: {
+            if (patch->isCustom()) {
+                return QString("%1 (Custom)").arg(patch->getVersion());
+            } else {
+                return patch->getVersion();
             }
         }
-        case Qt::DecorationRole: {
-            if (column == NameColumn) {
-                auto severity = patch->getProblemSeverity();
-                switch (severity) {
-                    case ProblemSeverity::Warning:
-                        return "warning";
-                    case ProblemSeverity::Error:
-                        return "error";
-                    default:
-                        return QVariant();
-                }
-            }
+        default:
             return QVariant();
         }
+    }
+    case Qt::DecorationRole: {
+        if (column == NameColumn) {
+            auto severity = patch->getProblemSeverity();
+            switch (severity) {
+            case ProblemSeverity::Warning:
+                return "warning";
+            case ProblemSeverity::Error:
+                return "error";
+            default:
+                return QVariant();
+            }
+        }
+        return QVariant();
+    }
     }
     return QVariant();
 }
@@ -562,12 +560,12 @@ QVariant PackProfile::headerData(int section, Qt::Orientation orientation, int r
     if (orientation == Qt::Horizontal) {
         if (role == Qt::DisplayRole) {
             switch (section) {
-                case NameColumn:
-                    return tr("Name");
-                case VersionColumn:
-                    return tr("Version");
-                default:
-                    return QVariant();
+            case NameColumn:
+                return tr("Name");
+            case VersionColumn:
+                return tr("Version");
+            default:
+                return QVariant();
             }
         }
     }
@@ -626,7 +624,7 @@ void PackProfile::move(const int index, const MoveDirection direction)
     int togap = theirIndex > index ? theirIndex + 1 : theirIndex;
 
     auto from = getComponent(index);
-    auto to = getComponent(theirIndex);
+    auto to   = getComponent(theirIndex);
 
     if (!from || !to || !to->isMoveable() || !from->isMoveable()) {
         return;
@@ -663,8 +661,8 @@ bool PackProfile::installComponents(QStringList selectedFiles)
     for (const QString& source : selectedFiles) {
         const QFileInfo sourceInfo(source);
 
-        auto versionFile = ProfileUtils::parseJsonFile(sourceInfo, false);
-        const QString target = FS::PathCombine(patchDir, versionFile->uid + ".json");
+        auto          versionFile = ProfileUtils::parseJsonFile(sourceInfo, false);
+        const QString target      = FS::PathCombine(patchDir, versionFile->uid + ".json");
 
         if (!QFile::copy(source, target)) {
             qCWarning(instanceProfileC) << d->m_instance->name() << "|" << "Component" << source << "could not be copied to target"
@@ -693,12 +691,12 @@ bool PackProfile::installEmpty(const QString& uid, const QString& name)
     if (!FS::ensureFolderPathExists(patchDir)) {
         return false;
     }
-    auto f = std::make_shared<VersionFile>();
-    f->name = name;
-    f->uid = uid;
-    f->version = "1";
+    auto f                = std::make_shared<VersionFile>();
+    f->name               = name;
+    f->uid                = uid;
+    f->version            = "1";
     QString patchFileName = FS::PathCombine(patchDir, uid + ".json");
-    QFile file(patchFileName);
+    QFile   file(patchFileName);
     if (!file.open(QFile::WriteOnly)) {
         qCCritical(instanceProfileC) << d->m_instance->name() << "|" << "Error opening" << file.fileName()
                                      << "for reading:" << file.errorString();
@@ -769,11 +767,11 @@ bool PackProfile::installJarMods_internal(QStringList filepaths)
 
     for (auto filepath : filepaths) {
         QFileInfo sourceInfo(filepath);
-        QString id = QUuid::createUuid().toString(QUuid::WithoutBraces);
-        QString target_filename = id + ".jar";
-        QString target_id = "custom.jarmod." + id;
-        QString target_name = sourceInfo.completeBaseName() + " (jar mod)";
-        QString finalPath = FS::PathCombine(d->m_instance->jarModsDir(), target_filename);
+        QString   id              = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        QString   target_filename = id + ".jar";
+        QString   target_id       = "custom.jarmod." + id;
+        QString   target_name     = sourceInfo.completeBaseName() + " (jar mod)";
+        QString   finalPath       = FS::PathCombine(d->m_instance->jarModsDir(), target_filename);
 
         QFileInfo targetInfo(finalPath);
         Q_ASSERT(!targetInfo.exists());
@@ -782,15 +780,15 @@ bool PackProfile::installJarMods_internal(QStringList filepaths)
             return false;
         }
 
-        auto f = std::make_shared<VersionFile>();
+        auto f      = std::make_shared<VersionFile>();
         auto jarMod = std::make_shared<Library>();
         jarMod->setRawName(GradleSpecifier("custom.jarmods:" + id + ":1"));
         jarMod->setFilename(target_filename);
         jarMod->setDisplayName(sourceInfo.completeBaseName());
         jarMod->setHint("local");
         f->jarMods.append(jarMod);
-        f->name = target_name;
-        f->uid = target_id;
+        f->name               = target_name;
+        f->uid                = target_id;
         QString patchFileName = FS::PathCombine(patchDir, target_id + ".json");
 
         QFile file(patchFileName);
@@ -821,12 +819,12 @@ bool PackProfile::installCustomJar_internal(QString filepath)
         return false;
     }
 
-    auto specifier = GradleSpecifier("custom:customjar:1");
+    auto      specifier = GradleSpecifier("custom:customjar:1");
     QFileInfo sourceInfo(filepath);
-    QString target_filename = specifier.getFileName();
-    QString target_id = specifier.artifactId();
-    QString target_name = sourceInfo.completeBaseName() + " (custom jar)";
-    QString finalPath = FS::PathCombine(libDir, target_filename);
+    QString   target_filename = specifier.getFileName();
+    QString   target_id       = specifier.artifactId();
+    QString   target_name     = sourceInfo.completeBaseName() + " (custom jar)";
+    QString   finalPath       = FS::PathCombine(libDir, target_filename);
 
     QFileInfo jarInfo(finalPath);
     if (jarInfo.exists()) {
@@ -838,14 +836,14 @@ bool PackProfile::installCustomJar_internal(QString filepath)
         return false;
     }
 
-    auto f = std::make_shared<VersionFile>();
+    auto f      = std::make_shared<VersionFile>();
     auto jarMod = std::make_shared<Library>();
     jarMod->setRawName(specifier);
     jarMod->setDisplayName(sourceInfo.completeBaseName());
     jarMod->setHint("local");
-    f->mainJar = jarMod;
-    f->name = target_name;
-    f->uid = target_id;
+    f->mainJar            = jarMod;
+    f->name               = target_name;
+    f->uid                = target_id;
     QString patchFileName = FS::PathCombine(patchDir, target_id + ".json");
 
     QFile file(patchFileName);
@@ -876,11 +874,11 @@ bool PackProfile::installAgents_internal(QStringList filepaths)
 
     for (const QString& source : filepaths) {
         const QFileInfo sourceInfo(source);
-        const QString id = QUuid::createUuid().toString(QUuid::WithoutBraces);
-        const QString targetBaseName = id + ".jar";
-        const QString targetId = "custom.agent." + id;
-        const QString targetName = sourceInfo.completeBaseName() + " (agent)";
-        const QString target = FS::PathCombine(d->m_instance->getLocalLibraryPath(), targetBaseName);
+        const QString   id             = QUuid::createUuid().toString(QUuid::WithoutBraces);
+        const QString   targetBaseName = id + ".jar";
+        const QString   targetId       = "custom.agent." + id;
+        const QString   targetName     = sourceInfo.completeBaseName() + " (agent)";
+        const QString   target         = FS::PathCombine(d->m_instance->getLocalLibraryPath(), targetBaseName);
 
         const QFileInfo targetInfo(target);
         Q_ASSERT(!targetInfo.exists());
@@ -897,10 +895,10 @@ bool PackProfile::installAgents_internal(QStringList filepaths)
         agent->setDisplayName(sourceInfo.completeBaseName());
         agent->setHint("local");
 
-        versionFile->agents.append(Agent{ agent, QString() });
+        versionFile->agents.append(Agent{agent, QString()});
 
         versionFile->name = targetName;
-        versionFile->uid = targetId;
+        versionFile->uid  = targetId;
 
         QFile patchFile(FS::PathCombine(patchDir, targetId + ".json"));
 
@@ -952,7 +950,7 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
             component->setImportant(important);
 
             if (important) {
-                component->setUpdateAction(UpdateAction{ UpdateActionImportantChanged{ oldVersion } });
+                component->setUpdateAction(UpdateAction{UpdateActionImportantChanged{oldVersion}});
                 resolve(Net::Mode::Online);
             }
 
@@ -960,8 +958,8 @@ bool PackProfile::setComponentVersion(const QString& uid, const QString& version
         }
         return false;
     } else {
-        auto component = makeShared<Component>(this, uid);
-        component->m_version = version;
+        auto component         = makeShared<Component>(this, uid);
+        component->m_version   = version;
         component->m_important = important;
         appendComponent(component);
         return true;
@@ -981,7 +979,7 @@ void PackProfile::disableInteraction(bool disable)
 {
     if (d->interactionDisabled != disable) {
         d->interactionDisabled = disable;
-        auto size = d->components.size();
+        auto size              = d->components.size();
         if (size) {
             emit dataChanged(index(0), index(size - 1));
         }
@@ -991,7 +989,7 @@ void PackProfile::disableInteraction(bool disable)
 std::optional<ModPlatform::ModLoaderTypes> PackProfile::getModLoaders()
 {
     ModPlatform::ModLoaderTypes result;
-    bool has_any_loader = false;
+    bool                        has_any_loader = false;
 
     QMapIterator<QString, ModloaderMapEntry> i(Component::KNOWN_MODLOADERS);
 

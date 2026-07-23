@@ -76,16 +76,16 @@ MinecraftAccountPtr MinecraftAccount::createBlank(const AccountType type)
 
 MinecraftAccountPtr MinecraftAccount::createOffline(const QString& username)
 {
-    auto account = makeShared<MinecraftAccount>();
-    account->data.type = AccountType::Offline;
-    account->data.yggdrasilToken.token = "0";
-    account->data.yggdrasilToken.validity = Validity::Certain;
-    account->data.yggdrasilToken.issueInstant = QDateTime::currentDateTimeUtc();
-    account->data.yggdrasilToken.extra["userName"] = username;
+    auto account                                      = makeShared<MinecraftAccount>();
+    account->data.type                                = AccountType::Offline;
+    account->data.yggdrasilToken.token                = "0";
+    account->data.yggdrasilToken.validity             = Validity::Certain;
+    account->data.yggdrasilToken.issueInstant         = QDateTime::currentDateTimeUtc();
+    account->data.yggdrasilToken.extra["userName"]    = username;
     account->data.yggdrasilToken.extra["clientToken"] = QUuid::createUuid().toString(QUuid::Id128);
-    account->data.minecraftProfile.id = uuidFromUsername(username).toString(QUuid::Id128);
-    account->data.minecraftProfile.name = username;
-    account->data.minecraftProfile.validity = Validity::Certain;
+    account->data.minecraftProfile.id                 = uuidFromUsername(username).toString(QUuid::Id128);
+    account->data.minecraftProfile.name               = username;
+    account->data.minecraftProfile.validity           = Validity::Certain;
     return account;
 }
 
@@ -155,34 +155,34 @@ void MinecraftAccount::authSucceeded()
 void MinecraftAccount::authFailed(QString reason)
 {
     switch (m_currentTask->taskState()) {
-        case AccountTaskState::STATE_OFFLINE:
-        case AccountTaskState::STATE_DISABLED: {
+    case AccountTaskState::STATE_OFFLINE:
+    case AccountTaskState::STATE_DISABLED: {
+    }
+    case AccountTaskState::STATE_FAILED_SOFT: {
+    } break;
+    case AccountTaskState::STATE_FAILED_HARD: {
+        if (accountType() == AccountType::MSA || accountType() == AccountType::Ely) {
+            data.msaToken.token         = QString();
+            data.msaToken.refresh_token = QString();
+            data.msaToken.validity      = Validity::None;
+            data.validity_              = Validity::None;
+        } else {
+            data.yggdrasilToken.token    = QString();
+            data.yggdrasilToken.validity = Validity::None;
+            data.validity_               = Validity::None;
         }
-        case AccountTaskState::STATE_FAILED_SOFT: {
-        } break;
-        case AccountTaskState::STATE_FAILED_HARD: {
-            if (accountType() == AccountType::MSA || accountType() == AccountType::Ely) {
-                data.msaToken.token = QString();
-                data.msaToken.refresh_token = QString();
-                data.msaToken.validity = Validity::None;
-                data.validity_ = Validity::None;
-            } else {
-                data.yggdrasilToken.token = QString();
-                data.yggdrasilToken.validity = Validity::None;
-                data.validity_ = Validity::None;
-            }
-            emit changed();
-        } break;
-        case AccountTaskState::STATE_FAILED_GONE: {
-            data.validity_ = Validity::None;
-            emit changed();
-        } break;
-        case AccountTaskState::STATE_WORKING: {
-            data.accountState = AccountState::Unchecked;
-        } break;
-        case AccountTaskState::STATE_CREATED:
-        case AccountTaskState::STATE_SUCCEEDED: {
-        }
+        emit changed();
+    } break;
+    case AccountTaskState::STATE_FAILED_GONE: {
+        data.validity_ = Validity::None;
+        emit changed();
+    } break;
+    case AccountTaskState::STATE_WORKING: {
+        data.accountState = AccountState::Unchecked;
+    } break;
+    case AccountTaskState::STATE_CREATED:
+    case AccountTaskState::STATE_SUCCEEDED: {
+    }
     }
     m_currentTask.reset();
     emit activityChanged(false);
@@ -192,18 +192,18 @@ QString MinecraftAccount::displayName() const
 {
     const auto typeFriendlyString = [](const AccountType type) {
         switch (type) {
-            case AccountType::MSA:
-                return QStringLiteral("MSA");
-            case AccountType::Ely:
-                return QStringLiteral("Ely.by");
-            case AccountType::Offline:
-                return QStringLiteral("Offline");
+        case AccountType::MSA:
+            return QStringLiteral("MSA");
+        case AccountType::Ely:
+            return QStringLiteral("Ely.by");
+        case AccountType::Offline:
+            return QStringLiteral("Offline");
         }
         Q_ASSERT_X(false, "MinecraftAccount::displayName", "No type friendly string mapping for current account type");
         return QString();
     };
     const QString nameWithType = QString("%1 [%2]").arg(profileName(), typeFriendlyString(data.type));
-    if (const QList validStates{ AccountState::Unchecked, AccountState::Working, AccountState::Offline, AccountState::Online };
+    if (const QList validStates{AccountState::Unchecked, AccountState::Working, AccountState::Offline, AccountState::Online};
         !validStates.contains(accountState())) {
         return QString("⚠ %1").arg(nameWithType);
     }
@@ -221,18 +221,18 @@ bool MinecraftAccount::shouldRefresh() const
         return false;
     }
     switch (data.validity_) {
-        case Validity::Certain: {
-            break;
-        }
-        case Validity::None: {
-            return false;
-        }
-        case Validity::Assumed: {
-            return true;
-        }
+    case Validity::Certain: {
+        break;
     }
-    auto now = QDateTime::currentDateTimeUtc();
-    auto issuedTimestamp = data.yggdrasilToken.issueInstant;
+    case Validity::None: {
+        return false;
+    }
+    case Validity::Assumed: {
+        return true;
+    }
+    }
+    auto now              = QDateTime::currentDateTimeUtc();
+    auto issuedTimestamp  = data.yggdrasilToken.issueInstant;
     auto expiresTimestamp = data.yggdrasilToken.notAfter;
 
     if (!expiresTimestamp.isValid()) {
@@ -261,18 +261,18 @@ void MinecraftAccount::fillSession(AuthSessionPtr session, int elyPatchPreferenc
         session->session = "-";
     }
     switch (elyPatchPreference) {
-        case 0: {
-            session->wantsElyPatch = true;
-        } break;
-        case 1: {
-            session->wantsElyPatch = data.type == AccountType::Ely || data.type == AccountType::Offline;
-        } break;
-        case 2: {
-            session->wantsElyPatch = data.type == AccountType::Ely;
-        } break;
-        default: {
-            session->wantsElyPatch = false;
-        }
+    case 0: {
+        session->wantsElyPatch = true;
+    } break;
+    case 1: {
+        session->wantsElyPatch = data.type == AccountType::Ely || data.type == AccountType::Offline;
+    } break;
+    case 2: {
+        session->wantsElyPatch = data.type == AccountType::Ely;
+    } break;
+    default: {
+        session->wantsElyPatch = false;
+    }
     }
 }
 
@@ -303,7 +303,7 @@ QUuid MinecraftAccount::uuidFromUsername(QString username)
 
     QByteArray digest = QCryptographicHash::hash(input, QCryptographicHash::Md5);
 
-    auto bOr = [](QByteArray& array, qsizetype index, uint8_t value) { array[index] |= value; };
+    auto bOr  = [](QByteArray& array, qsizetype index, uint8_t value) { array[index] |= value; };
     auto bAnd = [](QByteArray& array, qsizetype index, uint8_t value) { array[index] &= value; };
     bAnd(digest, 6, 0x0f);
 

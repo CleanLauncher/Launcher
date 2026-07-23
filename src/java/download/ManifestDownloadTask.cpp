@@ -23,14 +23,16 @@
 #include "net/ChecksumValidator.h"
 #include "net/NetJob.h"
 
-struct File {
-    QString path;
-    QString url;
+struct File
+{
+    QString    path;
+    QString    url;
     QByteArray hash;
-    bool isExec;
+    bool       isExec;
 };
 
-namespace Java {
+namespace Java
+{
 ManifestDownloadTask::ManifestDownloadTask(QUrl url, QString final_path, QString checksumType, QString checksumHash)
     : m_url(url), m_final_path(final_path), m_checksum_type(checksumType), m_checksum_hash(checksumHash)
 {}
@@ -58,7 +60,7 @@ void ManifestDownloadTask::executeTask()
 
     connect(download.get(), &Task::succeeded, [files, this] {
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(*files, &parse_error);
+        QJsonDocument   doc = QJsonDocument::fromJson(*files, &parse_error);
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response at" << parse_error.offset << "reason:" << parse_error.errorString();
             qWarning() << *files;
@@ -75,12 +77,12 @@ void ManifestDownloadTask::downloadJava(const QJsonDocument& doc)
 {
     FS::ensureFolderPathExists(m_final_path);
     std::vector<File> toDownload;
-    auto list = doc.object()["files"].toObject();
+    auto              list = doc.object()["files"].toObject();
     for (const auto& paths : list.keys()) {
         auto file = FS::PathCombine(m_final_path, paths);
 
         const QJsonObject& meta = list[paths].toObject();
-        auto type = meta["type"].toString();
+        auto               type = meta["type"].toString();
         if (type == "directory") {
             FS::ensureFolderPathExists(file);
         } else if (type == "link") {
@@ -89,11 +91,11 @@ void ManifestDownloadTask::downloadJava(const QJsonDocument& doc)
                 QFile::link(path, file);
             }
         } else if (type == "file") {
-            auto raw = meta["downloads"].toObject()["raw"].toObject();
+            auto raw    = meta["downloads"].toObject()["raw"].toObject();
             auto isExec = meta["executable"].toBool();
-            auto url = raw["url"].toString();
+            auto url    = raw["url"].toString();
             if (!url.isEmpty() && QUrl(url).isValid()) {
-                auto f = File{ file, url, QByteArray::fromHex(raw["sha1"].toString().toLatin1()), isExec };
+                auto f = File{file, url, QByteArray::fromHex(raw["sha1"].toString().toLatin1()), isExec};
                 toDownload.push_back(f);
             }
         }
@@ -105,8 +107,9 @@ void ManifestDownloadTask::downloadJava(const QJsonDocument& doc)
             dl->addValidator(new Net::ChecksumValidator(QCryptographicHash::Sha1, file.hash));
         }
         if (file.isExec) {
-            connect(dl.get(), &Net::Download::succeeded,
-                    [file] { QFile(file.path).setPermissions(QFile(file.path).permissions() | QFileDevice::Permissions(0x1111)); });
+            connect(dl.get(), &Net::Download::succeeded, [file] {
+                QFile(file.path).setPermissions(QFile(file.path).permissions() | QFileDevice::Permissions(0x1111));
+            });
         }
         elementDownload->addNetAction(dl);
     }

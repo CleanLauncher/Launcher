@@ -4,16 +4,18 @@
 #include <QSet>
 #include <QString>
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
-class PrivatePackManager {
-   public:
+class PrivatePackManager
+{
+public:
     ~PrivatePackManager() { save(); }
-    void load();
-    void save() const;
-    bool empty() const { return currentPacks.empty(); }
+    void                 load();
+    void                 save() const;
+    bool                 empty() const { return currentPacks.empty(); }
     const QSet<QString>& getCurrentPackCodes() const { return currentPacks; }
-    void add(const QString& code)
+    void                 add(const QString& code)
     {
         currentPacks.insert(code);
         dirty = true;
@@ -24,10 +26,10 @@ class PrivatePackManager {
         dirty = true;
     }
 
-   private:
+private:
     QSet<QString> currentPacks;
-    QString m_filename = "private_packs.txt";
-    mutable bool dirty = false;
+    QString       m_filename = "private_packs.txt";
+    mutable bool  dirty      = false;
 };
 
 }  // namespace LegacyFTB

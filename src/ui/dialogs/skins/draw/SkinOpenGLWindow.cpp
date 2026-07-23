@@ -75,7 +75,7 @@ SkinOpenGLWindow::~SkinOpenGLWindow()
 
 void SkinOpenGLWindow::mousePressEvent(QMouseEvent* e)
 {
-    m_mousePosition = QVector2D(e->pos());
+    m_mousePosition  = QVector2D(e->pos());
     m_isMousePressed = true;
 }
 
@@ -119,7 +119,7 @@ void SkinOpenGLWindow::initializeGL()
     generateBackgroundTexture(32, 32, 1);
 
     QImage skin, cape;
-    bool slim = false;
+    bool   slim = false;
     if (m_parent) {
         if (auto s = m_parent->getSelectedSkin()) {
             skin = s->getTexture();
@@ -128,7 +128,7 @@ void SkinOpenGLWindow::initializeGL()
         }
     }
 
-    m_scene = new opengl::Scene(skin, slim, cape);
+    m_scene      = new opengl::Scene(skin, slim, cape);
     m_background = opengl::BoxGeometry::Plane();
     glEnable(GL_TEXTURE_2D);
 }
@@ -173,7 +173,7 @@ void SkinOpenGLWindow::resizeGL(int w, int h)
     m_projection.setToIdentity();
 
     double radians = qDegreesToRadians(fov / 2.);
-    double sine = std::sin(radians);
+    double sine    = std::sin(radians);
     if (sine == 0)
         return;
     double cotan = std::cos(radians) / sine;
@@ -207,8 +207,8 @@ void SkinOpenGLWindow::paintGL()
     m_backgroundProgram->release();
 
     QMatrix4x4 matrix;
-    float yawRad = qDegreesToRadians(m_yaw);
-    float pitchRad = qDegreesToRadians(m_pitch);
+    float      yawRad   = qDegreesToRadians(m_yaw);
+    float      pitchRad = qDegreesToRadians(m_pitch);
     matrix.lookAt(QVector3D(
 
                       m_distance * qCos(pitchRad) * qCos(yawRad),
@@ -216,7 +216,8 @@ void SkinOpenGLWindow::paintGL()
                       m_distance * qSin(pitchRad) - 8,
 
                       m_distance * qCos(pitchRad) * qSin(yawRad)),
-                  QVector3D(0, -8, 0), QVector3D(0, 1, 0));
+                  QVector3D(0, -8, 0),
+                  QVector3D(0, 1, 0));
 
     m_modelProgram->bind();
     m_modelProgram->setUniformValue("mvp_matrix", m_projection * matrix);
@@ -262,11 +263,11 @@ QColor calculateContrastingColor(const QColor& color)
 QImage generateChessboardImage(int width, int height, int tileSize, QColor baseColor)
 {
     QImage image(width, height, QImage::Format_RGB888);
-    bool isDarkBase = Rainbow::luma(baseColor) < 0.5;
-    float contrast = isDarkBase ? 0.05 : 0.45;
-    auto contrastFunc = std::bind(isDarkBase ? Rainbow::lighten : Rainbow::darken, std::placeholders::_1, contrast, 1.0);
-    auto white = contrastFunc(baseColor);
-    auto black = contrastFunc(calculateContrastingColor(baseColor));
+    bool   isDarkBase   = Rainbow::luma(baseColor) < 0.5;
+    float  contrast     = isDarkBase ? 0.05 : 0.45;
+    auto   contrastFunc = std::bind(isDarkBase ? Rainbow::lighten : Rainbow::darken, std::placeholders::_1, contrast, 1.0);
+    auto   white        = contrastFunc(baseColor);
+    auto   black        = contrastFunc(calculateContrastingColor(baseColor));
     for (int y = 0; y < height; ++y) {
         for (int x = 0; x < width; ++x) {
             bool isWhite = ((x / tileSize) + (y / tileSize)) % 2 == 0;

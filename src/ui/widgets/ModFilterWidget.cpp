@@ -34,11 +34,6 @@
  */
 
 #include "ModFilterWidget.h"
-#include <QCheckBox>
-#include <QComboBox>
-#include <QListWidget>
-#include <algorithm>
-#include <list>
 #include "BaseVersionList.h"
 #include "Json.h"
 #include "Version.h"
@@ -46,6 +41,11 @@
 #include "modplatform/ModIndex.h"
 #include "ui/widgets/CheckComboBox.h"
 #include "ui_ModFilterWidget.h"
+#include <QCheckBox>
+#include <QComboBox>
+#include <QListWidget>
+#include <algorithm>
+#include <list>
 
 #include "Application.h"
 #include "minecraft/PackProfile.h"
@@ -55,10 +55,11 @@ std::unique_ptr<ModFilterWidget> ModFilterWidget::create(MinecraftInstance* inst
     return std::unique_ptr<ModFilterWidget>(new ModFilterWidget(instance, extended));
 }
 
-class VersionBasicModel : public QIdentityProxyModel {
+class VersionBasicModel : public QIdentityProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     explicit VersionBasicModel(QObject* parent = nullptr) : QIdentityProxyModel(parent) {}
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override
@@ -71,10 +72,11 @@ class VersionBasicModel : public QIdentityProxyModel {
     }
 };
 
-class AllVersionProxyModel : public QSortFilterProxyModel {
+class AllVersionProxyModel : public QSortFilterProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     AllVersionProxyModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) {}
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override { return QSortFilterProxyModel::rowCount(parent) + 1; }
@@ -227,7 +229,7 @@ void ModFilterWidget::prepareBasicFilter()
     m_filter->openSource = false;
     if (m_instance) {
         m_filter->hideInstalled = false;
-        m_filter->side = ModPlatform::Side::NoSide;
+        m_filter->side          = ModPlatform::Side::NoSide;
 
         ModPlatform::ModLoaderTypes loaders;
         if (m_instance->settings()->get("OverrideModDownloadLoaders").toBool()) {
@@ -248,9 +250,9 @@ void ModFilterWidget::prepareBasicFilter()
         ui->ornithe->setChecked(loaders & ModPlatform::Ornithe);
         ui->rift->setChecked(loaders & ModPlatform::Rift);
         m_filter->loaders = loaders;
-        auto def = m_instance->getPackProfile()->getComponentVersion("net.minecraft");
+        auto def          = m_instance->getPackProfile()->getComponentVersion("net.minecraft");
         m_filter->versions.emplace_back(def);
-        ui->versions->setCheckedItems({ def });
+        ui->versions->setCheckedItems({def});
         ui->version->setCurrentIndex(ui->version->findText(def));
     } else {
         ui->hideInstalled->hide();
@@ -304,7 +306,7 @@ void ModFilterWidget::onLoadersFilterChanged()
         loaders |= ModPlatform::Ornithe;
     if (ui->rift->isChecked())
         loaders |= ModPlatform::Rift;
-    m_filter_changed = loaders != m_filter->loaders;
+    m_filter_changed  = loaders != m_filter->loaders;
     m_filter->loaders = loaders;
     if (m_filter_changed)
         emit filterChanged();
@@ -325,15 +327,15 @@ void ModFilterWidget::onSideFilterChanged()
     }
 
     m_filter_changed = side != m_filter->side;
-    m_filter->side = side;
+    m_filter->side   = side;
     if (m_filter_changed)
         emit filterChanged();
 }
 
 void ModFilterWidget::onHideInstalledFilterChanged()
 {
-    auto hide = ui->hideInstalled->isChecked();
-    m_filter_changed = hide != m_filter->hideInstalled;
+    auto hide               = ui->hideInstalled->isChecked();
+    m_filter_changed        = hide != m_filter->hideInstalled;
     m_filter->hideInstalled = hide;
     if (m_filter_changed)
         emit filterChanged();
@@ -361,7 +363,7 @@ void ModFilterWidget::setCategories(const QList<ModPlatform::Category>& categori
         name.replace("-", " ");
         name.replace("&", "&&");
         auto checkbox = new QCheckBox(name);
-        auto font = checkbox->font();
+        auto font     = checkbox->font();
         font.setCapitalization(QFont::Capitalize);
         checkbox->setFont(font);
 
@@ -382,8 +384,8 @@ void ModFilterWidget::setCategories(const QList<ModPlatform::Category>& categori
 
 void ModFilterWidget::onOpenSourceFilterChanged()
 {
-    auto open = ui->openSource->isChecked();
-    m_filter_changed = open != m_filter->openSource;
+    auto open            = ui->openSource->isChecked();
+    m_filter_changed     = open != m_filter->openSource;
     m_filter->openSource = open;
     if (m_filter_changed)
         emit filterChanged();
@@ -400,7 +402,7 @@ void ModFilterWidget::onReleaseFilterChanged()
         releases.push_back(ModPlatform::IndexedVersionType::Alpha);
     if (ui->unknownCb->isChecked())
         releases.push_back(ModPlatform::IndexedVersionType::Unknown);
-    m_filter_changed = releases != m_filter->releases;
+    m_filter_changed   = releases != m_filter->releases;
     m_filter->releases = releases;
     if (m_filter_changed)
         emit filterChanged();

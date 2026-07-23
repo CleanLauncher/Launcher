@@ -25,7 +25,8 @@
 #include "net/NetJob.h"
 #include "tasks/Task.h"
 
-namespace Java {
+namespace Java
+{
 ArchiveDownloadTask::ArchiveDownloadTask(QUrl url, QString final_path, QString checksumType, QString checksumHash)
     : m_url(url), m_final_path(final_path), m_checksum_type(checksumType), m_checksum_hash(checksumHash)
 {}
@@ -37,7 +38,7 @@ void ArchiveDownloadTask::executeTask()
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("java", m_url.fileName());
 
     auto download = makeShared<NetJob>(QString("JRE::DownloadJava"), APPLICATION->network());
-    auto action = Net::Download::makeCached(m_url, entry);
+    auto action   = Net::Download::makeCached(m_url, entry);
     if (!m_checksum_hash.isEmpty() && !m_checksum_type.isEmpty()) {
         auto hashType = QCryptographicHash::Algorithm::Sha1;
         if (m_checksum_type == "sha256") {
@@ -74,7 +75,7 @@ void ArchiveDownloadTask::extractJava(QString input)
         return;
     }
     auto firstFolderParts = files[0].split('/', Qt::SkipEmptyParts);
-    m_task = makeShared<MMCZip::ExtractZipTask>(input, m_final_path, firstFolderParts.value(0));
+    m_task                = makeShared<MMCZip::ExtractZipTask>(input, m_final_path, firstFolderParts.value(0));
 
     auto progressStep = std::make_shared<TaskStepProgress>();
     connect(m_task.get(), &Task::finished, this, [this, progressStep] {

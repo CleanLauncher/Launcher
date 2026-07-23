@@ -39,17 +39,18 @@
 #include <QStringList>
 #include <QUrl>
 
-struct ModLicense {
-    QString name = {};
-    QString id = {};
-    QString url = {};
+struct ModLicense
+{
+    QString name        = {};
+    QString id          = {};
+    QString url         = {};
     QString description = {};
 
     ModLicense() {}
 
     ModLicense(const QString license)
     {
-        auto parts = license.split(' ');
+        auto        parts        = license.split(' ');
         QStringList notNameParts = {};
         for (auto part : parts) {
             auto _url = QUrl(part);
@@ -67,8 +68,8 @@ struct ModLicense {
             parts.removeOne(part);
         }
 
-        auto licensePart = parts.join(' ');
-        this->name = licensePart;
+        auto licensePart  = parts.join(' ');
+        this->name        = licensePart;
         this->description = licensePart;
 
         if (parts.size() == 1) {
@@ -84,9 +85,9 @@ struct ModLicense {
 
     ModLicense& operator=(const ModLicense& other)
     {
-        this->name = other.name;
-        this->id = other.id;
-        this->url = other.url;
+        this->name        = other.name;
+        this->id          = other.id;
+        this->url         = other.url;
         this->description = other.description;
 
         return *this;
@@ -94,9 +95,9 @@ struct ModLicense {
 
     ModLicense& operator=(const ModLicense&& other)
     {
-        this->name = other.name;
-        this->id = other.id;
-        this->url = other.url;
+        this->name        = other.name;
+        this->id          = other.id;
+        this->url         = other.url;
         this->description = other.description;
 
         return *this;
@@ -105,7 +106,8 @@ struct ModLicense {
     bool isEmpty() { return this->name.isEmpty() && this->id.isEmpty() && this->url.isEmpty() && this->description.isEmpty(); }
 };
 
-struct ModDetails {
+struct ModDetails
+{
     QString mod_id = {};
 
     QString name = {};
@@ -132,17 +134,9 @@ struct ModDetails {
     ModDetails() = default;
 
     ModDetails(const ModDetails& other)
-        : mod_id(other.mod_id)
-        , name(other.name)
-        , version(other.version)
-        , mcversion(other.mcversion)
-        , homeurl(other.homeurl)
-        , description(other.description)
-        , authors(other.authors)
-        , issue_tracker(other.issue_tracker)
-        , licenses(other.licenses)
-        , icon_file(other.icon_file)
-        , dependencies(other.dependencies)
+        : mod_id(other.mod_id), name(other.name), version(other.version), mcversion(other.mcversion), homeurl(other.homeurl),
+          description(other.description), authors(other.authors), issue_tracker(other.issue_tracker), licenses(other.licenses),
+          icon_file(other.icon_file), dependencies(other.dependencies)
     {}
 
     ModDetails& operator=(const ModDetails& other) = default;

@@ -39,12 +39,13 @@
 
 #include "FileSystem.h"
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
 void PrivatePackManager::load()
 {
     try {
-        auto foo = QString::fromUtf8(FS::read(m_filename)).split('\n', Qt::SkipEmptyParts);
+        auto foo     = QString::fromUtf8(FS::read(m_filename)).split('\n', Qt::SkipEmptyParts);
         currentPacks = QSet<QString>(foo.begin(), foo.end());
 
         dirty = false;

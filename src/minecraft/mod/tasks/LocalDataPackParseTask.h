@@ -28,9 +28,14 @@
 
 #include "tasks/Task.h"
 
-namespace DataPackUtils {
+namespace DataPackUtils
+{
 
-enum class ProcessingLevel { Full, BasicInfoOnly };
+enum class ProcessingLevel
+{
+    Full,
+    BasicInfoOnly
+};
 
 bool process(DataPack* pack, ProcessingLevel level = ProcessingLevel::Full);
 
@@ -51,16 +56,17 @@ bool validateResourcePack(QFileInfo file);
 
 }  // namespace DataPackUtils
 
-class LocalDataPackParseTask : public Task {
+class LocalDataPackParseTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LocalDataPackParseTask(int token, DataPack* dp);
 
     void executeTask() override;
 
     int token() const { return m_token; }
 
-   private:
+private:
     int m_token;
 
     DataPack* m_data_pack;

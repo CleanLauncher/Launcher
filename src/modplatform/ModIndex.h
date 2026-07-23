@@ -29,22 +29,24 @@
 
 class QIODevice;
 
-namespace ModPlatform {
+namespace ModPlatform
+{
 
-enum class ModLoaderType : std::uint16_t {
-    None = 0U,
-    NeoForge = 1U << 0U,
-    Forge = 1U << 1U,
-    Cauldron = 1U << 2U,
-    LiteLoader = 1U << 3U,
-    Fabric = 1U << 4U,
-    Quilt = 1U << 5U,
-    DataPack = 1U << 6U,
-    Babric = 1U << 7U,
-    BTA = 1U << 8U,
+enum class ModLoaderType : std::uint16_t
+{
+    None         = 0U,
+    NeoForge     = 1U << 0U,
+    Forge        = 1U << 1U,
+    Cauldron     = 1U << 2U,
+    LiteLoader   = 1U << 3U,
+    Fabric       = 1U << 4U,
+    Quilt        = 1U << 5U,
+    DataPack     = 1U << 6U,
+    Babric       = 1U << 7U,
+    BTA          = 1U << 8U,
     LegacyFabric = 1U << 9U,
-    Ornithe = 1U << 10U,
-    Rift = 1U << 11U
+    Ornithe      = 1U << 10U,
+    Rift         = 1U << 11U
 };
 
 ModLoaderType operator|(ModLoaderType lhs, ModLoaderType rhs);
@@ -54,86 +56,119 @@ using enum ModLoaderType;
 Q_DECLARE_FLAGS(ModLoaderTypes, ModLoaderType)
 QList<ModLoaderType> modLoaderTypesToList(ModLoaderTypes flags);
 
-enum class ResourceProvider : std::uint8_t { MODRINTH, FLAME };
+enum class ResourceProvider : std::uint8_t
+{
+    MODRINTH,
+    FLAME
+};
 
-enum class DependencyType : std::uint8_t { REQUIRED, OPTIONAL, INCOMPATIBLE, EMBEDDED, TOOL, INCLUDE, UNKNOWN };
+enum class DependencyType : std::uint8_t
+{
+    REQUIRED,
+    OPTIONAL,
+    INCOMPATIBLE,
+    EMBEDDED,
+    TOOL,
+    INCLUDE,
+    UNKNOWN
+};
 
-enum class Side : std::uint8_t { NoSide = 0, ClientSide = 1U << 0U, ServerSide = 1U << 1U, UniversalSide = ClientSide | ServerSide };
+enum class Side : std::uint8_t
+{
+    NoSide        = 0,
+    ClientSide    = 1U << 0U,
+    ServerSide    = 1U << 1U,
+    UniversalSide = ClientSide | ServerSide
+};
 
-namespace SideUtils {
+namespace SideUtils
+{
 QString toString(Side side);
-Side fromString(QString side);
+Side    fromString(QString side);
 }  // namespace SideUtils
 
-namespace DependencyTypeUtils {
-QString toString(DependencyType type);
+namespace DependencyTypeUtils
+{
+QString        toString(DependencyType type);
 DependencyType fromString(const QString& str);
 }  // namespace DependencyTypeUtils
 
-namespace ProviderCapabilities {
+namespace ProviderCapabilities
+{
 const char* name(ResourceProvider);
-QString readableName(ResourceProvider);
+QString     readableName(ResourceProvider);
 QStringList hashType(ResourceProvider);
 }  // namespace ProviderCapabilities
 
-struct ModpackAuthor {
+struct ModpackAuthor
+{
     QString name;
     QString url;
 };
 
-struct DonationData {
+struct DonationData
+{
     QString id;
     QString platform;
     QString url;
 };
 
-struct IndexedVersionType {
-    enum class Enum : std::uint8_t { Unknown = 0, Release = 1, Beta = 2, Alpha = 3 };
+struct IndexedVersionType
+{
+    enum class Enum : std::uint8_t
+    {
+        Unknown = 0,
+        Release = 1,
+        Beta    = 2,
+        Alpha   = 3
+    };
     using enum Enum;
     constexpr IndexedVersionType(Enum e = Unknown) : m_type(e) {}  // NOLINT(hicpp-explicit-conversions)
     static IndexedVersionType fromString(const QString& type);
-    bool isValid() const { return m_type != Unknown; }
-    std::strong_ordering operator<=>(const IndexedVersionType& other) const = default;
-    std::strong_ordering operator<=>(const IndexedVersionType::Enum& other) const { return m_type <=> other; }
-    QString toString() const;
-    explicit operator int() const { return static_cast<int>(m_type); }
-    explicit operator IndexedVersionType::Enum() { return m_type; }
+    bool                      isValid() const { return m_type != Unknown; }
+    std::strong_ordering      operator<=>(const IndexedVersionType& other) const = default;
+    std::strong_ordering      operator<=>(const IndexedVersionType::Enum& other) const { return m_type <=> other; }
+    QString                   toString() const;
+    explicit                  operator int() const { return static_cast<int>(m_type); }
+    explicit                  operator IndexedVersionType::Enum() { return m_type; }
 
-   private:
+private:
     Enum m_type;
 };
 
-struct Dependency {
-    QVariant addonId;
+struct Dependency
+{
+    QVariant       addonId;
     DependencyType type;
-    QString version;
+    QString        version;
 };
 
-struct IndexedVersion {
-    QVariant addonId;
-    QVariant fileId;
-    QString version;
-    QString version_number;
+struct IndexedVersion
+{
+    QVariant           addonId;
+    QVariant           fileId;
+    QString            version;
+    QString            version_number;
     IndexedVersionType version_type;
-    QStringList mcVersion;
-    QString downloadUrl;
-    QString date;
-    QString fileName;
-    ModLoaderTypes loaders;
-    QString hash_type;
-    QString hash;
-    bool is_preferred = true;
-    QString changelog;
-    QList<Dependency> dependencies;
-    Side side = Side::NoSide;
+    QStringList        mcVersion;
+    QString            downloadUrl;
+    QString            date;
+    QString            fileName;
+    ModLoaderTypes     loaders;
+    QString            hash_type;
+    QString            hash;
+    bool               is_preferred = true;
+    QString            changelog;
+    QList<Dependency>  dependencies;
+    Side               side = Side::NoSide;
 
     bool is_currently_selected = false;
 
     QString getVersionDisplayString() const
     {
-        auto release_type = version_type.isValid() ? QString(" [%1]").arg(version_type.toString()) : "";
-        auto versionStr = !version.contains(version_number) ? version_number : "";
-        QString gameVersion = "";
+        auto    release_type = version_type.isValid() ? QString(" [%1]").arg(version_type.toString()) : "";
+        auto    versionStr   = !version.contains(version_number) ? version_number : "";
+        QString gameVersion  = "";
         for (const auto& v : mcVersion) {
             if (version.contains(v)) {
                 gameVersion = "";
@@ -147,7 +182,8 @@ struct IndexedVersion {
     }
 };
 
-struct ExtraPackData {
+struct ExtraPackData
+{
     QList<DonationData> donate;
 
     QString issuesUrl;
@@ -160,24 +196,25 @@ struct ExtraPackData {
     QString body;
 };
 
-struct IndexedPack {
+struct IndexedPack
+{
     using Ptr = std::shared_ptr<IndexedPack>;
 
-    QVariant addonId;
-    ResourceProvider provider;
-    QString name;
-    QString slug;
-    QString description;
+    QVariant             addonId;
+    ResourceProvider     provider;
+    QString              name;
+    QString              slug;
+    QString              description;
     QList<ModpackAuthor> authors;
-    QString logoName;
-    QString logoUrl;
-    QString websiteUrl;
-    Side side = Side::NoSide;
+    QString              logoName;
+    QString              logoUrl;
+    QString              websiteUrl;
+    Side                 side = Side::NoSide;
 
-    bool versionsLoaded = false;
+    bool                  versionsLoaded = false;
     QList<IndexedVersion> versions;
 
-    bool extraDataLoaded = true;
+    bool          extraDataLoaded = true;
     ExtraPackData extraData;
 
     bool isVersionSelected(int index) const
@@ -198,22 +235,21 @@ struct IndexedPack {
     }
 };
 
-struct OverrideDep {
-    QString quilt;
-    QString fabric;
-    QString slug;
+struct OverrideDep
+{
+    QString                       quilt;
+    QString                       fabric;
+    QString                       slug;
     ModPlatform::ResourceProvider provider;
 };
 
 inline auto getOverrideDeps() -> QList<OverrideDep>
 {
-    return {
-        { .quilt = "634179", .fabric = "306612", .slug = "API", .provider = ModPlatform::ResourceProvider::FLAME },
-        { .quilt = "720410", .fabric = "308769", .slug = "KotlinLibraries", .provider = ModPlatform::ResourceProvider::FLAME },
+    return {{.quilt = "634179", .fabric = "306612", .slug = "API", .provider = ModPlatform::ResourceProvider::FLAME},
+            {.quilt = "720410", .fabric = "308769", .slug = "KotlinLibraries", .provider = ModPlatform::ResourceProvider::FLAME},
 
-        { .quilt = "qvIfYCYJ", .fabric = "P7dR8mSH", .slug = "API", .provider = ModPlatform::ResourceProvider::MODRINTH },
-        { .quilt = "lwVhp9o5", .fabric = "Ha28R6CL", .slug = "KotlinLibraries", .provider = ModPlatform::ResourceProvider::MODRINTH }
-    };
+            {.quilt = "qvIfYCYJ", .fabric = "P7dR8mSH", .slug = "API", .provider = ModPlatform::ResourceProvider::MODRINTH},
+            {.quilt = "lwVhp9o5", .fabric = "Ha28R6CL", .slug = "KotlinLibraries", .provider = ModPlatform::ResourceProvider::MODRINTH}};
 }
 
 QString getMetaURL(ResourceProvider provider, QVariant projectID);
@@ -227,7 +263,8 @@ constexpr bool hasSingleModLoaderSelected(ModLoaderTypes l) noexcept
     return (x != 0U) && ((x & (x - 1U)) == 0U);
 }
 
-struct Category {
+struct Category
+{
     QString name;
     QString id;
 };

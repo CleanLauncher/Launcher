@@ -18,10 +18,12 @@
 
 #pragma once
 
-namespace Net {
+namespace Net
+{
 
-class DummySink : public Sink {
-   public:
+class DummySink : public Sink
+{
+public:
     explicit DummySink() {}
     ~DummySink() override {}
     auto init(QNetworkRequest& request) -> Task::State override { return Task::State::Running; }

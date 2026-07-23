@@ -1,6 +1,6 @@
 #include "ScrollMessageBox.h"
-#include <QPushButton>
 #include "ui_ScrollMessageBox.h"
+#include <QPushButton>
 
 ScrollMessageBox::ScrollMessageBox(QWidget* parent, const QString& title, const QString& text, const QString& body, const QString& option)
     : QDialog(parent), ui(new Ui::ScrollMessageBox)

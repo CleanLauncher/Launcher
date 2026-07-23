@@ -100,7 +100,7 @@ bool EnvironmentVariables::override() const
 QMap<QString, QVariant> EnvironmentVariables::value() const
 {
     QMap<QString, QVariant> result;
-    QTreeWidgetItem* item = ui->list->topLevelItem(0);
+    QTreeWidgetItem*        item = ui->list->topLevelItem(0);
     for (int i = 1; item != nullptr; item = ui->list->topLevelItem(i++))
         result[item->text(0).trimmed()] = item->text(1).trimmed();
 

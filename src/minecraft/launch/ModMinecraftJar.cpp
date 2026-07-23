@@ -61,10 +61,10 @@ void ModMinecraftJar::executeTask()
     }
 
     auto components = m_inst->getPackProfile();
-    auto profile = components->getProfile();
-    auto jarMods = m_inst->getJarMods();
+    auto profile    = components->getProfile();
+    auto jarMods    = m_inst->getJarMods();
     if (jarMods.size()) {
-        auto mainJar = profile->getMainJar();
+        auto        mainJar = profile->getMainJar();
         QStringList jars, temp1, temp2, temp3, temp4;
         mainJar->getApplicableFiles(m_inst->runtimeContext(), jars, temp1, temp2, temp3, m_inst->getLocalLibraryPath());
         auto sourceJarPath = jars[0];
@@ -83,8 +83,8 @@ void ModMinecraftJar::finalize()
 
 bool ModMinecraftJar::removeJar()
 {
-    auto m_inst = m_parent->instance();
-    auto finalJarPath = QDir(m_inst->binRoot()).absoluteFilePath("minecraft.jar");
+    auto  m_inst       = m_parent->instance();
+    auto  finalJarPath = QDir(m_inst->binRoot()).absoluteFilePath("minecraft.jar");
     QFile finalJar(finalJarPath);
     if (finalJar.exists()) {
         if (!finalJar.remove()) {

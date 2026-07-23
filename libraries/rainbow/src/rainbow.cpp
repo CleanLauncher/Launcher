@@ -43,22 +43,23 @@ static inline qreal normalize(qreal a)
 #define HCY_REC 709
 
 #if HCY_REC == 601
-static const qreal yc[3] = { 0.299, 0.587, 0.114 };
+static const qreal yc[3] = {0.299, 0.587, 0.114};
 #elif HCY_REC == 709
-static const qreal yc[3] = { 0.2126, 0.7152, 0.0722 };
+static const qreal yc[3] = {0.2126, 0.7152, 0.0722};
 #else
 
-static const qreal yc[3] = { 0.34375, 0.5, 0.15625 };
+static const qreal yc[3] = {0.34375, 0.5, 0.15625};
 #endif
 
-class KHCY {
-   public:
+class KHCY
+{
+public:
     explicit KHCY(const QColor& color)
     {
         qreal r = gamma(color.redF());
         qreal g = gamma(color.greenF());
         qreal b = gamma(color.blueF());
-        a = color.alphaF();
+        a       = color.alphaF();
 
         y = lumag(r, g, b);
 
@@ -91,7 +92,6 @@ class KHCY {
 
     QColor qColor() const
     {
-
         qreal _h = wrap(h);
         qreal _c = normalize(c);
         qreal _y = normalize(y);
@@ -143,10 +143,10 @@ class KHCY {
         }
     }
 
-    qreal h, c, y, a;
+    qreal        h, c, y, a;
     static qreal luma(const QColor& color) { return lumag(gamma(color.redF()), gamma(color.greenF()), gamma(color.blueF())); }
 
-   private:
+private:
     static qreal gamma(qreal n) { return pow(normalize(n), 2.2); }
     static qreal igamma(qreal n) { return pow(normalize(n), 1.0 / 2.2); }
     static qreal lumag(qreal r, qreal g, qreal b) { return r * yc[0] + g * yc[1] + b * yc[2]; }
@@ -241,8 +241,8 @@ QColor Rainbow::tint(const QColor& base, const QColor& color, qreal amount)
     double u = 1.0, l = 0.0;
     QColor result;
     for (int i = 12; i; --i) {
-        double a = 0.5 * (l + u);
-        result = tintHelper(base, baseLuma, color, a);
+        double a  = 0.5 * (l + u);
+        result    = tintHelper(base, baseLuma, color, a);
         double ra = contrastRatioForLuma(baseLuma, luma(result));
         if (ra > rg) {
             u = a;
@@ -275,10 +275,9 @@ QColor Rainbow::mix(const QColor& c1, const QColor& c2, qreal bias)
 
 QColor Rainbow::overlayColors(const QColor& base, const QColor& paint, QPainter::CompositionMode comp)
 {
-
-    QImage img(1, 1, QImage::Format_ARGB32_Premultiplied);
+    QImage   img(1, 1, QImage::Format_ARGB32_Premultiplied);
     QPainter p(&img);
-    QColor start = base;
+    QColor   start = base;
     start.setAlpha(255);
 
     p.fillRect(0, 0, 1, 1, start);

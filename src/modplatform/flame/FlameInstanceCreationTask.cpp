@@ -115,7 +115,7 @@ bool FlameCreationTask::updateInstance()
         return false;
     }
 
-    auto version_id = inst->getManagedPackVersionName();
+    auto version_id  = inst->getManagedPackVersionName();
     auto version_str = !version_id.isEmpty() ? tr(" (version %1)").arg(version_id) : "";
 
     if (shouldConfirmUpdate()) {
@@ -181,7 +181,7 @@ bool FlameCreationTask::updateInstance()
 
         connect(job.get(), &Task::succeeded, this, [this, raw_response, fileIds, old_inst_dir, &old_files, old_minecraft_dir] {
             QJsonParseError parse_error{};
-            auto doc = QJsonDocument::fromJson(*raw_response, &parse_error);
+            auto            doc = QJsonDocument::fromJson(*raw_response, &parse_error);
             if (parse_error.error != QJsonParseError::NoError) {
                 qWarning() << "Error while parsing JSON response from Flame files task at" << parse_error.offset
                            << "reason:" << parse_error.errorString();
@@ -192,7 +192,7 @@ bool FlameCreationTask::updateInstance()
             try {
                 QJsonArray entries;
                 if (fileIds.size() == 1)
-                    entries = { Json::requireObject(Json::requireObject(doc), "data") };
+                    entries = {Json::requireObject(Json::requireObject(doc), "data")};
                 else
                     entries = Json::requireArray(Json::requireObject(doc), "data");
 
@@ -202,7 +202,7 @@ bool FlameCreationTask::updateInstance()
                     Flame::File file;
 
                     file.version = FlameMod::loadIndexedPackVersion(entry_obj);
-                    auto id = Json::requireInteger(entry_obj, "id");
+                    auto id      = Json::requireInteger(entry_obj, "id");
                     old_files.insert(id, file);
                 }
             } catch (Json::JsonException& e) {
@@ -227,10 +227,12 @@ bool FlameCreationTask::updateInstance()
 
         m_processUpdateFileInfoJob = nullptr;
     } else {
-        auto dialog = CustomMessageBox::selectable(m_parent, tr("No index file."),
+        auto dialog = CustomMessageBox::selectable(m_parent,
+                                                   tr("No index file."),
                                                    tr("We couldn't find a suitable index file for the older version. This may cause some "
                                                       "of the files to be duplicated. Do you want to continue?"),
-                                                   QMessageBox::Warning, QMessageBox::Ok | QMessageBox::Cancel);
+                                                   QMessageBox::Warning,
+                                                   QMessageBox::Ok | QMessageBox::Cancel);
 
         if (dialog->exec() == QDialog::DialogCode::Rejected) {
             m_abort = true;
@@ -257,7 +259,7 @@ QString FlameCreationTask::getVersionForLoader(QString uid, QString loaderType, 
 
         if (!vlist->isLoaded()) {
             QEventLoop loadVersionLoop;
-            auto task = vlist->getLoadTask();
+            auto       task = vlist->getLoadTask();
             connect(task.get(), &Task::finished, &loadVersionLoop, &QEventLoop::quit);
             if (!task->isRunning())
                 task->start();
@@ -340,19 +342,19 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
                 id.remove("1.20.1-");
 
             loaderType = "neoforge";
-            loaderUid = "net.neoforged";
+            loaderUid  = "net.neoforged";
         } else if (id.startsWith("forge-")) {
             id.remove("forge-");
             loaderType = "forge";
-            loaderUid = "net.minecraftforge";
+            loaderUid  = "net.minecraftforge";
         } else if (id.startsWith("fabric-")) {
             id.remove("fabric-");
             loaderType = "fabric";
-            loaderUid = "net.fabricmc.fabric-loader";
+            loaderUid  = "net.fabricmc.fabric-loader";
         } else if (id.startsWith("quilt-")) {
             id.remove("quilt-");
             loaderType = "quilt";
-            loaderUid = "org.quiltmc.quilt-loader";
+            loaderUid  = "org.quiltmc.quilt-loader";
         } else {
             logWarning(tr("Unknown mod loader in manifest: %1").arg(id));
             continue;
@@ -360,10 +362,10 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
         loaderVersion = id;
     }
 
-    QString configPath = FS::PathCombine(m_stagingPath, "instance.cfg");
-    auto instanceSettings = std::make_unique<INISettingsObject>(configPath);
-    auto instance = std::make_unique<MinecraftInstance>(m_globalSettings, std::move(instanceSettings), m_stagingPath);
-    auto mcVersion = m_pack.minecraft.version;
+    QString configPath       = FS::PathCombine(m_stagingPath, "instance.cfg");
+    auto    instanceSettings = std::make_unique<INISettingsObject>(configPath);
+    auto    instance         = std::make_unique<MinecraftInstance>(m_globalSettings, std::move(instanceSettings), m_stagingPath);
+    auto    mcVersion        = m_pack.minecraft.version;
 
     if (mcVersion.endsWith('.')) {
         static const QRegularExpression s_regex("[.]+$");
@@ -397,7 +399,7 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
 
     if (!m_instance && recommendedRAM > 0) {
         const uint64_t sysMiB = HardwareInfo::totalRamMiB();
-        const uint64_t max = sysMiB * 0.9;
+        const uint64_t max    = sysMiB * 0.9;
 
         if (static_cast<uint64_t>(recommendedRAM) > max) {
             logWarning(tr("The recommended memory of the modpack exceeds 90% of your system RAM—reducing it from %1 MiB to %2 MiB!")
@@ -410,11 +412,11 @@ std::unique_ptr<MinecraftInstance> FlameCreationTask::createInstance()
         instance->settings()->set("MaxMemAlloc", recommendedRAM);
     }
 
-    QString jarmodsPath = FS::PathCombine(m_stagingPath, "minecraft", "jarmods");
+    QString   jarmodsPath = FS::PathCombine(m_stagingPath, "minecraft", "jarmods");
     QFileInfo jarmodsInfo(jarmodsPath);
     if (jarmodsInfo.isDir()) {
         qDebug() << "Found jarmods:";
-        QDir jarmodsDir(jarmodsPath);
+        QDir        jarmodsDir(jarmodsPath);
         QStringList jarMods;
         for (const auto& info : jarmodsDir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files)) {
             qDebug() << info.fileName();
@@ -487,7 +489,7 @@ void FlameCreationTask::idResolverSucceeded(QEventLoop& loop)
     }
 
     QList<BlockedMod> blocked_mods;
-    auto anyBlocked = false;
+    auto              anyBlocked = false;
     for (const auto& result : results.values()) {
         if (result.resourceType != ModPlatform::ResourceType::Mod) {
             m_otherResources.append(std::make_pair(result.version.fileName, result.targetFolder));
@@ -495,16 +497,16 @@ void FlameCreationTask::idResolverSucceeded(QEventLoop& loop)
 
         if (result.version.downloadUrl.isEmpty()) {
             BlockedMod blocked_mod;
-            blocked_mod.name = result.version.fileName;
-            blocked_mod.websiteUrl = QString("%1/download/%2").arg(result.pack.websiteUrl, QString::number(result.fileId));
-            blocked_mod.hash = result.version.hash;
-            blocked_mod.matched = false;
-            blocked_mod.localPath = "";
+            blocked_mod.name         = result.version.fileName;
+            blocked_mod.websiteUrl   = QString("%1/download/%2").arg(result.pack.websiteUrl, QString::number(result.fileId));
+            blocked_mod.hash         = result.version.hash;
+            blocked_mod.matched      = false;
+            blocked_mod.localPath    = "";
             blocked_mod.targetFolder = result.targetFolder;
-            auto fileName = result.version.fileName;
-            fileName = FS::RemoveInvalidPathChars(fileName);
-            auto relpath = FS::PathCombine(result.targetFolder, fileName);
-            blocked_mod.disabled = !result.required && !m_selectedOptionalMods.contains(relpath);
+            auto fileName            = result.version.fileName;
+            fileName                 = FS::RemoveInvalidPathChars(fileName);
+            auto relpath             = FS::PathCombine(result.targetFolder, fileName);
+            blocked_mod.disabled     = !result.required && !m_selectedOptionalMods.contains(relpath);
 
             blocked_mods.append(blocked_mod);
 
@@ -514,7 +516,8 @@ void FlameCreationTask::idResolverSucceeded(QEventLoop& loop)
     if (anyBlocked) {
         qWarning() << "Blocked mods found, displaying mod list";
 
-        BlockedModsDialog message_dialog(m_parent, tr("Blocked mods found"),
+        BlockedModsDialog message_dialog(m_parent,
+                                         tr("Blocked mods found"),
                                          tr("The following files are not available for download in third party launchers.<br/>"
                                             "You will need to manually download them and add them to the instance."),
                                          blocked_mods);
@@ -542,14 +545,14 @@ void FlameCreationTask::setupDownloadJob(QEventLoop& loop)
 
     for (const auto& result : results) {
         auto fileName = result.version.fileName;
-        fileName = FS::RemoveInvalidPathChars(fileName);
-        auto relpath = FS::PathCombine(result.targetFolder, fileName);
+        fileName      = FS::RemoveInvalidPathChars(fileName);
+        auto relpath  = FS::PathCombine(result.targetFolder, fileName);
 
         if (!result.required && !m_selectedOptionalMods.contains(relpath)) {
             relpath += ".disabled";
         }
 
-        relpath = FS::PathCombine("minecraft", relpath);
+        relpath   = FS::PathCombine("minecraft", relpath);
         auto path = FS::PathCombine(m_stagingPath, relpath);
 
         if (!result.version.downloadUrl.isEmpty()) {
@@ -581,7 +584,7 @@ void FlameCreationTask::copyBlockedMods(const QList<BlockedMod>& blocked_mods)
 {
     setStatus(tr("Copying Blocked Mods..."));
     setAbortable(false);
-    int i = 0;
+    int i     = 0;
     int total = blocked_mods.length();
     setProgress(i, total);
     for (const auto& mod : blocked_mods) {
@@ -640,7 +643,7 @@ void FlameCreationTask::validateOtherResources(QEventLoop& loop)
         auto installWorld = [this](QString worldPath) {
             qDebug() << "Installing World from" << worldPath;
             QFileInfo worldFileInfo(worldPath);
-            World w(worldFileInfo);
+            World     w(worldFileInfo);
             if (!w.isValid()) {
                 qDebug() << "World at" << worldPath << "is not valid, skipping install.";
             } else {
@@ -649,43 +652,43 @@ void FlameCreationTask::validateOtherResources(QEventLoop& loop)
         };
 
         QFileInfo localFileInfo(localPath);
-        auto type = ResourceUtils::identify(localFileInfo);
+        auto      type = ResourceUtils::identify(localFileInfo);
 
         QString worldPath;
 
         switch (type) {
-            case ModPlatform::ResourceType::Mod:
-                validatePath(fileName, targetFolder, "mods");
-                zipMods.push_back(fileName);
-                break;
-            case ModPlatform::ResourceType::ResourcePack:
-                validatePath(fileName, targetFolder, "resourcepacks");
-                break;
-            case ModPlatform::ResourceType::TexturePack:
-                validatePath(fileName, targetFolder, "texturepacks");
-                break;
-            case ModPlatform::ResourceType::DataPack:
-                validatePath(fileName, targetFolder, "datapacks");
-                break;
-            case ModPlatform::ResourceType::ShaderPack:
+        case ModPlatform::ResourceType::Mod:
+            validatePath(fileName, targetFolder, "mods");
+            zipMods.push_back(fileName);
+            break;
+        case ModPlatform::ResourceType::ResourcePack:
+            validatePath(fileName, targetFolder, "resourcepacks");
+            break;
+        case ModPlatform::ResourceType::TexturePack:
+            validatePath(fileName, targetFolder, "texturepacks");
+            break;
+        case ModPlatform::ResourceType::DataPack:
+            validatePath(fileName, targetFolder, "datapacks");
+            break;
+        case ModPlatform::ResourceType::ShaderPack:
 
-                validatePath(fileName, targetFolder, "shaderpacks");
-                break;
-            case ModPlatform::ResourceType::World:
-                worldPath = validatePath(fileName, targetFolder, "saves");
-                installWorld(worldPath);
-                break;
-            case ModPlatform::ResourceType::Unknown:
+            validatePath(fileName, targetFolder, "shaderpacks");
+            break;
+        case ModPlatform::ResourceType::World:
+            worldPath = validatePath(fileName, targetFolder, "saves");
+            installWorld(worldPath);
+            break;
+        case ModPlatform::ResourceType::Unknown:
 
-            default:
-                qDebug() << "Can't Identify" << fileName << "at" << localPath << ", leaving it where it is.";
-                break;
+        default:
+            qDebug() << "Can't Identify" << fileName << "at" << localPath << ", leaving it where it is.";
+            break;
         }
     }
 
-    auto task = makeShared<ConcurrentTask>("CreateModMetadata", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
+    auto task    = makeShared<ConcurrentTask>("CreateModMetadata", APPLICATION->settings()->get("NumberOfConcurrentTasks").toInt());
     auto results = m_modIdResolver->getResults().files;
-    auto folder = FS::PathCombine(m_stagingPath, "minecraft", "mods", ".index");
+    auto folder  = FS::PathCombine(m_stagingPath, "minecraft", "mods", ".index");
     for (auto file : results) {
         if (file.targetFolder != "mods" || (file.version.fileName.endsWith(".zip") && !zipMods.contains(file.version.fileName))) {
             continue;

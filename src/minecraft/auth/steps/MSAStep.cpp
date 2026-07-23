@@ -53,14 +53,14 @@ bool isSchemeHandlerRegistered()
 {
 #ifdef Q_OS_LINUX
     QProcess process;
-    process.start("xdg-mime", { "query", "default", "x-scheme-handler/" + BuildConfig.LAUNCHER_APP_BINARY_NAME });
+    process.start("xdg-mime", {"query", "default", "x-scheme-handler/" + BuildConfig.LAUNCHER_APP_BINARY_NAME});
     process.waitForFinished();
     QString output = process.readAllStandardOutput().trimmed();
 
     return output.contains(APPLICATION->desktopFileName());
 
 #elif defined(Q_OS_WIN)
-    QString regPath = QString("HKEY_CURRENT_USER\\Software\\Classes\\%1").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
+    QString   regPath = QString("HKEY_CURRENT_USER\\Software\\Classes\\%1").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
     QSettings settings(regPath, QSettings::NativeFormat);
 
     const QString registeredRunCommand = settings.value("shell/open/command/.").toString().replace("\\", "/");
@@ -69,10 +69,11 @@ bool isSchemeHandlerRegistered()
     return true;
 }
 
-class CustomOAuthOobReplyHandler : public QOAuthOobReplyHandler {
+class CustomOAuthOobReplyHandler : public QOAuthOobReplyHandler
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CustomOAuthOobReplyHandler(QObject* parent = nullptr) : QOAuthOobReplyHandler(parent)
     {
         connect(APPLICATION, &Application::oauthReplyRecieved, this, &QOAuthOobReplyHandler::callbackReceived);
@@ -83,7 +84,7 @@ class CustomOAuthOobReplyHandler : public QOAuthOobReplyHandler {
     }
     QString callback() const override { return BuildConfig.LAUNCHER_APP_BINARY_NAME + "://oauth/microsoft"; }
 
-   protected:
+protected:
     void networkReplyFinished(QNetworkReply* reply) override
     {
         if (reply->error() != QNetworkReply::NoError) {
@@ -94,13 +95,14 @@ class CustomOAuthOobReplyHandler : public QOAuthOobReplyHandler {
     }
 };
 
-class LoggingOAuthHttpServerReplyHandler final : public QOAuthHttpServerReplyHandler {
+class LoggingOAuthHttpServerReplyHandler final : public QOAuthHttpServerReplyHandler
+{
     Q_OBJECT
 
-   public:
+public:
     explicit LoggingOAuthHttpServerReplyHandler(QObject* parent = nullptr) : QOAuthHttpServerReplyHandler(parent) {}
 
-   protected:
+protected:
     void networkReplyFinished(QNetworkReply* reply) override
     {
         if (reply->error() != QNetworkReply::NoError) {
@@ -144,12 +146,12 @@ MSAStep::MSAStep(AccountData* data, bool silent, QString clientId, QString scope
 #endif
 
     connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::granted, this, [this] {
-        m_data->msaClientID = m_oauth2.clientIdentifier();
-        m_data->msaToken.issueInstant = QDateTime::currentDateTimeUtc();
-        m_data->msaToken.notAfter = m_oauth2.expirationAt();
-        m_data->msaToken.extra = m_oauth2.extraTokens();
+        m_data->msaClientID            = m_oauth2.clientIdentifier();
+        m_data->msaToken.issueInstant  = QDateTime::currentDateTimeUtc();
+        m_data->msaToken.notAfter      = m_oauth2.expirationAt();
+        m_data->msaToken.extra         = m_oauth2.extraTokens();
         m_data->msaToken.refresh_token = m_oauth2.refreshToken();
-        m_data->msaToken.token = m_oauth2.token();
+        m_data->msaToken.token         = m_oauth2.token();
         emit finished(AccountTaskState::STATE_WORKING, tr("Got MSA token"));
     });
     connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser, this, &MSAStep::authorizeWithBrowser);
@@ -169,17 +171,21 @@ MSAStep::MSAStep(AccountData* data, bool silent, QString clientId, QString scope
         qWarning() << message;
         emit finished(state, message);
     });
-    connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::error, this,
+    connect(&m_oauth2,
+            &QOAuth2AuthorizationCodeFlow::error,
+            this,
             [this](const QString& error, const QString& errorDescription, const QUrl& uri) {
                 qWarning() << "Failed to login because" << error << errorDescription;
                 emit finished(AccountTaskState::STATE_FAILED_HARD, errorDescription);
             });
 
-    connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::extraTokensChanged, this,
-            [this](const QVariantMap& tokens) { m_data->msaToken.extra = tokens; });
+    connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::extraTokensChanged, this, [this](const QVariantMap& tokens) {
+        m_data->msaToken.extra = tokens;
+    });
 
-    connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::clientIdentifierChanged, this,
-            [this](const QString& clientIdentifier) { m_data->msaClientID = clientIdentifier; });
+    connect(&m_oauth2, &QOAuth2AuthorizationCodeFlow::clientIdentifierChanged, this, [this](const QString& clientIdentifier) {
+        m_data->msaClientID = clientIdentifier;
+    });
 }
 
 QString MSAStep::describe()
@@ -204,9 +210,9 @@ void MSAStep::perform()
         m_oauth2.setModifyParametersFunction(
             [](QAbstractOAuth::Stage stage, QMultiMap<QString, QVariant>* map) { map->insert("prompt", "select_account"); });
 
-        auto type = m_data->type;
-        *m_data = AccountData();
-        m_data->type = type;
+        auto type           = m_data->type;
+        *m_data             = AccountData();
+        m_data->type        = type;
         m_data->msaClientID = m_clientId;
         m_oauth2.grant();
     }

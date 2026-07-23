@@ -27,16 +27,16 @@ void XboxUserStep::perform()
     "TokenType": "JWT"
 }
 )XXX";
-    auto xbox_auth_data = xbox_auth_template.arg(m_data->msaToken.token);
+    auto    xbox_auth_data     = xbox_auth_template.arg(m_data->msaToken.token);
 
     QUrl url("https://user.auth.xboxlive.com/user/authenticate");
 
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
+    auto headers             = QList<Net::HeaderPair>{{"Content-Type", "application/json"},
+                                                      {"Accept", "application/json"},
 
-                                           { "x-xbl-contract-version", "1" } };
+                                                      {"x-xbl-contract-version", "1"}};
     auto [request, response] = Net::Upload::makeByteArray(url, xbox_auth_data.toUtf8());
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
 

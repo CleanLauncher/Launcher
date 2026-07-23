@@ -32,7 +32,7 @@ void ElyPatchTask::executeTask()
 {
     setStatus(tr("Preparing Ely.by patch..."));
 
-    QString authlibVersion;
+    QString     authlibVersion;
     const auto& libraries = m_inst->getPackProfile()->getProfile()->getLibraries();
     for (const auto& library : libraries) {
         if (const QString& artifact = library->artifactPrefix(); artifact == "com.mojang:authlib") {
@@ -63,7 +63,7 @@ void ElyPatchTask::resolveAuthlib(QString version)
     setDetails("Resolving Ely.by Authlib");
 
     const auto metaVersionList = APPLICATION->metadataIndex()->get("by.ely.authlib");
-    auto metaVersion = metaVersionList->getVersion(version);
+    auto       metaVersion     = metaVersionList->getVersion(version);
 
     if (!metaVersion->isLoaded()) {
         m_currentTask = APPLICATION->metadataIndex()->loadVersion("by.ely.authlib", version, m_netMode);

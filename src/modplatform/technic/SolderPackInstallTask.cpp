@@ -45,16 +45,13 @@
 #include "net/ApiDownload.h"
 #include "net/ChecksumValidator.h"
 
-Technic::SolderPackInstallTask::SolderPackInstallTask(QNetworkAccessManager* network,
-                                                      const QUrl& solderUrl,
-                                                      const QString& pack,
-                                                      const QString& version,
-                                                      const QString& minecraftVersion)
+Technic::SolderPackInstallTask::SolderPackInstallTask(
+    QNetworkAccessManager* network, const QUrl& solderUrl, const QString& pack, const QString& version, const QString& minecraftVersion)
 {
-    m_solderUrl = solderUrl;
-    m_pack = pack;
-    m_version = version;
-    m_network = network;
+    m_solderUrl        = solderUrl;
+    m_pack             = pack;
+    m_version          = version;
+    m_network          = network;
     m_minecraftVersion = minecraftVersion;
 }
 
@@ -71,7 +68,7 @@ void Technic::SolderPackInstallTask::executeTask()
     setStatus(tr("Resolving modpack files"));
 
     m_filesNetJob.reset(new NetJob(tr("Resolving modpack files"), m_network));
-    auto sourceUrl = QString("%1/modpack/%2/%3").arg(m_solderUrl.toString(), m_pack, m_version);
+    auto sourceUrl          = QString("%1/modpack/%2/%3").arg(m_solderUrl.toString(), m_pack, m_version);
     auto [action, response] = Net::ApiDownload::makeByteArray(sourceUrl);
     m_filesNetJob->addNetAction(action);
 
@@ -87,7 +84,7 @@ void Technic::SolderPackInstallTask::fileListSucceeded(QByteArray* response)
     setStatus(tr("Downloading modpack"));
 
     QJsonParseError parse_error{};
-    QJsonDocument doc = QJsonDocument::fromJson(*response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(*response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from Solder at" << parse_error.offset << "reason:" << parse_error.errorString();
         qWarning() << *response;
@@ -139,7 +136,7 @@ void Technic::SolderPackInstallTask::downloadSucceeded()
     setStatus(tr("Extracting modpack"));
     m_filesNetJob.reset();
     m_extractFuture = QtConcurrent::run([this]() {
-        int i = 0;
+        int     i          = 0;
         QString extractDir = FS::PathCombine(m_stagingPath, "minecraft");
         FS::ensureFolderPathExists(extractDir);
 
@@ -187,10 +184,10 @@ void Technic::SolderPackInstallTask::extractFinished()
     qDebug() << "Fixing permissions for extracted pack files...";
     QDirIterator it(extractDir, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        auto filepath = it.next();
+        auto      filepath = it.next();
         QFileInfo file(filepath);
-        auto permissions = QFile::permissions(filepath);
-        auto origPermissions = permissions;
+        auto      permissions     = QFile::permissions(filepath);
+        auto      origPermissions = permissions;
         if (file.isDir()) {
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {

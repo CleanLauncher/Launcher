@@ -26,18 +26,20 @@
 #endif
 
 #include <system_error>
-namespace console {
-void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr);
-bool AttachWindowsConsole();
+namespace console
+{
+void            BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr);
+bool            AttachWindowsConsole();
 std::error_code EnableAnsiSupport();
-void FreeWindowsConsole();
+void            FreeWindowsConsole();
 
-class WindowsConsoleGuard {
-   public:
+class WindowsConsoleGuard
+{
+public:
     WindowsConsoleGuard();
     ~WindowsConsoleGuard();
 
-   private:
+private:
     bool m_consoleAttached;
 };
 

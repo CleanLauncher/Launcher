@@ -42,14 +42,16 @@
 #include "minecraft/mod/ResourcePack.h"
 #include "minecraft/mod/TexturePack.h"
 
-namespace Ui {
+namespace Ui
+{
 class InfoFrame;
 }
 
-class InfoFrame : public QFrame {
+class InfoFrame : public QFrame
+{
     Q_OBJECT
 
-   public:
+public:
     InfoFrame(QWidget* parent = nullptr);
     ~InfoFrame() override;
 
@@ -69,18 +71,18 @@ class InfoFrame : public QFrame {
 
     static QString renderColorCodes(QString input);
 
-   public slots:
+public slots:
     void descriptionEllipsisHandler(QString link);
     void licenseEllipsisHandler(QString link);
     void boxClosed(int result);
 
-   private:
+private:
     void updateHiddenState();
     void resetScroll();
 
-   private:
-    Ui::InfoFrame* ui;
-    QString m_description;
-    QString m_license;
+private:
+    Ui::InfoFrame*     ui;
+    QString            m_description;
+    QString            m_license;
     class QMessageBox* m_current_box = nullptr;
 };

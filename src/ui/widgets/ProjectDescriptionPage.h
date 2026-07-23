@@ -8,18 +8,19 @@ QT_BEGIN_NAMESPACE
 class VariableSizedImageObject;
 QT_END_NAMESPACE
 
-class ProjectDescriptionPage final : public QTextBrowser {
+class ProjectDescriptionPage final : public QTextBrowser
+{
     Q_OBJECT
 
-   public:
+public:
     ProjectDescriptionPage(QWidget* parent = nullptr);
 
     void setMetaEntry(QString entry);
 
-   public slots:
+public slots:
 
     void flush();
 
-   private:
+private:
     shared_qobject_ptr<VariableSizedImageObject> m_image_text_object;
 };

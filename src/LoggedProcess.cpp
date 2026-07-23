@@ -35,9 +35,9 @@
  */
 
 #include "LoggedProcess.h"
+#include "MessageLevel.h"
 #include <QDebug>
 #include <QStringDecoder>
-#include "MessageLevel.h"
 
 LoggedProcess::LoggedProcess(const QStringConverter::Encoding output_codec, QObject* parent)
     : QProcess(parent), m_err_decoder(output_codec), m_out_decoder(output_codec)
@@ -89,17 +89,17 @@ void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
 
     if (!m_is_aborting) {
         if (status == QProcess::NormalExit) {
-            emit log({ tr("Process exited with code %1.").arg(exit_code) }, MessageLevel::Launcher);
+            emit log({tr("Process exited with code %1.").arg(exit_code)}, MessageLevel::Launcher);
             changeState(LoggedProcess::Finished);
         } else {
             if (exit_code == -1)
-                emit log({ tr("Process crashed.") }, MessageLevel::Launcher);
+                emit log({tr("Process crashed.")}, MessageLevel::Launcher);
             else
-                emit log({ tr("Process crashed with exitcode %1.").arg(exit_code) }, MessageLevel::Launcher);
+                emit log({tr("Process crashed with exitcode %1.").arg(exit_code)}, MessageLevel::Launcher);
             changeState(LoggedProcess::Crashed);
         }
     } else {
-        emit log({ tr("Process was killed by user.") }, MessageLevel::Error);
+        emit log({tr("Process was killed by user.")}, MessageLevel::Error);
         changeState(LoggedProcess::Aborted);
     }
 }
@@ -107,18 +107,18 @@ void LoggedProcess::on_exit(int exit_code, QProcess::ExitStatus status)
 void LoggedProcess::on_error(QProcess::ProcessError error)
 {
     switch (error) {
-        case QProcess::FailedToStart: {
-            emit log({ tr("The process failed to start: %1").arg(errorString()) }, MessageLevel::Fatal);
-            changeState(LoggedProcess::FailedToStart);
-            break;
-        }
+    case QProcess::FailedToStart: {
+        emit log({tr("The process failed to start: %1").arg(errorString())}, MessageLevel::Fatal);
+        changeState(LoggedProcess::FailedToStart);
+        break;
+    }
 
-        case QProcess::Crashed:
-        case QProcess::ReadError:
-        case QProcess::Timedout:
-        case QProcess::UnknownError:
-        case QProcess::WriteError:
-            break;
+    case QProcess::Crashed:
+    case QProcess::ReadError:
+    case QProcess::Timedout:
+    case QProcess::UnknownError:
+    case QProcess::WriteError:
+        break;
     }
 }
 
@@ -149,23 +149,23 @@ LoggedProcess::State LoggedProcess::state() const
 void LoggedProcess::on_stateChange(QProcess::ProcessState state)
 {
     switch (state) {
-        case QProcess::NotRunning:
-            break;
+    case QProcess::NotRunning:
+        break;
 
-        case QProcess::Starting: {
-            if (m_state != LoggedProcess::NotRunning) {
-                qWarning() << "Wrong state change for process from state" << m_state << "to" << (int)LoggedProcess::Starting;
-            }
-            changeState(LoggedProcess::Starting);
-            return;
+    case QProcess::Starting: {
+        if (m_state != LoggedProcess::NotRunning) {
+            qWarning() << "Wrong state change for process from state" << m_state << "to" << (int)LoggedProcess::Starting;
         }
-        case QProcess::Running: {
-            if (m_state != LoggedProcess::Starting) {
-                qWarning() << "Wrong state change for process from state" << m_state << "to" << (int)LoggedProcess::Running;
-            }
-            changeState(LoggedProcess::Running);
-            return;
+        changeState(LoggedProcess::Starting);
+        return;
+    }
+    case QProcess::Running: {
+        if (m_state != LoggedProcess::Starting) {
+            qWarning() << "Wrong state change for process from state" << m_state << "to" << (int)LoggedProcess::Running;
         }
+        changeState(LoggedProcess::Running);
+        return;
+    }
     }
 }
 

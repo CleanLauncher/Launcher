@@ -20,19 +20,20 @@
 
 class MinecraftInstance;
 
-class MinecraftLoadAndCheck : public Task {
+class MinecraftLoadAndCheck : public Task
+{
     Q_OBJECT
-   public:
+public:
     explicit MinecraftLoadAndCheck(MinecraftInstance* inst, Net::Mode netmode);
     virtual ~MinecraftLoadAndCheck() = default;
     void executeTask() override;
 
     bool canAbort() const override;
-   public slots:
+public slots:
     bool abort() override;
 
-   private:
+private:
     MinecraftInstance* m_inst = nullptr;
-    Task::Ptr m_task;
-    Net::Mode m_netmode;
+    Task::Ptr          m_task;
+    Net::Mode          m_netmode;
 };

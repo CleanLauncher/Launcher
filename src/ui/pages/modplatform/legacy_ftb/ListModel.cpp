@@ -40,9 +40,9 @@
 #include "net/NetJob.h"
 #include "settings/SettingsObject.h"
 
-#include <Version.h>
 #include "StringUtils.h"
 #include "ui/widgets/ProjectItem.h"
+#include <Version.h>
 
 #include <QLabel>
 #include <QtMath>
@@ -51,7 +51,8 @@
 
 #include <BuildConfig.h>
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
 FilterModel::FilterModel(QObject* parent) : QSortFilterProxyModel(parent)
 {
@@ -64,7 +65,7 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
 {
     QVariant leftRaw = sourceModel()->data(left, Qt::UserRole);
     Q_ASSERT(leftRaw.canConvert<Modpack>());
-    auto leftPack = leftRaw.value<Modpack>();
+    auto     leftPack = leftRaw.value<Modpack>();
     QVariant rightRaw = sourceModel()->data(right, Qt::UserRole);
     Q_ASSERT(rightRaw.canConvert<Modpack>());
     auto rightPack = rightRaw.value<Modpack>();
@@ -88,7 +89,7 @@ bool FilterModel::filterAcceptsRow([[maybe_unused]] int sourceRow, [[maybe_unuse
         return true;
     }
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    QVariant raw = sourceModel()->data(index, Qt::UserRole);
+    QVariant    raw   = sourceModel()->data(index, Qt::UserRole);
     Q_ASSERT(raw.canConvert<Modpack>());
     auto pack = raw.value<Modpack>();
     if (searchTerm.startsWith("#"))
@@ -130,12 +131,12 @@ ListModel::~ListModel() {}
 QString ListModel::translatePackType(PackType type) const
 {
     switch (type) {
-        case PackType::Public:
-            return tr("Public Modpack");
-        case PackType::ThirdParty:
-            return tr("Third Party Modpack");
-        case PackType::Private:
-            return tr("Private Modpack");
+    case PackType::Public:
+        return tr("Public Modpack");
+    case PackType::ThirdParty:
+        return tr("Third Party Modpack");
+    case PackType::Private:
+        return tr("Private Modpack");
     }
     qWarning() << "Unknown FTB modpack type:" << int(type);
     return QString();
@@ -160,48 +161,48 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
 
     Modpack pack = modpacks.at(pos);
     switch (role) {
-        case Qt::ToolTipRole: {
-            if (pack.description.length() > 100) {
-                QString edit = pack.description.left(97);
-                edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
-                return edit;
-            }
-            return pack.description;
+    case Qt::ToolTipRole: {
+        if (pack.description.length() > 100) {
+            QString edit = pack.description.left(97);
+            edit         = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
+            return edit;
         }
-        case Qt::DecorationRole: {
-            if (m_logoMap.contains(pack.logo)) {
-                return (m_logoMap.value(pack.logo));
-            }
-            QIcon icon = QIcon::fromTheme("screenshot-placeholder");
-            ((ListModel*)this)->requestLogo(pack.logo);
-            return icon;
+        return pack.description;
+    }
+    case Qt::DecorationRole: {
+        if (m_logoMap.contains(pack.logo)) {
+            return (m_logoMap.value(pack.logo));
         }
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
+        QIcon icon = QIcon::fromTheme("screenshot-placeholder");
+        ((ListModel*)this)->requestLogo(pack.logo);
+        return icon;
+    }
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
+    case Qt::ForegroundRole: {
+        if (pack.broken) {
+            return QColor(255, 0, 50);
+        } else if (pack.bugged) {
+            return QColor(244, 229, 66);
         }
-        case Qt::ForegroundRole: {
-            if (pack.broken) {
-                return QColor(255, 0, 50);
-            } else if (pack.bugged) {
-                return QColor(244, 229, 66);
-            }
-            return {};
-        }
-        case Qt::DisplayRole:
-            return pack.name;
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
+        return {};
+    }
+    case Qt::DisplayRole:
+        return pack.name;
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
 
-        case UserDataTypes::TITLE:
-            return pack.name;
-        case UserDataTypes::DESCRIPTION:
-            return pack.description;
-        case UserDataTypes::INSTALLED:
-            return false;
-        default:
-            break;
+    case UserDataTypes::TITLE:
+        return pack.name;
+    case UserDataTypes::DESCRIPTION:
+        return pack.description;
+    case UserDataTypes::INSTALLED:
+        return false;
+    default:
+        break;
     }
 
     return {};
@@ -264,7 +265,7 @@ void ListModel::requestLogo(QString file)
     }
 
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("FTBPacks", QString("logos/%1").arg(file));
-    NetJob* job = new NetJob(QString("FTB Icon Download for %1").arg(file), APPLICATION->network());
+    NetJob*      job   = new NetJob(QString("FTB Icon Download for %1").arg(file), APPLICATION->network());
     job->setAskRetry(false);
     job->addNetAction(Net::ApiDownload::makeCached(QUrl(QString(BuildConfig.LEGACY_FTB_CDN_BASE_URL + "static/%1").arg(file)), entry));
 

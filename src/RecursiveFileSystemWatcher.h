@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Filter.h"
 #include <QDir>
 #include <QFileSystemWatcher>
-#include "Filter.h"
 
-class RecursiveFileSystemWatcher : public QObject {
+class RecursiveFileSystemWatcher : public QObject
+{
     Q_OBJECT
-   public:
+public:
     RecursiveFileSystemWatcher(QObject* parent);
 
     void setRootDir(const QDir& root);
@@ -19,29 +20,29 @@ class RecursiveFileSystemWatcher : public QObject {
 
     QStringList files() const { return m_files; }
 
-   signals:
+signals:
     void filesChanged();
     void fileChanged(const QString& path);
 
-   public slots:
+public slots:
     void enable();
     void disable();
 
-   private:
-    QDir m_root;
-    bool m_watchFiles = false;
-    bool m_isEnabled = false;
+private:
+    QDir   m_root;
+    bool   m_watchFiles = false;
+    bool   m_isEnabled  = false;
     Filter m_matcher;
 
     QFileSystemWatcher* m_watcher;
 
     QStringList m_files;
-    void setFiles(const QStringList& files);
+    void        setFiles(const QStringList& files);
 
-    void addFilesToWatcherRecursive(const QDir& dir);
+    void        addFilesToWatcherRecursive(const QDir& dir);
     QStringList scanRecursive(const QDir& dir);
 
-   private slots:
+private slots:
     void fileChange(const QString& path);
     void directoryChange(const QString& path);
 };

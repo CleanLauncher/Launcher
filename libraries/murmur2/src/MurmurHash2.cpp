@@ -1,17 +1,18 @@
 
 #include "MurmurHash2.h"
 
-namespace Murmur2 {
+namespace Murmur2
+{
 
 const uint32_t m = 0x5bd1e995;
-const int r = 24;
+const int      r = 24;
 
 uint32_t hash(Reader* file_stream, std::size_t buffer_size, std::function<bool(char)> filter_out)
 {
     auto* buffer = new char[buffer_size];
-    char data[4];
+    char  data[4];
 
-    int read = 0;
+    int      read = 0;
     uint32_t size = 0;
 
     do {
@@ -26,7 +27,7 @@ uint32_t hash(Reader* file_stream, std::size_t buffer_size, std::function<bool(c
 
     int index = 0;
 
-    IncrementalHashInfo info{ (uint32_t)1 ^ size, (uint32_t)size };
+    IncrementalHashInfo info{(uint32_t)1 ^ size, (uint32_t)size};
     do {
         read = file_stream->read(buffer, buffer_size);
         for (int i = 0; i < read; i++) {
@@ -36,7 +37,7 @@ uint32_t hash(Reader* file_stream, std::size_t buffer_size, std::function<bool(c
                 continue;
 
             data[index] = c;
-            index = (index + 1) % 4;
+            index       = (index + 1) % 4;
 
             if (index == 0)
                 FourBytes_MurmurHash2(reinterpret_cast<unsigned char*>(&data), info);
@@ -53,7 +54,6 @@ uint32_t hash(Reader* file_stream, std::size_t buffer_size, std::function<bool(c
 void FourBytes_MurmurHash2(const unsigned char* data, IncrementalHashInfo& prev)
 {
     if (prev.len >= 4) {
-
         uint32_t k = *reinterpret_cast<const uint32_t*>(data);
 
         k *= m;
@@ -65,17 +65,16 @@ void FourBytes_MurmurHash2(const unsigned char* data, IncrementalHashInfo& prev)
 
         prev.len -= 4;
     } else {
-
         switch (prev.len) {
-            case 3:
-                prev.h ^= data[2] << 16;
-                [[fallthrough]];
-            case 2:
-                prev.h ^= data[1] << 8;
-                [[fallthrough]];
-            case 1:
-                prev.h ^= data[0];
-                prev.h *= m;
+        case 3:
+            prev.h ^= data[2] << 16;
+            [[fallthrough]];
+        case 2:
+            prev.h ^= data[1] << 8;
+            [[fallthrough]];
+        case 1:
+            prev.h ^= data[0];
+            prev.h *= m;
         };
 
         prev.h ^= prev.h >> 13;
@@ -86,4 +85,4 @@ void FourBytes_MurmurHash2(const unsigned char* data, IncrementalHashInfo& prev)
     }
 }
 
-}
+}  // namespace Murmur2

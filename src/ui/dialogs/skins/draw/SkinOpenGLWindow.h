@@ -18,26 +18,28 @@
 
 #pragma once
 
+#include "minecraft/skins/SkinModel.h"
+#include "ui/dialogs/skins/draw/BoxGeometry.h"
+#include "ui/dialogs/skins/draw/Scene.h"
 #include <QMatrix4x4>
 #include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QOpenGLWindow>
 #include <QVector2D>
-#include "minecraft/skins/SkinModel.h"
-#include "ui/dialogs/skins/draw/BoxGeometry.h"
-#include "ui/dialogs/skins/draw/Scene.h"
 
-class SkinProvider {
-   public:
-    virtual ~SkinProvider() = default;
-    virtual SkinModel* getSelectedSkin() = 0;
-    virtual QHash<QString, QImage> capes() = 0;
+class SkinProvider
+{
+public:
+    virtual ~SkinProvider()                          = default;
+    virtual SkinModel*             getSelectedSkin() = 0;
+    virtual QHash<QString, QImage> capes()           = 0;
 };
-class SkinOpenGLWindow : public QOpenGLWindow, protected QOpenGLFunctions {
+class SkinOpenGLWindow : public QOpenGLWindow, protected QOpenGLFunctions
+{
     Q_OBJECT
 
-   public:
+public:
     SkinOpenGLWindow(SkinProvider* parent, QColor color);
     virtual ~SkinOpenGLWindow();
 
@@ -47,7 +49,7 @@ class SkinOpenGLWindow : public QOpenGLWindow, protected QOpenGLFunctions {
 
     static bool hasOpenGL();
 
-   protected:
+protected:
     void mousePressEvent(QMouseEvent* e) override;
     void mouseReleaseEvent(QMouseEvent* e) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -62,25 +64,25 @@ class SkinOpenGLWindow : public QOpenGLWindow, protected QOpenGLFunctions {
     void generateBackgroundTexture(int width, int height, int tileSize);
     void renderBackground();
 
-   private:
+private:
     QOpenGLShaderProgram* m_modelProgram;
     QOpenGLShaderProgram* m_backgroundProgram;
-    opengl::Scene* m_scene = nullptr;
+    opengl::Scene*        m_scene = nullptr;
 
     QMatrix4x4 m_projection;
 
     QVector2D m_mousePosition;
 
-    bool m_isMousePressed = false;
-    float m_distance = 48;
-    float m_yaw = 90;
+    bool  m_isMousePressed = false;
+    float m_distance       = 48;
+    float m_yaw            = 90;
 
     float m_pitch = 0;
 
     bool m_isFirstFrame = true;
 
-    opengl::BoxGeometry* m_background = nullptr;
-    QOpenGLTexture* m_backgroundTexture = nullptr;
-    QColor m_baseColor;
-    SkinProvider* m_parent = nullptr;
+    opengl::BoxGeometry* m_background        = nullptr;
+    QOpenGLTexture*      m_backgroundTexture = nullptr;
+    QColor               m_baseColor;
+    SkinProvider*        m_parent = nullptr;
 };

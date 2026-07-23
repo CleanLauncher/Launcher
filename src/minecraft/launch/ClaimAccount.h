@@ -18,9 +18,10 @@
 #include <launch/LaunchStep.h>
 #include <minecraft/auth/MinecraftAccount.h>
 
-class ClaimAccount : public LaunchStep {
+class ClaimAccount : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit ClaimAccount(LaunchTask* parent, AuthSessionPtr session);
     virtual ~ClaimAccount() = default;
 
@@ -28,7 +29,7 @@ class ClaimAccount : public LaunchStep {
     void finalize() override;
     bool canAbort() const override { return false; }
 
-   private:
+private:
     std::unique_ptr<UseLock> lock;
-    MinecraftAccountPtr m_account;
+    MinecraftAccountPtr      m_account;
 };

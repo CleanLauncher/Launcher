@@ -45,12 +45,14 @@
 #include "QObjectPtr.h"
 #include "net/NetRequest.h"
 
-namespace Net {
+namespace Net
+{
 class ByteArraySink;
 
-class Download : public NetRequest {
+class Download : public NetRequest
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<class Download>;
     explicit Download() : NetRequest() { logCat = taskDownloadLogC; }
 
@@ -61,7 +63,7 @@ class Download : public NetRequest {
     static auto makeByteArray(QUrl url, Options options = Option::NoOptions) -> std::pair<Download::Ptr, QByteArray*>;
     static auto makeFile(QUrl url, QString path, Options options = Option::NoOptions) -> Download::Ptr;
 
-   protected:
+protected:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
 };
 }  // namespace Net

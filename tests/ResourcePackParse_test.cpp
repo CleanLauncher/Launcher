@@ -16,24 +16,25 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include "minecraft/mod/tasks/LocalDataPackParseTask.h"
 #include <QTest>
 #include <QTimer>
-#include "minecraft/mod/tasks/LocalDataPackParseTask.h"
 
 #include <FileSystem.h>
 
 #include <minecraft/mod/ResourcePack.h>
 
-class ResourcePackParseTest : public QObject {
+class ResourcePackParseTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
     void test_parseZIP()
     {
         QString source = QFINDTESTDATA("testdata/Resources");
 
-        QString zip_rp = FS::PathCombine(source, "test_resource_pack_idk.zip");
-        ResourcePack pack{ QFileInfo(zip_rp) };
+        QString      zip_rp = FS::PathCombine(source, "test_resource_pack_idk.zip");
+        ResourcePack pack{QFileInfo(zip_rp)};
 
         bool valid = DataPackUtils::processZIP(&pack, DataPackUtils::ProcessingLevel::BasicInfoOnly);
 
@@ -48,8 +49,8 @@ class ResourcePackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/Resources");
 
-        QString folder_rp = FS::PathCombine(source, "test_folder");
-        ResourcePack pack{ QFileInfo(folder_rp) };
+        QString      folder_rp = FS::PathCombine(source, "test_folder");
+        ResourcePack pack{QFileInfo(folder_rp)};
 
         bool valid = DataPackUtils::processFolder(&pack, DataPackUtils::ProcessingLevel::BasicInfoOnly);
 
@@ -62,8 +63,8 @@ class ResourcePackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/Resources");
 
-        QString folder_rp = FS::PathCombine(source, "another_test_folder");
-        ResourcePack pack{ QFileInfo(folder_rp) };
+        QString      folder_rp = FS::PathCombine(source, "another_test_folder");
+        ResourcePack pack{QFileInfo(folder_rp)};
 
         bool valid = DataPackUtils::process(&pack, DataPackUtils::ProcessingLevel::BasicInfoOnly);
 

@@ -36,17 +36,18 @@
 
 #include "MinimalTheme.h"
 
-class DarkTheme : public MinimalTheme {
-   public:
+class DarkTheme : public MinimalTheme
+{
+public:
     virtual ~DarkTheme() {}
 
-    QString id() override;
-    QString name() override;
-    QString tooltip() override;
-    bool hasStyleSheet() override;
-    QString appStyleSheet() override;
+    QString  id() override;
+    QString  name() override;
+    QString  tooltip() override;
+    bool     hasStyleSheet() override;
+    QString  appStyleSheet() override;
     QPalette colorScheme() override;
-    double fadeAmount() override;
-    QColor fadeColor() override;
-    bool isDark() override { return true; }
+    double   fadeAmount() override;
+    QColor   fadeColor() override;
+    bool     isDark() override { return true; }
 };

@@ -22,7 +22,8 @@
 
 #include <QPainter>
 
-namespace Ftb {
+namespace Ftb
+{
 
 ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {}
 
@@ -94,8 +95,8 @@ void ListModel::request()
     m_modpacks.clear();
     endResetModel();
 
-    auto netJob = makeShared<NetJob>("Ftb::Request", APPLICATION->network());
-    auto url = QString(BuildConfig.FTB_API_BASE_URL + "/modpack/all");
+    auto netJob             = makeShared<NetJob>("Ftb::Request", APPLICATION->network());
+    auto url                = QString(BuildConfig.FTB_API_BASE_URL + "/modpack/all");
     auto [action, response] = Net::Download::makeByteArray(QUrl(url));
     netJob->addNetAction(action);
     m_jobPtr = netJob;
@@ -118,7 +119,7 @@ void ListModel::requestFinished(QByteArray* responsePtr)
     m_remainingPacks.clear();
 
     QJsonParseError parse_error{};
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from FTB at " << parse_error.offset << " reason: " << parse_error.errorString();
         qWarning() << response;
@@ -145,8 +146,8 @@ void ListModel::requestFailed(QString)
 
 void ListModel::requestPack()
 {
-    auto netJob = makeShared<NetJob>("Ftb::Search", APPLICATION->network());
-    auto searchUrl = QString(BuildConfig.FTB_API_BASE_URL + "/modpack/%1").arg(m_currentPack);
+    auto netJob             = makeShared<NetJob>("Ftb::Search", APPLICATION->network());
+    auto searchUrl          = QString(BuildConfig.FTB_API_BASE_URL + "/modpack/%1").arg(m_currentPack);
     auto [action, response] = Net::Download::makeByteArray(QUrl(searchUrl));
     netJob->addNetAction(action);
     m_jobPtr = netJob;
@@ -167,7 +168,7 @@ void ListModel::packRequestFinished(QByteArray* responsePtr)
     m_remainingPacks.removeOne(m_currentPack);
 
     QJsonParseError parse_error;
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
 
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from FTB at " << parse_error.offset << " reason: " << parse_error.errorString();
@@ -213,7 +214,7 @@ void ListModel::logoLoaded(QString logo)
     logoObj.result = QIcon(logoObj.fullpath);
     for (int i = 0; i < m_modpacks.size(); i++) {
         if (m_modpacks[i].safeName == logo) {
-            emit dataChanged(createIndex(i, 0), createIndex(i, 0), { Qt::DecorationRole });
+            emit dataChanged(createIndex(i, 0), createIndex(i, 0), {Qt::DecorationRole});
         }
     }
 }
@@ -241,9 +242,9 @@ void ListModel::requestLogo(QString logo, QString url)
 
     QObject::connect(job.get(), &NetJob::failed, this, [this, logo] { logoFailed(logo); });
 
-    auto& newLogoEntry = m_logoMap[logo];
+    auto& newLogoEntry       = m_logoMap[logo];
     newLogoEntry.downloadJob = job;
-    newLogoEntry.fullpath = fullPath;
+    newLogoEntry.fullpath    = fullPath;
     job->start();
 }
 

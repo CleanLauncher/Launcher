@@ -116,8 +116,8 @@
     if (!QDBusConnection::systemBus().isConnected())
         return false;
 
-    QDBusInterface switcheroo("net.hadess.SwitcherooControl", "/net/hadess/SwitcherooControl", "org.freedesktop.DBus.Properties",
-                              QDBusConnection::systemBus());
+    QDBusInterface switcheroo(
+        "net.hadess.SwitcherooControl", "/net/hadess/SwitcherooControl", "org.freedesktop.DBus.Properties", QDBusConnection::systemBus());
 
     if (!switcheroo.isValid())
         return false;
@@ -127,14 +127,14 @@
     if (!reply.isValid())
         return false;
 
-    QDBusArgument arg = qvariant_cast<QDBusArgument>(reply.value().variant());
+    QDBusArgument      arg = qvariant_cast<QDBusArgument>(reply.value().variant());
     QList<QVariantMap> gpus;
     arg >> gpus;
 
     for (const auto& gpu : gpus) {
-        QString name = qvariant_cast<QString>(gpu[QStringLiteral("Name")]);
-        bool defaultGpu = qvariant_cast<bool>(gpu[QStringLiteral("Default")]);
-        bool discrete = qvariant_cast<bool>(gpu.value(QStringLiteral("Discrete"), !defaultGpu));
+        QString name       = qvariant_cast<QString>(gpu[QStringLiteral("Name")]);
+        bool    defaultGpu = qvariant_cast<bool>(gpu[QStringLiteral("Default")]);
+        bool    discrete   = qvariant_cast<bool>(gpu.value(QStringLiteral("Discrete"), !defaultGpu));
         if (discrete) {
             QStringList envList = qvariant_cast<QStringList>(gpu[QStringLiteral("Environment")]);
             for (int i = 0; i + 1 < envList.size(); i += 2) {
@@ -147,10 +147,11 @@
     return false;
 }
 
-class OrSetting : public Setting {
+class OrSetting : public Setting
+{
     Q_OBJECT
-   public:
-    OrSetting(QString id, std::shared_ptr<Setting> a, std::shared_ptr<Setting> b) : Setting({ id }, false), m_a(a), m_b(b) {}
+public:
+    OrSetting(QString id, std::shared_ptr<Setting> a, std::shared_ptr<Setting> b) : Setting({id}, false), m_a(a), m_b(b) {}
     virtual QVariant get() const
     {
         bool a = m_a->get().toBool();
@@ -160,7 +161,7 @@ class OrSetting : public Setting {
     virtual void reset() {}
     virtual void set(QVariant value) {}
 
-   private:
+private:
     std::shared_ptr<Setting> m_a;
     std::shared_ptr<Setting> m_b;
 };
@@ -184,7 +185,7 @@ void MinecraftInstance::loadSpecificSettings()
         return;
 
     auto locationOverride = m_settings->registerSetting("OverrideJavaLocation", false);
-    auto argsOverride = m_settings->registerSetting("OverrideJavaArgs", false);
+    auto argsOverride     = m_settings->registerSetting("OverrideJavaArgs", false);
     m_settings->registerSetting("AutomaticJava", false);
 
     if (auto global_settings = globalSettings()) {
@@ -254,7 +255,7 @@ void MinecraftInstance::loadSpecificSettings()
     m_settings->registerSetting("ExportRecommendedRAM");
 
     auto dataPacksEnabled = m_settings->registerSetting("GlobalDataPacksEnabled", false);
-    auto dataPacksPath = m_settings->registerSetting("GlobalDataPacksPath", "");
+    auto dataPacksPath    = m_settings->registerSetting("GlobalDataPacksPath", "");
 
     connect(dataPacksEnabled.get(), &Setting::SettingChanged, this, [this] { m_data_pack_list.reset(); });
     connect(dataPacksPath.get(), &Setting::SettingChanged, this, [this] { m_data_pack_list.reset(); });
@@ -289,11 +290,11 @@ QSet<QString> MinecraftInstance::traits() const
 {
     auto components = getPackProfile();
     if (!components) {
-        return { "version-incomplete" };
+        return {"version-incomplete"};
     }
     auto profile = components->getProfile();
     if (!profile) {
-        return { "version-incomplete" };
+        return {"version-incomplete"};
     }
     return profile->getTraits();
 }
@@ -371,7 +372,7 @@ QString MinecraftInstance::getLocalLibraryPath() const
 
 bool MinecraftInstance::supportsDemo() const
 {
-    Version instance_ver{ getPackProfile()->getComponentVersion("net.minecraft") };
+    Version instance_ver{getPackProfile()->getComponentVersion("net.minecraft")};
 
     return instance_ver >= Version("1.3.1");
 }
@@ -465,7 +466,7 @@ QDir MinecraftInstance::versionsPath() const
 QStringList MinecraftInstance::getClassPath()
 {
     QStringList jars, nativeJars;
-    auto profile = m_components->getProfile();
+    auto        profile = m_components->getProfile();
     profile->getLibraryFiles(runtimeContext(), jars, nativeJars, getLocalLibraryPath(), binRoot());
     return jars;
 }
@@ -479,23 +480,23 @@ QString MinecraftInstance::getMainClass() const
 QStringList MinecraftInstance::getNativeJars()
 {
     QStringList jars, nativeJars;
-    auto profile = m_components->getProfile();
+    auto        profile = m_components->getProfile();
     profile->getLibraryFiles(runtimeContext(), jars, nativeJars, getLocalLibraryPath(), binRoot());
     return nativeJars;
 }
 
 static QString replaceTokensIn(const QString& text, const QMap<QString, QString>& with)
 {
-    QString result;
+    QString                         result;
     static const QRegularExpression s_token_regexp("\\$\\{(.+)\\}", QRegularExpression::InvertedGreedinessOption);
-    QStringList list;
-    QRegularExpressionMatchIterator i = s_token_regexp.globalMatch(text);
-    int lastCapturedEnd = 0;
+    QStringList                     list;
+    QRegularExpressionMatchIterator i               = s_token_regexp.globalMatch(text);
+    int                             lastCapturedEnd = 0;
     while (i.hasNext()) {
         QRegularExpressionMatch match = i.next();
         result.append(text.mid(lastCapturedEnd, match.capturedStart()));
-        QString key = match.captured(1);
-        auto iter = with.find(key);
+        QString key  = match.captured(1);
+        auto    iter = with.find(key);
         if (iter != with.end()) {
             result.append(*iter);
         }
@@ -507,13 +508,13 @@ static QString replaceTokensIn(const QString& text, const QMap<QString, QString>
 
 QStringList MinecraftInstance::extraArguments()
 {
-    auto list = BaseInstance::extraArguments();
+    auto list    = BaseInstance::extraArguments();
     auto version = getPackProfile();
     if (!version)
         return list;
     auto jarMods = getJarMods();
     if (!jarMods.isEmpty()) {
-        list.append({ "-Dfml.ignoreInvalidMinecraftCertificates=true", "-Dfml.ignorePatchDiscrepancies=true" });
+        list.append({"-Dfml.ignoreInvalidMinecraftCertificates=true", "-Dfml.ignorePatchDiscrepancies=true"});
     }
     auto addn = m_components->getProfile()->getAddnJvmArguments();
     if (!addn.isEmpty()) {
@@ -535,13 +536,13 @@ QStringList MinecraftInstance::extraArguments()
         QString glfwPath;
 
         if (settings()->get("UseNativeOpenAL").toBool()) {
-            openALPath = APPLICATION->m_detectedOpenALPath;
+            openALPath      = APPLICATION->m_detectedOpenALPath;
             auto customPath = settings()->get("CustomOpenALPath").toString();
             if (!customPath.isEmpty())
                 openALPath = customPath;
         }
         if (settings()->get("UseNativeGLFW").toBool()) {
-            glfwPath = APPLICATION->m_detectedGLFWPath;
+            glfwPath        = APPLICATION->m_detectedGLFWPath;
             auto customPath = settings()->get("CustomGLFWPath").toString();
             if (!customPath.isEmpty())
                 glfwPath = customPath;
@@ -580,9 +581,8 @@ QStringList MinecraftInstance::javaArguments()
 #endif
 
 #ifdef Q_OS_WIN32
-    args << QString(
-        "-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_"
-        "minecraft.exe.heapdump");
+    args << QString("-XX:HeapDumpPath=MojangTricksIntelDriversForPerformance_javaw.exe_"
+                    "minecraft.exe.heapdump");
 #endif
 
 #ifdef Q_OS_LINUX
@@ -611,7 +611,7 @@ QStringList MinecraftInstance::javaArguments()
     }
 
     const auto presetString = m_settings->get("GarbageCollectorPreset").toString();
-    const auto preset = JavaPerformance::presetFromString(presetString);
+    const auto preset       = JavaPerformance::presetFromString(presetString);
     args.append(JavaPerformance::getCompletePerformanceArgs(javaVersion, m_settings->get("UseOptimizedJvmArgs").toBool(), preset));
 
     if (javaVersion.isModular() && shouldApplyOnlineFixes())
@@ -689,8 +689,8 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
         auto mangoHudLibString = LibraryUtils::findMangoHud();
         if (!mangoHudLibString.isEmpty()) {
             QFileInfo mangoHudLib(mangoHudLibString);
-            QString libPath = mangoHudLib.absolutePath();
-            auto appendLib = [libPath, &preloadList](QString fileName) {
+            QString   libPath   = mangoHudLib.absolutePath();
+            auto      appendLib = [libPath, &preloadList](QString fileName) {
                 if (QFileInfo(FS::PathCombine(libPath, fileName)).exists())
                     preloadList << FS::PathCombine(libPath, fileName);
             };
@@ -728,7 +728,7 @@ QProcessEnvironment MinecraftInstance::createLaunchEnvironment()
 QStringList MinecraftInstance::processMinecraftArgs(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) const
 {
     auto profile = m_components->getProfile();
-    auto args = profile->getMinecraftArguments().split(' ', Qt::SkipEmptyParts);
+    auto args    = profile->getMinecraftArguments().split(' ', Qt::SkipEmptyParts);
     for (auto tweaker : profile->getTweakers()) {
         args << "--tweakClass" << tweaker;
     }
@@ -749,12 +749,12 @@ QStringList MinecraftInstance::processMinecraftArgs(AuthSessionPtr session, Mine
     QMap<QString, QString> tokenMapping = makeProfileVarMapping(profile);
 
     if (session) {
-        tokenMapping["auth_session"] = session->session;
+        tokenMapping["auth_session"]      = session->session;
         tokenMapping["auth_access_token"] = session->access_token;
-        tokenMapping["auth_player_name"] = session->player_name;
-        tokenMapping["auth_uuid"] = session->uuid;
-        tokenMapping["user_properties"] = session->serializeUserProperties();
-        tokenMapping["user_type"] = session->user_type;
+        tokenMapping["auth_player_name"]  = session->player_name;
+        tokenMapping["auth_uuid"]         = session->uuid;
+        tokenMapping["user_properties"]   = session->serializeUserProperties();
+        tokenMapping["user_type"]         = session->user_type;
 
         if (session->launchMode == LaunchMode::Demo) {
             args << "--demo";
@@ -803,13 +803,13 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
         QString windowParams;
         if (settings()->get("LaunchMaximized").toBool()) {
             if (!isLegacy()) {
-                auto screen = QGuiApplication::primaryScreen();
+                auto screen         = QGuiApplication::primaryScreen();
                 auto screenGeometry = screen->availableSize();
 
                 for (auto w : QApplication::topLevelWidgets()) {
                     auto mainWindow = qobject_cast<QMainWindow*>(w);
                     if (mainWindow) {
-                        auto m = mainWindow->windowHandle()->frameMargins();
+                        auto m         = mainWindow->windowHandle()->frameMargins();
                         screenGeometry = screenGeometry.shrunkBy(m);
                         break;
                     }
@@ -857,7 +857,7 @@ QString MinecraftInstance::createLaunchScript(AuthSessionPtr session, MinecraftT
 
 QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin)
 {
-    constexpr auto indent = "  ";
+    constexpr auto indent    = "  ";
     constexpr auto emptyLine = "";
 
     QStringList out;
@@ -908,7 +908,7 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
         out << "Jar Mods:";
         for (auto& jarmod : jarMods) {
             auto displayname = jarmod->displayName(runtimeContext());
-            auto realname = jarmod->filename(runtimeContext());
+            auto realname    = jarmod->filename(runtimeContext());
             if (displayname != realname) {
                 out << indent + displayname + " (" + realname + ")";
             } else {
@@ -927,9 +927,9 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
         out << emptyLine;
     }
 
-    auto settings = this->settings();
+    auto settings     = this->settings();
     bool nativeOpenAL = settings->get("UseNativeOpenAL").toBool();
-    bool nativeGLFW = settings->get("UseNativeGLFW").toBool();
+    bool nativeGLFW   = settings->get("UseNativeGLFW").toBool();
     if (nativeOpenAL || nativeGLFW) {
         if (nativeOpenAL)
             out << "Using system OpenAL.";
@@ -964,7 +964,7 @@ QStringList MinecraftInstance::verboseDescription(AuthSessionPtr session, Minecr
     if (settings->get("LaunchMaximized").toBool()) {
         out << "Window size: max (if available)";
     } else {
-        auto width = settings->get("MinecraftWinWidth").toInt();
+        auto width  = settings->get("MinecraftWinWidth").toInt();
         auto height = settings->get("MinecraftWinHeight").toInt();
         out << "Window size: " + QString::number(width) + " x " + QString::number(height);
     }
@@ -987,9 +987,9 @@ QMap<QString, QString> MinecraftInstance::createCensorFilterFromSession(AuthSess
     if (!session) {
         return QMap<QString, QString>();
     }
-    auto& sessionRef = *session.get();
+    auto&                  sessionRef = *session.get();
     QMap<QString, QString> filter;
-    auto addToFilter = [&filter](QString key, QString value) {
+    auto                   addToFilter = [&filter](QString key, QString value) {
         if (key.trimmed().size()) {
             filter[key] = value;
         }
@@ -1013,13 +1013,13 @@ QMap<QString, QString> MinecraftInstance::makeProfileVarMapping(std::shared_ptr<
     result["version_name"] = profile->getMinecraftVersion();
     result["version_type"] = profile->getMinecraftVersionType();
 
-    QString absRootDir = QDir(gameRoot()).absolutePath();
+    QString absRootDir       = QDir(gameRoot()).absolutePath();
     result["game_directory"] = absRootDir;
-    QString absAssetsDir = QDir("assets/").absolutePath();
-    auto assets = profile->getMinecraftAssets();
-    result["game_assets"] = AssetsUtils::getAssetsDir(assets->id, resourcesDir()).absolutePath();
+    QString absAssetsDir     = QDir("assets/").absolutePath();
+    auto    assets           = profile->getMinecraftAssets();
+    result["game_assets"]    = AssetsUtils::getAssetsDir(assets->id, resourcesDir()).absolutePath();
 
-    result["assets_root"] = absAssetsDir;
+    result["assets_root"]       = absAssetsDir;
     result["assets_index_name"] = assets->id;
 
     result["library_directory"] = APPLICATION->metacache()->getBasePath("libraries");
@@ -1029,7 +1029,7 @@ QMap<QString, QString> MinecraftInstance::makeProfileVarMapping(std::shared_ptr<
 
 QStringList MinecraftInstance::getLogFileSearchPaths()
 {
-    return { FS::PathCombine(gameRoot(), "crash-reports"), FS::PathCombine(gameRoot(), "logs"), gameRoot() };
+    return {FS::PathCombine(gameRoot(), "crash-reports"), FS::PathCombine(gameRoot(), "logs"), gameRoot()};
 }
 
 QString MinecraftInstance::getStatusbarDescription()
@@ -1086,7 +1086,7 @@ LaunchTask* MinecraftInstance::createLaunchTask(AuthSessionPtr session, Minecraf
 {
     updateRuntimeContext();
     auto process = LaunchTask::create(this);
-    auto pptr = process.get();
+    auto pptr    = process.get();
 
     APPLICATION->icons()->saveIcon(iconKey(), FS::PathCombine(gameRoot(), "icon.png"), "PNG");
 
@@ -1266,7 +1266,7 @@ DataPackFolderModel* MinecraftInstance::dataPackList()
 
 QList<ResourceFolderModel*> MinecraftInstance::resourceLists()
 {
-    return { loaderModList(), coreModList(), nilModList(), resourcePackList(), texturePackList(), shaderPackList(), dataPackList() };
+    return {loaderModList(), coreModList(), nilModList(), resourcePackList(), texturePackList(), shaderPackList(), dataPackList()};
 }
 
 WorldList* MinecraftInstance::worldList()
@@ -1279,7 +1279,7 @@ WorldList* MinecraftInstance::worldList()
 
 QList<Mod*> MinecraftInstance::getJarMods() const
 {
-    auto profile = m_components->getProfile();
+    auto        profile = m_components->getProfile();
     QList<Mod*> mods;
     for (auto jarmod : profile->getJarMods()) {
         QStringList jar, temp1, temp2, temp3;

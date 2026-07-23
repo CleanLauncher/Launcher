@@ -36,7 +36,8 @@
 #include <linux/limits.h>
 #endif
 
-namespace LibraryUtils {
+namespace LibraryUtils
+{
 
 QString findMangoHud()
 {
@@ -81,7 +82,7 @@ QString findMangoHud()
             currentArch = "aarch64";
         }
 
-        QStringList manifestNames = { QString("MangoHud.%1.json").arg(currentArch), "MangoHud.json" };
+        QStringList manifestNames = {QString("MangoHud.%1.json").arg(currentArch), "MangoHud.json"};
 
         QString filePath{};
         for (const QString& manifestName : manifestNames) {
@@ -96,9 +97,9 @@ QString findMangoHud()
             continue;
         }
         try {
-            auto conf = Json::requireDocument(filePath, vkLayer);
-            auto confObject = Json::requireObject(conf, vkLayer);
-            auto layer = confObject["layer"].toObject();
+            auto    conf        = Json::requireDocument(filePath, vkLayer);
+            auto    confObject  = Json::requireObject(conf, vkLayer);
+            auto    layer       = confObject["layer"].toObject();
             QString libraryName = layer["library_path"].toString();
 
             if (libraryName.isEmpty()) {
@@ -118,8 +119,7 @@ QString findMangoHud()
 
             return libraryName;
 #endif
-        } catch (const Exception& e) {
-        }
+        } catch (const Exception& e) {}
     }
 
     return {};

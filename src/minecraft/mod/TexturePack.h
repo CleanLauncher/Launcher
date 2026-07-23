@@ -28,9 +28,10 @@
 
 class Version;
 
-class TexturePack : public Resource {
+class TexturePack : public Resource
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<Resource>;
 
     TexturePack(QObject* parent = nullptr) : Resource(parent) {}
@@ -46,13 +47,14 @@ class TexturePack : public Resource {
 
     bool valid() const override;
 
-   protected:
+protected:
     mutable QMutex m_data_lock;
 
     QString m_description;
 
-    struct {
+    struct
+    {
         QPixmapCache::Key key;
-        bool was_ever_used = false;
+        bool              was_ever_used = false;
     } mutable m_pack_image_cache_key;
 };

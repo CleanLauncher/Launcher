@@ -35,8 +35,8 @@
  */
 #include "ConcurrentTask.h"
 
-#include <QDebug>
 #include "tasks/Task.h"
+#include <QDebug>
 
 ConcurrentTask::ConcurrentTask(QString task_name, int max_concurrent) : Task(), m_total_max_size(max_concurrent)
 {
@@ -120,7 +120,7 @@ void ConcurrentTask::executeNextSubTask()
             if (m_failed.isEmpty()) {
                 emitSucceeded();
             } else if (m_failed.count() == 1) {
-                auto task = m_failed.keys().first();
+                auto task   = m_failed.keys().first();
                 auto reason = task->failReason();
                 if (reason.isEmpty()) {
                     reason = tr("Task failed");
@@ -177,7 +177,7 @@ void ConcurrentTask::subTaskFinished(Task::Ptr task, TaskStepState state)
 
     m_doing.remove(task.get());
 
-    auto task_progress = *m_task_progress.value(task->getUid());
+    auto task_progress  = *m_task_progress.value(task->getUid());
     task_progress.state = state;
     m_task_progress.remove(task->getUid());
 
@@ -200,9 +200,9 @@ void ConcurrentTask::subTaskFailed(Task::Ptr task, [[maybe_unused]] const QStrin
 
 void ConcurrentTask::subTaskStatus(Task::Ptr task, const QString& msg)
 {
-    auto task_progress = m_task_progress.value(task->getUid());
+    auto task_progress    = m_task_progress.value(task->getUid());
     task_progress->status = msg;
-    task_progress->state = TaskStepState::Running;
+    task_progress->state  = TaskStepState::Running;
 
     emit stepProgress(*task_progress);
 
@@ -213,9 +213,9 @@ void ConcurrentTask::subTaskStatus(Task::Ptr task, const QString& msg)
 
 void ConcurrentTask::subTaskDetails(Task::Ptr task, const QString& msg)
 {
-    auto task_progress = m_task_progress.value(task->getUid());
+    auto task_progress     = m_task_progress.value(task->getUid());
     task_progress->details = msg;
-    task_progress->state = TaskStepState::Running;
+    task_progress->state   = TaskStepState::Running;
 
     emit stepProgress(*task_progress);
 

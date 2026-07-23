@@ -28,9 +28,14 @@
 
 #include "tasks/Task.h"
 
-namespace ShaderPackUtils {
+namespace ShaderPackUtils
+{
 
-enum class ProcessingLevel { Full, BasicInfoOnly };
+enum class ProcessingLevel
+{
+    Full,
+    BasicInfoOnly
+};
 
 bool process(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Full);
 
@@ -40,9 +45,10 @@ bool processFolder(ShaderPack& pack, ProcessingLevel level = ProcessingLevel::Fu
 bool validate(QFileInfo file);
 }  // namespace ShaderPackUtils
 
-class LocalShaderPackParseTask : public Task {
+class LocalShaderPackParseTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LocalShaderPackParseTask(int token, ShaderPack& sp);
 
     bool canAbort() const override { return true; }
@@ -52,7 +58,7 @@ class LocalShaderPackParseTask : public Task {
 
     int token() const { return m_token; }
 
-   private:
+private:
     int m_token;
 
     ShaderPack& m_shader_pack;

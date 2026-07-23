@@ -47,9 +47,11 @@
 #include <memory>
 #include <utility>
 
-class PasteUpload : public Net::NetRequest {
-   public:
-    enum PasteType : int {
+class PasteUpload : public Net::NetRequest
+{
+public:
+    enum PasteType : int
+    {
 
         NullPointer,
 
@@ -60,9 +62,10 @@ class PasteUpload : public Net::NetRequest {
         Mclogs,
 
         First = NullPointer,
-        Last = Mclogs
+        Last  = Mclogs
     };
-    struct PasteTypeInfo {
+    struct PasteTypeInfo
+    {
         const QString name;
         const QString defaultBase;
         const QString endpointPath;
@@ -70,15 +73,16 @@ class PasteUpload : public Net::NetRequest {
 
     static const std::array<PasteTypeInfo, 4> PasteTypes;
 
-    class Sink : public Net::ByteArraySink {
-       public:
+    class Sink : public Net::ByteArraySink
+    {
+    public:
         Sink(PasteUpload* p) : m_d(p) {};
         virtual ~Sink() = default;
 
-       public:
+    public:
         auto finalize(QNetworkReply& reply) -> Task::State override;
 
-       private:
+    private:
         PasteUpload* m_d;
     };
     friend Sink;
@@ -88,10 +92,10 @@ class PasteUpload : public Net::NetRequest {
 
     QString pasteLink() { return m_pasteLink; }
 
-   private:
+private:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
-    QString m_log;
-    QString m_pasteLink;
-    QString m_baseUrl;
-    const PasteType m_paste_type;
+    QString                m_log;
+    QString                m_pasteLink;
+    QString                m_baseUrl;
+    const PasteType        m_paste_type;
 };

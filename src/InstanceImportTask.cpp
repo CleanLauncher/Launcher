@@ -138,22 +138,22 @@ void InstanceImportTask::processZipPack()
         if (fileName == "modrinth.index.json") {
             qDebug() << "Modrinth:" << true;
             m_modpackType = ModpackType::Modrinth;
-            stop = true;
+            stop          = true;
         } else if (fileName == "bin/modpack.jar" || fileName == "bin/version.json") {
             qDebug() << "Technic:" << true;
             extractDir.mkpath("minecraft");
             extractDir.cd("minecraft");
             m_modpackType = ModpackType::Technic;
-            stop = true;
+            stop          = true;
         } else if (fileName == "manifest.json") {
             qDebug() << "Flame:" << true;
             m_modpackType = ModpackType::Flame;
-            stop = true;
+            stop          = true;
         } else if (QFileInfo fileInfo(fileName); fileInfo.fileName() == "instance.cfg") {
             qDebug() << "MultiMC:" << true;
             m_modpackType = ModpackType::MultiMC;
-            root = cleanPath(fileInfo.path());
-            stop = true;
+            root          = cleanPath(fileInfo.path());
+            stop          = true;
         }
         QCoreApplication::processEvents();
         return true;
@@ -206,10 +206,10 @@ void InstanceImportTask::extractFinished()
     qDebug() << "Fixing permissions for extracted pack files...";
     QDirIterator it(extractDir, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        auto filepath = it.next();
+        auto      filepath = it.next();
         QFileInfo file(filepath);
-        auto permissions = QFile::permissions(filepath);
-        auto origPermissions = permissions;
+        auto      permissions     = QFile::permissions(filepath);
+        auto      origPermissions = permissions;
         if (file.isDir()) {
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {
@@ -225,21 +225,21 @@ void InstanceImportTask::extractFinished()
     }
 
     switch (m_modpackType) {
-        case ModpackType::MultiMC:
-            processMultiMC();
-            return;
-        case ModpackType::Technic:
-            processTechnic();
-            return;
-        case ModpackType::Flame:
-            processFlame();
-            return;
-        case ModpackType::Modrinth:
-            processModrinth();
-            return;
-        case ModpackType::Unknown:
-            emitFailed(tr("Archive does not contain a recognized modpack type."));
-            return;
+    case ModpackType::MultiMC:
+        processMultiMC();
+        return;
+    case ModpackType::Technic:
+        processTechnic();
+        return;
+    case ModpackType::Flame:
+        processFlame();
+        return;
+    case ModpackType::Modrinth:
+        processModrinth();
+        return;
+    case ModpackType::Unknown:
+        emitFailed(tr("Archive does not contain a recognized modpack type."));
+        return;
     }
 }
 
@@ -274,7 +274,7 @@ void InstanceImportTask::processFlame()
         auto pack_version_id = pack_version_id_it.value();
 
         QString original_instance_id;
-        auto original_instance_id_it = m_extra_info.constFind("original_instance_id");
+        auto    original_instance_id_it = m_extra_info.constFind("original_instance_id");
         if (original_instance_id_it != m_extra_info.constEnd())
             original_instance_id = original_instance_id_it.value();
 
@@ -323,7 +323,7 @@ void InstanceImportTask::processFlame()
 
 void InstanceImportTask::processTechnic()
 {
-    shared_qobject_ptr<Technic::TechnicPackProcessor> packProcessor{ new Technic::TechnicPackProcessor };
+    shared_qobject_ptr<Technic::TechnicPackProcessor> packProcessor{new Technic::TechnicPackProcessor};
     connect(packProcessor.get(), &Technic::TechnicPackProcessor::succeeded, this, &InstanceImportTask::emitSucceeded);
     connect(packProcessor.get(), &Technic::TechnicPackProcessor::failed, this, &InstanceImportTask::emitFailed);
     packProcessor->run(m_globalSettings, name(), m_instIcon, m_stagingPath);
@@ -331,8 +331,8 @@ void InstanceImportTask::processTechnic()
 
 void InstanceImportTask::processMultiMC()
 {
-    QString configPath = FS::PathCombine(m_stagingPath, "instance.cfg");
-    auto instanceSettings = std::make_unique<INISettingsObject>(configPath);
+    QString configPath       = FS::PathCombine(m_stagingPath, "instance.cfg");
+    auto    instanceSettings = std::make_unique<INISettingsObject>(configPath);
 
     NullInstance instance(m_globalSettings, std::move(instanceSettings), m_stagingPath);
 
@@ -359,12 +359,12 @@ void InstanceImportTask::processModrinth()
         auto pack_id = pack_id_it.value();
 
         QString pack_version_id;
-        auto pack_version_id_it = m_extra_info.constFind("pack_version_id");
+        auto    pack_version_id_it = m_extra_info.constFind("pack_version_id");
         if (pack_version_id_it != m_extra_info.constEnd())
             pack_version_id = pack_version_id_it.value();
 
         QString original_instance_id;
-        auto original_instance_id_it = m_extra_info.constFind("original_instance_id");
+        auto    original_instance_id_it = m_extra_info.constFind("original_instance_id");
         if (original_instance_id_it != m_extra_info.constEnd())
             original_instance_id = original_instance_id_it.value();
 

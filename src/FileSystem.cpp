@@ -36,8 +36,8 @@
  */
 
 #include "FileSystem.h"
-#include <qcontainerfwd.h>
 #include <QPair>
+#include <qcontainerfwd.h>
 
 #include "BuildConfig.h"
 
@@ -63,11 +63,11 @@
 #include <objidl.h>
 #include <shlguid.h>
 #include <shobjidl.h>
+#include <string>
 #include <sys/utime.h>
 #include <versionhelpers.h>
 #include <windows.h>
 #include <winnls.h>
-#include <string>
 
 #include <Shellapi.h>
 #include <objbase.h>
@@ -107,18 +107,20 @@ namespace fs = std::filesystem;
 
 #if __MINGW64_VERSION_MAJOR < 13
 
-struct _DUPLICATE_EXTENTS_DATA {
-    HANDLE FileHandle;
+struct _DUPLICATE_EXTENTS_DATA
+{
+    HANDLE        FileHandle;
     LARGE_INTEGER SourceFileOffset;
     LARGE_INTEGER TargetFileOffset;
     LARGE_INTEGER ByteCount;
 };
 
-using DUPLICATE_EXTENTS_DATA = _DUPLICATE_EXTENTS_DATA;
+using DUPLICATE_EXTENTS_DATA  = _DUPLICATE_EXTENTS_DATA;
 using PDUPLICATE_EXTENTS_DATA = _DUPLICATE_EXTENTS_DATA*;
 #endif
 
-struct _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER {
+struct _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER
+{
     WORD ChecksumAlgorithm;
 
     WORD Reserved;
@@ -129,10 +131,11 @@ struct _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER {
     DWORD ClusterSizeInBytes;
 };
 
-using FSCTL_GET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER;
+using FSCTL_GET_INTEGRITY_INFORMATION_BUFFER  = _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER;
 using PFSCTL_GET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_GET_INTEGRITY_INFORMATION_BUFFER*;
 
-struct _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER {
+struct _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER
+{
     WORD ChecksumAlgorithm;
 
     WORD Reserved;
@@ -140,7 +143,7 @@ struct _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER {
     DWORD Flags;
 };
 
-using FSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER;
+using FSCTL_SET_INTEGRITY_INFORMATION_BUFFER  = _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER;
 using PFSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION_BUFFER*;
 
 #endif
@@ -169,7 +172,8 @@ using PFSCTL_SET_INTEGRITY_INFORMATION_BUFFER = _FSCTL_SET_INTEGRITY_INFORMATION
 
 #endif
 
-namespace FS {
+namespace FS
+{
 
 void ensureExists(const QDir& dir)
 {
@@ -234,7 +238,7 @@ QByteArray read(const QString& filename)
         throw FileSystemException("Unable to open " + filename + " for reading: " + file.errorString());
     }
     const qint64 size = file.size();
-    QByteArray data(int(size), 0);
+    QByteArray   data(int(size), 0);
     const qint64 ret = file.read(data.data(), size);
     if (ret == -1 || ret != size) {
         throw FileSystemException("Error reading data from " + filename + ": " + file.errorString());
@@ -256,15 +260,15 @@ bool updateTimestamp(const QString& filename)
 bool ensureFilePathExists(QString filenamepath)
 {
     QFileInfo a(filenamepath);
-    QDir dir;
-    QString ensuredPath = a.path();
-    bool success = dir.mkpath(ensuredPath);
+    QDir      dir;
+    QString   ensuredPath = a.path();
+    bool      success     = dir.mkpath(ensuredPath);
     return success;
 }
 
 bool ensureFolderPathExists(const QFileInfo folderPath)
 {
-    QDir dir;
+    QDir    dir;
     QString ensuredPath = folderPath.filePath();
     if (folderPath.exists())
         return true;
@@ -305,7 +309,7 @@ void copyFolderAttributes(QString src, QString dst, QString relative)
 bool copy::operator()(const QString& offset, bool dryRun)
 {
     using copy_opts = fs::copy_options;
-    m_copied = 0;
+    m_copied        = 0;
 
     m_failedPaths.clear();
 
@@ -350,11 +354,11 @@ bool copy::operator()(const QString& offset, bool dryRun)
         emit fileCopied(relative_dst_path);
     };
 
-    QDir src_dir(src);
+    QDir         src_dir(src);
     QDirIterator source_it(src, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::Subdirectories);
 
     while (source_it.hasNext()) {
-        auto src_path = source_it.next();
+        auto src_path      = source_it.next();
         auto relative_path = src_dir.relativeFilePath(src_path);
 
         copy_file(src_path, relative_path);
@@ -409,8 +413,8 @@ void create_link::make_link_list(const QString& offset)
                 return;
             }
 
-            auto dst_path = PathCombine(dst, relative_dst_path);
-            LinkPair link = { src_path, dst_path };
+            auto     dst_path = PathCombine(dst, relative_dst_path);
+            LinkPair link     = {src_path, dst_path};
             m_links_to_make.append(link);
         };
 
@@ -421,18 +425,18 @@ void create_link::make_link_list(const QString& offset)
         } else {
             if (m_debug)
                 qDebug().nospace() << "linking recursively: " << src << " to " << dst << ", max_depth: " << m_max_depth;
-            QDir src_dir(src);
+            QDir         src_dir(src);
             QDirIterator source_it(src, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::Subdirectories);
 
             QStringList linkedPaths;
 
             while (source_it.hasNext()) {
-                auto src_path = source_it.next();
+                auto src_path      = source_it.next();
                 auto relative_path = src_dir.relativeFilePath(src_path);
 
                 if (m_max_depth >= 0 && pathDepth(relative_path) > m_max_depth) {
                     relative_path = pathTruncate(relative_path, m_max_depth);
-                    src_path = src_dir.filePath(relative_path);
+                    src_path      = src_dir.filePath(relative_path);
                     if (linkedPaths.contains(src_path)) {
                         continue;
                     }
@@ -449,10 +453,10 @@ void create_link::make_link_list(const QString& offset)
 bool create_link::make_links()
 {
     for (auto link : m_links_to_make) {
-        QString src_path = link.src;
-        QString dst_path = link.dst;
-        auto src_path_std = StringUtils::toStdString(link.src);
-        auto dst_path_std = StringUtils::toStdString(link.dst);
+        QString src_path     = link.src;
+        QString dst_path     = link.dst;
+        auto    src_path_std = StringUtils::toStdString(link.src);
+        auto    dst_path_std = StringUtils::toStdString(link.dst);
 
         ensureFilePathExists(dst_path);
         if (m_useHardLinks) {
@@ -502,7 +506,7 @@ void create_link::runPrivileged(const QString& offset)
     connect(&m_linkServer, &QLocalServer::newConnection, this, [this, &gotResults]() {
         qDebug() << "Client connected, sending out pairs";
 
-        QByteArray block;
+        QByteArray  block;
         QDataStream out(&block, QIODevice::WriteOnly);
 
         qint32 blocksize = quint32(sizeof(quint32));
@@ -524,7 +528,7 @@ void create_link::runPrivileged(const QString& offset)
 
         connect(clientConnection, &QLocalSocket::readyRead, this, [&, clientConnection]() {
             QDataStream in;
-            quint32 blockSize = 0;
+            quint32     blockSize = 0;
             in.setDevice(clientConnection);
 
             qDebug() << "Reading path results from client";
@@ -568,7 +572,7 @@ void create_link::runPrivileged(const QString& offset)
         });
 
         qint64 byteswritten = clientConnection->write(block);
-        bool bytesflushed = clientConnection->flush();
+        bool   bytesflushed = clientConnection->flush();
         qDebug() << "block flushed" << byteswritten << bytesflushed;
     });
 
@@ -601,19 +605,19 @@ void ExternalLinkFileProcess::runLinkFile()
     qDebug() << "Running: runas" << fileLinkExe << params;
 
     LPCWSTR programNameWin = (const wchar_t*)fileLinkExe.utf16();
-    LPCWSTR paramsWin = (const wchar_t*)params.utf16();
+    LPCWSTR paramsWin      = (const wchar_t*)params.utf16();
 
     ShExecInfo.cbSize = sizeof(SHELLEXECUTEINFO);
-    ShExecInfo.fMask = SEE_MASK_NOCLOSEPROCESS;
-    ShExecInfo.hwnd = NULL;
+    ShExecInfo.fMask  = SEE_MASK_NOCLOSEPROCESS;
+    ShExecInfo.hwnd   = NULL;
 
     ShExecInfo.lpVerb = L"runas";
 
-    ShExecInfo.lpFile = programNameWin;
+    ShExecInfo.lpFile       = programNameWin;
     ShExecInfo.lpParameters = paramsWin;
-    ShExecInfo.lpDirectory = NULL;
-    ShExecInfo.nShow = SW_HIDE;
-    ShExecInfo.hInstApp = NULL;
+    ShExecInfo.lpDirectory  = NULL;
+    ShExecInfo.nShow        = SW_HIDE;
+    ShExecInfo.hInstApp     = NULL;
 
     ShellExecuteEx(&ShExecInfo);
 
@@ -786,10 +790,10 @@ QString ResolveExecutable(QString path)
 
 QString NormalizePath(QString path)
 {
-    QDir a = QDir::currentPath();
+    QDir    a               = QDir::currentPath();
     QString currentAbsolute = a.absolutePath();
 
-    QDir b(path);
+    QDir    b(path);
     QString newAbsolute = b.absolutePath();
 
     if (newAbsolute.startsWith(currentAbsolute)) {
@@ -799,9 +803,10 @@ QString NormalizePath(QString path)
     }
 }
 
-namespace {
+namespace
+{
 const QString g_badChars = "<>:\"|?*\r\n!";
-QString removeChars(QString source, QChar replace, const QString& extraChars = "")
+QString       removeChars(QString source, QChar replace, const QString& extraChars = "")
 {
     auto badChars = g_badChars;
     if (!extraChars.isEmpty()) {
@@ -830,7 +835,7 @@ QString RemoveInvalidPathChars(QString string, QChar replaceWith)
 
 QString DirNameFromString(QString string, QString inDir)
 {
-    int num = 0;
+    int     num      = 0;
     QString baseName = RemoveInvalidFilenameChars(string, '-');
     QString dirName;
     do {
@@ -908,9 +913,9 @@ QString createShortcut(QString destination, QString target, QStringList args, QS
         return QString();
     }
 
-    QDir content = application.path() + "/Contents/";
-    QDir resources = content.path() + "/Resources/";
-    QDir binaryDir = content.path() + "/MacOS/";
+    QDir  content   = application.path() + "/Contents/";
+    QDir  resources = content.path() + "/Resources/";
+    QDir  binaryDir = content.path() + "/MacOS/";
     QFile info(content.path() + "/Info.plist");
 
     if (!(content.mkpath(".") && resources.mkpath(".") && binaryDir.mkpath("."))) {
@@ -1101,7 +1106,7 @@ bool overrideFolder(QString overwritten_path, QString override_path)
     if (!FS::ensureFolderPathExists(overwritten_path))
         return false;
 
-    std::error_code err;
+    std::error_code  err;
     fs::copy_options opt = copy_opts::recursive | copy_opts::overwrite_existing;
 
     fs::copy(StringUtils::toStdString(override_path), StringUtils::toStdString(overwritten_path), opt, err);
@@ -1170,12 +1175,12 @@ FilesystemInfo statFS(const QString& path)
 
     info.fsType = getFilesystemTypeFuzzy(info.fsTypeName);
 
-    info.blockSize = storage_info.blockSize();
+    info.blockSize      = storage_info.blockSize();
     info.bytesAvailable = storage_info.bytesAvailable();
-    info.bytesFree = storage_info.bytesFree();
-    info.bytesTotal = storage_info.bytesTotal();
+    info.bytesFree      = storage_info.bytesFree();
+    info.bytesTotal     = storage_info.bytesTotal();
 
-    info.name = storage_info.name();
+    info.name     = storage_info.name();
     info.rootPath = storage_info.rootPath();
 
     return info;
@@ -1245,11 +1250,11 @@ bool clone::operator()(const QString& offset, bool dryRun)
         emit fileCloned(src_path, dst_path);
     };
 
-    QDir src_dir(src);
+    QDir         src_dir(src);
     QDirIterator source_it(src, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::Subdirectories);
 
     while (source_it.hasNext()) {
-        auto src_path = source_it.next();
+        auto src_path      = source_it.next();
         auto relative_path = src_dir.relativeFilePath(src_path);
 
         cloneFile(src_path, relative_path);
@@ -1364,10 +1369,10 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
         CloseHandle(hSourceFile);
         return false;
     }
-    ULONG junk;
+    ULONG                                  junk;
     FSCTL_GET_INTEGRITY_INFORMATION_BUFFER sourceFileIntegrity;
-    if (!DeviceIoControl(hSourceFile, FSCTL_GET_INTEGRITY_INFORMATION, nullptr, 0, &sourceFileIntegrity, sizeof(sourceFileIntegrity), &junk,
-                         nullptr)) {
+    if (!DeviceIoControl(
+            hSourceFile, FSCTL_GET_INTEGRITY_INFORMATION, nullptr, 0, &sourceFileIntegrity, sizeof(sourceFileIntegrity), &junk, nullptr)) {
         ec = std::error_code(GetLastError(), std::system_category());
         qDebug() << "Failed to source file integrity info" << src_path.c_str();
         CloseHandle(hSourceFile);
@@ -1382,7 +1387,7 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
         CloseHandle(hSourceFile);
         return false;
     }
-    FILE_DISPOSITION_INFO destFileDispose = { TRUE };
+    FILE_DISPOSITION_INFO destFileDispose = {TRUE};
     if (!SetFileInformationByHandle(hDestFile, FileDispositionInfo, &destFileDispose, sizeof(destFileDispose))) {
         ec = std::error_code(GetLastError(), std::system_category());
         qDebug() << "Failed to set dest file info" << dst_path.c_str();
@@ -1398,10 +1403,16 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
         CloseHandle(hDestFile);
         return false;
     }
-    FSCTL_SET_INTEGRITY_INFORMATION_BUFFER setDestFileintegrity = { sourceFileIntegrity.ChecksumAlgorithm, sourceFileIntegrity.Reserved,
-                                                                    sourceFileIntegrity.Flags };
-    if (!DeviceIoControl(hDestFile, FSCTL_SET_INTEGRITY_INFORMATION, &setDestFileintegrity, sizeof(setDestFileintegrity), nullptr, 0,
-                         nullptr, nullptr)) {
+    FSCTL_SET_INTEGRITY_INFORMATION_BUFFER setDestFileintegrity = {
+        sourceFileIntegrity.ChecksumAlgorithm, sourceFileIntegrity.Reserved, sourceFileIntegrity.Flags};
+    if (!DeviceIoControl(hDestFile,
+                         FSCTL_SET_INTEGRITY_INFORMATION,
+                         &setDestFileintegrity,
+                         sizeof(setDestFileintegrity),
+                         nullptr,
+                         0,
+                         nullptr,
+                         nullptr)) {
         ec = std::error_code(GetLastError(), std::system_category());
         qDebug() << "Failed to set dest file integrity info" << dst_path.c_str();
         CloseHandle(hSourceFile);
@@ -1421,12 +1432,13 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
     DUPLICATE_EXTENTS_DATA dupExtent;
     dupExtent.FileHandle = hSourceFile;
     for (LONG64 offset = 0, remain = RoundUpToPowerOf2(sourceFileLength.EndOfFile.QuadPart, sourceFileIntegrity.ClusterSizeInBytes);
-         remain > 0; offset += splitThreshold, remain -= splitThreshold) {
+         remain > 0;
+         offset += splitThreshold, remain -= splitThreshold) {
         dupExtent.SourceFileOffset.QuadPart = dupExtent.TargetFileOffset.QuadPart = offset;
-        dupExtent.ByteCount.QuadPart = std::min(splitThreshold, remain);
+        dupExtent.ByteCount.QuadPart                                              = std::min(splitThreshold, remain);
 
         if (!DeviceIoControl(hDestFile, FSCTL_DUPLICATE_EXTENTS_TO_FILE, &dupExtent, sizeof(dupExtent), nullptr, 0, &junk, nullptr)) {
-            DWORD err = GetLastError();
+            DWORD   err = GetLastError();
             QString additionalMessage;
             if (err == ERROR_BLOCK_TOO_MANY_REFERENCES) {
                 static const int MaxClonesPerFile = 8175;
@@ -1448,7 +1460,7 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
     }
 
     if (!(sourceFileBasicInfo.FileAttributes & FILE_ATTRIBUTE_SPARSE_FILE)) {
-        FILE_SET_SPARSE_BUFFER setDestSparse = { FALSE };
+        FILE_SET_SPARSE_BUFFER setDestSparse = {FALSE};
         if (!DeviceIoControl(hDestFile, FSCTL_SET_SPARSE, &setDestSparse, sizeof(setDestSparse), nullptr, 0, &junk, nullptr)) {
             qDebug() << "Failed to set dest file sparseness" << dst_path.c_str();
             CloseHandle(hSourceFile);
@@ -1470,8 +1482,8 @@ bool win_ioctl_clone(const std::wstring& src_path, const std::wstring& dst_path,
         CloseHandle(hDestFile);
         return false;
     }
-    destFileDispose = { FALSE };
-    bool result = !!SetFileInformationByHandle(hDestFile, FileDispositionInfo, &destFileDispose, sizeof(destFileDispose));
+    destFileDispose = {FALSE};
+    bool result     = !!SetFileInformationByHandle(hDestFile, FileDispositionInfo, &destFileDispose, sizeof(destFileDispose));
 
     CloseHandle(hSourceFile);
     CloseHandle(hDestFile);
@@ -1555,7 +1567,7 @@ bool canLink(const QString& src, const QString& dst)
 uintmax_t hardLinkCount(const QString& path)
 {
     std::error_code err;
-    int count = fs::hard_link_count(StringUtils::toStdString(path), err);
+    int             count = fs::hard_link_count(StringUtils::toStdString(path), err);
     if (err) {
         qWarning() << "Failed to count hard links for" << path << ":" << QString::fromStdString(err.message());
         count = 0;
@@ -1567,9 +1579,9 @@ uintmax_t hardLinkCount(const QString& path)
 
 QString shortPathName(const QString& file)
 {
-    auto input = file.toStdWString();
+    auto         input = file.toStdWString();
     std::wstring output;
-    long length = GetShortPathNameW(input.c_str(), NULL, 0);
+    long         length = GetShortPathNameW(input.c_str(), NULL, 0);
     if (length == 0)
         return {};
 
@@ -1609,8 +1621,8 @@ QString getUniqueResourceName(const QString& filePath)
         return filePath;
     }
     QFileInfo fileInfo(filePath);
-    auto baseName = fileInfo.completeBaseName();
-    auto path = fileInfo.absolutePath();
+    auto      baseName = fileInfo.completeBaseName();
+    auto      path     = fileInfo.absolutePath();
 
     int counter = 1;
     do {

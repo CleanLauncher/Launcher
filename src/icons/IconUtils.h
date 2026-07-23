@@ -37,7 +37,8 @@
 
 #include <QString>
 
-namespace IconUtils {
+namespace IconUtils
+{
 
 QString findBestIconIn(const QString& folder, const QString& iconKey);
 

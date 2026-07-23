@@ -12,7 +12,8 @@
 #include <QMessageBox>
 #include <algorithm>
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 ModModel::ModModel(BaseInstance& base_inst, ResourceAPI* api, QString debugName, QString metaEntryBase)
     : ResourceModel(api), m_base_instance(base_inst), m_debugName(debugName + " (Model)"), m_metaEntryBase(metaEntryBase)
@@ -26,8 +27,8 @@ ResourceAPI::SearchArgs ModModel::createSearchArguments()
     Q_ASSERT(m_filter);
 
     std::optional<std::vector<Version>> versions{};
-    std::optional<QStringList> categories{};
-    auto loaders = profile->getSupportedModLoaders();
+    std::optional<QStringList>          categories{};
+    auto                                loaders = profile->getSupportedModLoaders();
 
     if (!m_filter->versions.empty())
         versions = m_filter->versions;
@@ -39,33 +40,39 @@ ResourceAPI::SearchArgs ModModel::createSearchArguments()
 
     auto sort = getCurrentSortingMethodByIndex();
 
-    return {
-        ModPlatform::ResourceType::Mod, m_next_search_offset, m_search_term, sort, loaders, versions, side, categories, m_filter->openSource
-    };
+    return {ModPlatform::ResourceType::Mod,
+            m_next_search_offset,
+            m_search_term,
+            sort,
+            loaders,
+            versions,
+            side,
+            categories,
+            m_filter->openSource};
 }
 
 ResourceAPI::VersionSearchArgs ModModel::createVersionsArguments(const QModelIndex& entry)
 {
-    auto pack = m_packs[entry.row()];
+    auto pack    = m_packs[entry.row()];
     auto profile = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
 
     Q_ASSERT(profile);
     Q_ASSERT(m_filter);
 
     std::optional<std::vector<Version>> versions{};
-    auto loaders = profile->getSupportedModLoaders();
+    auto                                loaders = profile->getSupportedModLoaders();
     if (!m_filter->versions.empty())
         versions = m_filter->versions;
     if (m_filter->loaders)
         loaders = m_filter->loaders;
 
-    return { pack, versions, loaders, ModPlatform::ResourceType::Mod };
+    return {pack, versions, loaders, ModPlatform::ResourceType::Mod};
 }
 
 ResourceAPI::ProjectInfoArgs ModModel::createInfoArguments(const QModelIndex& entry)
 {
     auto pack = m_packs[entry.row()];
-    return { pack };
+    return {pack};
 }
 
 void ModModel::searchWithTerm(const QString& term, unsigned int sort, bool filter_changed)

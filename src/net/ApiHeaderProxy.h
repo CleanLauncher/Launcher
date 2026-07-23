@@ -26,9 +26,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-namespace Net {
+namespace Net
+{
 
-struct ModrinthDownloadMeta {
+struct ModrinthDownloadMeta
+{
     QString reason;
     QString gameVersion;
     QString loader;
@@ -51,35 +53,36 @@ struct ModrinthDownloadMeta {
     }
 };
 
-class ApiHeaderProxy : public HeaderProxy {
-   public:
+class ApiHeaderProxy : public HeaderProxy
+{
+public:
     ApiHeaderProxy() = default;
     explicit ApiHeaderProxy(ModrinthDownloadMeta meta) : m_meta(std::move(meta)) {}
     ~ApiHeaderProxy() override = default;
 
-   public:
+public:
     QList<HeaderPair> headers(const QNetworkRequest& request) const override
     {
         QList<HeaderPair> hdrs;
-        const auto host = request.url().host();
+        const auto        host = request.url().host();
 
         if (APPLICATION->capabilities() & Application::SupportsFlame &&
             (host == QUrl(BuildConfig.FLAME_BASE_URL).host() || host == BuildConfig.FLAME_DOWNLOAD_HOST)) {
-            hdrs.append({ .headerName = "x-api-key", .headerValue = APPLICATION->getFlameAPIKey().toUtf8() });
+            hdrs.append({.headerName = "x-api-key", .headerValue = APPLICATION->getFlameAPIKey().toUtf8()});
         } else if (host == QUrl(BuildConfig.MODRINTH_PROD_URL).host() || host == QUrl(BuildConfig.MODRINTH_STAGING_URL).host()) {
             QString token = APPLICATION->getModrinthAPIToken();
             if (!token.isNull()) {
-                hdrs.append({ .headerName = "Authorization", .headerValue = token.toUtf8() });
+                hdrs.append({.headerName = "Authorization", .headerValue = token.toUtf8()});
             }
         }
 
         if (host == BuildConfig.MODRINTH_DOWNLOAD_HOST && !m_meta.isEmpty()) {
-            hdrs.append({ .headerName = "modrinth-download-meta", .headerValue = m_meta.toJson() });
+            hdrs.append({.headerName = "modrinth-download-meta", .headerValue = m_meta.toJson()});
         }
         return hdrs;
     };
 
-   private:
+private:
     ModrinthDownloadMeta m_meta;
 };
 

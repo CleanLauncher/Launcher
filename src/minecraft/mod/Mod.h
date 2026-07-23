@@ -47,30 +47,31 @@
 #include "ModDetails.h"
 #include "Resource.h"
 
-class Mod : public Resource {
+class Mod : public Resource
+{
     Q_OBJECT
-   public:
-    using Ptr = shared_qobject_ptr<Mod>;
+public:
+    using Ptr     = shared_qobject_ptr<Mod>;
     using WeakPtr = QPointer<Mod>;
 
     Mod() = default;
     Mod(const QFileInfo& file);
     Mod(QString file_path) : Mod(QFileInfo(file_path)) {}
 
-    auto details() const -> const ModDetails&;
-    auto name() const -> QString override;
-    auto mod_id() const -> QString;
-    auto version() const -> QString;
-    auto homepage() const -> QString override;
-    auto description() const -> QString;
-    auto authors() const -> QStringList;
-    auto licenses() const -> const QList<ModLicense>&;
-    auto issueTracker() const -> QString;
-    auto side() const -> QString;
-    auto loaders() const -> QString;
-    auto mcVersions() const -> QStringList;
-    auto mcVersionsString() const -> QString;
-    auto releaseType() const -> QString;
+    auto        details() const -> const ModDetails&;
+    auto        name() const -> QString override;
+    auto        mod_id() const -> QString;
+    auto        version() const -> QString;
+    auto        homepage() const -> QString override;
+    auto        description() const -> QString;
+    auto        authors() const -> QStringList;
+    auto        licenses() const -> const QList<ModLicense>&;
+    auto        issueTracker() const -> QString;
+    auto        side() const -> QString;
+    auto        loaders() const -> QString;
+    auto        mcVersions() const -> QStringList;
+    auto        mcVersionsString() const -> QString;
+    auto        releaseType() const -> QString;
     QStringList dependencies() const;
 
     int requiredByCount() const;
@@ -89,7 +90,7 @@ class Mod : public Resource {
 
     bool valid() const override;
 
-    [[nodiscard]] int compare(const Resource& other, SortType type) const override;
+    [[nodiscard]] int  compare(const Resource& other, SortType type) const override;
     [[nodiscard]] bool applyFilter(QRegularExpression filter) const override;
 
     auto destroy(QDir& index_dir, bool preserve_metadata = false, bool attempt_trash = true) -> bool;
@@ -98,17 +99,18 @@ class Mod : public Resource {
 
     void finishResolvingWithDetails(ModDetails&& details);
 
-   protected:
+protected:
     ModDetails m_local_details;
 
     mutable QMutex m_data_lock;
 
-    struct {
+    struct
+    {
         QPixmapCache::Key key;
-        bool wasEverUsed = false;
-        bool wasReadAttempt = false;
+        bool              wasEverUsed    = false;
+        bool              wasReadAttempt = false;
     } mutable m_packImageCacheKey;
 
     int m_requiredByCount = 0;
-    int m_requiresCount = 0;
+    int m_requiresCount   = 0;
 };

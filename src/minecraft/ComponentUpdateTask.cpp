@@ -24,8 +24,8 @@ ComponentUpdateTask::ComponentUpdateTask(Mode mode, Net::Mode netmode, PackProfi
 {
     d.reset(new ComponentUpdateTaskData);
     d->m_profile = list;
-    d->mode = mode;
-    d->netmode = netmode;
+    d->mode      = mode;
+    d->netmode   = netmode;
 }
 
 ComponentUpdateTask::~ComponentUpdateTask() {}
@@ -65,8 +65,14 @@ void ComponentUpdateTask::executeTask()
     loadComponents();
 }
 
-namespace {
-enum class LoadResult { LoadedLocal, RequiresRemote, Failed };
+namespace
+{
+enum class LoadResult
+{
+    LoadedLocal,
+    RequiresRemote,
+    Failed
+};
 
 LoadResult composeLoadResult(LoadResult a, LoadResult b)
 {
@@ -83,28 +89,28 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
         return LoadResult::LoadedLocal;
     }
 
-    LoadResult result = LoadResult::Failed;
-    auto customPatchFilename = component->getFilename();
+    LoadResult result              = LoadResult::Failed;
+    auto       customPatchFilename = component->getFilename();
     if (QFile::exists(customPatchFilename)) {
         bool fileChanged = false;
-        auto file = ProfileUtils::parseJsonFile(QFileInfo(customPatchFilename), false);
+        auto file        = ProfileUtils::parseJsonFile(QFileInfo(customPatchFilename), false);
         if (file->uid != component->m_uid) {
-            file->uid = component->m_uid;
+            file->uid   = component->m_uid;
             fileChanged = true;
         }
         if (fileChanged) {
             ProfileUtils::saveJsonFile(OneSixVersionFormat::versionFileToJson(file), customPatchFilename);
         }
 
-        component->m_file = file;
+        component->m_file   = file;
         component->m_loaded = true;
-        result = LoadResult::LoadedLocal;
+        result              = LoadResult::LoadedLocal;
     } else {
-        auto metaVersion = APPLICATION->metadataIndex()->get(component->m_uid, component->m_version);
+        auto metaVersion         = APPLICATION->metadataIndex()->get(component->m_uid, component->m_version);
         component->m_metaVersion = metaVersion;
         if (metaVersion->isLoaded()) {
             component->m_loaded = true;
-            result = LoadResult::LoadedLocal;
+            result              = LoadResult::LoadedLocal;
         } else {
             loadTask = APPLICATION->metadataIndex()->loadVersion(component->m_uid, component->m_version, netmode);
             loadTask->start();
@@ -123,14 +129,14 @@ static LoadResult loadComponent(ComponentPtr component, Task::Ptr& loadTask, Net
 
 void ComponentUpdateTask::loadComponents()
 {
-    LoadResult result = LoadResult::LoadedLocal;
-    size_t taskIndex = 0;
-    size_t componentIndex = 0;
-    d->remoteLoadSuccessful = true;
+    LoadResult result         = LoadResult::LoadedLocal;
+    size_t     taskIndex      = 0;
+    size_t     componentIndex = 0;
+    d->remoteLoadSuccessful   = true;
 
     for (auto component : d->m_profile->d->components) {
-        Task::Ptr loadTask;
-        LoadResult singleResult;
+        Task::Ptr              loadTask;
+        LoadResult             singleResult;
         RemoteLoadStatus::Type loadType;
         component->resetComponentProblems();
 
@@ -152,7 +158,7 @@ void ComponentUpdateTask::loadComponents()
         }
 #else
         singleResult = loadComponent(component, loadTask, d->netmode);
-        loadType = RemoteLoadStatus::Type::Version;
+        loadType     = RemoteLoadStatus::Type::Version;
 #endif
         if (singleResult == LoadResult::LoadedLocal) {
             component->updateCachedData();
@@ -165,40 +171,43 @@ void ComponentUpdateTask::loadComponents()
             connect(loadTask.get(), &Task::failed, this, [this, taskIndex](const QString& error) { remoteLoadFailed(taskIndex, error); });
             connect(loadTask.get(), &Task::aborted, this, [this, taskIndex]() { remoteLoadFailed(taskIndex, tr("Aborted")); });
             RemoteLoadStatus status;
-            status.type = loadType;
+            status.type             = loadType;
             status.PackProfileIndex = componentIndex;
-            status.task = loadTask;
+            status.task             = loadTask;
             d->remoteLoadStatusList.append(status);
             taskIndex++;
         }
         componentIndex++;
     }
     d->remoteTasksInProgress = taskIndex;
-    m_progressTotal = static_cast<int>(taskIndex);
+    m_progressTotal          = static_cast<int>(taskIndex);
     switch (result) {
-        case LoadResult::LoadedLocal: {
-            performUpdateActions();
-            resolveDependencies(d->mode == Mode::Launch || d->netmode == Net::Mode::Offline);
-            return;
-        }
-        case LoadResult::RequiresRemote: {
-            break;
-        }
-        case LoadResult::Failed: {
-            emitFailed(tr("Some component metadata load tasks failed."));
-            return;
-        }
+    case LoadResult::LoadedLocal: {
+        performUpdateActions();
+        resolveDependencies(d->mode == Mode::Launch || d->netmode == Net::Mode::Offline);
+        return;
+    }
+    case LoadResult::RequiresRemote: {
+        break;
+    }
+    case LoadResult::Failed: {
+        emitFailed(tr("Some component metadata load tasks failed."));
+        return;
+    }
     }
 
     setDetails(tr("Downloading metadata for %1 components").arg(taskIndex));
 }
 
-namespace {
-struct RequireEx : public Meta::Require {
+namespace
+{
+struct RequireEx : public Meta::Require
+{
     size_t indexOfFirstDependee = 0;
 };
-struct RequireCompositionResult {
-    bool ok;
+struct RequireCompositionResult
+{
+    bool      ok;
     RequireEx outcome;
 };
 using RequireExSet = std::set<RequireEx>;
@@ -208,7 +217,7 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
 {
     assert(a.uid == b.uid);
     RequireEx out;
-    out.uid = a.uid;
+    out.uid                  = a.uid;
     out.indexOfFirstDependee = std::min(a.indexOfFirstDependee, b.indexOfFirstDependee);
     if (a.equalsVersion.isEmpty()) {
         out.equalsVersion = b.equalsVersion;
@@ -217,7 +226,7 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
     } else if (a.equalsVersion == b.equalsVersion) {
         out.equalsVersion = a.equalsVersion;
     } else {
-        return { false, out };
+        return {false, out};
     }
 
     if (a.suggests.isEmpty()) {
@@ -229,23 +238,23 @@ static RequireCompositionResult composeRequirement(const RequireEx& a, const Req
         Version bVer(b.suggests);
         out.suggests = (aVer < bVer ? b.suggests : a.suggests);
     }
-    return { true, out };
+    return {true, out};
 }
 
 static bool gatherRequirementsFromComponents(const ComponentContainer& input, RequireExSet& output)
 {
-    bool succeeded = true;
+    bool   succeeded    = true;
     size_t componentNum = 0;
     for (auto component : input) {
         auto& componentRequires = component->m_cachedRequires;
         for (const auto& componentRequire : componentRequires) {
-            auto found = std::find_if(output.cbegin(), output.cend(),
-                                      [componentRequire](const Meta::Require& req) { return req.uid == componentRequire.uid; });
+            auto found = std::find_if(
+                output.cbegin(), output.cend(), [componentRequire](const Meta::Require& req) { return req.uid == componentRequire.uid; });
 
             RequireEx componenRequireEx;
-            componenRequireEx.uid = componentRequire.uid;
-            componenRequireEx.suggests = componentRequire.suggests;
-            componenRequireEx.equalsVersion = componentRequire.equalsVersion;
+            componenRequireEx.uid                  = componentRequire.uid;
+            componenRequireEx.suggests             = componentRequire.suggests;
+            componenRequireEx.equalsVersion        = componentRequire.equalsVersion;
             componenRequireEx.indexOfFirstDependee = componentNum;
 
             if (found != output.cend()) {
@@ -275,7 +284,7 @@ static void getTrivialRemovals(const ComponentContainer& components, const Requi
         if (!component->m_cachedVolatile)
             continue;
         RequireEx reqNeedle;
-        reqNeedle.uid = component->m_uid;
+        reqNeedle.uid   = component->m_uid;
         const auto iter = reqs.find(reqNeedle);
         if (iter == reqs.cend()) {
             toRemove.append(component->m_uid);
@@ -285,10 +294,17 @@ static void getTrivialRemovals(const ComponentContainer& components, const Requi
 
 static bool getTrivialComponentChanges(const ComponentIndex& index, const RequireExSet& input, RequireExSet& toAdd, RequireExSet& toChange)
 {
-    enum class Decision { Undetermined, Met, Missing, VersionNotSame, LockedVersionNotSame } decision = Decision::Undetermined;
+    enum class Decision
+    {
+        Undetermined,
+        Met,
+        Missing,
+        VersionNotSame,
+        LockedVersionNotSame
+    } decision = Decision::Undetermined;
 
     QString reqStr;
-    bool succeeded = true;
+    bool    succeeded = true;
 
     for (auto& req : input) {
         do {
@@ -302,7 +318,7 @@ static bool getTrivialComponentChanges(const ComponentIndex& index, const Requir
                 }
                 break;
             } else {
-                reqStr = QString("Req: %1 == %2").arg(req.uid, req.equalsVersion);
+                reqStr               = QString("Req: %1 == %2").arg(req.uid, req.equalsVersion);
                 const auto& compIter = index.find(req.uid);
                 if (compIter == index.cend()) {
                     toAdd.insert(req);
@@ -326,25 +342,25 @@ static bool getTrivialComponentChanges(const ComponentIndex& index, const Requir
             }
         } while (false);
         switch (decision) {
-            case Decision::Undetermined:
-                qCCritical(instanceProfileResolveC) << "No decision for" << reqStr;
-                succeeded = false;
-                break;
-            case Decision::Met:
-                qCDebug(instanceProfileResolveC) << reqStr << "Is met.";
-                break;
-            case Decision::Missing:
-                qCDebug(instanceProfileResolveC) << reqStr << "Is missing and should be added at" << req.indexOfFirstDependee;
-                toAdd.insert(req);
-                break;
-            case Decision::VersionNotSame:
-                qCDebug(instanceProfileResolveC) << reqStr << "already has different version that can be changed.";
-                toChange.insert(req);
-                break;
-            case Decision::LockedVersionNotSame:
-                qCDebug(instanceProfileResolveC) << reqStr << "already has different version that cannot be changed.";
-                succeeded = false;
-                break;
+        case Decision::Undetermined:
+            qCCritical(instanceProfileResolveC) << "No decision for" << reqStr;
+            succeeded = false;
+            break;
+        case Decision::Met:
+            qCDebug(instanceProfileResolveC) << reqStr << "Is met.";
+            break;
+        case Decision::Missing:
+            qCDebug(instanceProfileResolveC) << reqStr << "Is missing and should be added at" << req.indexOfFirstDependee;
+            toAdd.insert(req);
+            break;
+        case Decision::VersionNotSame:
+            qCDebug(instanceProfileResolveC) << reqStr << "already has different version that can be changed.";
+            toChange.insert(req);
+            break;
+        case Decision::LockedVersionNotSame:
+            qCDebug(instanceProfileResolveC) << reqStr << "already has different version that cannot be changed.";
+            succeeded = false;
+            break;
         }
     }
     return succeeded;
@@ -354,14 +370,15 @@ ComponentContainer ComponentUpdateTask::collectTreeLinked(const QString& uid)
 {
     ComponentContainer linked;
 
-    auto& components = d->m_profile->d->components;
+    auto& components     = d->m_profile->d->components;
     auto& componentIndex = d->m_profile->d->componentIndex;
-    auto& instance = d->m_profile->d->m_instance;
+    auto& instance       = d->m_profile->d->m_instance;
     for (auto comp : components) {
         qCDebug(instanceProfileResolveC) << instance->name() << "|"
                                          << "scanning" << comp->getID() << ":" << comp->getVersion() << "for tree link";
-        auto dep = std::find_if(comp->m_cachedRequires.cbegin(), comp->m_cachedRequires.cend(),
-                                [uid](const Meta::Require& req) -> bool { return req.uid == uid; });
+        auto dep = std::find_if(comp->m_cachedRequires.cbegin(), comp->m_cachedRequires.cend(), [uid](const Meta::Require& req) -> bool {
+            return req.uid == uid;
+        });
         if (dep != comp->m_cachedRequires.cend()) {
             qCDebug(instanceProfileResolveC) << instance->name() << "|" << comp->getID() << ":" << comp->getVersion() << "depends on"
                                              << uid;
@@ -390,11 +407,11 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
 {
     qCDebug(instanceProfileResolveC) << "Resolving dependencies";
 
-    auto& components = d->m_profile->d->components;
+    auto& components     = d->m_profile->d->components;
     auto& componentIndex = d->m_profile->d->componentIndex;
 
     RequireExSet allRequires;
-    QStringList toRemove;
+    QStringList  toRemove;
     do {
         allRequires.clear();
         toRemove.clear();
@@ -414,7 +431,7 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
     } while (!toRemove.isEmpty());
     RequireExSet toAdd;
     RequireExSet toChange;
-    bool succeeded = getTrivialComponentChanges(componentIndex, allRequires, toAdd, toChange);
+    bool         succeeded = getTrivialComponentChanges(componentIndex, allRequires, toAdd, toChange);
     if (!succeeded) {
         finalizeComponents();
         emitFailed(tr("Instance has conflicting dependencies."));
@@ -449,8 +466,8 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
                     } else if (add.uid == "org.lwjgl3") {
                         component->m_version = "3.1.2";
                     } else if (add.uid == "net.fabricmc.intermediary" || add.uid == "org.quiltmc.hashed") {
-                        auto minecraft = std::find_if(components.begin(), components.end(),
-                                                      [](ComponentPtr& cmp) { return cmp->getID() == "net.minecraft"; });
+                        auto minecraft = std::find_if(
+                            components.begin(), components.end(), [](ComponentPtr& cmp) { return cmp->getID() == "net.minecraft"; });
                         if (minecraft != components.end()) {
                             component->m_version = (*minecraft)->getVersion();
                         }
@@ -482,7 +499,8 @@ void ComponentUpdateTask::resolveDependencies(bool checkOnly)
 }
 
 template <class... Ts>
-struct overload : Ts... {
+struct overload : Ts...
+{
     using Ts::operator()...;
 };
 template <class... Ts>
@@ -490,108 +508,107 @@ overload(Ts...) -> overload<Ts...>;
 
 void ComponentUpdateTask::performUpdateActions()
 {
-    auto& instance = d->m_profile->d->m_instance;
-    bool addedActions;
+    auto&       instance = d->m_profile->d->m_instance;
+    bool        addedActions;
     QStringList toRemove;
     do {
         addedActions = false;
         toRemove.clear();
-        auto& components = d->m_profile->d->components;
+        auto& components     = d->m_profile->d->components;
         auto& componentIndex = d->m_profile->d->componentIndex;
         for (auto component : components) {
             if (!component) {
                 continue;
             }
-            auto action = component->getUpdateAction();
-            auto visitor =
-                overload{ [](const UpdateActionNone&) {
+            auto action  = component->getUpdateAction();
+            auto visitor = overload{
+                [](const UpdateActionNone&) {
 
-                         },
-                          [&component, &instance](const UpdateActionChangeVersion& cv) {
-                              qCDebug(instanceProfileResolveC) << instance->name() << "|"
-                                                               << "UpdateActionChangeVersion" << component->getID() << ":"
-                                                               << component->getVersion() << "change to" << cv.targetVersion;
-                              component->setVersion(cv.targetVersion);
-                              component->waitLoadMeta();
-                          },
-                          [&component, &instance](const UpdateActionLatestRecommendedCompatible& lrc) {
-                              qCDebug(instanceProfileResolveC)
-                                  << instance->name() << "|"
-                                  << "UpdateActionLatestRecommendedCompatible" << component->getID() << ":" << component->getVersion()
-                                  << "updating to latest recommend or compatible with" << lrc.parentUid << lrc.version;
-                              auto versionList = APPLICATION->metadataIndex()->get(component->getID());
-                              if (versionList) {
-                                  versionList->waitToLoad();
-                                  auto recommended = versionList->getRecommendedForParent(lrc.parentUid, lrc.version);
-                                  if (!recommended) {
-                                      recommended = versionList->getLatestForParent(lrc.parentUid, lrc.version);
-                                  }
-                                  if (recommended) {
-                                      component->setVersion(recommended->version());
-                                      component->waitLoadMeta();
-                                      return;
-                                  } else {
-                                      component->addComponentProblem(ProblemSeverity::Error,
-                                                                     QObject::tr("No compatible version of %1 found for %2 %3")
-                                                                         .arg(component->getName(), lrc.parentName, lrc.version));
-                                  }
-                              } else {
-                                  component->addComponentProblem(
-                                      ProblemSeverity::Error,
-                                      QObject::tr("No version list in metadata index for %1").arg(component->getID()));
-                              }
-                          },
-                          [&component, &instance, &toRemove](const UpdateActionRemove&) {
-                              qCDebug(instanceProfileResolveC)
-                                  << instance->name() << "|"
-                                  << "UpdateActionRemove" << component->getID() << ":" << component->getVersion() << "removing";
-                              toRemove.append(component->getID());
-                          },
-                          [this, &component, &instance, &addedActions, &componentIndex](const UpdateActionImportantChanged& ic) {
-                              qCDebug(instanceProfileResolveC)
-                                  << instance->name() << "|"
-                                  << "UpdateImportantChanged" << component->getID() << ":" << component->getVersion() << "was changed from"
-                                  << ic.oldVersion << "updating linked components";
-                              auto oldVersion = APPLICATION->metadataIndex()->getLoadedVersion(component->getID(), ic.oldVersion);
-                              for (auto oldReq : oldVersion->requiredSet()) {
-                                  auto currentlyRequired = component->m_cachedRequires.find(oldReq);
-                                  if (currentlyRequired == component->m_cachedRequires.cend()) {
-                                      auto oldReqComp = componentIndex.find(oldReq.uid);
-                                      if (oldReqComp != componentIndex.cend()) {
-                                          (*oldReqComp)->setUpdateAction(UpdateAction{ UpdateActionRemove{} });
-                                          addedActions = true;
-                                      }
-                                  }
-                              }
-                              auto linked = collectTreeLinked(component->getID());
-                              for (auto comp : linked) {
-                                  if (comp->isCustom()) {
-                                      continue;
-                                  }
-                                  auto compUid = comp->getID();
-                                  auto parentReq = std::find_if(component->m_cachedRequires.begin(), component->m_cachedRequires.end(),
-                                                                [compUid](const Meta::Require& req) { return req.uid == compUid; });
-                                  if (parentReq != component->m_cachedRequires.end()) {
-                                      auto newVersion = parentReq->equalsVersion.isEmpty() ? parentReq->suggests : parentReq->equalsVersion;
-                                      if (!newVersion.isEmpty()) {
-                                          comp->setUpdateAction(UpdateAction{ UpdateActionChangeVersion{ newVersion } });
-                                      } else {
-                                          comp->setUpdateAction(UpdateAction{ UpdateActionLatestRecommendedCompatible{
-                                              component->getID(),
-                                              component->getName(),
-                                              component->getVersion(),
-                                          } });
-                                      }
-                                  } else {
-                                      comp->setUpdateAction(UpdateAction{ UpdateActionLatestRecommendedCompatible{
-                                          component->getID(),
-                                          component->getName(),
-                                          component->getVersion(),
-                                      } });
-                                  }
-                                  addedActions = true;
-                              }
-                          } };
+                },
+                [&component, &instance](const UpdateActionChangeVersion& cv) {
+                    qCDebug(instanceProfileResolveC) << instance->name() << "|"
+                                                     << "UpdateActionChangeVersion" << component->getID() << ":" << component->getVersion()
+                                                     << "change to" << cv.targetVersion;
+                    component->setVersion(cv.targetVersion);
+                    component->waitLoadMeta();
+                },
+                [&component, &instance](const UpdateActionLatestRecommendedCompatible& lrc) {
+                    qCDebug(instanceProfileResolveC)
+                        << instance->name() << "|"
+                        << "UpdateActionLatestRecommendedCompatible" << component->getID() << ":" << component->getVersion()
+                        << "updating to latest recommend or compatible with" << lrc.parentUid << lrc.version;
+                    auto versionList = APPLICATION->metadataIndex()->get(component->getID());
+                    if (versionList) {
+                        versionList->waitToLoad();
+                        auto recommended = versionList->getRecommendedForParent(lrc.parentUid, lrc.version);
+                        if (!recommended) {
+                            recommended = versionList->getLatestForParent(lrc.parentUid, lrc.version);
+                        }
+                        if (recommended) {
+                            component->setVersion(recommended->version());
+                            component->waitLoadMeta();
+                            return;
+                        } else {
+                            component->addComponentProblem(ProblemSeverity::Error,
+                                                           QObject::tr("No compatible version of %1 found for %2 %3")
+                                                               .arg(component->getName(), lrc.parentName, lrc.version));
+                        }
+                    } else {
+                        component->addComponentProblem(ProblemSeverity::Error,
+                                                       QObject::tr("No version list in metadata index for %1").arg(component->getID()));
+                    }
+                },
+                [&component, &instance, &toRemove](const UpdateActionRemove&) {
+                    qCDebug(instanceProfileResolveC)
+                        << instance->name() << "|"
+                        << "UpdateActionRemove" << component->getID() << ":" << component->getVersion() << "removing";
+                    toRemove.append(component->getID());
+                },
+                [this, &component, &instance, &addedActions, &componentIndex](const UpdateActionImportantChanged& ic) {
+                    qCDebug(instanceProfileResolveC) << instance->name() << "|"
+                                                     << "UpdateImportantChanged" << component->getID() << ":" << component->getVersion()
+                                                     << "was changed from" << ic.oldVersion << "updating linked components";
+                    auto oldVersion = APPLICATION->metadataIndex()->getLoadedVersion(component->getID(), ic.oldVersion);
+                    for (auto oldReq : oldVersion->requiredSet()) {
+                        auto currentlyRequired = component->m_cachedRequires.find(oldReq);
+                        if (currentlyRequired == component->m_cachedRequires.cend()) {
+                            auto oldReqComp = componentIndex.find(oldReq.uid);
+                            if (oldReqComp != componentIndex.cend()) {
+                                (*oldReqComp)->setUpdateAction(UpdateAction{UpdateActionRemove{}});
+                                addedActions = true;
+                            }
+                        }
+                    }
+                    auto linked = collectTreeLinked(component->getID());
+                    for (auto comp : linked) {
+                        if (comp->isCustom()) {
+                            continue;
+                        }
+                        auto compUid   = comp->getID();
+                        auto parentReq = std::find_if(component->m_cachedRequires.begin(),
+                                                      component->m_cachedRequires.end(),
+                                                      [compUid](const Meta::Require& req) { return req.uid == compUid; });
+                        if (parentReq != component->m_cachedRequires.end()) {
+                            auto newVersion = parentReq->equalsVersion.isEmpty() ? parentReq->suggests : parentReq->equalsVersion;
+                            if (!newVersion.isEmpty()) {
+                                comp->setUpdateAction(UpdateAction{UpdateActionChangeVersion{newVersion}});
+                            } else {
+                                comp->setUpdateAction(UpdateAction{UpdateActionLatestRecommendedCompatible{
+                                    component->getID(),
+                                    component->getName(),
+                                    component->getVersion(),
+                                }});
+                            }
+                        } else {
+                            comp->setUpdateAction(UpdateAction{UpdateActionLatestRecommendedCompatible{
+                                component->getID(),
+                                component->getName(),
+                                component->getVersion(),
+                            }});
+                        }
+                        addedActions = true;
+                    }
+                }};
             std::visit(visitor, action);
             component->clearUpdateAction();
             for (auto uid : toRemove) {
@@ -603,7 +620,7 @@ void ComponentUpdateTask::performUpdateActions()
 
 void ComponentUpdateTask::finalizeComponents()
 {
-    auto& components = d->m_profile->d->components;
+    auto& components     = d->m_profile->d->components;
     auto& componentIndex = d->m_profile->d->componentIndex;
     for (auto component : components) {
         for (auto req : component->m_cachedRequires) {
@@ -663,11 +680,11 @@ void ComponentUpdateTask::remoteLoadSucceeded(size_t taskIndex)
     }
     qCDebug(instanceProfileResolveC) << "Remote task" << taskIndex << "succeeded";
     taskSlot.succeeded = false;
-    taskSlot.finished = true;
+    taskSlot.finished  = true;
     d->remoteTasksInProgress--;
 
     if (taskSlot.type == RemoteLoadStatus::Type::Version) {
-        auto component = d->m_profile->getComponent(taskSlot.PackProfileIndex);
+        auto component      = d->m_profile->getComponent(taskSlot.PackProfileIndex);
         component->m_loaded = true;
         component->updateCachedData();
     }
@@ -690,8 +707,8 @@ void ComponentUpdateTask::remoteLoadFailed(size_t taskIndex, const QString& msg)
     }
     qCDebug(instanceProfileResolveC) << "Remote task" << taskIndex << "failed:" << msg;
     d->remoteLoadSuccessful = false;
-    taskSlot.succeeded = false;
-    taskSlot.finished = true;
+    taskSlot.succeeded      = false;
+    taskSlot.finished       = true;
     d->remoteTasksInProgress--;
     checkIfAllFinished();
 }

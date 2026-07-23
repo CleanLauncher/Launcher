@@ -11,28 +11,29 @@
 #include <QFuture>
 #include <QFutureWatcher>
 
-class DataMigrationTask : public Task {
+class DataMigrationTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     explicit DataMigrationTask(const QString& sourcePath, const QString& targetPath, Filter pathmatcher);
     ~DataMigrationTask() override = default;
 
-   protected:
+protected:
     virtual void executeTask() override;
 
-   protected slots:
+protected slots:
     void dryRunFinished();
     void dryRunAborted();
     void copyFinished();
     void copyAborted();
 
-   private:
+private:
     const QString& m_sourcePath;
     const QString& m_targetPath;
-    const Filter m_pathMatcher;
+    const Filter   m_pathMatcher;
 
-    FS::copy m_copy;
-    int m_toCopy = 0;
-    QFuture<bool> m_copyFuture;
+    FS::copy             m_copy;
+    int                  m_toCopy = 0;
+    QFuture<bool>        m_copyFuture;
     QFutureWatcher<bool> m_copyFutureWatcher;
 };

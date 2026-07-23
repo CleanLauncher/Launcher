@@ -15,24 +15,26 @@
 
 #pragma once
 
-#include <QString>
 #include "settings/SettingsObject.h"
+#include <QString>
 
-namespace Technic {
+namespace Technic
+{
 
-class TechnicPackProcessor : public QObject {
+class TechnicPackProcessor : public QObject
+{
     Q_OBJECT
 
-   signals:
+signals:
     void succeeded();
     void failed(QString reason);
 
-   public:
+public:
     void run(SettingsObject* globalSettings,
-             const QString& instName,
-             const QString& instIcon,
-             const QString& stagingPath,
-             const QString& minecraftVersion = QString(),
-             bool isSolder = false);
+             const QString&  instName,
+             const QString&  instIcon,
+             const QString&  stagingPath,
+             const QString&  minecraftVersion = QString(),
+             bool            isSolder         = false);
 };
 }  // namespace Technic

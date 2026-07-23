@@ -3,7 +3,8 @@
 
 #include <minecraft/MojangVersionFormat.h>
 
-class MojangVersionFormatTest : public QObject {
+class MojangVersionFormatTest : public QObject
+{
     Q_OBJECT
 
     static QJsonDocument readJson(const QString path)
@@ -30,12 +31,12 @@ class MojangVersionFormatTest : public QObject {
         jsonFile.close();
     }
 
-   private slots:
+private slots:
     void test_Through_Simple()
     {
-        QJsonDocument doc = readJson(QFINDTESTDATA("testdata/Libraries/1.9-simple.json"));
-        auto vfile = MojangVersionFormat::versionFileFromJson(doc, "1.9-simple.json");
-        auto doc2 = MojangVersionFormat::versionFileToJson(vfile);
+        QJsonDocument doc   = readJson(QFINDTESTDATA("testdata/Libraries/1.9-simple.json"));
+        auto          vfile = MojangVersionFormat::versionFileFromJson(doc, "1.9-simple.json");
+        auto          doc2  = MojangVersionFormat::versionFileToJson(vfile);
         writeJson("1.9-simple-passthorugh.json", doc2);
 
         QCOMPARE(doc.toJson(), doc2.toJson());
@@ -43,9 +44,9 @@ class MojangVersionFormatTest : public QObject {
 
     void test_Through()
     {
-        QJsonDocument doc = readJson(QFINDTESTDATA("testdata/Libraries/1.9.json"));
-        auto vfile = MojangVersionFormat::versionFileFromJson(doc, "1.9.json");
-        auto doc2 = MojangVersionFormat::versionFileToJson(vfile);
+        QJsonDocument doc   = readJson(QFINDTESTDATA("testdata/Libraries/1.9.json"));
+        auto          vfile = MojangVersionFormat::versionFileFromJson(doc, "1.9.json");
+        auto          doc2  = MojangVersionFormat::versionFileToJson(vfile);
         writeJson("1.9-passthorugh.json", doc2);
         QCOMPARE(doc.toJson(), doc2.toJson());
     }

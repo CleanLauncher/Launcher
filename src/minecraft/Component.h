@@ -1,36 +1,41 @@
 #pragma once
 
+#include "ProblemProvider.h"
+#include "QObjectPtr.h"
+#include "meta/JsonFormat.h"
+#include "modplatform/ModIndex.h"
 #include <QDateTime>
 #include <QJsonDocument>
 #include <QList>
 #include <memory>
 #include <optional>
 #include <variant>
-#include "ProblemProvider.h"
-#include "QObjectPtr.h"
-#include "meta/JsonFormat.h"
-#include "modplatform/ModIndex.h"
 
 class PackProfile;
 class LaunchProfile;
-namespace Meta {
+namespace Meta
+{
 class Version;
 class VersionList;
 }  // namespace Meta
 
 class VersionFile;
 
-struct UpdateActionChangeVersion {
+struct UpdateActionChangeVersion
+{
     QString targetVersion;
 };
-struct UpdateActionLatestRecommendedCompatible {
+struct UpdateActionLatestRecommendedCompatible
+{
     QString parentUid;
     QString parentName;
 
     QString version;
 };
-struct UpdateActionRemove {};
-struct UpdateActionImportantChanged {
+struct UpdateActionRemove
+{};
+struct UpdateActionImportantChanged
+{
     QString oldVersion;
 };
 
@@ -42,14 +47,16 @@ using UpdateAction = std::variant<UpdateActionNone,
                                   UpdateActionRemove,
                                   UpdateActionImportantChanged>;
 
-struct ModloaderMapEntry {
+struct ModloaderMapEntry
+{
     ModPlatform::ModLoaderType type;
-    QStringList knownConflictingComponents;
+    QStringList                knownConflictingComponents;
 };
 
-class Component : public QObject, public ProblemProvider {
+class Component : public QObject, public ProblemProvider
+{
     Q_OBJECT
-   public:
+public:
     Component(PackProfile* parent, const QString& uid);
 
     Component(PackProfile* parent, const QString& uid, std::shared_ptr<VersionFile> file);
@@ -64,35 +71,35 @@ class Component : public QObject, public ProblemProvider {
     bool setEnabled(bool state);
     bool canBeDisabled();
 
-    bool isMoveable();
-    bool isCustomizable();
-    bool isRevertible();
-    bool isRemovable();
-    bool isCustom();
-    bool isVersionChangeable(bool wait = true);
-    bool isKnownModloader();
+    bool        isMoveable();
+    bool        isCustomizable();
+    bool        isRevertible();
+    bool        isRemovable();
+    bool        isCustom();
+    bool        isVersionChangeable(bool wait = true);
+    bool        isKnownModloader();
     QStringList knownConflictingComponents();
 
     void setOrder(int order);
-    int getOrder();
+    int  getOrder();
 
-    QString getID();
-    QString getName();
-    QString getVersion();
+    QString                        getID();
+    QString                        getName();
+    QString                        getVersion();
     std::shared_ptr<Meta::Version> getMeta();
-    QDateTime getReleaseDateTime();
+    QDateTime                      getReleaseDateTime();
 
     QString getFilename();
 
-    std::shared_ptr<class VersionFile> getVersionFile() const;
+    std::shared_ptr<class VersionFile>       getVersionFile() const;
     std::shared_ptr<class Meta::VersionList> getVersionList() const;
 
     void setImportant(bool state);
 
     const QList<PatchProblem> getProblems() const override;
-    ProblemSeverity getProblemSeverity() const override;
-    void addComponentProblem(ProblemSeverity severity, const QString& description);
-    void resetComponentProblems();
+    ProblemSeverity           getProblemSeverity() const override;
+    void                      addComponentProblem(ProblemSeverity severity, const QString& description);
+    void                      resetComponentProblems();
 
     void setVersion(const QString& version);
     bool customize();
@@ -102,14 +109,14 @@ class Component : public QObject, public ProblemProvider {
 
     void waitLoadMeta();
 
-    void setUpdateAction(const UpdateAction& action);
-    void clearUpdateAction();
+    void         setUpdateAction(const UpdateAction& action);
+    void         clearUpdateAction();
     UpdateAction getUpdateAction();
 
-   signals:
+signals:
     void dataChanged();
 
-   public:
+public:
     PackProfile* m_parent;
 
     QString m_uid;
@@ -132,16 +139,16 @@ class Component : public QObject, public ProblemProvider {
     bool m_cachedVolatile = false;
 
     bool m_orderOverride = false;
-    int m_order = 0;
+    int  m_order         = 0;
 
     std::shared_ptr<Meta::Version> m_metaVersion;
-    std::shared_ptr<VersionFile> m_file;
-    bool m_loaded = false;
+    std::shared_ptr<VersionFile>   m_file;
+    bool                           m_loaded = false;
 
-   private:
+private:
     QList<PatchProblem> m_componentProblems;
-    ProblemSeverity m_componentProblemSeverity = ProblemSeverity::None;
-    UpdateAction m_updateAction = UpdateAction{ UpdateActionNone{} };
+    ProblemSeverity     m_componentProblemSeverity = ProblemSeverity::None;
+    UpdateAction        m_updateAction             = UpdateAction{UpdateActionNone{}};
 };
 
 using ComponentPtr = shared_qobject_ptr<Component>;

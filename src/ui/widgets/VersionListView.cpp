@@ -120,11 +120,11 @@ void VersionListView::paintEvent(QPaintEvent* event)
 QString VersionListView::currentEmptyString() const
 {
     switch (m_emptyMode) {
-        default:
-        case VersionListView::String:
-            return m_emptyString;
-        case VersionListView::ErrorString:
-            return m_emptyErrorString;
+    default:
+    case VersionListView::String:
+        return m_emptyString;
+    case VersionListView::ErrorString:
+        return m_emptyErrorString;
     }
 }
 
@@ -147,7 +147,7 @@ void VersionListView::paintInfoLabel(QPaintEvent* event) const
     foreground.setAlpha(190);
     painter.setFont(font);
     auto fontMetrics = painter.fontMetrics();
-    auto textRect = fontMetrics.boundingRect(innerBounds, Qt::AlignHCenter | Qt::TextWordWrap, emptyString);
+    auto textRect    = fontMetrics.boundingRect(innerBounds, Qt::AlignHCenter | Qt::TextWordWrap, emptyString);
     textRect.moveCenter(bounds.center());
 
     auto wrapRect = textRect;

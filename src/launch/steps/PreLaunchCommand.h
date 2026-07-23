@@ -18,20 +18,21 @@
 #include "LoggedProcess.h"
 #include "launch/LaunchStep.h"
 
-class PreLaunchCommand : public LaunchStep {
+class PreLaunchCommand : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit PreLaunchCommand(LaunchTask* parent);
     virtual ~PreLaunchCommand() {};
 
     virtual void executeTask();
     virtual bool abort();
     virtual bool canAbort() const { return true; }
-    void setWorkingDirectory(const QString& wd);
-   private slots:
+    void         setWorkingDirectory(const QString& wd);
+private slots:
     void on_state(LoggedProcess::State state);
 
-   private:
+private:
     LoggedProcess m_process;
-    QString m_command;
+    QString       m_command;
 };

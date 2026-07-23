@@ -17,17 +17,19 @@
  */
 #pragma once
 
+#include "archive/ArchiveReader.h"
+#include "tasks/Task.h"
 #include <QDir>
 #include <QFuture>
 #include <QFutureWatcher>
-#include "archive/ArchiveReader.h"
-#include "tasks/Task.h"
 
-namespace MMCZip {
+namespace MMCZip
+{
 
-class ExtractZipTask : public Task {
+class ExtractZipTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     ExtractZipTask(QString input, QDir outputDir, QString subdirectory = "")
         : m_input(input), m_outputDir(outputDir), m_subdirectory(subdirectory)
     {}
@@ -35,19 +37,19 @@ class ExtractZipTask : public Task {
 
     using ZipResult = std::optional<QString>;
 
-   protected:
+protected:
     virtual void executeTask() override;
-    bool abort() override;
+    bool         abort() override;
 
     ZipResult extractZip();
-    void finish();
+    void      finish();
 
-   private:
+private:
     ArchiveReader m_input;
-    QDir m_outputDir;
-    QString m_subdirectory;
+    QDir          m_outputDir;
+    QString       m_subdirectory;
 
-    QFuture<ZipResult> m_zipFuture;
+    QFuture<ZipResult>        m_zipFuture;
     QFutureWatcher<ZipResult> m_zipWatcher;
 };
 }  // namespace MMCZip

@@ -35,14 +35,16 @@
 
 #include "IconUtils.h"
 
-#include <QDirIterator>
 #include "FileSystem.h"
+#include <QDirIterator>
 
-namespace {
-static const QStringList validIconExtensions = { { "svg", "png", "ico", "gif", "jpg", "jpeg", "webp" } };
+namespace
+{
+static const QStringList validIconExtensions = {{"svg", "png", "ico", "gif", "jpg", "jpeg", "webp"}};
 }
 
-namespace IconUtils {
+namespace IconUtils
+{
 
 QString findBestIconIn(const QString& folder, const QString& iconKey)
 {

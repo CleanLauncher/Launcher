@@ -36,37 +36,39 @@
 
 #pragma once
 
+#include "FastFileIconProvider.h"
+#include "FileIgnoreProxy.h"
 #include <QDialog>
 #include <QModelIndex>
 #include <memory>
-#include "FastFileIconProvider.h"
-#include "FileIgnoreProxy.h"
 
 class BaseInstance;
 
-namespace Ui {
+namespace Ui
+{
 class ExportInstanceDialog;
 }
 
-class ExportInstanceDialog : public QDialog {
+class ExportInstanceDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ExportInstanceDialog(BaseInstance* instance, QWidget* parent = 0);
     ~ExportInstanceDialog();
 
     virtual void done(int result);
 
-   private:
-    void doExport();
+private:
+    void    doExport();
     QString ignoreFileName();
 
-   private:
+private:
     Ui::ExportInstanceDialog* m_ui;
-    BaseInstance* m_instance;
-    FileIgnoreProxy* m_proxyModel;
-    FastFileIconProvider m_icons;
+    BaseInstance*             m_instance;
+    FileIgnoreProxy*          m_proxyModel;
+    FastFileIconProvider      m_icons;
 
-   private slots:
+private slots:
     void rowsInserted(QModelIndex parent, int top, int bottom);
 };

@@ -34,12 +34,12 @@
  */
 
 #include "OneSixVersionFormat.h"
-#include <Json.h>
-#include <minecraft/MojangVersionFormat.h>
-#include <QList>
 #include "java/JavaMetadata.h"
 #include "minecraft/Agent.h"
 #include "minecraft/ParseUtils.h"
+#include <Json.h>
+#include <QList>
+#include <minecraft/MojangVersionFormat.h>
 
 #include <QRegularExpression>
 
@@ -91,10 +91,10 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
 
     Meta::MetadataVersion formatVersion = Meta::parseFormatVersion(root, false);
     switch (formatVersion) {
-        case Meta::MetadataVersion::InitialRelease:
-            break;
-        case Meta::MetadataVersion::Invalid:
-            throw JSONValidationError(filename + " does not contain a recognizable version of the metadata format.");
+    case Meta::MetadataVersion::InitialRelease:
+        break;
+    case Meta::MetadataVersion::Invalid:
+        throw JSONValidationError(filename + " does not contain a recognizable version of the metadata format.");
     }
 
     if (requireOrder) {
@@ -113,8 +113,8 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         out->uid = root.value("fileId").toString();
     }
 
-    static const QRegularExpression s_validUidRegex{ QRegularExpression::anchoredPattern(
-        QStringLiteral(R"([a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]+)*)")) };
+    static const QRegularExpression s_validUidRegex{
+        QRegularExpression::anchoredPattern(QStringLiteral(R"([a-zA-Z0-9-_]+(?:\.[a-zA-Z0-9-_]+)*)"))};
     if (!s_validUidRegex.match(out->uid).hasMatch()) {
         qCritical() << "The component's 'uid' contains illegal characters! UID:" << out->uid;
         out->addProblem(ProblemSeverity::Error,
@@ -184,7 +184,7 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         }
     };
     bool hasPlusLibs = root.contains("+libraries");
-    bool hasLibs = root.contains("libraries");
+    bool hasLibs     = root.contains("libraries");
     if (hasPlusLibs && hasLibs) {
         out->addProblem(ProblemSeverity::Warning,
                         QObject::tr("Version file has both '+libraries' and 'libraries'. This is no longer supported."));
@@ -203,18 +203,18 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
     if (root.contains("+agents")) {
         for (auto agentVal : requireArray(root.value("+agents"))) {
             QJsonObject agentObj = requireObject(agentVal);
-            auto lib = libraryFromJson(*out, agentObj, filename);
+            auto        lib      = libraryFromJson(*out, agentObj, filename);
 
             QString arg = "";
             readString(agentObj, "argument", arg);
 
-            out->agents.append(Agent{ lib, arg });
+            out->agents.append(Agent{lib, arg});
         }
     }
 
     if (root.contains("mainJar")) {
         QJsonObject libObj = requireObject(root, "mainJar");
-        out->mainJar = libraryFromJson(*out, libObj, filename);
+        out->mainJar       = libraryFromJson(*out, libObj, filename);
     }
 
     else if (!out->minecraftVersion.isEmpty()) {
@@ -222,7 +222,7 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
         lib->setRawName(GradleSpecifier(QString("com.mojang:minecraft:%1:client").arg(out->minecraftVersion)));
 
         if (out->mojangDownloads.contains("client")) {
-            auto LibDLInfo = std::make_shared<MojangLibraryDownloadInfo>();
+            auto LibDLInfo      = std::make_shared<MojangLibraryDownloadInfo>();
             LibDLInfo->artifact = out->mojangDownloads["client"];
             lib->setMojangDownloadInfo(LibDLInfo);
         }
@@ -241,7 +241,7 @@ VersionFilePtr OneSixVersionFormat::versionFileFromJson(const QJsonDocument& doc
     QString dependsOnMinecraftVersion = root.value("mcVersion").toString();
     if (!dependsOnMinecraftVersion.isEmpty()) {
         Meta::Require mcReq;
-        mcReq.uid = "net.minecraft";
+        mcReq.uid           = "net.minecraft";
         mcReq.equalsVersion = dependsOnMinecraftVersion;
         if (out->m_requires.count(mcReq) == 0) {
             out->m_requires.insert(mcReq);
@@ -356,9 +356,9 @@ QJsonDocument OneSixVersionFormat::versionFileToJson(const VersionFilePtr& patch
 }
 
 LibraryPtr OneSixVersionFormat::plusJarModFromJson([[maybe_unused]] ProblemContainer& problems,
-                                                   const QJsonObject& libObj,
-                                                   const QString& filename,
-                                                   const QString& originalName)
+                                                   const QJsonObject&                 libObj,
+                                                   const QString&                     filename,
+                                                   const QString&                     originalName)
 {
     LibraryPtr out(new Library());
     if (!libObj.contains("name")) {

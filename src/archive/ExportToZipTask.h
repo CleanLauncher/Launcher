@@ -25,17 +25,15 @@
 #include "archive/ArchiveWriter.h"
 #include "tasks/Task.h"
 
-namespace MMCZip {
-class ExportToZipTask : public Task {
+namespace MMCZip
+{
+class ExportToZipTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     ExportToZipTask(QString outputPath, QDir dir, QFileInfoList files, QString destinationPrefix = "", bool followSymlinks = false)
-        : m_outputPath(outputPath)
-        , m_output(outputPath)
-        , m_dir(dir)
-        , m_files(files)
-        , m_destinationPrefix(destinationPrefix)
-        , m_followSymlinks(followSymlinks)
+        : m_outputPath(outputPath), m_output(outputPath), m_dir(dir), m_files(files), m_destinationPrefix(destinationPrefix),
+          m_followSymlinks(followSymlinks)
     {
         setAbortable(true);
     };
@@ -49,24 +47,24 @@ class ExportToZipTask : public Task {
 
     using ZipResult = std::optional<QString>;
 
-   protected:
+protected:
     virtual void executeTask() override;
-    bool abort() override;
+    bool         abort() override;
 
     ZipResult exportZip();
-    void finish();
+    void      finish();
 
-   private:
-    QString m_outputPath;
-    ArchiveWriter m_output;
-    QDir m_dir;
-    QFileInfoList m_files;
-    QString m_destinationPrefix;
-    bool m_followSymlinks;
-    QStringList m_excludeFiles;
+private:
+    QString                    m_outputPath;
+    ArchiveWriter              m_output;
+    QDir                       m_dir;
+    QFileInfoList              m_files;
+    QString                    m_destinationPrefix;
+    bool                       m_followSymlinks;
+    QStringList                m_excludeFiles;
     QHash<QString, QByteArray> m_extraFiles;
 
-    QFuture<ZipResult> m_buildZipFuture;
+    QFuture<ZipResult>        m_buildZipFuture;
     QFutureWatcher<ZipResult> m_buildZipWatcher;
 };
 }  // namespace MMCZip

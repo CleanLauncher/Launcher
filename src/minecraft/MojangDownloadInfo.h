@@ -3,7 +3,8 @@
 #include <QString>
 #include <memory>
 
-struct MojangDownloadInfo {
+struct MojangDownloadInfo
+{
     using Ptr = std::shared_ptr<MojangDownloadInfo>;
 
     QString path;
@@ -15,7 +16,8 @@ struct MojangDownloadInfo {
     int size;
 };
 
-struct MojangLibraryDownloadInfo {
+struct MojangLibraryDownloadInfo
+{
     MojangLibraryDownloadInfo(MojangDownloadInfo::Ptr artifact_) : artifact(artifact_) {}
     MojangLibraryDownloadInfo() {}
 
@@ -30,11 +32,12 @@ struct MojangLibraryDownloadInfo {
         return classifiers[classifier].get();
     }
 
-    MojangDownloadInfo::Ptr artifact;
+    MojangDownloadInfo::Ptr                artifact;
     QMap<QString, MojangDownloadInfo::Ptr> classifiers;
 };
 
-struct MojangAssetIndexInfo : public MojangDownloadInfo {
+struct MojangAssetIndexInfo : public MojangDownloadInfo
+{
     using Ptr = std::shared_ptr<MojangAssetIndexInfo>;
 
     MojangAssetIndexInfo() {}
@@ -53,7 +56,7 @@ struct MojangAssetIndexInfo : public MojangDownloadInfo {
         known = false;
     }
 
-    int totalSize;
+    int     totalSize;
     QString id;
-    bool known = true;
+    bool    known = true;
 };

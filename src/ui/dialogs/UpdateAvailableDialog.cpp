@@ -21,16 +21,16 @@
  */
 
 #include "UpdateAvailableDialog.h"
-#include <QPushButton>
 #include "BuildConfig.h"
 #include "Markdown.h"
 #include "StringUtils.h"
 #include "ui_UpdateAvailableDialog.h"
+#include <QPushButton>
 
 UpdateAvailableDialog::UpdateAvailableDialog(const QString& currentVersion,
                                              const QString& availableVersion,
                                              const QString& releaseNotes,
-                                             QWidget* parent)
+                                             QWidget*       parent)
     : QDialog(parent), ui(new Ui::UpdateAvailableDialog)
 {
     ui->setupUi(this);

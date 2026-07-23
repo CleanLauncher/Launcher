@@ -19,15 +19,15 @@ AssetUpdateTask::AssetUpdateTask(MinecraftInstance* inst)
 void AssetUpdateTask::executeTask()
 {
     setStatus(tr("Updating assets index..."));
-    auto components = m_inst->getPackProfile();
-    auto profile = components->getProfile();
-    auto assets = profile->getMinecraftAssets();
-    QUrl indexUrl = assets->url;
-    QString localPath = assets->id + ".json";
-    auto job = makeShared<NetJob>(tr("Asset index for %1").arg(m_inst->name()), APPLICATION->network());
+    auto    components = m_inst->getPackProfile();
+    auto    profile    = components->getProfile();
+    auto    assets     = profile->getMinecraftAssets();
+    QUrl    indexUrl   = assets->url;
+    QString localPath  = assets->id + ".json";
+    auto    job        = makeShared<NetJob>(tr("Asset index for %1").arg(m_inst->name()), APPLICATION->network());
 
     auto metacache = APPLICATION->metacache();
-    auto entry = metacache->resolveEntry("asset_indexes", localPath);
+    auto entry     = metacache->resolveEntry("asset_indexes", localPath);
     entry->setStale(true);
     auto hexSha1 = assets->sha1.toLatin1();
     qDebug() << "Asset index SHA1:" << hexSha1;
@@ -58,14 +58,14 @@ void AssetUpdateTask::assetIndexFinished()
     qDebug() << "Finished asset index download for" << m_inst->name();
 
     auto components = m_inst->getPackProfile();
-    auto profile = components->getProfile();
-    auto assets = profile->getMinecraftAssets();
+    auto profile    = components->getProfile();
+    auto assets     = profile->getMinecraftAssets();
 
     QString asset_fname = "assets/indexes/" + assets->id + ".json";
 
     if (!AssetsUtils::loadAssetsIndexJson(assets->id, asset_fname, index)) {
         auto metacache = APPLICATION->metacache();
-        auto entry = metacache->resolveEntry("asset_indexes", assets->id + ".json");
+        auto entry     = metacache->resolveEntry("asset_indexes", assets->id + ".json");
         metacache->evictEntry(entry);
         emitFailed(tr("Failed to read the assets index!"));
         return;
@@ -74,7 +74,7 @@ void AssetUpdateTask::assetIndexFinished()
     auto job = index.getDownloadJob();
     if (job) {
         QString resourceURL = resourceUrl();
-        QString source = tr("Mojang");
+        QString source      = tr("Mojang");
         if (resourceURL != BuildConfig.DEFAULT_RESOURCE_BASE) {
             source = QUrl(resourceURL).host();
         }

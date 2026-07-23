@@ -20,7 +20,7 @@ PassthroughSetting::PassthroughSetting(std::shared_ptr<Setting> other, std::shar
 {
     Q_ASSERT(other);
     m_other = other;
-    m_gate = gate;
+    m_gate  = gate;
 }
 
 bool PassthroughSetting::isOverriding() const

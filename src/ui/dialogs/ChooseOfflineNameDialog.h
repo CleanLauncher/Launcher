@@ -22,29 +22,31 @@
 #include <QRegularExpressionValidator>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class ChooseOfflineNameDialog;
 }
 QT_END_NAMESPACE
 
-class ChooseOfflineNameDialog final : public QDialog {
+class ChooseOfflineNameDialog final : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ChooseOfflineNameDialog(const QString& message, QWidget* parent = nullptr);
     ~ChooseOfflineNameDialog() override;
 
     QString getUsername() const;
-    void setUsername(const QString& username) const;
+    void    setUsername(const QString& username) const;
 
-   private:
+private:
     void updateAcceptAllowed(const QString& username) const;
 
-   protected slots:
+protected slots:
     void on_usernameTextBox_textEdited(const QString& newText) const;
     void on_allowInvalidUsernames_checkStateChanged(Qt::CheckState checkState) const;
 
-   private:
+private:
     Ui::ChooseOfflineNameDialog* ui;
     QRegularExpressionValidator* m_usernameValidator;
 };

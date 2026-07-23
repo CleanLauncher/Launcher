@@ -49,50 +49,50 @@ QStringList JavaPerformance::getBaseOptimizationArgs(const JavaVersion& version,
 QStringList JavaPerformance::getGarbageCollectorArgs(const JavaVersion& version, const GarbageCollectorPreset preset)
 {
     switch (preset) {
-        case GarbageCollectorPreset::None:
-            return {};
-        case GarbageCollectorPreset::G1GC: {
-            QStringList args{ "-XX:+UnlockExperimentalVMOptions",
-                              "-XX:+UseG1GC",
-                              "-XX:G1NewSizePercent=20",
-                              "-XX:G1ReservePercent=20",
-                              "-XX:MaxGCPauseMillis=50",
-                              "-XX:G1HeapRegionSize=32M",
+    case GarbageCollectorPreset::None:
+        return {};
+    case GarbageCollectorPreset::G1GC: {
+        QStringList args{"-XX:+UnlockExperimentalVMOptions",
+                         "-XX:+UseG1GC",
+                         "-XX:G1NewSizePercent=20",
+                         "-XX:G1ReservePercent=20",
+                         "-XX:MaxGCPauseMillis=50",
+                         "-XX:G1HeapRegionSize=32M",
 
-                              "-XX:SurvivorRatio=32",
-                              "-XX:MaxTenuringThreshold=1" };
-            return args;
-        }
-        case GarbageCollectorPreset::Shenandoah: {
-            QStringList args{ "-XX:+UseShenandoahGC" };
-            if (version.major() >= 24) {
-                if (version.major() == 24) {
-                    args << "-XX:+UnlockExperimentalVMOptions";
-                }
-                args << "-XX:ShenandoahGCMode=generational";
+                         "-XX:SurvivorRatio=32",
+                         "-XX:MaxTenuringThreshold=1"};
+        return args;
+    }
+    case GarbageCollectorPreset::Shenandoah: {
+        QStringList args{"-XX:+UseShenandoahGC"};
+        if (version.major() >= 24) {
+            if (version.major() == 24) {
+                args << "-XX:+UnlockExperimentalVMOptions";
             }
-            return args;
+            args << "-XX:ShenandoahGCMode=generational";
         }
-        case GarbageCollectorPreset::ZGC: {
-            QStringList args{ "-XX:+UseZGC" };
+        return args;
+    }
+    case GarbageCollectorPreset::ZGC: {
+        QStringList args{"-XX:+UseZGC"};
 
-            if (version.major() >= 21 && version.major() < 23) {
-                args << "-XX:+ZGenerational";
-            }
-
-            args << "-XX:-ZUncommit";
-            return args;
+        if (version.major() >= 21 && version.major() < 23) {
+            args << "-XX:+ZGenerational";
         }
+
+        args << "-XX:-ZUncommit";
+        return args;
+    }
     }
 
     Q_ASSERT_X(false, "JavaPerformance::getGarbageCollectorArgs", "No arguments specified for current garbage collector preset");
     return {};
 }
 
-QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion& version,
-                                                        const bool useOptimized,
+QStringList JavaPerformance::getCompletePerformanceArgs(const JavaVersion&     version,
+                                                        const bool             useOptimized,
                                                         GarbageCollectorPreset preset,
-                                                        QString* warning)
+                                                        QString*               warning)
 {
     GarbageCollectorPreset maximumSupported;
     if (version.major() >= 17) {

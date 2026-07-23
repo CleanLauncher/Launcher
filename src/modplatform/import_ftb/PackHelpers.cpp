@@ -26,12 +26,13 @@
 #include "FileSystem.h"
 #include "Json.h"
 
-namespace FTBImportAPP {
+namespace FTBImportAPP
+{
 
 QIcon loadFTBIcon(const QString& imagePath)
 {
-    static const QHash<char, QByteArray> imageTypeMap = { { 0x00, "png" }, { 0x01, "jpg" }, { 0x02, "gif" }, { 0x03, "webp" } };
-    QFile file(imagePath);
+    static const QHash<char, QByteArray> imageTypeMap = {{0x00, "png"}, {0x01, "jpg"}, {0x02, "gif"}, {0x03, "webp"}};
+    QFile                                file(imagePath);
     if (!file.exists() || !file.open(QIODevice::ReadOnly)) {
         return QIcon();
     }
@@ -48,7 +49,7 @@ QIcon loadFTBIcon(const QString& imagePath)
     auto imageType = imageTypeMap[type];
 
     QImageReader reader(&file, imageType);
-    auto pixmap = QPixmap::fromImageReader(&reader);
+    auto         pixmap = QPixmap::fromImageReader(&reader);
     if (pixmap.isNull()) {
         qDebug() << "The FTB image at" << imagePath << "is not valid";
         return QIcon();
@@ -58,27 +59,27 @@ QIcon loadFTBIcon(const QString& imagePath)
 
 Modpack parseDirectory(QString path)
 {
-    Modpack modpack{ path };
-    auto instanceFile = QFileInfo(FS::PathCombine(path, "instance.json"));
+    Modpack modpack{path};
+    auto    instanceFile = QFileInfo(FS::PathCombine(path, "instance.json"));
     if (!instanceFile.exists() || !instanceFile.isFile())
         return {};
     try {
-        auto doc = Json::requireDocument(instanceFile.absoluteFilePath(), "FTB_APP instance JSON file");
-        const auto root = doc.object();
-        modpack.uuid = Json::requireString(root, "uuid", "uuid");
-        modpack.id = Json::requireInteger(root, "id", "id");
-        modpack.versionId = Json::requireInteger(root, "versionId", "versionId");
-        modpack.name = Json::requireString(root, "name", "name");
-        modpack.version = Json::requireString(root, "version", "version");
-        modpack.mcVersion = Json::requireString(root, "mcVersion", "mcVersion");
-        modpack.jvmArgs = root["jvmArgs"].toVariant();
+        auto       doc        = Json::requireDocument(instanceFile.absoluteFilePath(), "FTB_APP instance JSON file");
+        const auto root       = doc.object();
+        modpack.uuid          = Json::requireString(root, "uuid", "uuid");
+        modpack.id            = Json::requireInteger(root, "id", "id");
+        modpack.versionId     = Json::requireInteger(root, "versionId", "versionId");
+        modpack.name          = Json::requireString(root, "name", "name");
+        modpack.version       = Json::requireString(root, "version", "version");
+        modpack.mcVersion     = Json::requireString(root, "mcVersion", "mcVersion");
+        modpack.jvmArgs       = root["jvmArgs"].toVariant();
         modpack.totalPlayTime = Json::requireInteger(root, "totalPlayTime", "totalPlayTime");
 
         auto modLoader = Json::requireString(root, "modLoader", "modLoader");
         if (!modLoader.isEmpty()) {
             const auto parts = modLoader.split('-', Qt::KeepEmptyParts);
             if (parts.size() >= 2) {
-                const auto loader = parts.first().toLower();
+                const auto loader     = parts.first().toLower();
                 modpack.loaderVersion = parts.at(1).trimmed();
                 if (loader == "neoforge") {
                     modpack.loaderType = ModPlatform::NeoForge;
@@ -119,28 +120,28 @@ void legacyInstanceParsing(QString path, std::optional<ModPlatform::ModLoaderTyp
         return;
     }
     try {
-        auto doc = Json::requireDocument(versionsFile.absoluteFilePath(), "FTB_APP version JSON file");
-        const auto root = doc.object();
-        auto targets = Json::requireArray(root, "targets", "targets");
+        auto       doc     = Json::requireDocument(versionsFile.absoluteFilePath(), "FTB_APP version JSON file");
+        const auto root    = doc.object();
+        auto       targets = Json::requireArray(root, "targets", "targets");
 
         for (auto target : targets) {
-            auto obj = Json::requireObject(target, "target");
-            auto name = Json::requireString(obj, "name", "name");
+            auto obj     = Json::requireObject(target, "target");
+            auto name    = Json::requireString(obj, "name", "name");
             auto version = Json::requireString(obj, "version", "version");
             if (name == "neoforge") {
-                *loaderType = ModPlatform::NeoForge;
+                *loaderType    = ModPlatform::NeoForge;
                 *loaderVersion = version;
                 break;
             } else if (name == "forge") {
-                *loaderType = ModPlatform::Forge;
+                *loaderType    = ModPlatform::Forge;
                 *loaderVersion = version;
                 break;
             } else if (name == "fabric") {
-                *loaderType = ModPlatform::Fabric;
+                *loaderType    = ModPlatform::Fabric;
                 *loaderVersion = version;
                 break;
             } else if (name == "quilt") {
-                *loaderType = ModPlatform::Quilt;
+                *loaderType    = ModPlatform::Quilt;
                 *loaderVersion = version;
                 break;
             }

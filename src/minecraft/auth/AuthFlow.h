@@ -9,11 +9,17 @@
 #include "minecraft/auth/AuthStep.h"
 #include "tasks/Task.h"
 
-class AuthFlow : public Task {
+class AuthFlow : public Task
+{
     Q_OBJECT
 
-   public:
-    enum class Action { Refresh, Login, DeviceCode };
+public:
+    enum class Action
+    {
+        Refresh,
+        Login,
+        DeviceCode
+    };
 
     explicit AuthFlow(AccountData* data, Action action = Action::Refresh);
     virtual ~AuthFlow() = default;
@@ -22,25 +28,25 @@ class AuthFlow : public Task {
 
     AccountTaskState taskState() { return m_taskState; }
 
-   public slots:
+public slots:
     bool abort() override;
 
-   signals:
+signals:
     void authorizeWithBrowser(const QUrl& url);
     void authorizeWithBrowserWithExtra(QString url, QString code, int expiresIn);
 
-   protected:
+protected:
     void succeed();
     void nextStep();
 
-   private slots:
+private slots:
 
     bool changeState(AccountTaskState newState, QString reason = QString());
     void stepFinished(AccountTaskState resultingState, QString message);
 
-   private:
-    AccountTaskState m_taskState = AccountTaskState::STATE_CREATED;
+private:
+    AccountTaskState     m_taskState = AccountTaskState::STATE_CREATED;
     QList<AuthStep::Ptr> m_steps;
-    AuthStep::Ptr m_currentStep;
-    AccountData* m_data = nullptr;
+    AuthStep::Ptr        m_currentStep;
+    AccountData*         m_data = nullptr;
 };

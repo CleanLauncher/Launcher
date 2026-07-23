@@ -16,12 +16,12 @@ QString MinecraftProfileStep::describe()
 
 void MinecraftProfileStep::perform()
 {
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
-                                           { "Authorization", QString("Bearer %1").arg(m_data->yggdrasilToken.token).toUtf8() } };
+    auto headers = QList<Net::HeaderPair>{{"Content-Type", "application/json"},
+                                          {"Accept", "application/json"},
+                                          {"Authorization", QString("Bearer %1").arg(m_data->yggdrasilToken.token).toUtf8()}};
 
     auto [request, response] = Net::Download::makeByteArray(m_profileUrl);
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
 

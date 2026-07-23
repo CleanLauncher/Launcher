@@ -40,11 +40,17 @@
 #include <QMap>
 #include <QString>
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
-enum class PackType { Public, Private };
+enum class PackType
+{
+    Public,
+    Private
+};
 
-enum class ModType {
+enum class ModType
+{
     Root,
     Forge,
     Jar,
@@ -67,36 +73,45 @@ enum class ModType {
     Unknown
 };
 
-enum class DownloadType { Server, Browser, Direct, Unknown };
+enum class DownloadType
+{
+    Server,
+    Browser,
+    Direct,
+    Unknown
+};
 
-struct VersionLoader {
+struct VersionLoader
+{
     QString type;
-    bool latest;
-    bool recommended;
-    bool choose;
+    bool    latest;
+    bool    recommended;
+    bool    choose;
 
     QString version;
 };
 
-struct VersionLibrary {
-    QString url;
-    QString file;
-    QString server;
-    QString md5;
+struct VersionLibrary
+{
+    QString      url;
+    QString      file;
+    QString      server;
+    QString      md5;
     DownloadType download;
-    QString download_raw;
+    QString      download_raw;
 };
 
-struct VersionMod {
-    QString name;
-    QString version;
-    QString url;
-    QString file;
-    QString md5;
+struct VersionMod
+{
+    QString      name;
+    QString      version;
+    QString      url;
+    QString      file;
+    QString      md5;
     DownloadType download;
-    QString download_raw;
-    ModType type;
-    QString type_raw;
+    QString      download_raw;
+    ModType      type;
+    QString      type_raw;
 
     ModType extractTo;
     QString extractTo_raw;
@@ -106,79 +121,88 @@ struct VersionMod {
     QString decompType_raw;
     QString decompFile;
 
-    QString description;
-    bool optional;
-    bool recommended;
-    bool selected;
-    bool hidden;
-    bool library;
-    QString group;
+    QString     description;
+    bool        optional;
+    bool        recommended;
+    bool        selected;
+    bool        hidden;
+    bool        library;
+    QString     group;
     QStringList depends;
-    QString colour;
-    QString warning;
+    QString     colour;
+    QString     warning;
 
     bool client;
 
     bool effectively_hidden;
 };
 
-struct VersionConfigs {
-    int filesize;
+struct VersionConfigs
+{
+    int     filesize;
     QString sha1;
 };
 
-struct VersionMessages {
+struct VersionMessages
+{
     QString install;
     QString update;
 };
 
-struct VersionKeep {
+struct VersionKeep
+{
     QString base;
     QString target;
 };
 
-struct VersionKeeps {
+struct VersionKeeps
+{
     QList<VersionKeep> files;
     QList<VersionKeep> folders;
 };
 
-struct VersionDelete {
+struct VersionDelete
+{
     QString base;
     QString target;
 };
 
-struct VersionDeletes {
+struct VersionDeletes
+{
     QList<VersionDelete> files;
     QList<VersionDelete> folders;
 };
 
-struct PackVersionMainClass {
+struct PackVersionMainClass
+{
     QString mainClass;
     QString depends;
 };
 
-struct PackVersionExtraArguments {
+struct PackVersionExtraArguments
+{
     QString arguments;
     QString depends;
 };
 
-struct PackVersion {
-    QString version;
-    QString minecraft;
-    bool noConfigs;
-    PackVersionMainClass mainClass;
+struct PackVersion
+{
+    QString                   version;
+    QString                   minecraft;
+    bool                      noConfigs;
+    PackVersionMainClass      mainClass;
     PackVersionExtraArguments extraArguments;
 
-    VersionLoader loader;
+    VersionLoader         loader;
     QList<VersionLibrary> libraries;
-    QList<VersionMod> mods;
-    VersionConfigs configs;
+    QList<VersionMod>     mods;
+    VersionConfigs        configs;
 
     QMap<QString, QString> colours;
     QMap<QString, QString> warnings;
-    VersionMessages messages;
+    VersionMessages        messages;
 
-    VersionKeeps keeps;
+    VersionKeeps   keeps;
     VersionDeletes deletes;
 };
 

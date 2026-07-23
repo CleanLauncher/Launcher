@@ -155,16 +155,17 @@ void TechnicPage::suggestCurrent()
     }
 
     QString editedLogoName = "technic_" + current.logoName;
-    model->getLogo(current.logoName, current.logoUrl,
-                   [this, editedLogoName](QString logo) { dialog->setSuggestedIconFromFile(logo, editedLogoName); });
+    model->getLogo(current.logoName, current.logoUrl, [this, editedLogoName](QString logo) {
+        dialog->setSuggestedIconFromFile(logo, editedLogoName);
+    });
 
     if (current.metadataLoaded) {
         metadataLoaded();
         return;
     }
 
-    auto netJob = makeShared<NetJob>(QString("Technic::PackMeta(%1)").arg(current.name), APPLICATION->network());
-    QString slug = current.slug;
+    auto    netJob             = makeShared<NetJob>(QString("Technic::PackMeta(%1)").arg(current.name), APPLICATION->network());
+    QString slug               = current.slug;
     auto [action, responsePtr] = Net::ApiDownload::makeByteArray(
         QString("%1modpack/%2?build=%3").arg(BuildConfig.TECHNIC_API_BASE_URL, slug, BuildConfig.TECHNIC_API_BUILD));
     netJob->addNetAction(action);
@@ -177,8 +178,8 @@ void TechnicPage::suggestCurrent()
         }
 
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
-        QJsonObject obj = doc.object();
+        QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
+        QJsonObject     obj = doc.object();
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response from Technic at" << parse_error.offset
                        << "reason:" << parse_error.errorString();
@@ -199,7 +200,7 @@ void TechnicPage::suggestCurrent()
             }
             QJsonValueRef solderUrl = obj["solder"];
             if (solderUrl.isString()) {
-                current.url = solderUrl.toString();
+                current.url      = solderUrl.toString();
                 current.isSolder = true;
             } else {
                 qWarning() << "Json doesn't contain a valid url or solder key";
@@ -208,16 +209,17 @@ void TechnicPage::suggestCurrent()
         }
 
         current.minecraftVersion = obj["minecraft"].toString();
-        current.websiteUrl = obj["platformUrl"].toString();
-        current.author = obj["user"].toString();
-        current.description = obj["description"].toString();
-        current.currentVersion = obj["version"].toString();
-        current.metadataLoaded = true;
+        current.websiteUrl       = obj["platformUrl"].toString();
+        current.author           = obj["user"].toString();
+        current.description      = obj["description"].toString();
+        current.currentVersion   = obj["version"].toString();
+        current.metadataLoaded   = true;
 
         metadataLoaded();
     });
-    connect(jobPtr.get(), &NetJob::failed,
-            [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+    connect(jobPtr.get(), &NetJob::failed, [this](QString reason) {
+        CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+    });
 
     jobPtr = netJob;
     jobPtr->start();
@@ -256,14 +258,15 @@ void TechnicPage::metadataLoaded()
     } else {
         ui->versionSelectionBox->addItem(current.currentVersion);
 
-        auto netJob = makeShared<NetJob>(QString("Technic::SolderMeta(%1)").arg(current.name), APPLICATION->network());
-        auto url = QString("%1/modpack/%2").arg(current.url, current.slug);
+        auto netJob             = makeShared<NetJob>(QString("Technic::SolderMeta(%1)").arg(current.name), APPLICATION->network());
+        auto url                = QString("%1/modpack/%2").arg(current.url, current.slug);
         auto [action, response] = Net::ApiDownload::makeByteArray(QUrl(url));
         netJob->addNetAction(action);
 
         connect(netJob.get(), &NetJob::succeeded, this, [this, response] { onSolderLoaded(response); });
-        connect(jobPtr.get(), &NetJob::failed,
-                [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec(); });
+        connect(jobPtr.get(), &NetJob::failed, [this](QString reason) {
+            CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
+        });
 
         jobPtr = netJob;
         jobPtr->start();
@@ -283,12 +286,13 @@ void TechnicPage::selectVersion()
     }
 
     if (!current.isSolder) {
-        dialog->setSuggestedPack(current.name, selectedVersion,
-                                 new Technic::SingleZipPackInstallTask(current.url, current.minecraftVersion));
+        dialog->setSuggestedPack(
+            current.name, selectedVersion, new Technic::SingleZipPackInstallTask(current.url, current.minecraftVersion));
     } else {
-        dialog->setSuggestedPack(current.name, selectedVersion,
-                                 new Technic::SolderPackInstallTask(APPLICATION->network(), current.url, current.slug, selectedVersion,
-                                                                    current.minecraftVersion));
+        dialog->setSuggestedPack(current.name,
+                                 selectedVersion,
+                                 new Technic::SolderPackInstallTask(
+                                     APPLICATION->network(), current.url, current.slug, selectedVersion, current.minecraftVersion));
     }
 }
 
@@ -307,7 +311,7 @@ void TechnicPage::onSolderLoaded(QByteArray* responsePtr)
     current.versions.clear();
 
     QJsonParseError parse_error{};
-    auto doc = QJsonDocument::fromJson(response, &parse_error);
+    auto            doc = QJsonDocument::fromJson(response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from Solder at" << parse_error.offset << "reason:" << parse_error.errorString();
         qWarning() << response;
@@ -326,7 +330,7 @@ void TechnicPage::onSolderLoaded(QByteArray* responsePtr)
     }
 
     current.versionsLoaded = true;
-    current.recommended = pack.recommended;
+    current.recommended    = pack.recommended;
     current.versions.append(pack.builds);
 
     ui->versionSelectionBox->clear();

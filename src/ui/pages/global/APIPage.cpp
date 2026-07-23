@@ -58,8 +58,10 @@
 
 APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
 {
-    int comboBoxEntries[] = { PasteUpload::PasteType::Mclogs, PasteUpload::PasteType::NullPointer, PasteUpload::PasteType::PasteGG,
-                              PasteUpload::PasteType::Hastebin };
+    int comboBoxEntries[] = {PasteUpload::PasteType::Mclogs,
+                             PasteUpload::PasteType::NullPointer,
+                             PasteUpload::PasteType::PasteGG,
+                             PasteUpload::PasteType::Hastebin};
 
     static const QRegularExpression s_validUrlRegExp("https?://.+");
     static const QRegularExpression s_validMSAClientID(
@@ -115,11 +117,11 @@ APIPage::APIPage(QWidget* parent) : QWidget(parent), ui(new Ui::APIPage)
         FetchFlameAPIKey task{};
         connect(&task, &Task::succeeded, this, [this, &task] { ui->flameKey->setText(task.result()); });
         connect(&task, &Task::failed, this, [this, &task] {
-            QMessageBox::critical(this, tr("Could not fetch API key"),
-                                  tr("Could not fetch CurseForge API key:\n%1").arg(task.failReason()));
+            QMessageBox::critical(
+                this, tr("Could not fetch API key"), tr("Could not fetch CurseForge API key:\n%1").arg(task.failReason()));
         });
 
-        ProgressDialog dialog{ this };
+        ProgressDialog dialog{this};
         dialog.setSkipButton(true, tr("Abort"));
         dialog.execWithTask(&task);
     });
@@ -147,7 +149,7 @@ void APIPage::updateBaseURLNote(int index)
 
 void APIPage::updateBaseURLPlaceholder(int index)
 {
-    int pasteType = ui->pasteTypeComboBox->itemData(index).toInt();
+    int     pasteType       = ui->pasteTypeComboBox->itemData(index).toInt();
     QString pasteDefaultURL = PasteUpload::PasteTypes.at(pasteType).defaultBase;
     ui->baseURLEntry->setPlaceholderText(pasteDefaultURL);
 }
@@ -171,7 +173,7 @@ void APIPage::loadSettings()
 {
     auto s = APPLICATION->settings();
 
-    int pasteType = s->get("PastebinType").toInt();
+    int     pasteType   = s->get("PastebinType").toInt();
     QString pastebinURL = s->get("PastebinCustomAPIBase").toString();
 
     ui->baseURLEntry->setText(pastebinURL);
@@ -235,8 +237,8 @@ void APIPage::applySettings()
     addRequiredTrailingSlash(resourceURL);
     addRequiredTrailingSlash(fmlLibsURL);
 
-    auto isLocalhost = [](const QUrl& url) { return url.host() == "localhost" || url.host() == "127.0.0.1" || url.host() == "::1"; };
-    auto isUnsafe = [isLocalhost](const QUrl& url) { return !url.isEmpty() && url.scheme() == "http" && !isLocalhost(url); };
+    auto isLocalhost    = [](const QUrl& url) { return url.host() == "localhost" || url.host() == "127.0.0.1" || url.host() == "::1"; };
+    auto isUnsafe       = [isLocalhost](const QUrl& url) { return !url.isEmpty() && url.scheme() == "http" && !isLocalhost(url); };
     auto upgradeToHTTPS = [isUnsafe](QUrl& url) {
         if (isUnsafe(url)) {
             url.setScheme("https");

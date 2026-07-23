@@ -44,26 +44,32 @@
 #include <FileSystem.h>
 #include <io/stream_reader.h>
 #include <minecraft/MinecraftInstance.h>
+#include <sstream>
 #include <tag_compound.h>
 #include <tag_list.h>
 #include <tag_primitive.h>
 #include <tag_string.h>
-#include <sstream>
 
-#include <tasks/ConcurrentTask.h>
 #include <QFileSystemWatcher>
 #include <QMenu>
 #include <QTimer>
+#include <tasks/ConcurrentTask.h>
 
 static const int COLUMN_COUNT = 3;
 
-struct Server {
-    enum class AcceptsTextures : int { ASK = 0, ALWAYS = 1, NEVER = 2 };
+struct Server
+{
+    enum class AcceptsTextures : int
+    {
+        ASK    = 0,
+        ALWAYS = 1,
+        NEVER  = 2
+    };
 
     Server() { m_name = QObject::tr("Minecraft Server"); }
     Server(const QString& name, const QString& address)
     {
-        m_name = name;
+        m_name    = name;
         m_address = address;
     }
     Server(nbt::tag_compound& server)
@@ -101,8 +107,8 @@ struct Server {
         }
     }
 
-    QString m_name;
-    QString m_address;
+    QString         m_name;
+    QString         m_address;
     AcceptsTextures m_acceptsTextures = AcceptsTextures::ASK;
 
     QByteArray m_icon;
@@ -113,9 +119,9 @@ struct Server {
 static std::unique_ptr<nbt::tag_compound> parseServersDat(const QString& filename)
 {
     try {
-        QByteArray input = FS::read(filename);
+        QByteArray         input = FS::read(filename);
         std::istringstream foo(std::string(input.constData(), input.size()));
-        auto pair = nbt::io::read_compound(foo);
+        auto               pair = nbt::io::read_compound(foo);
 
         if (pair.first != "")
             return nullptr;
@@ -145,15 +151,17 @@ static bool serializeServerDat(const QString& filename, nbt::tag_compound* level
     }
 }
 
-class ServersModel : public QAbstractListModel {
+class ServersModel : public QAbstractListModel
+{
     Q_OBJECT
-   public:
-    enum Roles {
+public:
+    enum Roles
+    {
         ServerPtrRole = Qt::UserRole,
     };
     explicit ServersModel(const QString& path, QObject* parent = 0) : QAbstractListModel(parent)
     {
-        m_path = path;
+        m_path    = path;
         m_watcher = new QFileSystemWatcher(this);
         connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &ServersModel::fileChanged);
         connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &ServersModel::dirChanged);
@@ -277,12 +285,12 @@ class ServersModel : public QAbstractListModel {
 
         if (role == Qt::DisplayRole) {
             switch (section) {
-                case 0:
-                    return tr("Name");
-                case 1:
-                    return tr("Address");
-                case 2:
-                    return tr("Online");
+            case 0:
+                return tr("Name");
+            case 1:
+                return tr("Address");
+            case 2:
+                return tr("Online");
             }
         }
 
@@ -294,7 +302,7 @@ class ServersModel : public QAbstractListModel {
         if (!index.isValid())
             return QVariant();
 
-        int row = index.row();
+        int row    = index.row();
         int column = index.column();
         if (column < 0 || column >= COLUMN_COUNT)
             return QVariant();
@@ -303,46 +311,46 @@ class ServersModel : public QAbstractListModel {
             return QVariant();
 
         switch (role) {
-            case Qt::DecorationRole: {
-                if (column == 0) {
-                    auto& bytes = m_servers[row].m_icon;
-                    if (bytes.size()) {
-                        QPixmap px;
-                        if (px.loadFromData(bytes))
-                            return QIcon(px);
-                    }
-                    return QIcon::fromTheme("unknown_server");
-                } else {
-                    return QVariant();
+        case Qt::DecorationRole: {
+            if (column == 0) {
+                auto& bytes = m_servers[row].m_icon;
+                if (bytes.size()) {
+                    QPixmap px;
+                    if (px.loadFromData(bytes))
+                        return QIcon(px);
                 }
+                return QIcon::fromTheme("unknown_server");
+            } else {
+                return QVariant();
             }
-            case Qt::DisplayRole:
-                switch (column) {
-                    case 0:
-                        return m_servers[row].m_name;
-                    case 1:
-                        return m_servers[row].m_address;
-                    case 2:
-                        if (m_servers[row].m_currentPlayers) {
-                            return *m_servers[row].m_currentPlayers;
-                        } else {
-                            return "...";
-                        }
-                    default:
-                        return QVariant();
+        }
+        case Qt::DisplayRole:
+            switch (column) {
+            case 0:
+                return m_servers[row].m_name;
+            case 1:
+                return m_servers[row].m_address;
+            case 2:
+                if (m_servers[row].m_currentPlayers) {
+                    return *m_servers[row].m_currentPlayers;
+                } else {
+                    return "...";
                 }
-            case ServerPtrRole:
-                if (column == 0)
-                    return QVariant::fromValue<void*>((void*)&m_servers[row]);
-                else
-                    return QVariant();
             default:
                 return QVariant();
+            }
+        case ServerPtrRole:
+            if (column == 0)
+                return QVariant::fromValue<void*>((void*)&m_servers[row]);
+            else
+                return QVariant();
+        default:
+            return QVariant();
         }
     }
 
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override { return parent.isValid() ? 0 : m_servers.size(); }
-    int columnCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : COLUMN_COUNT; }
+    int         columnCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : COLUMN_COUNT; }
 
     Server* at(int index)
     {
@@ -399,11 +407,11 @@ class ServersModel : public QAbstractListModel {
         cancelSave();
         beginResetModel();
         QList<Server> servers;
-        auto serversDat = parseServersDat(serversPath());
+        auto          serversDat = parseServersDat(serversPath());
         if (serversDat) {
             auto& serversList = serversDat->at("servers").as<nbt::tag_list>();
             for (auto iter = serversList.begin(); iter != serversList.end(); iter++) {
-                auto& serverTag = (*iter).as<nbt::tag_compound>();
+                auto&  serverTag = (*iter).as<nbt::tag_compound>();
                 Server s(serverTag);
                 servers.append(s);
             }
@@ -434,8 +442,8 @@ class ServersModel : public QAbstractListModel {
             server.m_currentPlayers = {};
             emit dataChanged(index(row, 0), index(row, COLUMN_COUNT - 1));
 
-            auto target = MinecraftTarget::parse(server.m_address, false);
-            auto* task = new ServerPingTask(target.address, target.port);
+            auto  target = MinecraftTarget::parse(server.m_address, false);
+            auto* task   = new ServerPingTask(target.address, target.port);
             m_currentQueryTask->addTask(Task::Ptr(task));
 
             connect(task, &Task::finished, this, [this, task, row]() {
@@ -450,7 +458,7 @@ class ServersModel : public QAbstractListModel {
         m_currentQueryTask->start();
     }
 
-   public slots:
+public slots:
     void dirChanged(const QString& path)
     {
         qDebug() << "Changed:" << path;
@@ -458,7 +466,7 @@ class ServersModel : public QAbstractListModel {
     }
     void fileChanged(const QString& path) { qDebug() << "Changed:" << path; }
 
-   private slots:
+private slots:
     void save_internal()
     {
         cancelSave();
@@ -466,7 +474,7 @@ class ServersModel : public QAbstractListModel {
         qDebug() << "Server list about to be saved to" << path;
 
         nbt::tag_compound out;
-        nbt::tag_list list;
+        nbt::tag_list     list;
         for (auto& server : m_servers) {
             nbt::tag_compound serverNbt;
             server.serialize(serverNbt);
@@ -480,7 +488,7 @@ class ServersModel : public QAbstractListModel {
         }
     }
 
-   private:
+private:
     void scheduleSave()
     {
         if (!m_loaded) {
@@ -528,22 +536,22 @@ class ServersModel : public QAbstractListModel {
         return foo.filePath();
     }
 
-   private:
-    bool m_loaded = false;
-    bool m_locked = false;
-    bool m_observed = false;
-    bool m_dirty = false;
-    QString m_path;
-    QList<Server> m_servers;
+private:
+    bool                m_loaded   = false;
+    bool                m_locked   = false;
+    bool                m_observed = false;
+    bool                m_dirty    = false;
+    QString             m_path;
+    QList<Server>       m_servers;
     QFileSystemWatcher* m_watcher = nullptr;
-    QTimer m_saveTimer;
+    QTimer              m_saveTimer;
     ConcurrentTask::Ptr m_currentQueryTask = nullptr;
 };
 
 ServersPage::ServersPage(BaseInstance* inst, QWidget* parent) : QMainWindow(parent), ui(new Ui::ServersPage)
 {
     ui->setupUi(this);
-    m_inst = inst;
+    m_inst  = inst;
     m_model = new ServersModel(inst->gameRoot(), this);
     ui->serversView->setIconSize(QSize(64, 64));
     ui->serversView->setModel(m_model);
@@ -684,7 +692,7 @@ void ServersPage::openedImpl()
     m_model->observe();
 
     const auto setting_name = QString("WideBarVisibility_%1").arg(id());
-    m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+    m_wide_bar_setting      = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 
@@ -713,12 +721,15 @@ void ServersPage::on_actionAdd_triggered()
 void ServersPage::on_actionRemove_triggered()
 {
     auto response =
-        CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        CustomMessageBox::selectable(this,
+                                     tr("Confirm Removal"),
                                      tr("You are about to remove \"%1\".\n"
                                         "This is permanent and the server will be gone from your list forever (A LONG TIME).\n\n"
                                         "Are you sure?")
                                          .arg(m_model->at(currentServer)->m_name),
-                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                     QMessageBox::Warning,
+                                     QMessageBox::Yes | QMessageBox::No,
+                                     QMessageBox::No)
             ->exec();
 
     if (response != QMessageBox::Yes)

@@ -7,22 +7,25 @@
 #include "ui/pages/modplatform/ResourcePage.h"
 #include "ui/pages/modplatform/ShaderPackModel.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ShaderPackDownloadDialog;
 
-class ShaderPackResourcePage : public ResourcePage {
+class ShaderPackResourcePage : public ResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     template <typename T>
     static T* create(ShaderPackDownloadDialog* dialog, BaseInstance& instance)
     {
-        auto page = new T(dialog, instance);
+        auto  page  = new T(dialog, instance);
         auto* model = static_cast<ShaderPackResourceModel*>(page->getModel());
 
         connect(model, &ResourceModel::versionListUpdated, page, &ResourcePage::versionListUpdated);
@@ -47,10 +50,10 @@ class ShaderPackResourcePage : public ResourcePage {
 
     auto helpPage() const -> QString override { return "shaderpack-platform"; }
 
-   protected:
+protected:
     ShaderPackResourcePage(ShaderPackDownloadDialog* dialog, BaseInstance& instance);
 
-   protected slots:
+protected slots:
     void triggerSearch() override;
 };
 

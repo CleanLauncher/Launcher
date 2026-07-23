@@ -34,14 +34,15 @@
  */
 
 #include "MetaCacheSink.h"
+#include "Application.h"
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
-#include "Application.h"
 
 #include "net/Logging.h"
 
-namespace Net {
+namespace Net
+{
 
 #define MAX_TIME_TO_EXPIRE 1 * 7 * 24 * 60 * 60
 
@@ -95,7 +96,7 @@ Task::State MetaCacheSink::finalizeCache(QNetworkReply& reply)
             qCDebug(taskMetaCacheLogC) << "Parsing 'Cache-Control' header with" << cache_control_header;
 
             static const QRegularExpression s_maxAgeExpr("max-age=([0-9]+)");
-            qint64 max_age = s_maxAgeExpr.match(cache_control_header).captured(1).toLongLong();
+            qint64                          max_age = s_maxAgeExpr.match(cache_control_header).captured(1).toLongLong();
             m_entry->setMaximumAge(max_age);
 
         } else if (reply.hasRawHeader("Expires")) {

@@ -1,16 +1,17 @@
 #pragma once
 
-#include <QString>
 #include "settings/SettingsObject.h"
+#include <QString>
 
-class MCEditTool {
-   public:
+class MCEditTool
+{
+public:
     MCEditTool(SettingsObject* settings);
-    void setPath(QString& path);
+    void    setPath(QString& path);
     QString path() const;
-    bool check(const QString& toolPath, QString& error);
+    bool    check(const QString& toolPath, QString& error);
     QString getProgramPath();
 
-   private:
+private:
     SettingsObject* m_settings;
 };

@@ -15,31 +15,34 @@
 
 #pragma once
 
-#include <QMap>
-#include <QString>
 #include "net/NetJob.h"
 #include "net/NetRequest.h"
+#include <QMap>
+#include <QString>
 
-struct AssetObject {
-    QString getRelPath();
-    QUrl getUrl();
-    QString getLocalPath();
+struct AssetObject
+{
+    QString              getRelPath();
+    QUrl                 getUrl();
+    QString              getLocalPath();
     Net::NetRequest::Ptr getDownloadAction();
 
     QString hash;
-    qint64 size;
+    qint64  size;
 };
 
-struct AssetsIndex {
+struct AssetsIndex
+{
     NetJob::Ptr getDownloadJob();
 
-    QString id;
+    QString                    id;
     QMap<QString, AssetObject> objects;
-    bool isVirtual = false;
-    bool mapToResources = false;
+    bool                       isVirtual      = false;
+    bool                       mapToResources = false;
 };
 
-namespace AssetsUtils {
+namespace AssetsUtils
+{
 bool loadAssetsIndexJson(const QString& id, const QString& file, AssetsIndex& index);
 
 QDir getAssetsDir(const QString& assetsId, const QString& resourcesFolder);

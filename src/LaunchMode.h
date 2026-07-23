@@ -18,7 +18,8 @@
 
 #pragma once
 
-enum class LaunchMode {
+enum class LaunchMode
+{
     Normal,
     Offline,
     Demo,

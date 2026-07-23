@@ -41,15 +41,18 @@
 #include "modplatform/atlauncher/ATLPackManifest.h"
 #include "net/NetJob.h"
 
-namespace Ui {
+namespace Ui
+{
 class AtlOptionalModDialog;
 }
 
-class AtlOptionalModListModel : public QAbstractListModel {
+class AtlOptionalModListModel : public QAbstractListModel
+{
     Q_OBJECT
 
-   public:
-    enum Columns {
+public:
+    enum Columns
+    {
         EnabledColumn = 0,
         NameColumn,
         DescriptionColumn,
@@ -63,39 +66,40 @@ class AtlOptionalModListModel : public QAbstractListModel {
     int columnCount(const QModelIndex& parent) const override;
 
     QVariant data(const QModelIndex& index, int role) const override;
-    bool setData(const QModelIndex& index, const QVariant& value, int role) override;
+    bool     setData(const QModelIndex& index, const QVariant& value, int role) override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     void useShareCode(const QString& code);
 
-   public slots:
+public slots:
     void shareCodeSuccess(QByteArray* responsePtr);
     void shareCodeFailure(const QString& reason);
 
     void selectRecommended();
     void clearAll();
 
-   private:
+private:
     void toggleMod(const ATLauncher::VersionMod& mod, int index);
     void setMod(const ATLauncher::VersionMod& mod, int index, bool enable, bool shouldEmit = true);
 
-   private:
+private:
     NetJob::Ptr m_jobPtr;
 
-    ATLauncher::PackVersion m_version;
+    ATLauncher::PackVersion       m_version;
     QList<ATLauncher::VersionMod> m_mods;
 
-    QMap<QString, bool> m_selection;
-    QMap<QString, int> m_index;
+    QMap<QString, bool>           m_selection;
+    QMap<QString, int>            m_index;
     QMap<QString, QList<QString>> m_dependents;
 };
 
-class AtlOptionalModDialog : public QDialog {
+class AtlOptionalModDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     AtlOptionalModDialog(QWidget* parent, const ATLauncher::PackVersion& version, QList<ATLauncher::VersionMod> mods);
     ~AtlOptionalModDialog() override;
 
@@ -103,7 +107,7 @@ class AtlOptionalModDialog : public QDialog {
 
     void useShareCode();
 
-   private:
+private:
     Ui::AtlOptionalModDialog* ui;
 
     AtlOptionalModListModel* listModel;

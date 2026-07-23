@@ -28,7 +28,8 @@
 #include "modplatform/import_ftb/PackHelpers.h"
 #include "settings/INISettingsObject.h"
 
-namespace FTBImportAPP {
+namespace FTBImportAPP
+{
 
 void PackInstallTask::executeTask()
 {
@@ -50,7 +51,7 @@ void PackInstallTask::copySettings()
     setStatus(tr("Copying settings..."));
     progress(2, 2);
 
-    QString instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
+    QString           instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
     MinecraftInstance instance(m_globalSettings, std::make_unique<INISettingsObject>(instanceConfigPath), m_stagingPath);
 
     {
@@ -70,24 +71,24 @@ void PackInstallTask::copySettings()
         auto modloader = m_pack.loaderType;
         if (modloader.has_value()) {
             switch (modloader.value()) {
-                case ModPlatform::NeoForge: {
-                    components->setComponentVersion("net.neoforged", m_pack.loaderVersion, true);
-                    break;
-                }
-                case ModPlatform::Forge: {
-                    components->setComponentVersion("net.minecraftforge", m_pack.loaderVersion, true);
-                    break;
-                }
-                case ModPlatform::Fabric: {
-                    components->setComponentVersion("net.fabricmc.fabric-loader", m_pack.loaderVersion, true);
-                    break;
-                }
-                case ModPlatform::Quilt: {
-                    components->setComponentVersion("org.quiltmc.quilt-loader", m_pack.loaderVersion, true);
-                    break;
-                }
-                default:
-                    break;
+            case ModPlatform::NeoForge: {
+                components->setComponentVersion("net.neoforged", m_pack.loaderVersion, true);
+                break;
+            }
+            case ModPlatform::Forge: {
+                components->setComponentVersion("net.minecraftforge", m_pack.loaderVersion, true);
+                break;
+            }
+            case ModPlatform::Fabric: {
+                components->setComponentVersion("net.fabricmc.fabric-loader", m_pack.loaderVersion, true);
+                break;
+            }
+            case ModPlatform::Quilt: {
+                components->setComponentVersion("org.quiltmc.quilt-loader", m_pack.loaderVersion, true);
+                break;
+            }
+            default:
+                break;
             }
         }
         components->saveNow();

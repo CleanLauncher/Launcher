@@ -30,27 +30,28 @@
         QMetaObject::invokeMethod(s_instance, "_" #NAME, type, Q_RETURN_ARG(RET_TYPE, ret), Q_ARG(PARAM_1_TYPE, p1)); \
         return ret;                                                                                                   \
     }
-#define DEFINE_FUNC_TWO_PARAM(NAME, RET_TYPE, RET_DEF, PARAM_1_TYPE, PARAM_2_TYPE)                                   \
-    static RET_TYPE NAME(PARAM_1_TYPE p1, PARAM_2_TYPE p2)                                                           \
-    {                                                                                                                \
-        RET_TYPE ret = RET_DEF;                                                                                      \
-        GET_TYPE()                                                                                                   \
-        QMetaObject::invokeMethod(s_instance, "_" #NAME, type, Q_RETURN_ARG(RET_TYPE, ret), Q_ARG(PARAM_1_TYPE, p1), \
-                                  Q_ARG(PARAM_2_TYPE, p2));                                                          \
-        return ret;                                                                                                  \
+#define DEFINE_FUNC_TWO_PARAM(NAME, RET_TYPE, RET_DEF, PARAM_1_TYPE, PARAM_2_TYPE)                                       \
+    static RET_TYPE NAME(PARAM_1_TYPE p1, PARAM_2_TYPE p2)                                                               \
+    {                                                                                                                    \
+        RET_TYPE ret = RET_DEF;                                                                                          \
+        GET_TYPE()                                                                                                       \
+        QMetaObject::invokeMethod(                                                                                       \
+            s_instance, "_" #NAME, type, Q_RETURN_ARG(RET_TYPE, ret), Q_ARG(PARAM_1_TYPE, p1), Q_ARG(PARAM_2_TYPE, p2)); \
+        return ret;                                                                                                      \
     }
 
-class PixmapCache final : public QObject {
+class PixmapCache final : public QObject
+{
     Q_OBJECT
 
-   public:
+public:
     PixmapCache(QObject* parent) : QObject(parent) {}
     ~PixmapCache() override = default;
 
     static PixmapCache& instance() { return *s_instance; }
-    static void setInstance(PixmapCache* i) { s_instance = i; }
+    static void         setInstance(PixmapCache* i) { s_instance = i; }
 
-   public:
+public:
     DEFINE_FUNC_NO_PARAM(cacheLimit, int, -1)
     DEFINE_FUNC_NO_PARAM(clear, bool, false)
     DEFINE_FUNC_TWO_PARAM(find, bool, false, const QString&, QPixmap*)
@@ -64,18 +65,18 @@ class PixmapCache final : public QObject {
     DEFINE_FUNC_NO_PARAM(markCacheMissByEviciton, bool, false)
     DEFINE_FUNC_ONE_PARAM(setFastEvictionThreshold, bool, false, int)
 
-   private slots:
-    int _cacheLimit() { return QPixmapCache::cacheLimit(); }
+private slots:
+    int  _cacheLimit() { return QPixmapCache::cacheLimit(); }
     bool _clear()
     {
         QPixmapCache::clear();
         return true;
     }
-    bool _find(const QString& key, QPixmap* pixmap) { return QPixmapCache::find(key, pixmap); }
-    bool _find(const QPixmapCache::Key& key, QPixmap* pixmap) { return QPixmapCache::find(key, pixmap); }
-    bool _insert(const QString& key, const QPixmap& pixmap) { return QPixmapCache::insert(key, pixmap); }
+    bool              _find(const QString& key, QPixmap* pixmap) { return QPixmapCache::find(key, pixmap); }
+    bool              _find(const QPixmapCache::Key& key, QPixmap* pixmap) { return QPixmapCache::find(key, pixmap); }
+    bool              _insert(const QString& key, const QPixmap& pixmap) { return QPixmapCache::insert(key, pixmap); }
     QPixmapCache::Key _insert(const QPixmap& pixmap) { return QPixmapCache::insert(pixmap); }
-    bool _remove(const QString& key)
+    bool              _remove(const QString& key)
     {
         QPixmapCache::remove(key);
         return true;
@@ -94,9 +95,9 @@ class PixmapCache final : public QObject {
 
     bool _markCacheMissByEviciton()
     {
-        static constexpr uint maxCache = static_cast<uint>(std::numeric_limits<int>::max()) / 4;
-        static constexpr uint step = 10240;
-        static constexpr int oneSecond = 1000;
+        static constexpr uint maxCache  = static_cast<uint>(std::numeric_limits<int>::max()) / 4;
+        static constexpr uint step      = 10240;
+        static constexpr int  oneSecond = 1000;
 
         auto now = QTime::currentTime();
         if (!m_last_cache_miss_by_eviciton.isNull()) {
@@ -131,9 +132,9 @@ class PixmapCache final : public QObject {
         return true;
     }
 
-   private:
+private:
     static PixmapCache* s_instance;
-    QTime m_last_cache_miss_by_eviciton;
-    int m_consecutive_fast_evicitons = 0;
-    int m_consecutive_fast_evicitons_threshold = 15;
+    QTime               m_last_cache_miss_by_eviciton;
+    int                 m_consecutive_fast_evicitons           = 0;
+    int                 m_consecutive_fast_evicitons_threshold = 15;
 };

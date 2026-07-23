@@ -24,14 +24,14 @@
 #include "ui/dialogs/ProgressDialog.h"
 #include "ui_ExportPackDialog.h"
 
+#include "FileSystem.h"
+#include "MMCZip.h"
+#include "modplatform/modrinth/ModrinthPackExportTask.h"
 #include <QFileDialog>
 #include <QFileSystemModel>
 #include <QJsonDocument>
 #include <QMessageBox>
 #include <QPushButton>
-#include "FileSystem.h"
-#include "MMCZip.h"
-#include "modplatform/modrinth/ModrinthPackExportTask.h"
 
 ExportPackDialog::ExportPackDialog(MinecraftInstance* instance, QWidget* parent, ModPlatform::ResourceProvider provider)
     : QDialog(parent), m_instance(instance), m_ui(new Ui::ExportPackDialog), m_provider(provider)
@@ -85,12 +85,12 @@ ExportPackDialog::ExportPackDialog(MinecraftInstance* instance, QWidget* parent,
     model->setIconProvider(&m_icons);
 
     const QDir instanceRoot(instance->instanceRoot());
-    m_proxy = new FileIgnoreProxy(instance->instanceRoot(), this);
+    m_proxy     = new FileIgnoreProxy(instance->instanceRoot(), this);
     auto prefix = QDir(instance->instanceRoot()).relativeFilePath(instance->gameRoot());
-    for (auto path : { "logs", "crash-reports", ".cache", ".fabric", ".quilt" }) {
+    for (auto path : {"logs", "crash-reports", ".cache", ".fabric", ".quilt"}) {
         m_proxy->ignoreFilesWithPath().insert(FS::PathCombine(prefix, path));
     }
-    m_proxy->ignoreFilesWithName().append({ ".DS_Store", "thumbs.db", "Thumbs.db" });
+    m_proxy->ignoreFilesWithName().append({".DS_Store", "thumbs.db", "Thumbs.db"});
     m_proxy->ignoreFilesWithSuffix().append(".pw.toml");
     m_proxy->setSourceModel(model);
     m_proxy->loadBlockedPathsFromFile(ignoreFileName());
@@ -153,20 +153,26 @@ void ExportPackDialog::done(int result)
     }
 
     if (result == Accepted) {
-        const QString name = m_ui->name->text().isEmpty() ? m_instance->name() : m_ui->name->text();
+        const QString name     = m_ui->name->text().isEmpty() ? m_instance->name() : m_ui->name->text();
         const QString filename = FS::RemoveInvalidFilenameChars(name);
 
         QString output;
         if (m_provider == ModPlatform::ResourceProvider::MODRINTH) {
-            output = QFileDialog::getSaveFileName(this, tr("Export %1").arg(name), FS::PathCombine(QDir::homePath(), filename + ".mrpack"),
-                                                  tr("Modrinth pack") + " (*.mrpack *.zip)", nullptr);
+            output = QFileDialog::getSaveFileName(this,
+                                                  tr("Export %1").arg(name),
+                                                  FS::PathCombine(QDir::homePath(), filename + ".mrpack"),
+                                                  tr("Modrinth pack") + " (*.mrpack *.zip)",
+                                                  nullptr);
             if (output.isEmpty())
                 return;
             if (!(output.endsWith(".zip") || output.endsWith(".mrpack")))
                 output.append(".mrpack");
         } else {
-            output = QFileDialog::getSaveFileName(this, tr("Export %1").arg(name), FS::PathCombine(QDir::homePath(), filename + ".zip"),
-                                                  tr("CurseForge pack") + " (*.zip)", nullptr);
+            output = QFileDialog::getSaveFileName(this,
+                                                  tr("Export %1").arg(name),
+                                                  FS::PathCombine(QDir::homePath(), filename + ".zip"),
+                                                  tr("CurseForge pack") + " (*.zip)",
+                                                  nullptr);
             if (output.isEmpty())
                 return;
             if (!output.endsWith(".zip"))
@@ -175,25 +181,31 @@ void ExportPackDialog::done(int result)
 
         Task* task;
         if (m_provider == ModPlatform::ResourceProvider::MODRINTH) {
-            task = new ModrinthPackExportTask(name, m_ui->version->text(), m_ui->summary->toPlainText(), m_ui->optionalFiles->isChecked(),
-                                              m_instance, output, std::bind(&FileIgnoreProxy::filterFile, m_proxy, std::placeholders::_1));
+            task = new ModrinthPackExportTask(name,
+                                              m_ui->version->text(),
+                                              m_ui->summary->toPlainText(),
+                                              m_ui->optionalFiles->isChecked(),
+                                              m_instance,
+                                              output,
+                                              std::bind(&FileIgnoreProxy::filterFile, m_proxy, std::placeholders::_1));
         } else {
             FlamePackExportOptions options{};
 
-            options.name = name;
-            options.version = m_ui->version->text();
-            options.author = m_ui->author->text();
-            options.optionalFiles = m_ui->optionalFiles->isChecked();
-            options.instance = m_instance;
-            options.output = output;
-            options.filter = std::bind(&FileIgnoreProxy::filterFile, m_proxy, std::placeholders::_1);
+            options.name           = name;
+            options.version        = m_ui->version->text();
+            options.author         = m_ui->author->text();
+            options.optionalFiles  = m_ui->optionalFiles->isChecked();
+            options.instance       = m_instance;
+            options.output         = output;
+            options.filter         = std::bind(&FileIgnoreProxy::filterFile, m_proxy, std::placeholders::_1);
             options.recommendedRAM = m_ui->recommendedMemoryCheckBox->isChecked() ? m_ui->recommendedMemory->value() : 0;
 
             task = new FlamePackExportTask(std::move(options));
         }
 
-        connect(task, &Task::failed,
-                [this](const QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+        connect(task, &Task::failed, [this](const QString reason) {
+            CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+        });
         connect(task, &Task::aborted, [this] {
             CustomMessageBox::selectable(this, tr("Task aborted"), tr("The task has been aborted by the user."), QMessageBox::Information)
                 ->show();

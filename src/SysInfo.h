@@ -4,9 +4,10 @@
 
 #include <QString>
 
-namespace SysInfo {
+namespace SysInfo
+{
 QString currentSystem();
 QString useQTForArch();
 QString getSupportedJavaArchitecture();
-int defaultMaxJvmMem();
+int     defaultMaxJvmMem();
 }  // namespace SysInfo

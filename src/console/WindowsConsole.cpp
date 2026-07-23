@@ -25,14 +25,15 @@
 #include <windows.h>
 
 #include <consoleapi.h>
+#include <cstddef>
 #include <fcntl.h>
 #include <fileapi.h>
 #include <io.h>
-#include <stdio.h>
-#include <cstddef>
 #include <iostream>
+#include <stdio.h>
 
-namespace console {
+namespace console
+{
 
 void RedirectHandle(DWORD handle, FILE* stream, const char* mode)
 {
@@ -94,11 +95,11 @@ void BindCrtHandlesToStdHandles(bool bindStdIn, bool bindStdOut, bool bindStdErr
 
 bool AttachWindowsConsole()
 {
-    auto stdinType = GetFileType(GetStdHandle(STD_INPUT_HANDLE));
+    auto stdinType  = GetFileType(GetStdHandle(STD_INPUT_HANDLE));
     auto stdoutType = GetFileType(GetStdHandle(STD_OUTPUT_HANDLE));
     auto stderrType = GetFileType(GetStdHandle(STD_ERROR_HANDLE));
 
-    bool bindStdIn = false;
+    bool bindStdIn  = false;
     bool bindStdOut = false;
     bool bindStdErr = false;
 

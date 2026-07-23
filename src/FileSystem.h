@@ -49,10 +49,12 @@
 #include <QPair>
 #include <QThread>
 
-namespace FS {
+namespace FS
+{
 
-class FileSystemException : public ::Exception {
-   public:
+class FileSystemException : public ::Exception
+{
+public:
     FileSystemException(const QString& message) : Exception(message) {}
 };
 
@@ -72,9 +74,10 @@ bool ensureFolderPathExists(const QFileInfo folderPath);
 
 bool ensureFolderPathExists(const QString folderPathName);
 
-class copy : public QObject {
+class copy : public QObject
+{
     Q_OBJECT
-   public:
+public:
     copy(const QString& src, const QString& dst, QObject* parent = nullptr) : QObject(parent)
     {
         m_src.setPath(src);
@@ -103,43 +106,46 @@ class copy : public QObject {
 
     bool operator()(bool dryRun = false) { return operator()(QString(), dryRun); }
 
-    qsizetype totalCopied() { return m_copied; }
-    qsizetype totalFailed() { return m_failedPaths.length(); }
+    qsizetype   totalCopied() { return m_copied; }
+    qsizetype   totalFailed() { return m_failedPaths.length(); }
     QStringList failed() { return m_failedPaths; }
 
-   signals:
+signals:
     void fileCopied(const QString& relativeName);
     void copyFailed(const QString& relativeName);
 
-   private:
+private:
     bool operator()(const QString& offset, bool dryRun = false);
 
-   private:
-    bool m_followSymlinks = true;
-    Filter m_matcher = nullptr;
-    bool m_whitelist = false;
-    bool m_overwrite = false;
-    QDir m_src;
-    QDir m_dst;
-    qsizetype m_copied;
+private:
+    bool        m_followSymlinks = true;
+    Filter      m_matcher        = nullptr;
+    bool        m_whitelist      = false;
+    bool        m_overwrite      = false;
+    QDir        m_src;
+    QDir        m_dst;
+    qsizetype   m_copied;
     QStringList m_failedPaths;
 };
 
-struct LinkPair {
+struct LinkPair
+{
     QString src;
     QString dst;
 };
 
-struct LinkResult {
+struct LinkResult
+{
     QString src;
     QString dst;
     QString err_msg;
-    int err_value;
+    int     err_value;
 };
 
-class ExternalLinkFileProcess : public QThread {
+class ExternalLinkFileProcess : public QThread
+{
     Q_OBJECT
-   public:
+public:
     ExternalLinkFileProcess(QString server, bool useHardLinks, QObject* parent = nullptr)
         : QThread(parent), m_useHardLinks(useHardLinks), m_server(server)
     {}
@@ -150,10 +156,10 @@ class ExternalLinkFileProcess : public QThread {
         emit processExited();
     }
 
-   signals:
+signals:
     void processExited();
 
-   private:
+private:
     void runLinkFile();
 
     bool m_useHardLinks = false;
@@ -161,13 +167,14 @@ class ExternalLinkFileProcess : public QThread {
     QString m_server;
 };
 
-class create_link : public QObject {
+class create_link : public QObject
+{
     Q_OBJECT
-   public:
+public:
     create_link(const QList<LinkPair> path_pairs, QObject* parent = nullptr) : QObject(parent) { m_path_pairs.append(path_pairs); }
     create_link(const QString& src, const QString& dst, QObject* parent = nullptr) : QObject(parent)
     {
-        LinkPair pair = { src, dst };
+        LinkPair pair = {src, dst};
         m_path_pairs.append(pair);
     }
     create_link& useHardLinks(const bool useHard)
@@ -213,31 +220,31 @@ class create_link : public QObject {
 
     QList<LinkResult> getResults() { return m_path_results; }
 
-   signals:
+signals:
     void fileLinked(const QString& srcName, const QString& dstName);
     void linkFailed(const QString& srcName, const QString& dstName, const QString& err_msg, int err_value);
     void finished();
     void finishedPrivileged(bool gotResults);
 
-   private:
+private:
     bool operator()(const QString& offset, bool dryRun = false);
     void make_link_list(const QString& offset);
     bool make_links();
 
-   private:
-    bool m_useHardLinks = false;
-    Filter m_matcher = nullptr;
-    bool m_whitelist = false;
-    bool m_recursive = true;
+private:
+    bool   m_useHardLinks = false;
+    Filter m_matcher      = nullptr;
+    bool   m_whitelist    = false;
+    bool   m_recursive    = true;
 
     int m_max_depth = -1;
 
-    QList<LinkPair> m_path_pairs;
+    QList<LinkPair>   m_path_pairs;
     QList<LinkResult> m_path_results;
-    QList<LinkPair> m_links_to_make;
+    QList<LinkPair>   m_links_to_make;
 
-    int m_linked;
-    bool m_debug = false;
+    int             m_linked;
+    bool            m_debug = false;
     std::error_code m_os_err;
 
     QLocalServer m_linkServer;
@@ -283,7 +290,8 @@ bool overrideFolder(QString overwritten_path, QString override_path);
 
 QString createShortcut(QString destination, QString target, QStringList args, QString name, QString icon);
 
-enum class FilesystemType {
+enum class FilesystemType
+{
     FAT,
     NTFS,
     REFS,
@@ -304,25 +312,25 @@ enum class FilesystemType {
     UNKNOWN
 };
 
-static const QMap<FilesystemType, QStringList> s_filesystem_type_names = { { FilesystemType::FAT, { "FAT" } },
-                                                                           { FilesystemType::NTFS, { "NTFS" } },
-                                                                           { FilesystemType::REFS, { "REFS" } },
-                                                                           { FilesystemType::EXT_2_OLD, { "EXT_2_OLD", "EXT2_OLD" } },
-                                                                           { FilesystemType::EXT_2_3_4,
-                                                                             { "EXT2/3/4", "EXT_2_3_4", "EXT2", "EXT3", "EXT4" } },
-                                                                           { FilesystemType::EXT, { "EXT" } },
-                                                                           { FilesystemType::XFS, { "XFS" } },
-                                                                           { FilesystemType::BTRFS, { "BTRFS" } },
-                                                                           { FilesystemType::NFS, { "NFS" } },
-                                                                           { FilesystemType::ZFS, { "ZFS" } },
-                                                                           { FilesystemType::APFS, { "APFS" } },
-                                                                           { FilesystemType::HFS, { "HFS" } },
-                                                                           { FilesystemType::HFSPLUS, { "HFSPLUS" } },
-                                                                           { FilesystemType::HFSX, { "HFSX" } },
-                                                                           { FilesystemType::FUSEBLK, { "FUSEBLK" } },
-                                                                           { FilesystemType::F2FS, { "F2FS" } },
-                                                                           { FilesystemType::BCACHEFS, { "BCACHEFS" } },
-                                                                           { FilesystemType::UNKNOWN, { "UNKNOWN" } } };
+static const QMap<FilesystemType, QStringList> s_filesystem_type_names = {
+    {FilesystemType::FAT, {"FAT"}},
+    {FilesystemType::NTFS, {"NTFS"}},
+    {FilesystemType::REFS, {"REFS"}},
+    {FilesystemType::EXT_2_OLD, {"EXT_2_OLD", "EXT2_OLD"}},
+    {FilesystemType::EXT_2_3_4, {"EXT2/3/4", "EXT_2_3_4", "EXT2", "EXT3", "EXT4"}},
+    {FilesystemType::EXT, {"EXT"}},
+    {FilesystemType::XFS, {"XFS"}},
+    {FilesystemType::BTRFS, {"BTRFS"}},
+    {FilesystemType::NFS, {"NFS"}},
+    {FilesystemType::ZFS, {"ZFS"}},
+    {FilesystemType::APFS, {"APFS"}},
+    {FilesystemType::HFS, {"HFS"}},
+    {FilesystemType::HFSPLUS, {"HFSPLUS"}},
+    {FilesystemType::HFSX, {"HFSX"}},
+    {FilesystemType::FUSEBLK, {"FUSEBLK"}},
+    {FilesystemType::F2FS, {"F2FS"}},
+    {FilesystemType::BCACHEFS, {"BCACHEFS"}},
+    {FilesystemType::UNKNOWN, {"UNKNOWN"}}};
 
 QString getFilesystemTypeName(FilesystemType type);
 
@@ -330,23 +338,24 @@ FilesystemType getFilesystemType(const QString& name);
 
 FilesystemType getFilesystemTypeFuzzy(const QString& name);
 
-struct FilesystemInfo {
+struct FilesystemInfo
+{
     FilesystemType fsType = FilesystemType::UNKNOWN;
-    QString fsTypeName;
-    int blockSize;
-    qint64 bytesAvailable;
-    qint64 bytesFree;
-    qint64 bytesTotal;
-    QString name;
-    QString rootPath;
+    QString        fsTypeName;
+    int            blockSize;
+    qint64         bytesAvailable;
+    qint64         bytesFree;
+    qint64         bytesTotal;
+    QString        name;
+    QString        rootPath;
 };
 
 QString nearestExistentAncestor(const QString& path);
 
 FilesystemInfo statFS(const QString& path);
 
-static const QList<FilesystemType> s_clone_filesystems = { FilesystemType::BTRFS, FilesystemType::APFS, FilesystemType::ZFS,
-                                                           FilesystemType::XFS,   FilesystemType::REFS, FilesystemType::BCACHEFS };
+static const QList<FilesystemType> s_clone_filesystems = {
+    FilesystemType::BTRFS, FilesystemType::APFS, FilesystemType::ZFS, FilesystemType::XFS, FilesystemType::REFS, FilesystemType::BCACHEFS};
 
 bool canCloneOnFS(const QString& path);
 bool canCloneOnFS(const FilesystemInfo& info);
@@ -354,9 +363,10 @@ bool canCloneOnFS(FilesystemType type);
 
 bool canClone(const QString& src, const QString& dst);
 
-class clone : public QObject {
+class clone : public QObject
+{
     Q_OBJECT
-   public:
+public:
     clone(const QString& src, const QString& dst, QObject* parent = nullptr) : QObject(parent)
     {
         m_src.setPath(src);
@@ -380,19 +390,19 @@ class clone : public QObject {
 
     QList<QPair<QString, QString>> failed() { return m_failedClones; }
 
-   signals:
+signals:
     void fileCloned(const QString& src, const QString& dst);
     void cloneFailed(const QString& src, const QString& dst);
 
-   private:
+private:
     bool operator()(const QString& offset, bool dryRun = false);
 
-   private:
-    Filter m_matcher = nullptr;
-    bool m_whitelist = false;
-    QDir m_src;
-    QDir m_dst;
-    qsizetype m_cloned;
+private:
+    Filter                         m_matcher   = nullptr;
+    bool                           m_whitelist = false;
+    QDir                           m_src;
+    QDir                           m_dst;
+    qsizetype                      m_cloned;
     QList<QPair<QString, QString>> m_failedClones;
 };
 

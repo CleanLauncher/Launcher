@@ -33,9 +33,9 @@ JavaWizardWidget::JavaWizardWidget(QWidget* parent) : QWidget(parent)
 {
     m_availableMemory = HardwareInfo::totalRamMiB();
 
-    goodIcon = QIcon::fromTheme("status-good");
-    yellowIcon = QIcon::fromTheme("status-yellow");
-    badIcon = QIcon::fromTheme("status-bad");
+    goodIcon      = QIcon::fromTheme("status-good");
+    yellowIcon    = QIcon::fromTheme("status-yellow");
+    badIcon       = QIcon::fromTheme("status-bad");
     m_memoryTimer = new QTimer(this);
     setupUi();
 
@@ -190,8 +190,8 @@ void JavaWizardWidget::initialize()
     m_versionWidget->setResizeOn(2);
     auto s = APPLICATION->settings();
 
-    observedMinMemory = s->get("MinMemAlloc").toInt();
-    observedMaxMemory = s->get("MaxMemAlloc").toInt();
+    observedMinMemory     = s->get("MinMemAlloc").toInt();
+    observedMaxMemory     = s->get("MaxMemAlloc").toInt();
     observedPermGenMemory = s->get("PermGen").toInt();
     m_minMemSpinBox->setValue(observedMinMemory);
     m_maxMemSpinBox->setValue(observedMaxMemory);
@@ -217,60 +217,65 @@ void JavaWizardWidget::refresh()
 JavaWizardWidget::ValidationStatus JavaWizardWidget::validate()
 {
     switch (javaStatus) {
-        default:
-        case JavaStatus::NotSet:
+    default:
+    case JavaStatus::NotSet:
 
-        case JavaStatus::DoesNotExist:
+    case JavaStatus::DoesNotExist:
 
-        case JavaStatus::DoesNotStart:
+    case JavaStatus::DoesNotStart:
 
-        case JavaStatus::ReturnedInvalidData: {
-            if (!(BuildConfig.JAVA_DOWNLOADER_ENABLED && m_autodownloadCheckBox->isChecked())) {
-                int button = QMessageBox::No;
-                if (m_result.mojangPlatform == "32" && maxHeapSize() > 2048) {
-                    button = CustomMessageBox::selectable(
-                                 this, tr("32-bit Java detected"),
-                                 tr("You selected a 32-bit installation of Java, but allocated more than 2048MiB as maximum memory.\n"
-                                    "%1 will not be able to start Minecraft.\n"
-                                    "Do you wish to proceed?"
-                                    "\n\n"
-                                    "You can change the Java version in the settings later.\n")
-                                     .arg(BuildConfig.LAUNCHER_DISPLAYNAME),
-                                 QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No | QMessageBox::Help, QMessageBox::NoButton)
-                                 ->exec();
+    case JavaStatus::ReturnedInvalidData: {
+        if (!(BuildConfig.JAVA_DOWNLOADER_ENABLED && m_autodownloadCheckBox->isChecked())) {
+            int button = QMessageBox::No;
+            if (m_result.mojangPlatform == "32" && maxHeapSize() > 2048) {
+                button = CustomMessageBox::selectable(
+                             this,
+                             tr("32-bit Java detected"),
+                             tr("You selected a 32-bit installation of Java, but allocated more than 2048MiB as maximum memory.\n"
+                                "%1 will not be able to start Minecraft.\n"
+                                "Do you wish to proceed?"
+                                "\n\n"
+                                "You can change the Java version in the settings later.\n")
+                                 .arg(BuildConfig.LAUNCHER_DISPLAYNAME),
+                             QMessageBox::Warning,
+                             QMessageBox::Yes | QMessageBox::No | QMessageBox::Help,
+                             QMessageBox::NoButton)
+                             ->exec();
 
-                } else {
-                    button = CustomMessageBox::selectable(this, tr("No Java version selected"),
-                                                          tr("You either didn't select a Java version or selected one that does not work.\n"
-                                                             "%1 will not be able to start Minecraft.\n"
-                                                             "Do you wish to proceed without a functional version of Java?"
-                                                             "\n\n"
-                                                             "You can change the Java version in the settings later.\n")
-                                                              .arg(BuildConfig.LAUNCHER_DISPLAYNAME),
-                                                          QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No | QMessageBox::Help,
-                                                          QMessageBox::NoButton)
-                                 ->exec();
-                }
-                switch (button) {
-                    case QMessageBox::Yes:
-                        return ValidationStatus::JavaBad;
-                    case QMessageBox::Help:
-                        DesktopServices::openUrl(QUrl(BuildConfig.HELP_URL.arg("java-wizard")));
-                        [[fallthrough]];
-                    case QMessageBox::No:
-
-                    default:
-                        return ValidationStatus::Bad;
-                }
+            } else {
+                button = CustomMessageBox::selectable(this,
+                                                      tr("No Java version selected"),
+                                                      tr("You either didn't select a Java version or selected one that does not work.\n"
+                                                         "%1 will not be able to start Minecraft.\n"
+                                                         "Do you wish to proceed without a functional version of Java?"
+                                                         "\n\n"
+                                                         "You can change the Java version in the settings later.\n")
+                                                          .arg(BuildConfig.LAUNCHER_DISPLAYNAME),
+                                                      QMessageBox::Warning,
+                                                      QMessageBox::Yes | QMessageBox::No | QMessageBox::Help,
+                                                      QMessageBox::NoButton)
+                             ->exec();
             }
-            return ValidationStatus::JavaBad;
-        } break;
-        case JavaStatus::Pending: {
-            return ValidationStatus::Bad;
+            switch (button) {
+            case QMessageBox::Yes:
+                return ValidationStatus::JavaBad;
+            case QMessageBox::Help:
+                DesktopServices::openUrl(QUrl(BuildConfig.HELP_URL.arg("java-wizard")));
+                [[fallthrough]];
+            case QMessageBox::No:
+
+            default:
+                return ValidationStatus::Bad;
+            }
         }
-        case JavaStatus::Good: {
-            return ValidationStatus::AllOK;
-        }
+        return ValidationStatus::JavaBad;
+    } break;
+    case JavaStatus::Pending: {
+        return ValidationStatus::Bad;
+    }
+    case JavaStatus::Good: {
+        return ValidationStatus::AllOK;
+    }
     }
 }
 
@@ -309,21 +314,21 @@ int JavaWizardWidget::permGenSize() const
 
 void JavaWizardWidget::memoryValueChanged()
 {
-    bool actuallyChanged = false;
-    unsigned int min = m_minMemSpinBox->value();
-    unsigned int max = m_maxMemSpinBox->value();
-    unsigned int permgen = m_permGenSpinBox->value();
+    bool         actuallyChanged = false;
+    unsigned int min             = m_minMemSpinBox->value();
+    unsigned int max             = m_maxMemSpinBox->value();
+    unsigned int permgen         = m_permGenSpinBox->value();
     if (min != observedMinMemory) {
         observedMinMemory = min;
-        actuallyChanged = true;
+        actuallyChanged   = true;
     }
     if (max != observedMaxMemory) {
         observedMaxMemory = max;
-        actuallyChanged = true;
+        actuallyChanged   = true;
     }
     if (permgen != observedPermGenMemory) {
         observedPermGenMemory = permgen;
-        actuallyChanged = true;
+        actuallyChanged       = true;
     }
     if (actuallyChanged) {
         checkJavaPathOnEdit(m_javaPathTextBox->text());
@@ -346,7 +351,7 @@ void JavaWizardWidget::javaVersionSelected(BaseVersion::Ptr version)
 
 void JavaWizardWidget::on_javaBrowseBtn_clicked()
 {
-    auto filter = QString("Java (%1)").arg(JavaUtils::javaExecutable);
+    auto filter   = QString("Java (%1)").arg(JavaUtils::javaExecutable);
     auto raw_path = QFileDialog::getOpenFileName(this, tr("Find Java executable"), QString(), filter);
     if (raw_path.isEmpty()) {
         return;
@@ -365,46 +370,47 @@ void JavaWizardWidget::javaDownloadBtn_clicked()
 void JavaWizardWidget::on_javaStatusBtn_clicked()
 {
     QString text;
-    bool failed = false;
+    bool    failed = false;
     switch (javaStatus) {
-        case JavaStatus::NotSet:
-            checkJavaPath(m_javaPathTextBox->text());
-            return;
-        case JavaStatus::DoesNotExist:
-            text += QObject::tr("The specified file either doesn't exist or is not a proper executable.");
-            failed = true;
-            break;
-        case JavaStatus::DoesNotStart: {
-            text += QObject::tr("The specified Java binary didn't start properly.<br />");
-            auto htmlError = m_result.errorLog;
-            if (!htmlError.isEmpty()) {
-                htmlError.replace('\n', "<br />");
-                text += QString("<font color=\"red\">%1</font>").arg(htmlError);
-            }
-            failed = true;
-            break;
+    case JavaStatus::NotSet:
+        checkJavaPath(m_javaPathTextBox->text());
+        return;
+    case JavaStatus::DoesNotExist:
+        text += QObject::tr("The specified file either doesn't exist or is not a proper executable.");
+        failed = true;
+        break;
+    case JavaStatus::DoesNotStart: {
+        text += QObject::tr("The specified Java binary didn't start properly.<br />");
+        auto htmlError = m_result.errorLog;
+        if (!htmlError.isEmpty()) {
+            htmlError.replace('\n', "<br />");
+            text += QString("<font color=\"red\">%1</font>").arg(htmlError);
         }
-        case JavaStatus::ReturnedInvalidData: {
-            text += QObject::tr("The specified Java binary returned unexpected results:<br />");
-            auto htmlOut = m_result.outLog;
-            if (!htmlOut.isEmpty()) {
-                htmlOut.replace('\n', "<br />");
-                text += QString("<font color=\"red\">%1</font>").arg(htmlOut);
-            }
-            failed = true;
-            break;
-        }
-        case JavaStatus::Good:
-            text += QObject::tr(
-                        "Java test succeeded!<br />Platform reported: %1<br />Java version "
-                        "reported: %2<br />")
-                        .arg(m_result.realPlatform, m_result.javaVersion.toString());
-            break;
-        case JavaStatus::Pending:
-
-            return;
+        failed = true;
+        break;
     }
-    CustomMessageBox::selectable(this, failed ? QObject::tr("Java test failure") : QObject::tr("Java test success"), text,
+    case JavaStatus::ReturnedInvalidData: {
+        text += QObject::tr("The specified Java binary returned unexpected results:<br />");
+        auto htmlOut = m_result.outLog;
+        if (!htmlOut.isEmpty()) {
+            htmlOut.replace('\n', "<br />");
+            text += QString("<font color=\"red\">%1</font>").arg(htmlOut);
+        }
+        failed = true;
+        break;
+    }
+    case JavaStatus::Good:
+        text += QObject::tr("Java test succeeded!<br />Platform reported: %1<br />Java version "
+                            "reported: %2<br />")
+                    .arg(m_result.realPlatform, m_result.javaVersion.toString());
+        break;
+    case JavaStatus::Pending:
+
+        return;
+    }
+    CustomMessageBox::selectable(this,
+                                 failed ? QObject::tr("Java test failure") : QObject::tr("Java test success"),
+                                 text,
                                  failed ? QMessageBox::Critical : QMessageBox::Information)
         ->show();
 }
@@ -413,16 +419,16 @@ void JavaWizardWidget::setJavaStatus(JavaWizardWidget::JavaStatus status)
 {
     javaStatus = status;
     switch (javaStatus) {
-        case JavaStatus::Good:
-            m_javaStatusBtn->setIcon(goodIcon);
-            break;
-        case JavaStatus::NotSet:
-        case JavaStatus::Pending:
-            m_javaStatusBtn->setIcon(yellowIcon);
-            break;
-        default:
-            m_javaStatusBtn->setIcon(badIcon);
-            break;
+    case JavaStatus::Good:
+        m_javaStatusBtn->setIcon(goodIcon);
+        break;
+    case JavaStatus::NotSet:
+    case JavaStatus::Pending:
+        m_javaStatusBtn->setIcon(yellowIcon);
+        break;
+    default:
+        m_javaStatusBtn->setIcon(badIcon);
+        break;
     }
 }
 
@@ -433,7 +439,7 @@ void JavaWizardWidget::javaPathEdited(const QString& path)
 
 void JavaWizardWidget::checkJavaPathOnEdit(const QString& path)
 {
-    auto realPath = FS::ResolveExecutable(path);
+    auto      realPath = FS::ResolveExecutable(path);
     QFileInfo pathInfo(realPath);
     if (pathInfo.baseName().toLower().contains("java")) {
         checkJavaPath(path);
@@ -466,18 +472,18 @@ void JavaWizardWidget::checkFinished(const JavaChecker::Result& result)
 {
     m_result = result;
     switch (result.validity) {
-        case JavaChecker::Result::Validity::Valid: {
-            setJavaStatus(JavaStatus::Good);
-            break;
-        }
-        case JavaChecker::Result::Validity::ReturnedInvalidData: {
-            setJavaStatus(JavaStatus::ReturnedInvalidData);
-            break;
-        }
-        case JavaChecker::Result::Validity::Errored: {
-            setJavaStatus(JavaStatus::DoesNotStart);
-            break;
-        }
+    case JavaChecker::Result::Validity::Valid: {
+        setJavaStatus(JavaStatus::Good);
+        break;
+    }
+    case JavaChecker::Result::Validity::ReturnedInvalidData: {
+        setJavaStatus(JavaStatus::ReturnedInvalidData);
+        break;
+    }
+    case JavaChecker::Result::Validity::Errored: {
+        setJavaStatus(JavaStatus::DoesNotStart);
+        break;
+    }
     }
     updateThresholds();
     m_checker.reset();
@@ -528,9 +534,9 @@ void JavaWizardWidget::updateThresholds()
     }
 
     {
-        auto height = m_labelMaxMemIcon->fontInfo().pixelSize();
-        QIcon icon = QIcon::fromTheme(iconName);
-        QPixmap pix = icon.pixmap(height, height);
+        auto    height = m_labelMaxMemIcon->fontInfo().pixelSize();
+        QIcon   icon   = QIcon::fromTheme(iconName);
+        QPixmap pix    = icon.pixmap(height, height);
         m_labelMaxMemIcon->setPixmap(pix);
     }
 }

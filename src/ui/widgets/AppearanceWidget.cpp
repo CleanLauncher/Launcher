@@ -37,13 +37,13 @@
 #include "AppearanceWidget.h"
 #include "ui_AppearanceWidget.h"
 
-#include <DesktopServices.h>
 #include "BuildConfig.h"
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
+#include <DesktopServices.h>
 
-#include <Application.h>
 #include "settings/SettingsObject.h"
+#include <Application.h>
 
 AppearanceWidget::AppearanceWidget(bool themesOnly, QWidget* parent)
     : QWidget(parent), m_ui(new Ui::AppearanceWidget), m_themesOnly(themesOnly)
@@ -79,21 +79,21 @@ AppearanceWidget::~AppearanceWidget()
 
 void AppearanceWidget::applySettings()
 {
-    SettingsObject* settings = APPLICATION->settings();
-    QString consoleFontFamily = m_ui->consoleFont->currentFont().family();
+    SettingsObject* settings          = APPLICATION->settings();
+    QString         consoleFontFamily = m_ui->consoleFont->currentFont().family();
     settings->set("ConsoleFont", consoleFontFamily);
     settings->set("ConsoleFontSize", m_ui->fontSizeBox->value());
 }
 
 void AppearanceWidget::loadSettings()
 {
-    SettingsObject* settings = APPLICATION->settings();
-    QString fontFamily = settings->get("ConsoleFont").toString();
-    QFont consoleFont(fontFamily);
+    SettingsObject* settings   = APPLICATION->settings();
+    QString         fontFamily = settings->get("ConsoleFont").toString();
+    QFont           consoleFont(fontFamily);
     m_ui->consoleFont->setCurrentFont(consoleFont);
 
     bool conversionOk = true;
-    int fontSize = settings->get("ConsoleFontSize").toInt(&conversionOk);
+    int  fontSize     = settings->get("ConsoleFontSize").toInt(&conversionOk);
     if (!conversionOk) {
         fontSize = 11;
     }
@@ -107,9 +107,9 @@ void AppearanceWidget::retranslateUi()
 
 void AppearanceWidget::applyIconTheme(int index)
 {
-    auto settings = APPLICATION->settings();
+    auto settings          = APPLICATION->settings();
     auto originalIconTheme = settings->get("IconTheme").toString();
-    auto newIconTheme = m_ui->iconsComboBox->itemData(index).toString();
+    auto newIconTheme      = m_ui->iconsComboBox->itemData(index).toString();
     if (originalIconTheme != newIconTheme) {
         settings->set("IconTheme", newIconTheme);
         APPLICATION->themeManager()->applyCurrentlySelectedTheme();
@@ -118,9 +118,9 @@ void AppearanceWidget::applyIconTheme(int index)
 
 void AppearanceWidget::applyWidgetTheme(int index)
 {
-    auto settings = APPLICATION->settings();
+    auto settings         = APPLICATION->settings();
     auto originalAppTheme = settings->get("ApplicationTheme").toString();
-    auto newAppTheme = m_ui->widgetStyleComboBox->itemData(index).toString();
+    auto newAppTheme      = m_ui->widgetStyleComboBox->itemData(index).toString();
     if (originalAppTheme != newAppTheme) {
         settings->set("ApplicationTheme", newAppTheme);
         APPLICATION->themeManager()->applyCurrentlySelectedTheme();
@@ -142,7 +142,7 @@ void AppearanceWidget::loadThemeSettings()
     SettingsObject* settings = APPLICATION->settings();
 
     const QString currentIconTheme = settings->get("IconTheme").toString();
-    const auto iconThemes = APPLICATION->themeManager()->getValidIconThemes();
+    const auto    iconThemes       = APPLICATION->themeManager()->getValidIconThemes();
 
     for (int i = 0; i < iconThemes.count(); ++i) {
         const IconTheme* theme = iconThemes[i];
@@ -155,7 +155,7 @@ void AppearanceWidget::loadThemeSettings()
     }
 
     const QString currentTheme = settings->get("ApplicationTheme").toString();
-    auto themes = APPLICATION->themeManager()->getValidApplicationThemes();
+    auto          themes       = APPLICATION->themeManager()->getValidApplicationThemes();
     for (int i = 0; i < themes.count(); ++i) {
         ITheme* theme = themes[i];
 
@@ -176,7 +176,7 @@ void AppearanceWidget::updateConsolePreview()
 {
     const LogColors& colors = APPLICATION->themeManager()->getLogColors();
 
-    int fontSize = m_ui->fontSizeBox->value();
+    int     fontSize   = m_ui->fontSizeBox->value();
     QString fontFamily = m_ui->consoleFont->currentFont().family();
     m_ui->consolePreview->clear();
     m_defaultFormat.setFont(QFont(fontFamily, fontSize));

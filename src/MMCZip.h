@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include "archive/ArchiveReader.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QFuture>
@@ -45,13 +46,13 @@
 #include <QString>
 #include <functional>
 #include <optional>
-#include "archive/ArchiveReader.h"
 
 #if defined(LAUNCHER_APPLICATION)
 #include "minecraft/mod/Mod.h"
 #endif
 
-namespace MMCZip {
+namespace MMCZip
+{
 using FilterFileFunction = std::function<bool(const QFileInfo&)>;
 
 #if defined(LAUNCHER_APPLICATION)

@@ -45,7 +45,6 @@
 #include <QMessageBox>
 #include <QTextCharFormat>
 
-#include <FileSystem.h>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "DesktopServices.h"
@@ -53,11 +52,13 @@
 #include "ui/themes/ITheme.h"
 #include "ui/themes/ThemeManager.h"
 #include "updater/ExternalUpdater.h"
+#include <FileSystem.h>
 
 #include <QApplication>
 #include <QProcess>
 
-enum InstSortMode {
+enum InstSortMode
+{
 
     Sort_Name,
 
@@ -98,14 +99,12 @@ void LauncherPage::on_instDirBrowseBtn_clicked()
         QString cookedDir = FS::NormalizePath(rawDir);
         if (FS::checkProblemticPathJava(QDir(cookedDir))) {
             QMessageBox warning;
-            warning.setText(
-                tr("You're trying to specify an instance folder which\'s path "
-                   "contains at least one \'!\'. "
-                   "Java is known to cause problems if that is the case, your "
-                   "instances (probably) won't start!"));
-            warning.setInformativeText(
-                tr("Do you really want to use this path? "
-                   "Selecting \"No\" will close this and not alter your instance path."));
+            warning.setText(tr("You're trying to specify an instance folder which\'s path "
+                               "contains at least one \'!\'. "
+                               "Java is known to cause problems if that is the case, your "
+                               "instances (probably) won't start!"));
+            warning.setInformativeText(tr("Do you really want to use this path? "
+                                          "Selecting \"No\" will close this and not alter your instance path."));
             warning.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
             int result = warning.exec();
             if (result == QMessageBox::Ok) {
@@ -217,16 +216,16 @@ void LauncherPage::applySettings()
 
     auto sortMode = (InstSortMode)ui->sortingModeGroup->checkedId();
     switch (sortMode) {
-        case Sort_LastLaunch:
-            s->set("InstSortMode", "LastLaunch");
-            break;
-        case Sort_Playtime:
-            s->set("InstSortMode", "Playtime");
-            break;
-        case Sort_Name:
-        default:
-            s->set("InstSortMode", "Name");
-            break;
+    case Sort_LastLaunch:
+        s->set("InstSortMode", "LastLaunch");
+        break;
+    case Sort_Playtime:
+        s->set("InstSortMode", "Playtime");
+        break;
+    case Sort_Name:
+    default:
+        s->set("InstSortMode", "Name");
+        break;
     }
 
     if (ui->askToRenameDirBtn->isChecked()) {

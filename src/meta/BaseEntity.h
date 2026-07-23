@@ -22,42 +22,50 @@
 #include "net/NetJob.h"
 #include "tasks/Task.h"
 
-namespace Meta {
+namespace Meta
+{
 class BaseEntityLoadTask;
-class BaseEntity {
+class BaseEntity
+{
     friend BaseEntityLoadTask;
 
-   public:
+public:
     using Ptr = std::shared_ptr<BaseEntity>;
-    enum class LoadStatus { NotLoaded, Local, Remote };
+    enum class LoadStatus
+    {
+        NotLoaded,
+        Local,
+        Remote
+    };
 
-   public:
+public:
     virtual ~BaseEntity() = default;
 
     virtual QString localFilename() const = 0;
-    virtual QUrl url() const;
-    bool isLoaded() const;
-    LoadStatus status() const;
+    virtual QUrl    url() const;
+    bool            isLoaded() const;
+    LoadStatus      status() const;
 
     void setSha256(QString sha256);
 
-    virtual void parse(const QJsonObject& obj) = 0;
+    virtual void            parse(const QJsonObject& obj) = 0;
     [[nodiscard]] Task::Ptr loadTask(Net::Mode loadType = Net::Mode::Online, bool forceReload = false);
 
-   protected:
+protected:
     QString m_sha256;
 
     QString m_file_sha256;
 
-   private:
+private:
     LoadStatus m_load_status = LoadStatus::NotLoaded;
-    Task::Ptr m_task;
+    Task::Ptr  m_task;
 };
 
-class BaseEntityLoadTask : public Task {
+class BaseEntityLoadTask : public Task
+{
     Q_OBJECT
 
-   public:
+public:
     explicit BaseEntityLoadTask(BaseEntity* parent, Net::Mode mode, bool forceReload);
     ~BaseEntityLoadTask() override = default;
 
@@ -65,10 +73,10 @@ class BaseEntityLoadTask : public Task {
     virtual bool canAbort() const override;
     virtual bool abort() override;
 
-   private:
+private:
     BaseEntity* m_entity;
-    Net::Mode m_mode;
-    bool m_force_reload = false;
+    Net::Mode   m_mode;
+    bool        m_force_reload = false;
     NetJob::Ptr m_task;
 };
 }  // namespace Meta

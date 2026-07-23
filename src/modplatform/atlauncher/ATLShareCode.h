@@ -22,23 +22,27 @@
 #include <QList>
 #include <QString>
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
-struct ShareCodeMod {
-    bool selected;
+struct ShareCodeMod
+{
+    bool    selected;
     QString name;
 };
 
-struct ShareCode {
-    QString pack;
-    QString version;
+struct ShareCode
+{
+    QString             pack;
+    QString             version;
     QList<ShareCodeMod> mods;
 };
 
-struct ShareCodeResponse {
-    bool error;
-    int code;
-    QString message;
+struct ShareCodeResponse
+{
+    bool      error;
+    int       code;
+    QString   message;
     ShareCode data;
 };
 

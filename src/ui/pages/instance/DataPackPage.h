@@ -18,23 +18,24 @@
 
 #pragma once
 
-#include <QVBoxLayout>
 #include "ExternalResourcesPage.h"
 #include "minecraft/mod/DataPackFolderModel.h"
 #include "ui/dialogs/ResourceDownloadDialog.h"
+#include <QVBoxLayout>
 
-class DataPackPage : public ExternalResourcesPage {
+class DataPackPage : public ExternalResourcesPage
+{
     Q_OBJECT
-   public:
+public:
     explicit DataPackPage(BaseInstance* instance, DataPackFolderModel* model, QWidget* parent = nullptr);
 
     QString displayName() const override { return QObject::tr("Data Packs"); }
-    QIcon icon() const override { return QIcon::fromTheme("datapacks"); }
+    QIcon   icon() const override { return QIcon::fromTheme("datapacks"); }
     QString id() const override { return "datapacks"; }
     QString helpPage() const override { return "Data-packs"; }
-    bool shouldDisplay() const override { return true; }
+    bool    shouldDisplay() const override { return true; }
 
-   public slots:
+public slots:
     void updateFrame(const QModelIndex& current, const QModelIndex& previous) override;
     void downloadDataPacks();
     void downloadDialogFinished(int result);
@@ -42,17 +43,18 @@ class DataPackPage : public ExternalResourcesPage {
     void deleteDataPackMetadata();
     void changeDataPackVersion();
 
-   private:
-    DataPackFolderModel* m_model;
+private:
+    DataPackFolderModel*                               m_model;
     QPointer<ResourceDownload::DataPackDownloadDialog> m_downloadDialog;
 };
 
-class GlobalDataPackPage : public QWidget, public BasePage {
-   public:
+class GlobalDataPackPage : public QWidget, public BasePage
+{
+public:
     explicit GlobalDataPackPage(MinecraftInstance* instance, QWidget* parent = nullptr);
 
     QString displayName() const override;
-    QIcon icon() const override;
+    QIcon   icon() const override;
     QString id() const override { return "datapacks"; }
     QString helpPage() const override;
 
@@ -64,10 +66,10 @@ class GlobalDataPackPage : public QWidget, public BasePage {
 
     void setParentContainer(BasePageContainer* container) override;
 
-   private:
-    void updateContent();
+private:
+    void         updateContent();
     QVBoxLayout* layout() { return static_cast<QVBoxLayout*>(QWidget::layout()); }
 
     MinecraftInstance* m_instance;
-    DataPackPage* m_underlyingPage = nullptr;
+    DataPackPage*      m_underlyingPage = nullptr;
 };

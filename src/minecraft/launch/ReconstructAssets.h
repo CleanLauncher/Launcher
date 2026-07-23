@@ -18,9 +18,10 @@
 #include <launch/LaunchStep.h>
 #include <memory>
 
-class ReconstructAssets : public LaunchStep {
+class ReconstructAssets : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit ReconstructAssets(LaunchTask* parent) : LaunchStep(parent) {};
     virtual ~ReconstructAssets() {};
 

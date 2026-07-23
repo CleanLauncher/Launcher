@@ -25,11 +25,16 @@
 
 #include <QMutex>
 
-enum class ShaderPackFormat { VALID, INVALID };
+enum class ShaderPackFormat
+{
+    VALID,
+    INVALID
+};
 
-class ShaderPack : public Resource {
+class ShaderPack : public Resource
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<Resource>;
 
     ShaderPackFormat packFormat() const { return m_pack_format; }
@@ -41,7 +46,7 @@ class ShaderPack : public Resource {
 
     bool valid() const override;
 
-   protected:
+protected:
     mutable QMutex m_data_lock;
 
     ShaderPackFormat m_pack_format = ShaderPackFormat::INVALID;

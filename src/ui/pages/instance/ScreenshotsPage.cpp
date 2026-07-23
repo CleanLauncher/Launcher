@@ -55,8 +55,8 @@
 #include <memory>
 #include <utility>
 
-#include <Application.h>
 #include "settings/SettingsObject.h"
+#include <Application.h>
 
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui/dialogs/ProgressDialog.h"
@@ -66,17 +66,15 @@
 #include "screenshots/ImgurUpload.h"
 #include "tasks/SequentialTask.h"
 
+#include "RWStorage.h"
 #include <DesktopServices.h>
 #include <FileSystem.h>
-#include "RWStorage.h"
 
-class ScreenshotsFSModel : public QFileSystemModel {
-   public:
-    bool canDropMimeData(const QMimeData* data,
-                         const Qt::DropAction action,
-                         const int row,
-                         const int column,
-                         const QModelIndex& parent) const override
+class ScreenshotsFSModel : public QFileSystemModel
+{
+public:
+    bool canDropMimeData(
+        const QMimeData* data, const Qt::DropAction action, const int row, const int column, const QModelIndex& parent) const override
     {
         const QUrl root = QUrl::fromLocalFile(rootPath());
 
@@ -91,21 +89,23 @@ class ScreenshotsFSModel : public QFileSystemModel {
     }
 };
 
-using SharedIconCache = RWStorage<QString, QIcon>;
+using SharedIconCache    = RWStorage<QString, QIcon>;
 using SharedIconCachePtr = std::shared_ptr<SharedIconCache>;
 
-class ThumbnailingResult : public QObject {
+class ThumbnailingResult : public QObject
+{
     Q_OBJECT
-   public slots:
+public slots:
     void emitResultsReady(const QString& path) { emit resultsReady(path); }
     void emitResultsFailed(const QString& path) { emit resultsFailed(path); }
-   signals:
+signals:
     void resultsReady(const QString& path);
     void resultsFailed(const QString& path);
 };
 
-class ThumbnailRunnable : public QRunnable {
-   public:
+class ThumbnailRunnable : public QRunnable
+{
+public:
     ThumbnailRunnable(QString path, SharedIconCachePtr cache) : m_path(std::move(path)), m_cache(std::move(cache)) {}
     void run() override
     {
@@ -132,7 +132,7 @@ class ThumbnailRunnable : public QRunnable {
             small = image.scaledToHeight(512).scaledToHeight(256, Qt::SmoothTransformation);
         }
         const QPoint offset((256 - small.width()) / 2, (256 - small.height()) / 2);
-        QImage square(QSize(256, 256), QImage::Format_ARGB32);
+        QImage       square(QSize(256, 256), QImage::Format_ARGB32);
         square.fill(Qt::transparent);
 
         QPainter painter(&square);
@@ -143,14 +143,15 @@ class ThumbnailRunnable : public QRunnable {
         m_cache->add(m_path, icon);
         m_resultEmitter.emitResultsReady(m_path);
     }
-    QString m_path;
+    QString            m_path;
     SharedIconCachePtr m_cache;
     ThumbnailingResult m_resultEmitter;
 };
 
-class FilterModel : public QIdentityProxyModel {
+class FilterModel : public QIdentityProxyModel
+{
     Q_OBJECT
-   public:
+public:
     explicit FilterModel(QObject* parent = nullptr) : QIdentityProxyModel(parent)
     {
         m_thumbnailingPool.setMaxThreadCount(4);
@@ -172,13 +173,13 @@ class FilterModel : public QIdentityProxyModel {
             return {};
         }
         if (role == Qt::DisplayRole || role == Qt::EditRole) {
-            const QVariant result = model->data(mapToSource(proxyIndex), role);
+            const QVariant                  result = model->data(mapToSource(proxyIndex), role);
             static const QRegularExpression s_removeChars("\\.png$");
             return result.toString().remove(s_removeChars);
         }
         if (role == Qt::DecorationRole) {
-            const QVariant result = model->data(mapToSource(proxyIndex), QFileSystemModel::FilePathRole);
-            const QString filePath = result.toString();
+            const QVariant result   = model->data(mapToSource(proxyIndex), QFileSystemModel::FilePathRole);
+            const QString  filePath = result.toString();
             if (!watched.contains(filePath)) {
                 const_cast<QFileSystemWatcher&>(watcher).addPath(filePath);
                 const_cast<QSet<QString>&>(watched).insert(filePath);
@@ -210,7 +211,7 @@ class FilterModel : public QIdentityProxyModel {
         return model->setData(mapToSource(index), value.toString() + ".png", role);
     }
 
-   private:
+private:
     void thumbnailImage(QString path)
     {
         auto* runnable = new ThumbnailRunnable(std::move(path), m_thumbnailCache);
@@ -218,7 +219,7 @@ class FilterModel : public QIdentityProxyModel {
         connect(&runnable->m_resultEmitter, &ThumbnailingResult::resultsFailed, this, &FilterModel::thumbnailFailed);
         m_thumbnailingPool.start(runnable);
     }
-   private slots:
+private slots:
     void thumbnailReady(const QString&) { emit layoutChanged(); }
     void thumbnailFailed(const QString& path) { m_failed.insert(path); }
     void fileChanged(const QString& filepath)
@@ -232,16 +233,17 @@ class FilterModel : public QIdentityProxyModel {
         }
     }
 
-   private:
+private:
     SharedIconCachePtr m_thumbnailCache;
-    QThreadPool m_thumbnailingPool;
-    QSet<QString> m_failed;
-    QSet<QString> watched;
+    QThreadPool        m_thumbnailingPool;
+    QSet<QString>      m_failed;
+    QSet<QString>      watched;
     QFileSystemWatcher watcher;
 };
 
-class CenteredEditingDelegate : public QStyledItemDelegate {
-   public:
+class CenteredEditingDelegate : public QStyledItemDelegate
+{
+public:
     explicit CenteredEditingDelegate(QObject* parent = nullptr) : QStyledItemDelegate(parent) {}
     ~CenteredEditingDelegate() override = default;
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
@@ -259,12 +261,12 @@ class CenteredEditingDelegate : public QStyledItemDelegate {
 ScreenshotsPage::ScreenshotsPage(QString path, QWidget* parent)
     : QMainWindow(parent), ui(new Ui::ScreenshotsPage), m_folder(std::move(path))
 {
-    m_model = std::make_shared<ScreenshotsFSModel>();
+    m_model       = std::make_shared<ScreenshotsFSModel>();
     m_filterModel = std::make_shared<FilterModel>();
     m_filterModel->setSourceModel(m_model.get());
     m_model->setFilter(QDir::Files);
     m_model->setReadOnly(false);
-    m_model->setNameFilters({ "*.png" });
+    m_model->setNameFilters({"*.png"});
     m_model->setNameFilterDisables(false);
 
     constexpr int file_modified_column_index = 3;
@@ -306,14 +308,14 @@ bool ScreenshotsPage::eventFilter(QObject* obj, QEvent* evt)
     }
 
     switch (keyEvent->key()) {
-        case Qt::Key_Delete:
-            on_actionDelete_triggered();
-            return true;
-        case Qt::Key_F2:
-            on_actionRename_triggered();
-            return true;
-        default:
-            break;
+    case Qt::Key_Delete:
+        on_actionDelete_triggered();
+        return true;
+    case Qt::Key_F2:
+        on_actionRename_triggered();
+        return true;
+    default:
+        break;
     }
     return QWidget::eventFilter(obj, evt);
 }
@@ -395,7 +397,7 @@ void ScreenshotsPage::on_actionUpload_triggered()
         return;
     }
 
-    QString text;
+    QString    text;
     const QUrl baseUrl(BuildConfig.IMGUR_BASE_URL);
     if (selection.size() > 1) {
         text = tr("You are about to upload %1 screenshots to %2.\n"
@@ -409,8 +411,8 @@ void ScreenshotsPage::on_actionUpload_triggered()
                    .arg(baseUrl.host());
     }
 
-    auto response = CustomMessageBox::selectable(this, "Confirm Upload", text, QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No,
-                                                 QMessageBox::No)
+    auto response = CustomMessageBox::selectable(
+                        this, "Confirm Upload", text, QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
                         ->exec();
 
     if (response != QMessageBox::Yes) {
@@ -418,14 +420,14 @@ void ScreenshotsPage::on_actionUpload_triggered()
     }
 
     QList<ScreenShot::Ptr> uploaded;
-    auto job = NetJob::Ptr(new NetJob("Screenshot Upload", APPLICATION->network()));
+    auto                   job = NetJob::Ptr(new NetJob("Screenshot Upload", APPLICATION->network()));
 
     ProgressDialog dialog(this);
     dialog.setSkipButton(true, tr("Abort"));
 
     if (selection.size() < 2) {
-        auto item = selection.at(0);
-        auto info = m_model->fileInfo(item);
+        auto item       = selection.at(0);
+        auto info       = m_model->fileInfo(item);
         auto screenshot = std::make_shared<ScreenShot>(info);
         job->addNetAction(ImgurUpload::make(screenshot));
 
@@ -433,20 +435,21 @@ void ScreenshotsPage::on_actionUpload_triggered()
             CustomMessageBox::selectable(this, tr("Failed to upload screenshots!"), reason, QMessageBox::Critical)->show();
         });
         connect(job.get(), &Task::aborted, [this] {
-            CustomMessageBox::selectable(this, tr("Screenshots upload aborted"), tr("The task has been aborted by the user."),
-                                         QMessageBox::Information)
+            CustomMessageBox::selectable(
+                this, tr("Screenshots upload aborted"), tr("The task has been aborted by the user."), QMessageBox::Information)
                 ->show();
         });
 
         m_uploadActive = true;
 
         if (dialog.execWithTask(job.get()) == QDialog::Accepted) {
-            auto link = screenshot->m_url;
+            auto        link      = screenshot->m_url;
             QClipboard* clipboard = QApplication::clipboard();
             qDebug() << "ImgurUpload link" << link;
             clipboard->setText(link);
             CustomMessageBox::selectable(
-                this, tr("Upload finished"),
+                this,
+                tr("Upload finished"),
                 tr("The <a href=\"%1\">link  to the uploaded screenshot</a> has been placed in your clipboard.").arg(link),
                 QMessageBox::Information)
                 ->exec();
@@ -457,15 +460,15 @@ void ScreenshotsPage::on_actionUpload_triggered()
     }
 
     for (auto item : selection) {
-        auto info = m_model->fileInfo(item);
+        auto info       = m_model->fileInfo(item);
         auto screenshot = std::make_shared<ScreenShot>(info);
         uploaded.push_back(screenshot);
         job->addNetAction(ImgurUpload::make(screenshot));
     }
     SequentialTask task;
-    auto albumTask = NetJob::Ptr(new NetJob("Imgur Album Creation", APPLICATION->network()));
-    auto imgurResult = std::make_shared<ImgurAlbumCreation::Result>();
-    auto imgurAlbum = ImgurAlbumCreation::make(imgurResult, uploaded);
+    auto           albumTask   = NetJob::Ptr(new NetJob("Imgur Album Creation", APPLICATION->network()));
+    auto           imgurResult = std::make_shared<ImgurAlbumCreation::Result>();
+    auto           imgurAlbum  = ImgurAlbumCreation::make(imgurResult, uploaded);
     albumTask->addNetAction(imgurAlbum);
     task.addTask(job);
     task.addTask(albumTask);
@@ -474,8 +477,8 @@ void ScreenshotsPage::on_actionUpload_triggered()
         CustomMessageBox::selectable(this, tr("Failed to upload screenshots!"), reason, QMessageBox::Critical)->show();
     });
     connect(&task, &Task::aborted, [this] {
-        CustomMessageBox::selectable(this, tr("Screenshots upload aborted"), tr("The task has been aborted by the user."),
-                                     QMessageBox::Information)
+        CustomMessageBox::selectable(
+            this, tr("Screenshots upload aborted"), tr("The task has been aborted by the user."), QMessageBox::Information)
             ->show();
     });
 
@@ -489,7 +492,8 @@ void ScreenshotsPage::on_actionUpload_triggered()
             QClipboard* clipboard = QApplication::clipboard();
             clipboard->setText(link);
             CustomMessageBox::selectable(
-                this, tr("Upload finished"),
+                this,
+                tr("Upload finished"),
                 tr("The <a href=\"%1\">link  to the uploaded album</a> has been placed in your clipboard.").arg(link),
                 QMessageBox::Information)
                 ->exec();
@@ -505,8 +509,8 @@ void ScreenshotsPage::on_actionCopy_Image_triggered() const
         return;
     }
 
-    const auto item = selection.first();
-    const auto info = m_model->fileInfo(item);
+    const auto   item = selection.first();
+    const auto   info = m_model->fileInfo(item);
     const QImage image(info.absoluteFilePath());
     Q_ASSERT(!image.isNull());
     QApplication::clipboard()->setImage(image, QClipboard::Clipboard);
@@ -534,17 +538,16 @@ void ScreenshotsPage::on_actionDelete_triggered()
     auto selected = ui->listView->selectionModel()->selectedIndexes();
 
     const qsizetype count = selected.size();
-    QString text;
+    QString         text;
     if (count > 1) {
         text = tr("You are about to delete %1 screenshots.\n"
                   "This may be permanent and they will be gone from the folder.\n\n"
                   "Are you sure?")
                    .arg(count);
     } else {
-        text =
-            tr("You are about to delete the selected screenshot.\n"
-               "This may be permanent and it will be gone from the folder.\n\n"
-               "Are you sure?");
+        text = tr("You are about to delete the selected screenshot.\n"
+                  "This may be permanent and it will be gone from the folder.\n\n"
+                  "Are you sure?");
     }
 
     const auto response =
@@ -579,11 +582,11 @@ void ScreenshotsPage::openedImpl()
     }
     if (m_valid) {
         const QString path = QDir(m_folder).absolutePath();
-        const auto idx = m_model->setRootPath(path);
+        const auto    idx  = m_model->setRootPath(path);
         if (idx.isValid()) {
             ui->listView->setModel(m_filterModel.get());
-            connect(ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this,
-                    &ScreenshotsPage::onCurrentSelectionChanged);
+            connect(
+                ui->listView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &ScreenshotsPage::onCurrentSelectionChanged);
             onCurrentSelectionChanged(ui->listView->selectionModel()->selection());
 
             ui->listView->setRootIndex(m_filterModel->mapFromSource(idx));
@@ -593,7 +596,7 @@ void ScreenshotsPage::openedImpl()
     }
 
     const auto setting_name = QString("WideBarVisibility_%1").arg(id());
-    m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+    m_wide_bar_setting      = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 }

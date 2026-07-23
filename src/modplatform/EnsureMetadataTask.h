@@ -11,10 +11,11 @@
 class Mod;
 class QDir;
 
-class EnsureMetadataTask : public Task {
+class EnsureMetadataTask : public Task
+{
     Q_OBJECT
 
-   public:
+public:
     EnsureMetadataTask(Resource*, QDir, ModPlatform::ResourceProvider = ModPlatform::ResourceProvider::MODRINTH);
     EnsureMetadataTask(QList<Resource*>&, QDir, ModPlatform::ResourceProvider = ModPlatform::ResourceProvider::MODRINTH);
     EnsureMetadataTask(QHash<QString, Resource*>&, QDir, ModPlatform::ResourceProvider = ModPlatform::ResourceProvider::MODRINTH);
@@ -23,40 +24,44 @@ class EnsureMetadataTask : public Task {
 
     Task::Ptr getHashingTask() { return m_hashingTask; }
 
-   public slots:
+public slots:
     bool abort() override;
-   protected slots:
+protected slots:
     void executeTask() override;
 
-   private:
+private:
     Task::Ptr modrinthVersionsTask();
     Task::Ptr modrinthProjectsTask();
 
     Task::Ptr flameVersionsTask();
     Task::Ptr flameProjectsTask();
 
-    enum class RemoveFromList { Yes, No };
+    enum class RemoveFromList
+    {
+        Yes,
+        No
+    };
     void emitReady(Resource*, QString key = {}, RemoveFromList = RemoveFromList::Yes);
     void emitFail(Resource*, QString key = {}, RemoveFromList = RemoveFromList::Yes);
 
     Hashing::Hasher::Ptr createNewHash(Resource*);
-    QString getExistingHash(Resource*);
+    QString              getExistingHash(Resource*);
 
-   private slots:
+private slots:
     void updateMetadata(ModPlatform::IndexedPack& pack, ModPlatform::IndexedVersion& ver, Resource*);
     void updateMetadataCallback(ModPlatform::IndexedPack& pack, Resource* resource);
 
-   signals:
+signals:
     void metadataReady(Resource*);
     void metadataFailed(Resource*);
 
-   private:
-    QHash<QString, Resource*> m_resources;
-    QDir m_indexDir;
+private:
+    QHash<QString, Resource*>     m_resources;
+    QDir                          m_indexDir;
     ModPlatform::ResourceProvider m_provider;
 
     QHash<QString, ModPlatform::IndexedVersion> m_tempVersions;
-    Task::Ptr m_hashingTask;
-    Task::Ptr m_currentTask;
-    QHash<QString, Task::Ptr> m_updateMetadataTasks;
+    Task::Ptr                                   m_hashingTask;
+    Task::Ptr                                   m_currentTask;
+    QHash<QString, Task::Ptr>                   m_updateMetadataTasks;
 };

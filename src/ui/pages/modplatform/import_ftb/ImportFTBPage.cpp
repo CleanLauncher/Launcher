@@ -20,16 +20,17 @@
 #include "ui/widgets/ProjectItem.h"
 #include "ui_ImportFTBPage.h"
 
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QTemporaryFile>
-#include <QWidget>
 #include "FileSystem.h"
 #include "ListModel.h"
 #include "modplatform/import_ftb/PackInstallTask.h"
 #include "ui/dialogs/NewInstanceDialog.h"
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QTemporaryFile>
+#include <QWidget>
 
-namespace FTBImportAPP {
+namespace FTBImportAPP
+{
 
 ImportFTBPage::ImportFTBPage(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog(dialog), ui(new Ui::ImportFTBPage)
 {
@@ -37,7 +38,7 @@ ImportFTBPage::ImportFTBPage(NewInstanceDialog* dialog, QWidget* parent) : QWidg
 
     {
         currentModel = new FilterModel(this);
-        listModel = new ListModel(this);
+        listModel    = new ListModel(this);
         currentModel->setSourceModel(listModel);
 
         ui->modpackList->setModel(currentModel);
@@ -60,8 +61,8 @@ ImportFTBPage::ImportFTBPage(NewInstanceDialog* dialog, QWidget* parent) : QWidg
     connect(ui->searchEdit, &QLineEdit::textChanged, this, &ImportFTBPage::triggerSearch);
 
     connect(ui->browseButton, &QPushButton::clicked, this, [this] {
-        QString dir = QFileDialog::getExistingDirectory(this, tr("Select FTBApp instances directory"), listModel->getUserPath(),
-                                                        QFileDialog::ShowDirsOnly);
+        QString dir = QFileDialog::getExistingDirectory(
+            this, tr("Select FTBApp instances directory"), listModel->getUserPath(), QFileDialog::ShowDirsOnly);
         if (!dir.isEmpty())
             listModel->setPath(dir);
     });
@@ -129,7 +130,7 @@ void ImportFTBPage::suggestCurrent()
 
     dialog->setSuggestedPack(selected.name, new PackInstallTask(selected));
     QString editedLogoName = QString("ftb_%1_%2.jpg").arg(selected.name, QString::number(selected.id));
-    auto iconPath = FS::PathCombine(selected.path, "folder.jpg");
+    auto    iconPath       = FS::PathCombine(selected.path, "folder.jpg");
     if (!QFileInfo::exists(iconPath)) {
         iconPath = saveIconToTempFile(selected.icon);
     }

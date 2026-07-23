@@ -60,12 +60,13 @@
 #include "BuildConfig.h"
 #include "ui/dialogs/BlockedModsDialog.h"
 
-namespace {
+namespace
+{
 bool isPathTraversal(const QString& basePath, const QString& entryName)
 {
     auto safeName = FS::RemoveInvalidPathChars(entryName);
     auto fullPath = FS::PathCombine(basePath, safeName);
-    auto baseUrl = QUrl::fromLocalFile(basePath);
+    auto baseUrl  = QUrl::fromLocalFile(basePath);
     return !baseUrl.isParentOf(QUrl::fromLocalFile(fullPath));
 }
 
@@ -75,7 +76,8 @@ Meta::Version::Ptr getComponentVersion(const QString& uid, const QString& versio
 }
 }  // namespace
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
 PackInstallTask::PackInstallTask(UserInteractionSupport* support, QString packName, QString version, InstallMode installMode)
     : m_support(support), m_install_mode(installMode), m_pack_name(packName), m_version_name(std::move(version))
@@ -95,8 +97,8 @@ bool PackInstallTask::abort()
 void PackInstallTask::executeTask()
 {
     qDebug() << "PackInstallTask::executeTask:" << QThread::currentThreadId();
-    NetJob::Ptr netJob{ new NetJob("ATLauncher::VersionFetch", APPLICATION->network()) };
-    auto searchUrl =
+    NetJob::Ptr netJob{new NetJob("ATLauncher::VersionFetch", APPLICATION->network())};
+    auto        searchUrl =
         QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "packs/%1/versions/%2/Configs.json").arg(m_pack_safe_name).arg(m_version_name);
 
     auto [action, response] = Net::ApiDownload::makeByteArray(QUrl(searchUrl));
@@ -118,7 +120,7 @@ void PackInstallTask::onDownloadSucceeded(QByteArray* responsePtr)
     jobPtr.reset();
 
     QJsonParseError parseError{};
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parseError);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from ATLauncher at" << parseError.offset << "reason:" << parseError.errorString();
         qWarning() << response;
@@ -136,23 +138,23 @@ void PackInstallTask::onDownloadSucceeded(QByteArray* responsePtr)
     m_version = version;
 
     QString message;
-    bool resetDirectory = false;
+    bool    resetDirectory = false;
 
     switch (m_install_mode) {
-        case InstallMode::Reinstall:
-        case InstallMode::Update:
-            message = m_version.messages.update;
-            resetDirectory = true;
-            break;
+    case InstallMode::Reinstall:
+    case InstallMode::Update:
+        message        = m_version.messages.update;
+        resetDirectory = true;
+        break;
 
-        case InstallMode::Install:
-            message = m_version.messages.install;
-            resetDirectory = false;
-            break;
+    case InstallMode::Install:
+        message        = m_version.messages.install;
+        resetDirectory = false;
+        break;
 
-        default:
-            emitFailed(tr("Unsupported installation mode"));
-            return;
+    default:
+        emitFailed(tr("Unsupported installation mode"));
+        return;
     }
 
     if (!message.isEmpty()) {
@@ -195,17 +197,17 @@ void PackInstallTask::deleteExistingFiles()
     setStatus(tr("Deleting existing files..."));
 
     VersionDeletes deletes;
-    deletes.folders.append(VersionDelete{ "root", "mods%s%" });
-    deletes.folders.append(VersionDelete{ "root", "configs%s%" });
-    deletes.folders.append(VersionDelete{ "root", "bin%s%" });
+    deletes.folders.append(VersionDelete{"root", "mods%s%"});
+    deletes.folders.append(VersionDelete{"root", "configs%s%"});
+    deletes.folders.append(VersionDelete{"root", "bin%s%"});
 
     VersionKeeps keeps;
-    keeps.files.append(VersionKeep{ "root", "mods%s%PortalGunSounds.pak" });
-    keeps.folders.append(VersionKeep{ "root", "mods%s%rei_minimap%s%" });
-    keeps.folders.append(VersionKeep{ "root", "mods%s%VoxelMods%s%" });
-    keeps.files.append(VersionKeep{ "root", "config%s%NEI.cfg" });
-    keeps.files.append(VersionKeep{ "root", "options.txt" });
-    keeps.files.append(VersionKeep{ "root", "servers.dat" });
+    keeps.files.append(VersionKeep{"root", "mods%s%PortalGunSounds.pak"});
+    keeps.folders.append(VersionKeep{"root", "mods%s%rei_minimap%s%"});
+    keeps.folders.append(VersionKeep{"root", "mods%s%VoxelMods%s%"});
+    keeps.files.append(VersionKeep{"root", "config%s%NEI.cfg"});
+    keeps.files.append(VersionKeep{"root", "options.txt"});
+    keeps.files.append(VersionKeep{"root", "servers.dat"});
 
     for (const auto& item : m_version.deletes.files) {
         deletes.files.append(item);
@@ -241,18 +243,18 @@ void PackInstallTask::deleteExistingFiles()
 
     auto shouldKeep = [keeps, getPathForBase, convertToSystemPath](const QString& fullPath) {
         if (std::ranges::any_of(keeps.files, [&fullPath, &getPathForBase, &convertToSystemPath](const auto& item) {
-                auto basePath = getPathForBase(item.base);
+                auto basePath   = getPathForBase(item.base);
                 auto targetPath = convertToSystemPath(item.target);
-                auto path = FS::PathCombine(basePath, targetPath);
+                auto path       = FS::PathCombine(basePath, targetPath);
                 return fullPath == path;
             })) {
             return true;
         }
 
         if (std::ranges::any_of(keeps.folders, [&fullPath, &getPathForBase, &convertToSystemPath](const auto& item) {
-                auto basePath = getPathForBase(item.base);
+                auto basePath   = getPathForBase(item.base);
                 auto targetPath = convertToSystemPath(item.target);
-                auto path = FS::PathCombine(basePath, targetPath);
+                auto path       = FS::PathCombine(basePath, targetPath);
                 return fullPath.startsWith(path);
             })) {
             return true;
@@ -264,9 +266,9 @@ void PackInstallTask::deleteExistingFiles()
     QSet<QString> filesToDelete;
 
     for (const auto& item : deletes.files) {
-        auto basePath = getPathForBase(item.base);
+        auto basePath   = getPathForBase(item.base);
         auto targetPath = convertToSystemPath(item.target);
-        auto fullPath = FS::PathCombine(basePath, targetPath);
+        auto fullPath   = FS::PathCombine(basePath, targetPath);
 
         if (shouldKeep(fullPath)) {
             continue;
@@ -276,9 +278,9 @@ void PackInstallTask::deleteExistingFiles()
     }
 
     for (const auto& item : deletes.folders) {
-        auto basePath = getPathForBase(item.base);
+        auto basePath   = getPathForBase(item.base);
         auto targetPath = convertToSystemPath(item.target);
-        auto fullPath = FS::PathCombine(basePath, targetPath);
+        auto fullPath   = FS::PathCombine(basePath, targetPath);
 
         QDirIterator it(fullPath, QDirIterator::Subdirectories);
         while (it.hasNext()) {
@@ -300,43 +302,43 @@ void PackInstallTask::deleteExistingFiles()
 QString PackInstallTask::getDirForModType(ModType type, const QString& raw)
 {
     switch (type) {
-        case ModType::Root:
-        case ModType::Extract:
-        case ModType::Decomp:
-        case ModType::TexturePackExtract:
-        case ModType::ResourcePackExtract:
-        case ModType::MCPC:
-            return Q_NULLPTR;
-        case ModType::Forge:
+    case ModType::Root:
+    case ModType::Extract:
+    case ModType::Decomp:
+    case ModType::TexturePackExtract:
+    case ModType::ResourcePackExtract:
+    case ModType::MCPC:
+        return Q_NULLPTR;
+    case ModType::Forge:
 
-        case ModType::Jar:
-            return "jarmods";
-        case ModType::Mods:
-            return "mods";
-        case ModType::Flan:
-            return "Flan";
-        case ModType::Dependency:
-            return FS::PathCombine("mods", m_version.minecraft);
-        case ModType::Ic2Lib:
-            return FS::PathCombine("mods", "ic2");
-        case ModType::DenLib:
-            return FS::PathCombine("mods", "denlib");
-        case ModType::Coremods:
-            return "coremods";
-        case ModType::Plugins:
-            return "plugins";
-        case ModType::TexturePack:
-            return "texturepacks";
-        case ModType::ResourcePack:
-            return "resourcepacks";
-        case ModType::ShaderPack:
-            return "shaderpacks";
-        case ModType::Millenaire:
-            qWarning() << "Unsupported mod type: " + raw;
-            return Q_NULLPTR;
-        case ModType::Unknown:
-            emitFailed(tr("Unknown mod type: %1").arg(raw));
-            return Q_NULLPTR;
+    case ModType::Jar:
+        return "jarmods";
+    case ModType::Mods:
+        return "mods";
+    case ModType::Flan:
+        return "Flan";
+    case ModType::Dependency:
+        return FS::PathCombine("mods", m_version.minecraft);
+    case ModType::Ic2Lib:
+        return FS::PathCombine("mods", "ic2");
+    case ModType::DenLib:
+        return FS::PathCombine("mods", "denlib");
+    case ModType::Coremods:
+        return "coremods";
+    case ModType::Plugins:
+        return "plugins";
+    case ModType::TexturePack:
+        return "texturepacks";
+    case ModType::ResourcePack:
+        return "resourcepacks";
+    case ModType::ShaderPack:
+        return "shaderpacks";
+    case ModType::Millenaire:
+        qWarning() << "Unsupported mod type: " + raw;
+        return Q_NULLPTR;
+    case ModType::Unknown:
+        emitFailed(tr("Unknown mod type: %1").arg(raw));
+        return Q_NULLPTR;
     }
 
     return Q_NULLPTR;
@@ -356,7 +358,7 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
         if (m_version.loader.recommended || m_version.loader.latest) {
             for (int i = 0; i < vlist->versions().size(); i++) {
                 auto version = vlist->versions().at(i);
-                auto reqs = version->requiredSet();
+                auto reqs    = version->requiredSet();
 
                 if (m_version.loader.type != "fabric") {
                     auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Meta::Require& req) { return req.uid == "net.minecraft"; });
@@ -400,16 +402,16 @@ QString PackInstallTask::getVersionForLoader(const QString& uid)
 QString PackInstallTask::detectLibrary(const VersionLibrary& library)
 {
     if (!library.server.isEmpty() && library.server.split("/").length() >= 3) {
-        auto lastSlash = library.server.lastIndexOf("/");
+        auto lastSlash          = library.server.lastIndexOf("/");
         auto locationAndVersion = library.server.mid(0, lastSlash);
-        auto fileName = library.server.mid(lastSlash + 1);
+        auto fileName           = library.server.mid(lastSlash + 1);
 
-        lastSlash = locationAndVersion.lastIndexOf("/");
+        lastSlash     = locationAndVersion.lastIndexOf("/");
         auto location = locationAndVersion.mid(0, lastSlash);
-        auto version = locationAndVersion.mid(lastSlash + 1);
+        auto version  = locationAndVersion.mid(lastSlash + 1);
 
-        lastSlash = location.lastIndexOf("/");
-        auto group = location.mid(0, lastSlash).replace("/", ".");
+        lastSlash     = location.lastIndexOf("/");
+        auto group    = location.mid(0, lastSlash).replace("/", ".");
         auto artefact = location.mid(lastSlash + 1);
 
         return group + ":" + artefact + ":" + version;
@@ -417,8 +419,8 @@ QString PackInstallTask::detectLibrary(const VersionLibrary& library)
 
     if (library.file.contains("-")) {
         auto lastSlash = library.file.lastIndexOf("-");
-        auto name = library.file.mid(0, lastSlash);
-        auto version = library.file.mid(lastSlash + 1).remove(".jar");
+        auto name      = library.file.mid(0, lastSlash);
+        auto version   = library.file.mid(lastSlash + 1).remove(".jar");
 
         if (name == QString("guava")) {
             return "com.google.guava:guava:" + version;
@@ -455,7 +457,7 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
         }
     }
 
-    auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    auto id       = QUuid::createUuid().toString(QUuid::WithoutBraces);
     auto targetId = "org.multimc.atlauncher." + id;
 
     auto patchDir = FS::PathCombine(instanceRoot, "patches");
@@ -464,26 +466,25 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
     }
     auto patchFileName = FS::PathCombine(patchDir, targetId + ".json");
 
-    auto f = std::make_shared<VersionFile>();
+    auto f  = std::make_shared<VersionFile>();
     f->name = m_pack_name + " " + m_version_name + " (libraries)";
 
     const static QMap<QString, QString> s_liteLoaderMap = {
-        { "61179803bcd5fb7790789b790908663d", "1.12-SNAPSHOT" },   { "1420785ecbfed5aff4a586c5c9dd97eb", "1.12.2-SNAPSHOT" },
-        { "073f68e2fcb518b91fd0d99462441714", "1.6.2_03" },        { "10a15b52fc59b1bfb9c05b56de1097d6", "1.6.2_02" },
-        { "b52f90f08303edd3d4c374e268a5acf1", "1.6.2_04" },        { "ea747e24e03e24b7cad5bc8a246e0319", "1.6.2_01" },
-        { "55785ccc82c07ff0ba038fe24be63ea2", "1.7.10_01" },       { "63ada46e033d0cb6782bada09ad5ca4e", "1.7.10_04" },
-        { "7983e4b28217c9ae8569074388409c86", "1.7.10_03" },       { "c09882458d74fe0697c7681b8993097e", "1.7.10_02" },
-        { "db7235aefd407ac1fde09a7baba50839", "1.7.10_00" },       { "6e9028816027f53957bd8fcdfabae064", "1.8" },
-        { "5e732dc446f9fe2abe5f9decaec40cde", "1.10-SNAPSHOT" },   { "3a98b5ed95810bf164e71c1a53be568d", "1.11.2-SNAPSHOT" },
-        { "ba8e6285966d7d988a96496f48cbddaa", "1.8.9-SNAPSHOT" },  { "8524af3ac3325a82444cc75ae6e9112f", "1.11-SNAPSHOT" },
-        { "53639d52340479ccf206a04f5e16606f", "1.5.2_01" },        { "1fcdcf66ce0a0806b7ad8686afdce3f7", "1.6.4_00" },
-        { "531c116f71ae2b11033f9a11a0f8e668", "1.6.4_01" },        { "4009eeb99c9068f608d3483a6439af88", "1.7.2_03" },
-        { "66f343354b8417abce1a10d557d2c6e9", "1.7.2_04" },        { "ab554c21f28fbc4ae9b098bcb5f4cceb", "1.7.2_05" },
-        { "e1d76a05a3723920e2f80a5e66c45f16", "1.7.2_02" },        { "00318cb0c787934d523f63cdfe8ddde4", "1.9-SNAPSHOT" },
-        { "986fd1ee9525cb0dcab7609401cef754", "1.9.4-SNAPSHOT" },  { "571ad5e6edd5ff40259570c9be588bb5", "1.9.4" },
-        { "1cdd72f7232e45551f16cc8ffd27ccf3", "1.10.2-SNAPSHOT" }, { "8a7c21f32d77ee08b393dd3921ced8eb", "1.10.2" },
-        { "b9bef8abc8dc309069aeba6fbbe58980", "1.12.1-SNAPSHOT" }
-    };
+        {"61179803bcd5fb7790789b790908663d", "1.12-SNAPSHOT"},   {"1420785ecbfed5aff4a586c5c9dd97eb", "1.12.2-SNAPSHOT"},
+        {"073f68e2fcb518b91fd0d99462441714", "1.6.2_03"},        {"10a15b52fc59b1bfb9c05b56de1097d6", "1.6.2_02"},
+        {"b52f90f08303edd3d4c374e268a5acf1", "1.6.2_04"},        {"ea747e24e03e24b7cad5bc8a246e0319", "1.6.2_01"},
+        {"55785ccc82c07ff0ba038fe24be63ea2", "1.7.10_01"},       {"63ada46e033d0cb6782bada09ad5ca4e", "1.7.10_04"},
+        {"7983e4b28217c9ae8569074388409c86", "1.7.10_03"},       {"c09882458d74fe0697c7681b8993097e", "1.7.10_02"},
+        {"db7235aefd407ac1fde09a7baba50839", "1.7.10_00"},       {"6e9028816027f53957bd8fcdfabae064", "1.8"},
+        {"5e732dc446f9fe2abe5f9decaec40cde", "1.10-SNAPSHOT"},   {"3a98b5ed95810bf164e71c1a53be568d", "1.11.2-SNAPSHOT"},
+        {"ba8e6285966d7d988a96496f48cbddaa", "1.8.9-SNAPSHOT"},  {"8524af3ac3325a82444cc75ae6e9112f", "1.11-SNAPSHOT"},
+        {"53639d52340479ccf206a04f5e16606f", "1.5.2_01"},        {"1fcdcf66ce0a0806b7ad8686afdce3f7", "1.6.4_00"},
+        {"531c116f71ae2b11033f9a11a0f8e668", "1.6.4_01"},        {"4009eeb99c9068f608d3483a6439af88", "1.7.2_03"},
+        {"66f343354b8417abce1a10d557d2c6e9", "1.7.2_04"},        {"ab554c21f28fbc4ae9b098bcb5f4cceb", "1.7.2_05"},
+        {"e1d76a05a3723920e2f80a5e66c45f16", "1.7.2_02"},        {"00318cb0c787934d523f63cdfe8ddde4", "1.9-SNAPSHOT"},
+        {"986fd1ee9525cb0dcab7609401cef754", "1.9.4-SNAPSHOT"},  {"571ad5e6edd5ff40259570c9be588bb5", "1.9.4"},
+        {"1cdd72f7232e45551f16cc8ffd27ccf3", "1.10.2-SNAPSHOT"}, {"8a7c21f32d77ee08b393dd3921ced8eb", "1.10.2"},
+        {"b9bef8abc8dc309069aeba6fbbe58980", "1.12.1-SNAPSHOT"}};
 
     for (const auto& lib : m_version.libraries) {
         if (s_liteLoaderMap.contains(lib.md5)) {
@@ -494,7 +495,7 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
             }
         }
 
-        auto libName = detectLibrary(lib);
+        auto            libName = detectLibrary(lib);
         GradleSpecifier libSpecifier(libName);
 
         bool libExempt = false;
@@ -511,16 +512,16 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
         library->setRawName(libName);
 
         switch (lib.download) {
-            case DownloadType::Server:
-                library->setAbsoluteUrl(BuildConfig.ATL_DOWNLOAD_SERVER_URL + lib.url);
-                break;
-            case DownloadType::Direct:
-                library->setAbsoluteUrl(lib.url);
-                break;
-            case DownloadType::Browser:
-            case DownloadType::Unknown:
-                emitFailed(tr("Unknown or unsupported download type: %1").arg(lib.download_raw));
-                return false;
+        case DownloadType::Server:
+            library->setAbsoluteUrl(BuildConfig.ATL_DOWNLOAD_SERVER_URL + lib.url);
+            break;
+        case DownloadType::Direct:
+            library->setAbsoluteUrl(lib.url);
+            break;
+        case DownloadType::Browser:
+        case DownloadType::Unknown:
+            emitFailed(tr("Unknown or unsupported download type: %1").arg(lib.download_raw));
+            return false;
         }
 
         f->libraries.append(library);
@@ -538,7 +539,7 @@ bool PackInstallTask::createLibrariesComponent(const QString& instanceRoot, Pack
     file.write(OneSixVersionFormat::versionFileToJson(f).toJson());
     file.close();
 
-    profile->appendComponent(ComponentPtr{ new Component(profile, targetId, f) });
+    profile->appendComponent(ComponentPtr{new Component(profile, targetId, f)});
     return true;
 }
 
@@ -548,10 +549,10 @@ bool PackInstallTask::createPackComponent(const QString& instanceRoot, PackProfi
         return true;
     }
 
-    auto mainClass = m_version.mainClass.mainClass;
+    auto mainClass      = m_version.mainClass.mainClass;
     auto extraArguments = m_version.extraArguments.arguments;
 
-    auto hasMainClassDepends = !m_version.mainClass.depends.isEmpty();
+    auto hasMainClassDepends      = !m_version.mainClass.depends.isEmpty();
     auto hasExtraArgumentsDepends = !m_version.extraArguments.depends.isEmpty();
     if (hasMainClassDepends || hasExtraArgumentsDepends) {
         QSet<QString> mods;
@@ -572,7 +573,7 @@ bool PackInstallTask::createPackComponent(const QString& instanceRoot, PackProfi
         return true;
     }
 
-    auto id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    auto id       = QUuid::createUuid().toString(QUuid::WithoutBraces);
     auto targetId = "org.multimc.atlauncher." + id;
 
     auto patchDir = FS::PathCombine(instanceRoot, "patches");
@@ -594,13 +595,13 @@ bool PackInstallTask::createPackComponent(const QString& instanceRoot, PackProfi
         }
     }
 
-    auto f = std::make_shared<VersionFile>();
+    auto f  = std::make_shared<VersionFile>();
     f->name = m_pack_name + " " + m_version_name;
     if (!mainClass.isEmpty() && !mainClasses.contains(mainClass)) {
         f->mainClass = mainClass;
     }
 
-    auto args = extraArguments.split(" ");
+    auto    args = extraArguments.split(" ");
     QString previous;
     for (auto arg : args) {
         if (arg.startsWith("--tweakClass=") || previous == "--tweakClass") {
@@ -626,7 +627,7 @@ bool PackInstallTask::createPackComponent(const QString& instanceRoot, PackProfi
     file.write(OneSixVersionFormat::versionFileToJson(f).toJson());
     file.close();
 
-    profile->appendComponent(ComponentPtr{ new Component(profile, targetId, f) });
+    profile->appendComponent(ComponentPtr{new Component(profile, targetId, f)});
     return true;
 }
 
@@ -637,7 +638,7 @@ void PackInstallTask::installConfigs()
     jobPtr.reset(new NetJob(tr("Config download"), APPLICATION->network()));
 
     auto path = QString("Configs/%1/%2.zip").arg(m_pack_safe_name).arg(m_version_name);
-    auto url = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "packs/%1/versions/%2/Configs.zip").arg(m_pack_safe_name).arg(m_version_name);
+    auto url  = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "packs/%1/versions/%2/Configs.zip").arg(m_pack_safe_name).arg(m_version_name);
     auto entry = APPLICATION->metacache()->resolveEntry("ATLauncherPacks", path);
     entry->setStale(true);
 
@@ -678,7 +679,9 @@ void PackInstallTask::extractConfigs()
     setStatus(tr("Extracting configs..."));
 
     QDir extractDir(m_stagingPath);
-    m_extractFuture = QtConcurrent::run(QThreadPool::globalInstance(), QOverload<QString, QString>::of(MMCZip::extractDir), archivePath,
+    m_extractFuture = QtConcurrent::run(QThreadPool::globalInstance(),
+                                        QOverload<QString, QString>::of(MMCZip::extractDir),
+                                        archivePath,
                                         extractDir.absolutePath() + "/minecraft");
     connect(&m_extractFutureWatcher, &QFutureWatcher<QStringList>::finished, this, [this]() { downloadMods(); });
     connect(&m_extractFutureWatcher, &QFutureWatcher<QStringList>::canceled, this, [this]() { emitAborted(); });
@@ -724,23 +727,23 @@ void PackInstallTask::downloadMods()
 
         QString url;
         switch (mod.download) {
-            case DownloadType::Server:
-                url = BuildConfig.ATL_DOWNLOAD_SERVER_URL + mod.url;
-                break;
-            case DownloadType::Browser: {
-                blockedMods.append(mod);
-                continue;
-            }
-            case DownloadType::Direct:
-                url = mod.url;
-                break;
-            case DownloadType::Unknown:
-                emitFailed(tr("Unknown download type: %1").arg(mod.download_raw));
-                return;
+        case DownloadType::Server:
+            url = BuildConfig.ATL_DOWNLOAD_SERVER_URL + mod.url;
+            break;
+        case DownloadType::Browser: {
+            blockedMods.append(mod);
+            continue;
+        }
+        case DownloadType::Direct:
+            url = mod.url;
+            break;
+        case DownloadType::Unknown:
+            emitFailed(tr("Unknown download type: %1").arg(mod.download_raw));
+            return;
         }
 
         QFileInfo fileName(mod.file);
-        auto cacheName = fileName.completeBaseName() + "-" + mod.md5 + "." + fileName.suffix();
+        auto      cacheName = fileName.completeBaseName() + "-" + mod.md5 + "." + fileName.suffix();
 
         if (mod.type == ModType::Extract || mod.type == ModType::TexturePackExtract || mod.type == ModType::ResourcePackExtract) {
             auto entry = APPLICATION->metacache()->resolveEntry("ATLauncherPacks", cacheName);
@@ -804,21 +807,23 @@ void PackInstallTask::downloadMods()
 
         for (const auto& mod : blockedMods) {
             BlockedMod blockedMod;
-            blockedMod.name = mod.file;
+            blockedMod.name       = mod.file;
             blockedMod.websiteUrl = mod.url;
-            blockedMod.hash = mod.md5;
-            blockedMod.matched = false;
-            blockedMod.localPath = "";
+            blockedMod.hash       = mod.md5;
+            blockedMod.matched    = false;
+            blockedMod.localPath  = "";
 
             mods.append(blockedMod);
         }
 
         qWarning() << "Blocked mods found, displaying mod list";
 
-        BlockedModsDialog messageDialog(nullptr, tr("Blocked mods found"),
+        BlockedModsDialog messageDialog(nullptr,
+                                        tr("Blocked mods found"),
                                         tr("The following files are not available for download in third party launchers.<br/>"
                                            "You will need to manually download them and add them to the instance."),
-                                        mods, "md5");
+                                        mods,
+                                        "md5");
 
         messageDialog.setModal(true);
 
@@ -915,14 +920,14 @@ void PackInstallTask::onModsExtracted()
 
 bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
                                   const QMap<QString, VersionMod>& toDecomp,
-                                  const QMap<QString, QString>& toCopy)
+                                  const QMap<QString, QString>&    toCopy)
 {
     qDebug() << "PackInstallTask::extractMods:" << QThread::currentThreadId();
 
     setStatus(tr("Extracting mods..."));
     for (auto iter = toExtract.begin(); iter != toExtract.end(); iter++) {
         const auto& modPath = iter.key();
-        const auto& mod = iter.value();
+        const auto& mod     = iter.value();
 
         QString extractToDir;
         if (mod.type == ModType::Extract) {
@@ -954,9 +959,9 @@ bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
     }
 
     for (auto iter = toDecomp.begin(); iter != toDecomp.end(); iter++) {
-        const auto& modPath = iter.key();
-        const auto& mod = iter.value();
-        auto extractToDir = getDirForModType(mod.decompType, mod.decompType_raw);
+        const auto& modPath      = iter.key();
+        const auto& mod          = iter.value();
+        auto        extractToDir = getDirForModType(mod.decompType, mod.decompType_raw);
 
         QDir extractDir(m_stagingPath);
         auto extractToPath = FS::PathCombine(extractDir.absolutePath(), "minecraft", extractToDir, mod.decompFile);
@@ -975,7 +980,7 @@ bool PackInstallTask::extractMods(const QMap<QString, VersionMod>& toExtract,
 
     for (auto iter = toCopy.begin(); iter != toCopy.end(); iter++) {
         const auto& from = iter.key();
-        const auto& to = iter.value();
+        const auto& to   = iter.value();
 
         QFileInfo fileInfo(to);
         if (fileInfo.exists()) {
@@ -999,11 +1004,11 @@ void PackInstallTask::install()
     qDebug() << "PackInstallTask::install:" << QThread::currentThreadId();
     setStatus(tr("Installing modpack"));
 
-    auto instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
+    auto              instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
     MinecraftInstance instance(m_globalSettings, std::make_unique<INISettingsObject>(instanceConfigPath), m_stagingPath);
     {
         SettingsObject::Lock lock(instance.settings());
-        auto* components = instance.getPackProfile();
+        auto*                components = instance.getPackProfile();
         components->buildingFromScratch();
 
         if (!createLibrariesComponent(instance.instanceRoot(), components)) {

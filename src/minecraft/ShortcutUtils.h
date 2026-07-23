@@ -42,15 +42,17 @@
 #include <QList>
 #include <QMessageBox>
 
-namespace ShortcutUtils {
+namespace ShortcutUtils
+{
 
-struct Shortcut {
-    BaseInstance* instance;
-    QString name;
-    QString targetString;
-    QWidget* parent = nullptr;
-    QStringList extraArgs = {};
-    QString iconKey = "";
+struct Shortcut
+{
+    BaseInstance*  instance;
+    QString        name;
+    QString        targetString;
+    QWidget*       parent    = nullptr;
+    QStringList    extraArgs = {};
+    QString        iconKey   = "";
     ShortcutTarget target;
 };
 

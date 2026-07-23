@@ -25,11 +25,8 @@
 
 #include "ui_NetworkJobFailedDialog.h"
 
-NetworkJobFailedDialog::NetworkJobFailedDialog(const QString& jobName,
-                                               const int attempts,
-                                               const int requests,
-                                               const int failed,
-                                               QWidget* parent)
+NetworkJobFailedDialog::NetworkJobFailedDialog(
+    const QString& jobName, const int attempts, const int requests, const int failed, QWidget* parent)
     : QDialog(parent), m_ui(new Ui::NetworkJobFailedDialog)
 {
     m_ui->setupUi(this);
@@ -66,7 +63,7 @@ NetworkJobFailedDialog::~NetworkJobFailedDialog()
 
 void NetworkJobFailedDialog::addFailedRequest(const QUrl& url, QString error) const
 {
-    auto* item = new QTreeWidgetItem(m_ui->detailsTable, { url.toString(), std::move(error) });
+    auto* item = new QTreeWidgetItem(m_ui->detailsTable, {url.toString(), std::move(error)});
     m_ui->detailsTable->addTopLevelItem(item);
     if (m_ui->detailsTable->selectedItems().isEmpty()) {
         m_ui->detailsTable->setCurrentItem(item);

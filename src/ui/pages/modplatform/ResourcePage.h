@@ -14,31 +14,34 @@
 #include "ui/pages/modplatform/ResourceModel.h"
 #include "ui/widgets/ProgressWidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
 class BaseInstance;
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ResourceDownloadDialog;
 class ResourceModel;
 
-class ResourcePage : public QWidget, public BasePage {
+class ResourcePage : public QWidget, public BasePage
+{
     Q_OBJECT
-   public:
+public:
     using DownloadTaskPtr = shared_qobject_ptr<ResourceDownloadTask>;
     ~ResourcePage() override;
 
     auto displayName() const -> QString override = 0;
-    auto icon() const -> QIcon override = 0;
-    auto id() const -> QString override = 0;
-    auto helpPage() const -> QString override = 0;
-    bool shouldDisplay() const override = 0;
+    auto icon() const -> QIcon override          = 0;
+    auto id() const -> QString override          = 0;
+    auto helpPage() const -> QString override    = 0;
+    bool shouldDisplay() const override          = 0;
 
     virtual auto metaEntryBase() const -> QString = 0;
-    virtual auto debugName() const -> QString = 0;
+    virtual auto debugName() const -> QString     = 0;
 
     virtual QString resourcesString() const { return tr("resources"); }
 
@@ -59,18 +62,18 @@ class ResourcePage : public QWidget, public BasePage {
     auto getDialog() const -> const ResourceDownloadDialog* { return m_parentDialog; }
     auto getModel() const -> ResourceModel* { return m_model; }
 
-   protected:
+protected:
     ResourcePage(ResourceDownloadDialog* parent, BaseInstance&);
 
     void addSortings();
 
-   public slots:
+public slots:
     virtual void updateUi(const QModelIndex& index);
     virtual void updateSelectionButton();
     virtual void versionListUpdated(const QModelIndex& index);
 
-    void addResourceToDialog(ModPlatform::IndexedPack::Ptr, ModPlatform::IndexedVersion&);
-    void removeResourceFromDialog(const QString& packName);
+    void         addResourceToDialog(ModPlatform::IndexedPack::Ptr, ModPlatform::IndexedVersion&);
+    void         removeResourceFromDialog(const QString& packName);
     virtual void removeResourceFromPage(const QString& name);
     virtual void addResourceToPage(ModPlatform::IndexedPack::Ptr,
                                    ModPlatform::IndexedVersion&,
@@ -80,13 +83,13 @@ class ResourcePage : public QWidget, public BasePage {
     virtual void modelReset();
 
     QList<DownloadTaskPtr> selectedPacks() { return m_model->selectedPacks(); }
-    bool hasSelectedPacks() { return !(m_model->selectedPacks().isEmpty()); }
+    bool                   hasSelectedPacks() { return !(m_model->selectedPacks().isEmpty()); }
 
     virtual void openProject(const QVariant& projectID);
 
     void setSuppressInitialSearch(bool suppress);
 
-   protected slots:
+protected slots:
     virtual void triggerSearch() = 0;
 
     void onSelectionChanged(QModelIndex curr, QModelIndex prev);
@@ -95,16 +98,16 @@ class ResourcePage : public QWidget, public BasePage {
     void onResourceToggle(const QModelIndex& index);
 
     virtual QMap<QString, QString> urlHandlers() const = 0;
-    virtual void openUrl(const QUrl&);
+    virtual void                   openUrl(const QUrl&);
 
-   public:
+public:
     BaseInstance& m_baseInstance;
 
-   protected:
+protected:
     Ui::ResourcePage* m_ui;
 
     ResourceDownloadDialog* m_parentDialog = nullptr;
-    ResourceModel* m_model = nullptr;
+    ResourceModel*          m_model        = nullptr;
 
     int m_selectedVersionIndex = -1;
 
@@ -116,7 +119,7 @@ class ResourcePage : public QWidget, public BasePage {
 
     QSet<int> m_enableQueue;
 
-   private:
+private:
     bool m_suppressInitialSearch = false;
 };
 

@@ -74,9 +74,10 @@
 #include "meta/Index.h"
 #include "meta/VersionList.h"
 
-class IconProxy : public QIdentityProxyModel {
+class IconProxy : public QIdentityProxyModel
+{
     Q_OBJECT
-   public:
+public:
     IconProxy(QWidget* parentWidget) : QIdentityProxyModel(parentWidget)
     {
         connect(parentWidget, &QObject::destroyed, this, &IconProxy::widgetGone);
@@ -85,8 +86,8 @@ class IconProxy : public QIdentityProxyModel {
 
     virtual QVariant data(const QModelIndex& proxyIndex, int role = Qt::DisplayRole) const override
     {
-        QVariant var = QIdentityProxyModel::data(proxyIndex, role);
-        int column = proxyIndex.column();
+        QVariant var    = QIdentityProxyModel::data(proxyIndex, role);
+        int      column = proxyIndex.column();
         if (column == 0 && role == Qt::DecorationRole && m_parentWidget) {
             if (!var.isNull()) {
                 auto string = var.toString();
@@ -100,10 +101,10 @@ class IconProxy : public QIdentityProxyModel {
         }
         return var;
     }
-   private slots:
+private slots:
     void widgetGone() { m_parentWidget = nullptr; }
 
-   private:
+private:
     QWidget* m_parentWidget = nullptr;
 };
 
@@ -124,7 +125,7 @@ void VersionPage::retranslate()
 void VersionPage::openedImpl()
 {
     const auto setting_name = QString("WideBarVisibility_%1").arg(id());
-    m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+    m_wide_bar_setting      = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 }
@@ -197,23 +198,23 @@ void VersionPage::packageCurrent(const QModelIndex& current, [[maybe_unused]] co
         ui->frame->clear();
         return;
     }
-    int row = current.row();
-    auto patch = m_profile->getComponent(row);
+    int  row      = current.row();
+    auto patch    = m_profile->getComponent(row);
     auto severity = patch->getProblemSeverity();
     switch (severity) {
-        case ProblemSeverity::Warning:
-            ui->frame->setName(tr("%1 possibly has issues.").arg(patch->getName()));
-            break;
-        case ProblemSeverity::Error:
-            ui->frame->setName(tr("%1 has issues!").arg(patch->getName()));
-            break;
-        default:
-        case ProblemSeverity::None:
-            ui->frame->clear();
-            return;
+    case ProblemSeverity::Warning:
+        ui->frame->setName(tr("%1 possibly has issues.").arg(patch->getName()));
+        break;
+    case ProblemSeverity::Error:
+        ui->frame->setName(tr("%1 has issues!").arg(patch->getName()));
+        break;
+    default:
+    case ProblemSeverity::None:
+        ui->frame->clear();
+        return;
     }
 
-    auto& problems = patch->getProblems();
+    auto&   problems = patch->getProblems();
     QString problemOut;
     for (auto& problem : problems) {
         if (problem.m_severity == ProblemSeverity::Error) {
@@ -274,15 +275,18 @@ void VersionPage::on_actionRemove_triggered()
     if (!ui->packageView->currentIndex().isValid()) {
         return;
     }
-    int index = ui->packageView->currentIndex().row();
+    int  index     = ui->packageView->currentIndex().row();
     auto component = m_profile->getComponent(index);
     if (component->isCustom()) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove \"%1\".\n"
                                                         "This is permanent and will completely remove the custom component.\n\n"
                                                         "Are you sure?")
                                                          .arg(component->getName()),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes)
@@ -299,8 +303,11 @@ void VersionPage::on_actionRemove_triggered()
 
 void VersionPage::on_actionAdd_to_Minecraft_jar_triggered()
 {
-    auto list = GuiUtil::BrowseForFiles("jarmod", tr("Select jar mods"), tr("Minecraft.jar mods") + " (*.zip *.jar)",
-                                        APPLICATION->settings()->get("CentralModsDir").toString(), this->parentWidget());
+    auto list = GuiUtil::BrowseForFiles("jarmod",
+                                        tr("Select jar mods"),
+                                        tr("Minecraft.jar mods") + " (*.zip *.jar)",
+                                        APPLICATION->settings()->get("CentralModsDir").toString(),
+                                        this->parentWidget());
     if (!list.empty()) {
         m_profile->installJarMods(list);
     }
@@ -309,8 +316,11 @@ void VersionPage::on_actionAdd_to_Minecraft_jar_triggered()
 
 void VersionPage::on_actionReplace_Minecraft_jar_triggered()
 {
-    auto jarPath = GuiUtil::BrowseForFile("jar", tr("Select jar"), tr("Minecraft.jar replacement") + " (*.jar)",
-                                          APPLICATION->settings()->get("CentralModsDir").toString(), this->parentWidget());
+    auto jarPath = GuiUtil::BrowseForFile("jar",
+                                          tr("Select jar"),
+                                          tr("Minecraft.jar replacement") + " (*.jar)",
+                                          APPLICATION->settings()->get("CentralModsDir").toString(),
+                                          this->parentWidget());
     if (!jarPath.isEmpty()) {
         m_profile->installCustomJar(jarPath);
     }
@@ -319,13 +329,16 @@ void VersionPage::on_actionReplace_Minecraft_jar_triggered()
 
 void VersionPage::on_actionImport_Components_triggered()
 {
-    QStringList list = GuiUtil::BrowseForFiles("component", tr("Select components"), tr("Components") + " (*.json)",
-                                               APPLICATION->settings()->get("CentralModsDir").toString(), this->parentWidget());
+    QStringList list = GuiUtil::BrowseForFiles("component",
+                                               tr("Select components"),
+                                               tr("Components") + " (*.json)",
+                                               APPLICATION->settings()->get("CentralModsDir").toString(),
+                                               this->parentWidget());
 
     if (!list.isEmpty()) {
         if (!m_profile->installComponents(list)) {
-            QMessageBox::warning(this, tr("Failed to import components"),
-                                 tr("Some components could not be imported. Check logs for details"));
+            QMessageBox::warning(
+                this, tr("Failed to import components"), tr("Some components could not be imported. Check logs for details"));
         }
     }
 
@@ -334,8 +347,11 @@ void VersionPage::on_actionImport_Components_triggered()
 
 void VersionPage::on_actionAdd_Agents_triggered()
 {
-    QStringList list = GuiUtil::BrowseForFiles("agent", tr("Select agents"), tr("Java agents") + " (*.jar)",
-                                               APPLICATION->settings()->get("CentralModsDir").toString(), this->parentWidget());
+    QStringList list = GuiUtil::BrowseForFiles("agent",
+                                               tr("Select agents"),
+                                               tr("Java agents") + " (*.jar)",
+                                               APPLICATION->settings()->get("CentralModsDir").toString(),
+                                               this->parentWidget());
 
     if (!list.isEmpty())
         m_profile->installAgents(list);
@@ -370,8 +386,8 @@ void VersionPage::on_actionChange_version_triggered()
         return;
     }
     auto patch = m_profile->getComponent(versionRow);
-    auto name = patch->getName();
-    auto list = patch->getVersionList();
+    auto name  = patch->getName();
+    auto list  = patch->getVersionList();
     list->clearExternalRecommends();
     if (!list) {
         return;
@@ -380,12 +396,13 @@ void VersionPage::on_actionChange_version_triggered()
 
     if (uid == "org.lwjgl" || uid == "org.lwjgl3") {
         auto minecraft = m_profile->getComponent("net.minecraft");
-        auto lwjglReq = std::find_if(minecraft->m_cachedRequires.cbegin(), minecraft->m_cachedRequires.cend(),
+        auto lwjglReq  = std::find_if(minecraft->m_cachedRequires.cbegin(),
+                                     minecraft->m_cachedRequires.cend(),
                                      [uid](const Meta::Require& req) -> bool { return req.uid == uid; });
         if (lwjglReq != minecraft->m_cachedRequires.cend()) {
             auto lwjglVersion = !lwjglReq->equalsVersion.isEmpty() ? lwjglReq->equalsVersion : lwjglReq->suggests;
             if (!lwjglVersion.isEmpty()) {
-                list->addExternalRecommends({ lwjglVersion });
+                list->addExternalRecommends({lwjglVersion});
             }
         }
     }
@@ -422,7 +439,8 @@ void VersionPage::on_actionChange_version_triggered()
 void VersionPage::on_actionDownload_All_triggered()
 {
     if (!APPLICATION->accounts()->anyAccountIsValid()) {
-        CustomMessageBox::selectable(this, tr("Error"),
+        CustomMessageBox::selectable(this,
+                                     tr("Error"),
                                      tr("Cannot download Minecraft or update instances unless you have at least "
                                         "one account added.\nPlease add a Microsoft account."),
                                      QMessageBox::Warning)
@@ -456,7 +474,7 @@ void VersionPage::on_actionInstall_Loader_triggered()
 void VersionPage::on_actionAdd_Empty_triggered()
 {
     NewComponentDialog compdialog(QString(), QString(), this);
-    QStringList blacklist;
+    QStringList        blacklist;
     for (int i = 0; i < m_profile->rowCount(); i++) {
         auto comp = m_profile->getComponent(i);
         blacklist.push_back(comp->getID());
@@ -533,8 +551,7 @@ void VersionPage::on_actionCustomize_triggered()
     if (!patch->getVersionFile()) {
         return;
     }
-    if (!m_profile->customize(version)) {
-    }
+    if (!m_profile->customize(version)) {}
     updateButtons();
     preselect(currentIdx);
 }
@@ -561,19 +578,21 @@ void VersionPage::on_actionRevert_triggered()
     }
     auto component = m_profile->getComponent(version);
 
-    auto response = CustomMessageBox::selectable(this, tr("Confirm Reversion"),
+    auto response = CustomMessageBox::selectable(this,
+                                                 tr("Confirm Reversion"),
                                                  tr("You are about to revert \"%1\".\n"
                                                     "This is permanent and will completely revert your customizations.\n\n"
                                                     "Are you sure?")
                                                      .arg(component->getName()),
-                                                 QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                 QMessageBox::Warning,
+                                                 QMessageBox::Yes | QMessageBox::No,
+                                                 QMessageBox::No)
                         ->exec();
 
     if (response != QMessageBox::Yes)
         return;
 
-    if (!m_profile->revertToBase(version)) {
-    }
+    if (!m_profile->revertToBase(version)) {}
     updateButtons();
     preselect(currentIdx);
     m_container->refreshContainer();

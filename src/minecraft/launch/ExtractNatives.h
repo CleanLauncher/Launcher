@@ -17,9 +17,10 @@
 
 #include <launch/LaunchStep.h>
 
-class ExtractNatives : public LaunchStep {
+class ExtractNatives : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit ExtractNatives(LaunchTask* parent) : LaunchStep(parent) {};
     virtual ~ExtractNatives() {};
 

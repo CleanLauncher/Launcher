@@ -51,7 +51,8 @@
 #include "modplatform/legacy_ftb/PackInstallTask.h"
 #include "modplatform/legacy_ftb/PrivatePackManager.h"
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
 Page::Page(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog(dialog), ui(new Ui::Page)
 {
@@ -62,7 +63,7 @@ Page::Page(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog
 
     {
         publicFilterModel = new FilterModel(this);
-        publicListModel = new ListModel(this);
+        publicListModel   = new ListModel(this);
         publicFilterModel->setSourceModel(publicListModel);
 
         ui->publicPackList->setModel(publicFilterModel);
@@ -80,7 +81,7 @@ Page::Page(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog
 
     {
         thirdPartyFilterModel = new FilterModel(this);
-        thirdPartyModel = new ListModel(this);
+        thirdPartyModel       = new ListModel(this);
         thirdPartyFilterModel->setSourceModel(thirdPartyModel);
 
         ui->thirdPartyPackList->setModel(thirdPartyFilterModel);
@@ -94,7 +95,7 @@ Page::Page(NewInstanceDialog* dialog, QWidget* parent) : QWidget(parent), dialog
 
     {
         privateFilterModel = new FilterModel(this);
-        privateListModel = new ListModel(this);
+        privateListModel   = new ListModel(this);
         privateFilterModel->setSourceModel(privateListModel);
 
         ui->privatePackList->setModel(privateFilterModel);
@@ -219,8 +220,8 @@ void Page::ftbPrivatePackDataDownloadSuccessfully(const Modpack& pack)
 
 void Page::ftbPrivatePackDataDownloadFailed([[maybe_unused]] QString reason, QString packCode)
 {
-    auto reply = QMessageBox::question(this, tr("FTB private packs"),
-                                       tr("Failed to download pack information for code %1.\nShould it be removed now?").arg(packCode));
+    auto reply = QMessageBox::question(
+        this, tr("FTB private packs"), tr("Failed to download pack information for code %1.\nShould it be removed now?").arg(packCode));
     if (reply == QMessageBox::Yes) {
         ftbPrivatePacks->remove(packCode);
     }
@@ -315,16 +316,16 @@ void Page::onSortingSelectionChanged(QString sort)
 void Page::onTabChanged(int tab)
 {
     if (tab == 1) {
-        currentModel = thirdPartyFilterModel;
-        currentList = ui->thirdPartyPackList;
+        currentModel       = thirdPartyFilterModel;
+        currentList        = ui->thirdPartyPackList;
         currentModpackInfo = ui->thirdPartyPackDescription;
     } else if (tab == 2) {
-        currentModel = privateFilterModel;
-        currentList = ui->privatePackList;
+        currentModel       = privateFilterModel;
+        currentList        = ui->privatePackList;
         currentModpackInfo = ui->privatePackDescription;
     } else {
-        currentModel = publicFilterModel;
-        currentList = ui->publicPackList;
+        currentModel       = publicFilterModel;
+        currentList        = ui->publicPackList;
         currentModpackInfo = ui->publicPackDescription;
     }
 
@@ -344,11 +345,11 @@ void Page::onTabChanged(int tab)
 
 void Page::onAddPackClicked()
 {
-    bool ok;
+    bool    ok;
     QString text = QInputDialog::getText(this, tr("Add FTB pack"), tr("Enter pack code:"), QLineEdit::Normal, QString(), &ok);
     if (ok && !text.isEmpty()) {
         ftbPrivatePacks->add(text);
-        ftbFetchTask->fetchPrivate({ text });
+        ftbFetchTask->fetchPrivate({text});
     }
 }
 
@@ -358,10 +359,10 @@ void Page::onRemovePackClicked()
     if (!index.isValid()) {
         return;
     }
-    auto row = index.row();
-    Modpack pack = privateListModel->at(row);
-    auto answer = QMessageBox::question(this, tr("Remove pack"), tr("Are you sure you want to remove pack %1?").arg(pack.name),
-                                        QMessageBox::Yes | QMessageBox::No);
+    auto    row    = index.row();
+    Modpack pack   = privateListModel->at(row);
+    auto    answer = QMessageBox::question(
+        this, tr("Remove pack"), tr("Are you sure you want to remove pack %1?").arg(pack.name), QMessageBox::Yes | QMessageBox::No);
     if (answer != QMessageBox::Yes) {
         return;
     }

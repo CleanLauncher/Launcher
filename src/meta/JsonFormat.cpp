@@ -24,7 +24,8 @@
 
 using namespace Json;
 
-namespace Meta {
+namespace Meta
+{
 
 MetadataVersion currentFormatVersion()
 {
@@ -34,7 +35,7 @@ MetadataVersion currentFormatVersion()
 static std::shared_ptr<Index> parseIndexInternal(const QJsonObject& obj)
 {
     const QList<QJsonObject> objects = requireIsArrayOf<QJsonObject>(obj, "packages");
-    QList<VersionList::Ptr> lists;
+    QList<VersionList::Ptr>  lists;
     lists.reserve(objects.size());
     std::transform(objects.begin(), objects.end(), std::back_inserter(lists), [](const QJsonObject& obj) {
         VersionList::Ptr list = std::make_shared<VersionList>(requireString(obj, "uid"));
@@ -76,7 +77,7 @@ static VersionList::Ptr parseVersionListInternal(const QJsonObject& obj)
     const QString uid = requireString(obj, "uid");
 
     const QList<QJsonObject> versionsRaw = requireIsArrayOf<QJsonObject>(obj, "versions");
-    QList<Version::Ptr> versions;
+    QList<Version::Ptr>      versions;
     versions.reserve(versionsRaw.size());
     std::transform(versionsRaw.begin(), versionsRaw.end(), std::back_inserter(versions), [uid](const QJsonObject& vObj) {
         auto version = parseCommonVersion(uid, vObj);
@@ -102,11 +103,11 @@ MetadataVersion parseFormatVersion(const QJsonObject& obj, bool required)
         return MetadataVersion::Invalid;
     }
     switch (obj.value("formatVersion").toInt()) {
-        case 0:
-        case 1:
-            return MetadataVersion::InitialRelease;
-        default:
-            return MetadataVersion::Invalid;
+    case 0:
+    case 1:
+        return MetadataVersion::InitialRelease;
+    default:
+        return MetadataVersion::Invalid;
     }
 }
 
@@ -122,11 +123,11 @@ void parseIndex(const QJsonObject& obj, Index* ptr)
 {
     const MetadataVersion version = parseFormatVersion(obj);
     switch (version) {
-        case MetadataVersion::InitialRelease:
-            ptr->merge(parseIndexInternal(obj));
-            break;
-        case MetadataVersion::Invalid:
-            throw ParseException(QObject::tr("Unknown format version!"));
+    case MetadataVersion::InitialRelease:
+        ptr->merge(parseIndexInternal(obj));
+        break;
+    case MetadataVersion::Invalid:
+        throw ParseException(QObject::tr("Unknown format version!"));
     }
 }
 
@@ -134,11 +135,11 @@ void parseVersionList(const QJsonObject& obj, VersionList* ptr)
 {
     const MetadataVersion version = parseFormatVersion(obj);
     switch (version) {
-        case MetadataVersion::InitialRelease:
-            ptr->merge(parseVersionListInternal(obj));
-            break;
-        case MetadataVersion::Invalid:
-            throw ParseException(QObject::tr("Unknown format version!"));
+    case MetadataVersion::InitialRelease:
+        ptr->merge(parseVersionListInternal(obj));
+        break;
+    case MetadataVersion::Invalid:
+        throw ParseException(QObject::tr("Unknown format version!"));
     }
 }
 
@@ -146,11 +147,11 @@ void parseVersion(const QJsonObject& obj, Version* ptr)
 {
     const MetadataVersion version = parseFormatVersion(obj);
     switch (version) {
-        case MetadataVersion::InitialRelease:
-            ptr->merge(parseVersionInternal(obj));
-            break;
-        case MetadataVersion::Invalid:
-            throw ParseException(QObject::tr("Unknown format version!"));
+    case MetadataVersion::InitialRelease:
+        ptr->merge(parseVersionInternal(obj));
+        break;
+    case MetadataVersion::Invalid:
+        throw ParseException(QObject::tr("Unknown format version!"));
     }
 }
 
@@ -158,13 +159,13 @@ void parseRequires(const QJsonObject& obj, RequireSet* ptr, const char* keyName)
 {
     if (obj.contains(keyName)) {
         auto reqArray = requireArray(obj, keyName);
-        auto iter = reqArray.begin();
+        auto iter     = reqArray.begin();
         while (iter != reqArray.end()) {
             auto reqObject = requireObject(*iter);
-            auto uid = requireString(reqObject, "uid");
-            auto equals = reqObject["equals"].toString();
-            auto suggests = reqObject["suggests"].toString();
-            ptr->insert({ uid, equals, suggests });
+            auto uid       = requireString(reqObject, "uid");
+            auto equals    = reqObject["equals"].toString();
+            auto suggests  = reqObject["suggests"].toString();
+            ptr->insert({uid, equals, suggests});
             iter++;
         }
     }

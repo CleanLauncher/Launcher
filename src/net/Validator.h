@@ -36,16 +36,18 @@
 
 #include <QNetworkReply>
 
-namespace Net {
-class Validator {
-   public:
+namespace Net
+{
+class Validator
+{
+public:
     Validator() {}
     virtual ~Validator() {}
 
-   public:
+public:
     virtual bool init(QNetworkRequest& request) = 0;
-    virtual bool write(QByteArray& data) = 0;
-    virtual bool abort() = 0;
+    virtual bool write(QByteArray& data)        = 0;
+    virtual bool abort()                        = 0;
     virtual bool validate(QNetworkReply& reply) = 0;
 };
 }  // namespace Net

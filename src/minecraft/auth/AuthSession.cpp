@@ -14,17 +14,17 @@ QString AuthSession::serializeUserProperties()
 
 bool AuthSession::MakeOffline(QString offline_playername)
 {
-    session = "-";
+    session      = "-";
     access_token = "0";
-    player_name = offline_playername;
+    player_name  = offline_playername;
     return true;
 }
 
 void AuthSession::MakeDemo(QString name, QString u)
 {
-    uuid = u;
-    session = "-";
+    uuid         = u;
+    session      = "-";
     access_token = "0";
-    player_name = name;
-    launchMode = LaunchMode::Demo;
+    player_name  = name;
+    launchMode   = LaunchMode::Demo;
 };

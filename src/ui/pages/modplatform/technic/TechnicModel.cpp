@@ -59,40 +59,40 @@ QVariant Technic::ListModel::data(const QModelIndex& index, int role) const
 
     Modpack pack = modpacks.at(pos);
     switch (role) {
-        case Qt::ToolTipRole: {
-            if (pack.description.length() > 100) {
-                QString edit = pack.description.left(97);
-                edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
-                return edit;
-            }
-            return pack.description;
+    case Qt::ToolTipRole: {
+        if (pack.description.length() > 100) {
+            QString edit = pack.description.left(97);
+            edit         = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
+            return edit;
         }
-        case Qt::DecorationRole: {
-            if (m_logoMap.contains(pack.logoName)) {
-                return (m_logoMap.value(pack.logoName));
-            }
-            QIcon icon = QIcon::fromTheme("screenshot-placeholder");
-            ((ListModel*)this)->requestLogo(pack.logoName, pack.logoUrl);
-            return icon;
+        return pack.description;
+    }
+    case Qt::DecorationRole: {
+        if (m_logoMap.contains(pack.logoName)) {
+            return (m_logoMap.value(pack.logoName));
         }
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
-        }
-        case Qt::DisplayRole:
-            return pack.name;
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
+        QIcon icon = QIcon::fromTheme("screenshot-placeholder");
+        ((ListModel*)this)->requestLogo(pack.logoName, pack.logoUrl);
+        return icon;
+    }
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
+    case Qt::DisplayRole:
+        return pack.name;
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
 
-        case UserDataTypes::TITLE:
-            return pack.name;
-        case UserDataTypes::DESCRIPTION:
-            return pack.description;
-        case UserDataTypes::INSTALLED:
-            return false;
-        default:
-            break;
+    case UserDataTypes::TITLE:
+        return pack.name;
+    case UserDataTypes::DESCRIPTION:
+        return pack.description;
+    case UserDataTypes::INSTALLED:
+        return false;
+    default:
+        break;
     }
 
     return {};
@@ -133,16 +133,16 @@ void Technic::ListModel::performSearch()
     if (hasActiveSearchJob())
         return;
 
-    auto netJob = makeShared<NetJob>("Technic::Search", APPLICATION->network());
+    auto    netJob    = makeShared<NetJob>("Technic::Search", APPLICATION->network());
     QString searchUrl = "";
     if (currentSearchTerm.isEmpty()) {
-        searchUrl = QString("%1trending?build=%2").arg(BuildConfig.TECHNIC_API_BASE_URL, BuildConfig.TECHNIC_API_BUILD);
+        searchUrl  = QString("%1trending?build=%2").arg(BuildConfig.TECHNIC_API_BASE_URL, BuildConfig.TECHNIC_API_BUILD);
         searchMode = List;
     } else if (currentSearchTerm.startsWith("http://api.technicpack.net/modpack/")) {
-        searchUrl = QString("https://%1?build=%2").arg(currentSearchTerm.mid(7), BuildConfig.TECHNIC_API_BUILD);
+        searchUrl  = QString("https://%1?build=%2").arg(currentSearchTerm.mid(7), BuildConfig.TECHNIC_API_BUILD);
         searchMode = Single;
     } else if (currentSearchTerm.startsWith("https://api.technicpack.net/modpack/")) {
-        searchUrl = QString("%1?build=%2").arg(currentSearchTerm, BuildConfig.TECHNIC_API_BUILD);
+        searchUrl  = QString("%1?build=%2").arg(currentSearchTerm, BuildConfig.TECHNIC_API_BUILD);
         searchMode = Single;
     } else if (currentSearchTerm.startsWith("#")) {
         searchUrl = QString("https://api.technicpack.net/modpack/%1?build=%2").arg(currentSearchTerm.mid(1), BuildConfig.TECHNIC_API_BUILD);
@@ -170,7 +170,7 @@ void Technic::ListModel::searchRequestFinished(QByteArray* responsePtr)
     jobPtr.reset();
 
     QJsonParseError parse_error;
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from Technic at" << parse_error.offset << "reason:" << parse_error.errorString();
         qWarning() << response;
@@ -182,53 +182,53 @@ void Technic::ListModel::searchRequestFinished(QByteArray* responsePtr)
         auto root = Json::requireObject(doc);
 
         switch (searchMode) {
-            case List: {
-                auto objs = Json::requireArray(root, "modpacks");
-                for (auto technicPack : objs) {
-                    Modpack pack;
-                    auto technicPackObject = Json::requireObject(technicPack);
-                    pack.name = Json::requireString(technicPackObject, "name");
-                    pack.slug = Json::requireString(technicPackObject, "slug");
-                    if (pack.slug == "vanilla")
-                        continue;
-
-                    auto rawURL = technicPackObject["iconUrl"].toString("null");
-                    if (rawURL == "null") {
-                        pack.logoUrl = "null";
-                        pack.logoName = "null";
-                    } else {
-                        pack.logoUrl = rawURL;
-                        pack.logoName = pack.slug + "." + QFileInfo(QUrl(rawURL).fileName()).suffix();
-                    }
-                    pack.broken = false;
-                    newList.append(pack);
-                }
-                break;
-            }
-            case Single: {
-                if (root.contains("error")) {
-                    break;
-                }
-
+        case List: {
+            auto objs = Json::requireArray(root, "modpacks");
+            for (auto technicPack : objs) {
                 Modpack pack;
-                pack.name = Json::requireString(root, "displayName");
-                pack.slug = Json::requireString(root, "name");
+                auto    technicPackObject = Json::requireObject(technicPack);
+                pack.name                 = Json::requireString(technicPackObject, "name");
+                pack.slug                 = Json::requireString(technicPackObject, "slug");
+                if (pack.slug == "vanilla")
+                    continue;
 
-                if (root.contains("icon")) {
-                    auto iconObj = Json::requireObject(root, "icon");
-                    auto iconUrl = Json::requireString(iconObj, "url");
-
-                    pack.logoUrl = iconUrl;
-                    pack.logoName = pack.slug + "." + QFileInfo(QUrl(iconUrl).fileName()).suffix();
-                } else {
-                    pack.logoUrl = "null";
+                auto rawURL = technicPackObject["iconUrl"].toString("null");
+                if (rawURL == "null") {
+                    pack.logoUrl  = "null";
                     pack.logoName = "null";
+                } else {
+                    pack.logoUrl  = rawURL;
+                    pack.logoName = pack.slug + "." + QFileInfo(QUrl(rawURL).fileName()).suffix();
                 }
-
                 pack.broken = false;
                 newList.append(pack);
+            }
+            break;
+        }
+        case Single: {
+            if (root.contains("error")) {
                 break;
             }
+
+            Modpack pack;
+            pack.name = Json::requireString(root, "displayName");
+            pack.slug = Json::requireString(root, "name");
+
+            if (root.contains("icon")) {
+                auto iconObj = Json::requireObject(root, "icon");
+                auto iconUrl = Json::requireString(iconObj, "url");
+
+                pack.logoUrl  = iconUrl;
+                pack.logoName = pack.slug + "." + QFileInfo(QUrl(iconUrl).fileName()).suffix();
+            } else {
+                pack.logoUrl  = "null";
+                pack.logoName = "null";
+            }
+
+            pack.broken = false;
+            newList.append(pack);
+            break;
+        }
         }
     } catch (const JSONValidationError& err) {
         qCritical() << "Couldn't parse technic search results:" << err.cause();
@@ -274,7 +274,7 @@ void Technic::ListModel::logoLoaded(QString logo, QString out)
     m_logoMap.insert(logo, QIcon(out));
     for (int i = 0; i < modpacks.size(); i++) {
         if (modpacks[i].logoName == logo) {
-            emit dataChanged(createIndex(i, 0), createIndex(i, 0), { Qt::DecorationRole });
+            emit dataChanged(createIndex(i, 0), createIndex(i, 0), {Qt::DecorationRole});
         }
     }
 }
@@ -292,7 +292,7 @@ void Technic::ListModel::requestLogo(QString logo, QString url)
     }
 
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("TechnicPacks", QString("logos/%1").arg(logo));
-    auto job = new NetJob(QString("Technic Icon Download %1").arg(logo), APPLICATION->network());
+    auto         job   = new NetJob(QString("Technic Icon Download %1").arg(logo), APPLICATION->network());
     job->setAskRetry(false);
     job->addNetAction(Net::ApiDownload::makeCached(QUrl(url), entry));
 

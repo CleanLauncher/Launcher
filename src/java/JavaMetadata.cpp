@@ -25,7 +25,8 @@
 #include "java/JavaVersion.h"
 #include "minecraft/ParseUtils.h"
 
-namespace Java {
+namespace Java
+{
 
 DownloadType parseDownloadType(QString javaDownload)
 {
@@ -39,12 +40,12 @@ DownloadType parseDownloadType(QString javaDownload)
 QString downloadTypeToString(DownloadType javaDownload)
 {
     switch (javaDownload) {
-        case DownloadType::Manifest:
-            return "manifest";
-        case DownloadType::Archive:
-            return "archive";
-        case DownloadType::Unknown:
-            break;
+    case DownloadType::Manifest:
+        return "manifest";
+    case DownloadType::Archive:
+        return "archive";
+    case DownloadType::Unknown:
+        break;
     }
     return "unknown";
 }
@@ -52,27 +53,27 @@ MetadataPtr parseJavaMeta(const QJsonObject& in)
 {
     auto meta = std::make_shared<Metadata>();
 
-    meta->m_name = in["name"].toString("");
-    meta->vendor = in["vendor"].toString("");
-    meta->url = in["url"].toString("");
-    meta->releaseTime = timeFromS3Time(in["releaseTime"].toString(""));
+    meta->m_name       = in["name"].toString("");
+    meta->vendor       = in["vendor"].toString("");
+    meta->url          = in["url"].toString("");
+    meta->releaseTime  = timeFromS3Time(in["releaseTime"].toString(""));
     meta->downloadType = parseDownloadType(in["downloadType"].toString(""));
-    meta->packageType = in["packageType"].toString("");
-    meta->runtimeOS = in["runtimeOS"].toString("unknown");
+    meta->packageType  = in["packageType"].toString("");
+    meta->runtimeOS    = in["runtimeOS"].toString("unknown");
 
     if (in.contains("checksum")) {
-        auto obj = Json::requireObject(in, "checksum");
+        auto obj           = Json::requireObject(in, "checksum");
         meta->checksumHash = obj["hash"].toString("");
         meta->checksumType = obj["type"].toString("");
     }
 
     if (in.contains("version")) {
-        auto obj = Json::requireObject(in, "version");
-        auto name = obj["name"].toString("");
-        auto major = obj["major"].toInteger();
-        auto minor = obj["minor"].toInteger();
+        auto obj      = Json::requireObject(in, "version");
+        auto name     = obj["name"].toString("");
+        auto major    = obj["major"].toInteger();
+        auto minor    = obj["minor"].toInteger();
         auto security = obj["security"].toInteger();
-        auto build = obj["build"].toInteger();
+        auto build    = obj["build"].toInteger();
         meta->version = JavaVersion(major, minor, security, build, name);
     }
     return meta;

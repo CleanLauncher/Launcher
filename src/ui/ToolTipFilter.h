@@ -21,8 +21,9 @@
 #include <QEvent>
 #include <QObject>
 
-class ToolTipFilter : public QObject {
+class ToolTipFilter : public QObject
+{
     Q_OBJECT
-   protected:
+protected:
     bool eventFilter(QObject* obj, QEvent* event);
 };

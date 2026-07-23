@@ -27,16 +27,17 @@
 #include <minecraft/mod/DataPack.h>
 #include <minecraft/mod/tasks/LocalDataPackParseTask.h>
 
-class DataPackParseTest : public QObject {
+class DataPackParseTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
     void test_parseZIP()
     {
         QString source = QFINDTESTDATA("testdata/DataPackParse");
 
-        QString zip_dp = FS::PathCombine(source, "test_data_pack_boogaloo.zip");
-        DataPack pack{ QFileInfo(zip_dp) };
+        QString  zip_dp = FS::PathCombine(source, "test_data_pack_boogaloo.zip");
+        DataPack pack{QFileInfo(zip_dp)};
 
         bool valid = DataPackUtils::processZIP(&pack);
 
@@ -49,8 +50,8 @@ class DataPackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/DataPackParse");
 
-        QString folder_dp = FS::PathCombine(source, "test_folder");
-        DataPack pack{ QFileInfo(folder_dp) };
+        QString  folder_dp = FS::PathCombine(source, "test_folder");
+        DataPack pack{QFileInfo(folder_dp)};
 
         bool valid = DataPackUtils::processFolder(&pack);
 
@@ -63,8 +64,8 @@ class DataPackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/DataPackParse");
 
-        QString folder_dp = FS::PathCombine(source, "another_test_folder");
-        DataPack pack{ QFileInfo(folder_dp) };
+        QString  folder_dp = FS::PathCombine(source, "another_test_folder");
+        DataPack pack{QFileInfo(folder_dp)};
 
         bool valid = DataPackUtils::process(&pack);
 

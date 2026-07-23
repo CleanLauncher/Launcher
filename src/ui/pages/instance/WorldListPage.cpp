@@ -40,7 +40,6 @@
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui_WorldListPage.h"
 
-#include <ui/widgets/PageContainer.h>
 #include <QClipboard>
 #include <QDialogButtonBox>
 #include <QEvent>
@@ -52,6 +51,7 @@
 #include <QSortFilterProxyModel>
 #include <QTreeView>
 #include <Qt>
+#include <ui/widgets/PageContainer.h>
 
 #include "FileSystem.h"
 #include "tools/MCEditTool.h"
@@ -62,10 +62,11 @@
 #include "Application.h"
 #include "DataPackPage.h"
 
-class WorldListProxyModel : public QSortFilterProxyModel {
+class WorldListProxyModel : public QSortFilterProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     WorldListProxyModel(QObject* parent) : QSortFilterProxyModel(parent) {}
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
@@ -73,8 +74,8 @@ class WorldListProxyModel : public QSortFilterProxyModel {
         QModelIndex sourceIndex = mapToSource(index);
 
         if (index.column() == 0 && role == Qt::DecorationRole) {
-            WorldList* worlds = qobject_cast<WorldList*>(sourceModel());
-            auto iconFile = worlds->data(sourceIndex, WorldList::IconFileRole).toString();
+            WorldList* worlds   = qobject_cast<WorldList*>(sourceModel());
+            auto       iconFile = worlds->data(sourceIndex, WorldList::IconFileRole).toString();
             if (iconFile.isNull()) {
                 return QIcon::fromTheme("unknown_server");
             }
@@ -121,7 +122,7 @@ void WorldListPage::openedImpl()
     }
 
     const auto setting_name = QString("WideBarVisibility_%1").arg(id());
-    m_wide_bar_setting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+    m_wide_bar_setting      = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
     ui->toolBar->setVisibilityState(QByteArray::fromBase64(m_wide_bar_setting->get().toString().toUtf8()));
 }
@@ -190,12 +191,15 @@ void WorldListPage::on_actionRemove_triggered()
     if (!proxiedIndex.isValid())
         return;
 
-    auto result = CustomMessageBox::selectable(this, tr("Confirm Deletion"),
+    auto result = CustomMessageBox::selectable(this,
+                                               tr("Confirm Deletion"),
                                                tr("You are about to delete \"%1\".\n"
                                                   "The world may be gone forever (A LONG TIME).\n\n"
                                                   "Are you sure?")
                                                    .arg(m_worlds->allWorlds().at(proxiedIndex.row()).name()),
-                                               QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                               QMessageBox::Warning,
+                                               QMessageBox::Yes | QMessageBox::No,
+                                               QMessageBox::No)
                       ->exec();
 
     if (result != QMessageBox::Yes) {
@@ -223,7 +227,7 @@ void WorldListPage::on_actionData_Packs_triggered()
         return;
 
     const QString fullPath = m_worlds->data(index, WorldList::FolderRole).toString();
-    const QString folder = FS::PathCombine(fullPath, "datapacks");
+    const QString folder   = FS::PathCombine(fullPath, "datapacks");
 
     auto dialog = new QDialog(this);
     dialog->setWindowTitle(tr("Data packs for %1").arg(m_worlds->data(index, WorldList::NameRole).toString()));
@@ -260,8 +264,9 @@ void WorldListPage::on_actionData_Packs_triggered()
 
     dialog->setAttribute(Qt::WA_DeleteOnClose);
 
-    connect(dialog, &QDialog::finished, this,
-            [dialog]() { APPLICATION->settings()->set("DataPackDownloadGeometry", dialog->saveGeometry().toBase64()); });
+    connect(dialog, &QDialog::finished, this, [dialog]() {
+        APPLICATION->settings()->set("DataPackDownloadGeometry", dialog->saveGeometry().toBase64());
+    });
 
     dialog->open();
 }
@@ -320,48 +325,49 @@ void WorldListPage::on_actionMCEdit_triggered()
     auto program = mcedit->getProgramPath();
     if (program.size()) {
 #ifdef Q_OS_WIN32
-        if (!QProcess::startDetached(program, { fullPath }, mceditPath)) {
+        if (!QProcess::startDetached(program, {fullPath}, mceditPath)) {
             mceditError();
         }
 #else
         m_mceditProcess.reset(new LoggedProcess());
         m_mceditProcess->setDetachable(true);
         connect(m_mceditProcess.get(), &LoggedProcess::stateChanged, this, &WorldListPage::mceditState);
-        m_mceditProcess->start(program, { fullPath });
+        m_mceditProcess->start(program, {fullPath});
         m_mceditProcess->setWorkingDirectory(mceditPath);
         m_mceditStarting = true;
 #endif
     } else {
-        QMessageBox::warning(this->parentWidget(), tr("No MCEdit found or set up!"),
+        QMessageBox::warning(this->parentWidget(),
+                             tr("No MCEdit found or set up!"),
                              tr("You do not have MCEdit set up or it was moved.\nYou can set it up in the global settings."));
     }
 }
 
 void WorldListPage::mceditError()
 {
-    QMessageBox::warning(this->parentWidget(), tr("MCEdit failed to start!"),
-                         tr("MCEdit failed to start.\nIt may be necessary to reinstall it."));
+    QMessageBox::warning(
+        this->parentWidget(), tr("MCEdit failed to start!"), tr("MCEdit failed to start.\nIt may be necessary to reinstall it."));
 }
 
 void WorldListPage::mceditState(LoggedProcess::State state)
 {
     bool failed = false;
     switch (state) {
-        case LoggedProcess::NotRunning:
-        case LoggedProcess::Starting:
-            return;
-        case LoggedProcess::FailedToStart:
-        case LoggedProcess::Crashed:
-        case LoggedProcess::Aborted: {
-            failed = true;
-            [[fallthrough]];
-        }
+    case LoggedProcess::NotRunning:
+    case LoggedProcess::Starting:
+        return;
+    case LoggedProcess::FailedToStart:
+    case LoggedProcess::Crashed:
+    case LoggedProcess::Aborted: {
+        failed = true;
+        [[fallthrough]];
+    }
 
-        case LoggedProcess::Running:
-        case LoggedProcess::Finished: {
-            m_mceditStarting = false;
-            break;
-        }
+    case LoggedProcess::Running:
+    case LoggedProcess::Finished: {
+        m_mceditStarting = false;
+        break;
+    }
     }
     if (failed) {
         mceditError();
@@ -370,8 +376,8 @@ void WorldListPage::mceditState(LoggedProcess::State state)
 
 void WorldListPage::worldChanged([[maybe_unused]] const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    QModelIndex index = getSelectedWorld();
-    bool enable = index.isValid();
+    QModelIndex index  = getSelectedWorld();
+    bool        enable = index.isValid();
     ui->actionCopy_Seed->setEnabled(enable);
     ui->actionMCEdit->setEnabled(enable);
     ui->actionRemove->setEnabled(enable);
@@ -391,8 +397,8 @@ void WorldListPage::worldChanged([[maybe_unused]] const QModelIndex& current, [[
 
 void WorldListPage::on_actionAdd_triggered()
 {
-    auto list = GuiUtil::BrowseForFiles(displayName(), tr("Select a Minecraft world zip"), tr("Minecraft World Zip File") + " (*.zip)",
-                                        QString(), this->parentWidget());
+    auto list = GuiUtil::BrowseForFiles(
+        displayName(), tr("Select a Minecraft world zip"), tr("Minecraft World Zip File") + " (*.zip)", QString(), this->parentWidget());
     if (!list.empty()) {
         m_worlds->stopWatching();
         for (auto filename : list) {
@@ -429,9 +435,9 @@ void WorldListPage::on_actionCopy_triggered()
     if (!worldSafetyNagQuestion(tr("Copy World")))
         return;
 
-    auto worldVariant = m_worlds->data(index, WorldList::ObjectRole);
-    auto world = (World*)worldVariant.value<void*>();
-    bool ok = false;
+    auto    worldVariant = m_worlds->data(index, WorldList::ObjectRole);
+    auto    world        = (World*)worldVariant.value<void*>();
+    bool    ok           = false;
     QString name =
         QInputDialog::getText(this, tr("World name"), tr("Enter a new name for the copy."), QLineEdit::Normal, world->name(), &ok);
 
@@ -451,9 +457,9 @@ void WorldListPage::on_actionRename_triggered()
         return;
 
     auto worldVariant = m_worlds->data(index, WorldList::ObjectRole);
-    auto world = (World*)worldVariant.value<void*>();
+    auto world        = (World*)worldVariant.value<void*>();
 
-    bool ok = false;
+    bool    ok   = false;
     QString name = QInputDialog::getText(this, tr("World name"), tr("Enter a new world name."), QLineEdit::Normal, world->name(), &ok);
 
     if (ok && name.length() > 0) {
@@ -473,7 +479,7 @@ void WorldListPage::on_actionJoin_triggered()
         return;
     }
     auto worldVariant = m_worlds->data(index, WorldList::ObjectRole);
-    auto world = (World*)worldVariant.value<void*>();
+    auto world        = (World*)worldVariant.value<void*>();
     APPLICATION->launch(m_inst, LaunchMode::Normal, std::make_shared<MinecraftTarget>(MinecraftTarget::parse(world->folderName(), true)));
 }
 

@@ -4,18 +4,19 @@
 
 class QStyleOption;
 
-class IconLabel : public QWidget {
+class IconLabel : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     explicit IconLabel(QWidget* parent, QIcon icon, QSize size);
 
     virtual QSize sizeHint() const;
-    virtual void paintEvent(QPaintEvent*);
+    virtual void  paintEvent(QPaintEvent*);
 
     void setIcon(QIcon icon);
 
-   private:
+private:
     QSize m_size;
     QIcon m_icon;
 };

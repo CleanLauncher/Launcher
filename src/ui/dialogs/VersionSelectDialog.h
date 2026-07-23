@@ -28,10 +28,11 @@ class QPushButton;
 
 class VersionProxyModel;
 
-class VersionSelectDialog : public QDialog {
+class VersionSelectDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit VersionSelectDialog(BaseVersionList* vlist, QString title, QWidget* parent = 0, bool cancelable = true);
     virtual ~VersionSelectDialog() = default;
 
@@ -47,20 +48,20 @@ class VersionSelectDialog : public QDialog {
     void setEmptyErrorString(QString emptyErrorString);
     void setResizeOn(int column);
 
-   private slots:
+private slots:
     void on_refreshButton_clicked();
 
-   private:
+private:
     void retranslate();
     void selectRecommended();
 
-   private:
-    QString m_currentVersion;
-    VersionSelectWidget* m_versionWidget = nullptr;
-    QVBoxLayout* m_verticalLayout = nullptr;
-    QHBoxLayout* m_horizontalLayout = nullptr;
-    QPushButton* m_refreshButton = nullptr;
-    QDialogButtonBox* m_buttonBox = nullptr;
+private:
+    QString              m_currentVersion;
+    VersionSelectWidget* m_versionWidget    = nullptr;
+    QVBoxLayout*         m_verticalLayout   = nullptr;
+    QHBoxLayout*         m_horizontalLayout = nullptr;
+    QPushButton*         m_refreshButton    = nullptr;
+    QDialogButtonBox*    m_buttonBox        = nullptr;
 
     BaseVersionList* m_vlist = nullptr;
 

@@ -1,6 +1,4 @@
 #pragma once
-#include <FileSystem.h>
-#include <ui/pages/instance/DataPackPage.h>
 #include "minecraft/MinecraftInstance.h"
 #include "ui/pages/BasePage.h"
 #include "ui/pages/BasePageProvider.h"
@@ -17,10 +15,13 @@
 #include "ui/pages/instance/TexturePackPage.h"
 #include "ui/pages/instance/VersionPage.h"
 #include "ui/pages/instance/WorldListPage.h"
+#include <FileSystem.h>
+#include <ui/pages/instance/DataPackPage.h>
 
-class InstancePageProvider : protected QObject, public BasePageProvider {
+class InstancePageProvider : protected QObject, public BasePageProvider
+{
     Q_OBJECT
-   public:
+public:
     explicit InstancePageProvider(BaseInstance* parent) { inst = parent; }
 
     virtual ~InstancePageProvider() = default;
@@ -51,6 +52,6 @@ class InstancePageProvider : protected QObject, public BasePageProvider {
 
     virtual QString dialogTitle() override { return tr("Edit Instance (%1)").arg(inst->name()); }
 
-   protected:
+protected:
     BaseInstance* inst;
 };

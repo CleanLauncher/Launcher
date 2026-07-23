@@ -24,34 +24,36 @@
 #include <QUrl>
 #include <memory>
 
-class VariableSizedImageObject final : public QObject, public QTextObjectInterface {
+class VariableSizedImageObject final : public QObject, public QTextObjectInterface
+{
     Q_OBJECT
     Q_INTERFACES(QTextObjectInterface)
 
-    struct ImageMetadata {
-        int posInDocument;
-        QUrl url;
+    struct ImageMetadata
+    {
+        int    posInDocument;
+        QUrl   url;
         QImage image;
-        int width;
-        int height;
+        int    width;
+        int    height;
     };
 
-   public:
+public:
     QSizeF intrinsicSize(QTextDocument* doc, int posInDocument, const QTextFormat& format) override;
-    void drawObject(QPainter* painter, const QRectF& rect, QTextDocument* doc, int posInDocument, const QTextFormat& format) override;
+    void   drawObject(QPainter* painter, const QRectF& rect, QTextDocument* doc, int posInDocument, const QTextFormat& format) override;
 
     void setMetaEntry(QString meta_entry) { m_meta_entry = meta_entry; }
 
-   public slots:
+public slots:
 
     void flush();
 
-   private:
+private:
     void parseImage(QTextDocument* doc, std::shared_ptr<ImageMetadata> meta);
 
     void loadImage(QTextDocument* doc, std::shared_ptr<ImageMetadata> meta);
 
-   private:
+private:
     QString m_meta_entry;
 
     QSet<QUrl> m_fetching_images;

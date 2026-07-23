@@ -43,10 +43,11 @@
 #include "ui/widgets/PageContainer.h"
 #include "ui/widgets/VersionSelectWidget.h"
 
-class InstallJavaPage : public QWidget, public BasePage {
-   public:
+class InstallJavaPage : public QWidget, public BasePage
+{
+public:
     Q_OBJECT
-   public:
+public:
     explicit InstallJavaPage(const QString& id, const QString& iconName, const QString& name, QWidget* parent = nullptr)
         : QWidget(parent), uid(id), iconName(iconName), name(name)
     {
@@ -79,7 +80,7 @@ class InstallJavaPage : public QWidget, public BasePage {
 
     void initialize(Meta::VersionList::Ptr vlist)
     {
-        vlist->setProvidedRoles({ BaseVersionList::JavaMajorRole, BaseVersionList::RecommendedRole, BaseVersionList::VersionPointerRole });
+        vlist->setProvidedRoles({BaseVersionList::JavaMajorRole, BaseVersionList::RecommendedRole, BaseVersionList::VersionPointerRole});
         majorVersionSelect->initialize(vlist.get());
     }
 
@@ -95,7 +96,7 @@ class InstallJavaPage : public QWidget, public BasePage {
 
     QString id() const override { return uid; }
     QString displayName() const override { return name; }
-    QIcon icon() const override { return QIcon::fromTheme(iconName); }
+    QIcon   icon() const override { return QIcon::fromTheme(iconName); }
 
     void openedImpl() override
     {
@@ -117,14 +118,14 @@ class InstallJavaPage : public QWidget, public BasePage {
     }
 
     BaseVersion::Ptr selectedVersion() const { return javaVersionSelect->selectedVersion(); }
-    void selectSearch() { javaVersionSelect->selectSearch(); }
-    void loadList()
+    void             selectSearch() { javaVersionSelect->selectSearch(); }
+    void             loadList()
     {
         majorVersionSelect->loadList(true);
         javaVersionSelect->loadList(true);
     }
 
-   public slots:
+public slots:
     void setRecommendedMajors(const QStringList& majors)
     {
         m_recommended_majors = majors;
@@ -144,21 +145,21 @@ class InstallJavaPage : public QWidget, public BasePage {
         }
     }
 
-   signals:
+signals:
     void selectionChanged();
 
-   private:
+private:
     const QString uid;
     const QString iconName;
     const QString name;
-    bool loaded = false;
+    bool          loaded = false;
 
-    QHBoxLayout* horizontalLayout = nullptr;
+    QHBoxLayout*         horizontalLayout   = nullptr;
     VersionSelectWidget* majorVersionSelect = nullptr;
-    VersionSelectWidget* javaVersionSelect = nullptr;
+    VersionSelectWidget* javaVersionSelect  = nullptr;
 
     QStringList m_recommended_majors;
-    bool m_recommend;
+    bool        m_recommend;
 };
 
 static InstallJavaPage* pageCast(BasePage* page)
@@ -167,7 +168,8 @@ static InstallJavaPage* pageCast(BasePage* page)
     Q_ASSERT(result != nullptr);
     return result;
 }
-namespace Java {
+namespace Java
+{
 QStringList getRecommendedJavaVersionsFromVersionList(Meta::VersionList::Ptr list)
 {
     QStringList recommendedJavas;
@@ -311,20 +313,20 @@ void InstallDialog::done(int result)
             auto meta = std::dynamic_pointer_cast<Java::Metadata>(page->selectedVersion());
             if (meta) {
                 Task::Ptr task;
-                auto final_path = FS::PathCombine(APPLICATION->javaPath(), meta->m_name);
-                auto deletePath = [final_path] { FS::deletePath(final_path); };
+                auto      final_path = FS::PathCombine(APPLICATION->javaPath(), meta->m_name);
+                auto      deletePath = [final_path] { FS::deletePath(final_path); };
                 switch (meta->downloadType) {
-                    case Java::DownloadType::Manifest:
-                        task = makeShared<ManifestDownloadTask>(meta->url, final_path, meta->checksumType, meta->checksumHash);
-                        break;
-                    case Java::DownloadType::Archive:
-                        task = makeShared<ArchiveDownloadTask>(meta->url, final_path, meta->checksumType, meta->checksumHash);
-                        break;
-                    case Java::DownloadType::Unknown:
-                        QString error = QString(tr("Could not determine Java download type!"));
-                        CustomMessageBox::selectable(this, tr("Error"), error, QMessageBox::Warning)->show();
-                        deletePath();
-                        return;
+                case Java::DownloadType::Manifest:
+                    task = makeShared<ManifestDownloadTask>(meta->url, final_path, meta->checksumType, meta->checksumHash);
+                    break;
+                case Java::DownloadType::Archive:
+                    task = makeShared<ArchiveDownloadTask>(meta->url, final_path, meta->checksumType, meta->checksumHash);
+                    break;
+                case Java::DownloadType::Unknown:
+                    QString error = QString(tr("Could not determine Java download type!"));
+                    CustomMessageBox::selectable(this, tr("Error"), error, QMessageBox::Warning)->show();
+                    deletePath();
+                    return;
                 }
 #if defined(Q_OS_MACOS)
                 auto seq = makeShared<SequentialTask>(tr("Install Java"));

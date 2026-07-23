@@ -9,22 +9,25 @@
 #include "ui/pages/modplatform/TexturePackModel.h"
 #include "ui_ResourcePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class TexturePackDownloadDialog;
 
-class TexturePackResourcePage : public ResourcePackResourcePage {
+class TexturePackResourcePage : public ResourcePackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     template <typename T>
     static T* create(TexturePackDownloadDialog* dialog, BaseInstance& instance)
     {
-        auto page = new T(dialog, instance);
+        auto page  = new T(dialog, instance);
         auto model = static_cast<TexturePackResourceModel*>(page->getModel());
 
         connect(model, &ResourceModel::versionListUpdated, page, &ResourcePage::versionListUpdated);
@@ -38,7 +41,7 @@ class TexturePackResourcePage : public ResourcePackResourcePage {
 
     inline QString resourceString() const override { return tr("texture pack"); }
 
-   protected:
+protected:
     TexturePackResourcePage(TexturePackDownloadDialog* dialog, BaseInstance& instance) : ResourcePackResourcePage(dialog, instance) {}
 };
 

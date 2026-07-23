@@ -33,7 +33,7 @@ void PrintServers::executeTask()
 
 void PrintServers::resolveServer(const QHostInfo& host_info)
 {
-    QString server = host_info.hostName();
+    QString server    = host_info.hostName();
     QString addresses = server + " resolves to:\n  ";
 
     if (!host_info.addresses().isEmpty()) {

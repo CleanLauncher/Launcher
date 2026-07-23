@@ -1,10 +1,10 @@
 #include <QFutureWatcher>
 
-#include <Json.h>
 #include "Exception.h"
 #include "McClient.h"
 #include "McResolver.h"
 #include "ServerPingTask.h"
+#include <Json.h>
 
 unsigned getOnlinePlayers(QJsonObject data)
 {

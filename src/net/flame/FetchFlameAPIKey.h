@@ -19,25 +19,26 @@
 
 #pragma once
 
-#include <tasks/Task.h>
 #include <QNetworkReply>
+#include <tasks/Task.h>
 
-class FetchFlameAPIKey final : public Task {
+class FetchFlameAPIKey final : public Task
+{
     Q_OBJECT
 
-   public:
-    explicit FetchFlameAPIKey() = default;
+public:
+    explicit FetchFlameAPIKey()  = default;
     ~FetchFlameAPIKey() override = default;
 
-    bool abort() override;
+    bool    abort() override;
     QString result() { return m_result; }
 
-   public slots:
+public slots:
     void downloadFinished();
 
-   protected:
+protected:
     void executeTask() override;
 
-    QString m_result;
+    QString                        m_result;
     std::unique_ptr<QNetworkReply> m_reply;
 };

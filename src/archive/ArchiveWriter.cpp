@@ -35,7 +35,8 @@
 // clang-format on
 #endif
 
-namespace MMCZip {
+namespace MMCZip
+{
 
 ArchiveWriter::ArchiveWriter(const QString& archiveName) : m_filename(archiveName) {}
 
@@ -100,7 +101,7 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
     }
 
     std::unique_ptr<archive_entry, void (*)(archive_entry*)> entry_ptr(archive_entry_new(), archive_entry_free);
-    auto entry = entry_ptr.get();
+    auto                                                     entry = entry_ptr.get();
     if (!entry) {
         qCritical() << "Failed to create archive entry";
         return false;
@@ -111,7 +112,7 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
 
 #if defined Q_OS_WIN32
     {
-        auto widePath = fileInfo.absoluteFilePath().toStdWString();
+        auto   widePath    = fileInfo.absoluteFilePath().toStdWString();
         HANDLE file_handle = CreateFileW(widePath.data(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
         if (file_handle == INVALID_HANDLE_VALUE) {
             qCritical() << "Failed to stat file:" << fileInfo.filePath();
@@ -130,7 +131,7 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
     }
 #else
     {
-        QByteArray utf8 = fileInfo.absoluteFilePath().toUtf8();
+        QByteArray  utf8  = fileInfo.absoluteFilePath().toUtf8();
         const char* cpath = utf8.constData();
         struct stat st;
         if (stat(cpath, &st) != 0) {
@@ -169,7 +170,7 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
         }
 
         constexpr qint64 chunkSize = 8192;
-        QByteArray buffer;
+        QByteArray       buffer;
         buffer.resize(chunkSize);
 
         while (!file.atEnd()) {
@@ -192,7 +193,7 @@ bool ArchiveWriter::addFile(const QString& fileName, const QString& fileDest)
 bool ArchiveWriter::addFile(const QString& fileDest, const QByteArray& data)
 {
     std::unique_ptr<archive_entry, void (*)(archive_entry*)> entry_ptr(archive_entry_new(), archive_entry_free);
-    auto entry = entry_ptr.get();
+    auto                                                     entry = entry_ptr.get();
     if (!entry) {
         qCritical() << "Failed to create archive entry";
         return false;

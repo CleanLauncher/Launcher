@@ -10,13 +10,13 @@
 #include <QStringList>
 #include <optional>
 
-class QDCSS {
-
-   public:
+class QDCSS
+{
+public:
     QDCSS(QString);
     std::optional<QString>* get(QString);
 
-   private:
+private:
     QMap<QString, QStringList> m_data;
 };
 

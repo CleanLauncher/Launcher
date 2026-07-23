@@ -34,9 +34,9 @@
  *      limitations under the License.
  */
 #include "CustomTheme.h"
+#include "ThemeManager.h"
 #include <FileSystem.h>
 #include <Json.h>
-#include "ThemeManager.h"
 
 const char* themeFile = "theme.json";
 
@@ -45,7 +45,7 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
     if (isManifest) {
         m_id = fileInfo.dir().dirName();
 
-        QString path = FS::PathCombine("themes", m_id);
+        QString path          = FS::PathCombine("themes", m_id);
         QString pathResources = FS::PathCombine("themes", m_id, "resources");
 
         if (!FS::ensureFolderPathExists(path)) {
@@ -74,7 +74,7 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
             return;
         }
 
-        auto qssFilePath = FS::PathCombine(path, m_qssFilePath);
+        auto      qssFilePath = FS::PathCombine(path, m_qssFilePath);
         QFileInfo info(qssFilePath);
         if (info.isFile()) {
             try {
@@ -87,13 +87,13 @@ CustomTheme::CustomTheme(ITheme* baseTheme, QFileInfo& fileInfo, bool isManifest
             themeDebugLog() << "No theme qss present.";
         }
     } else {
-        m_id = fileInfo.fileName();
-        m_name = fileInfo.baseName();
+        m_id         = fileInfo.fileName();
+        m_name       = fileInfo.baseName();
         QString path = fileInfo.filePath();
 
         if (!FS::ensureFilePathExists(path)) {
             themeWarningLog().nospace() << m_name << ": Theme file path doesn't exist!";
-            m_palette = baseTheme->colorScheme();
+            m_palette    = baseTheme->colorScheme();
             m_styleSheet = baseTheme->appStyleSheet();
             return;
         }
@@ -112,7 +112,7 @@ QStringList CustomTheme::searchPaths()
 {
     QString pathResources = FS::PathCombine("themes", m_id, "resources");
     if (QFileInfo::exists(pathResources))
-        return { pathResources };
+        return {pathResources};
 
     return {};
 }
@@ -166,11 +166,11 @@ bool CustomTheme::read(const QString& path, bool& hasCustomLogColors)
     QFileInfo pathInfo(path);
     if (pathInfo.exists() && pathInfo.isFile()) {
         try {
-            auto doc = Json::requireDocument(path, "Theme JSON file");
+            auto              doc  = Json::requireDocument(path, "Theme JSON file");
             const QJsonObject root = doc.object();
-            m_name = Json::requireString(root, "name", "Theme name");
-            m_widgets = Json::requireString(root, "widgets", "Qt widget theme");
-            m_qssFilePath = root["qssFilePath"].toString("themeStyle.css");
+            m_name                 = Json::requireString(root, "name", "Theme name");
+            m_widgets              = Json::requireString(root, "widgets", "Qt widget theme");
+            m_qssFilePath          = root["qssFilePath"].toString("themeStyle.css");
 
             auto readColor = [](const QJsonObject& colors, const QString& colorName) -> QColor {
                 auto colorValue = colors[colorName].toString();
@@ -186,7 +186,7 @@ bool CustomTheme::read(const QString& path, bool& hasCustomLogColors)
             };
 
             if (root.contains("colors")) {
-                auto colorsRoot = Json::requireObject(root, "colors");
+                auto colorsRoot             = Json::requireObject(root, "colors");
                 auto readAndSetPaletteColor = [this, readColor, colorsRoot](QPalette::ColorRole role, const QString& colorName) {
                     auto color = readColor(colorsRoot, colorName);
                     if (color.isValid()) {
@@ -210,14 +210,14 @@ bool CustomTheme::read(const QString& path, bool& hasCustomLogColors)
                 readAndSetPaletteColor(QPalette::Highlight, "Highlight");
                 readAndSetPaletteColor(QPalette::HighlightedText, "HighlightedText");
 
-                m_fadeColor = readColor(colorsRoot, "fadeColor");
+                m_fadeColor  = readColor(colorsRoot, "fadeColor");
                 m_fadeAmount = colorsRoot["fadeAmount"].toDouble(0.5);
             }
 
             if (root.contains("logColors")) {
                 hasCustomLogColors = true;
 
-                auto logColorsRoot = Json::requireObject(root, "logColors");
+                auto logColorsRoot      = Json::requireObject(root, "logColors");
                 auto readAndSetLogColor = [this, readColor, logColorsRoot](MessageLevel level, bool fg, const QString& colorName) {
                     auto color = readColor(logColorsRoot, colorName);
                     if (color.isValid()) {

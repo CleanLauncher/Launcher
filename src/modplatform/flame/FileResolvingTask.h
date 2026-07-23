@@ -20,10 +20,12 @@
 #include "PackManifest.h"
 #include "tasks/Task.h"
 
-namespace Flame {
-class FileResolvingTask : public Task {
+namespace Flame
+{
+class FileResolvingTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     explicit FileResolvingTask(Flame::Manifest& toProcess);
     virtual ~FileResolvingTask() = default;
 
@@ -32,17 +34,17 @@ class FileResolvingTask : public Task {
 
     const Flame::Manifest& getResults() const { return m_manifest; }
 
-   protected:
+protected:
     virtual void executeTask() override;
 
-   protected slots:
+protected slots:
     void netJobFinished(QByteArray* response);
 
-   private:
+private:
     void getFlameProjects();
 
-   private:
+private:
     Flame::Manifest m_manifest;
-    Task::Ptr m_task;
+    Task::Ptr       m_task;
 };
 }  // namespace Flame

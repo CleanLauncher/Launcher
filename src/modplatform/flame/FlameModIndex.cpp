@@ -11,16 +11,16 @@ static FlameAPI api;
 
 void FlameMod::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
 {
-    pack.addonId = Json::requireInteger(obj, "id");
-    pack.provider = ModPlatform::ResourceProvider::FLAME;
-    pack.name = Json::requireString(obj, "name");
-    pack.slug = Json::requireString(obj, "slug");
-    pack.websiteUrl = obj["links"].toObject()["websiteUrl"].toString("");
+    pack.addonId     = Json::requireInteger(obj, "id");
+    pack.provider    = ModPlatform::ResourceProvider::FLAME;
+    pack.name        = Json::requireString(obj, "name");
+    pack.slug        = Json::requireString(obj, "slug");
+    pack.websiteUrl  = obj["links"].toObject()["websiteUrl"].toString("");
     pack.description = obj["summary"].toString("");
 
     QJsonObject logo = obj["logo"].toObject();
-    pack.logoName = logo["title"].toString();
-    pack.logoUrl = logo["thumbnailUrl"].toString();
+    pack.logoName    = logo["title"].toString();
+    pack.logoUrl     = logo["thumbnailUrl"].toString();
     if (pack.logoUrl.isEmpty()) {
         pack.logoUrl = logo["url"].toString();
     }
@@ -29,10 +29,10 @@ void FlameMod::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
     if (!authors.isEmpty()) {
         pack.authors.clear();
         for (auto authorIter : authors) {
-            auto author = Json::requireObject(authorIter);
+            auto                       author = Json::requireObject(authorIter);
             ModPlatform::ModpackAuthor packAuthor;
             packAuthor.name = Json::requireString(author, "name");
-            packAuthor.url = Json::requireString(author, "url");
+            packAuthor.url  = Json::requireString(author, "url");
             pack.authors.append(packAuthor);
         }
     }
@@ -72,11 +72,11 @@ void FlameMod::loadBody(ModPlatform::IndexedPack& pack)
 static QString enumToString(int hash_algorithm)
 {
     switch (hash_algorithm) {
-        default:
-        case 1:
-            return "sha1";
-        case 2:
-            return "md5";
+    default:
+    case 1:
+        return "sha1";
+    case 2:
+        return "md5";
     }
 }
 
@@ -99,7 +99,7 @@ void FlameMod::loadIndexedPackVersions(ModPlatform::IndexedPack& pack, QJsonArra
         return a.date > b.date;
     };
     std::sort(unsortedVersions.begin(), unsortedVersions.end(), orderSortPredicate);
-    pack.versions = unsortedVersions;
+    pack.versions       = unsortedVersions;
     pack.versionsLoaded = true;
 }
 
@@ -135,28 +135,28 @@ auto FlameMod::loadIndexedPackVersion(QJsonObject& obj, bool load_changelog) -> 
         }
     }
 
-    file.addonId = Json::requireInteger(obj, "modId");
-    file.fileId = Json::requireInteger(obj, "id");
-    file.date = Json::requireString(obj, "fileDate");
-    file.version = Json::requireString(obj, "displayName");
+    file.addonId     = Json::requireInteger(obj, "modId");
+    file.fileId      = Json::requireInteger(obj, "id");
+    file.date        = Json::requireString(obj, "fileDate");
+    file.version     = Json::requireString(obj, "displayName");
     file.downloadUrl = obj["downloadUrl"].toString();
-    file.fileName = Json::requireString(obj, "fileName");
-    file.fileName = FS::RemoveInvalidPathChars(file.fileName);
+    file.fileName    = Json::requireString(obj, "fileName");
+    file.fileName    = FS::RemoveInvalidPathChars(file.fileName);
 
     ModPlatform::IndexedVersionType ver_type;
     switch (Json::requireInteger(obj, "releaseType")) {
-        case 1:
-            ver_type = ModPlatform::IndexedVersionType::Release;
-            break;
-        case 2:
-            ver_type = ModPlatform::IndexedVersionType::Beta;
-            break;
-        case 3:
-            ver_type = ModPlatform::IndexedVersionType::Alpha;
-            break;
-        default:
-            ver_type = ModPlatform::IndexedVersionType::Unknown;
-            break;
+    case 1:
+        ver_type = ModPlatform::IndexedVersionType::Release;
+        break;
+    case 2:
+        ver_type = ModPlatform::IndexedVersionType::Beta;
+        break;
+    case 3:
+        ver_type = ModPlatform::IndexedVersionType::Alpha;
+        break;
+    default:
+        ver_type = ModPlatform::IndexedVersionType::Unknown;
+        break;
     }
     file.version_type = ver_type;
 
@@ -164,9 +164,9 @@ auto FlameMod::loadIndexedPackVersion(QJsonObject& obj, bool load_changelog) -> 
     for (auto h : hash_list) {
         auto hash_entry = h.toObject();
         auto hash_types = ModPlatform::ProviderCapabilities::hashType(ModPlatform::ResourceProvider::FLAME);
-        auto hash_algo = enumToString(hash_entry["algo"].toInt(1));
+        auto hash_algo  = enumToString(hash_entry["algo"].toInt(1));
         if (hash_types.contains(hash_algo)) {
-            file.hash = Json::requireString(hash_entry, "value");
+            file.hash      = Json::requireString(hash_entry, "value");
             file.hash_type = hash_algo;
             break;
         }
@@ -174,37 +174,37 @@ auto FlameMod::loadIndexedPackVersion(QJsonObject& obj, bool load_changelog) -> 
 
     auto dependencies = obj["dependencies"].toArray();
     for (auto d : dependencies) {
-        auto dep = d.toObject();
+        auto                    dep = d.toObject();
         ModPlatform::Dependency dependency;
         dependency.addonId = Json::requireInteger(dep, "modId");
         switch (Json::requireInteger(dep, "relationType")) {
-            case 1:
+        case 1:
 
-                dependency.type = ModPlatform::DependencyType::EMBEDDED;
-                break;
-            case 2:
+            dependency.type = ModPlatform::DependencyType::EMBEDDED;
+            break;
+        case 2:
 
-                dependency.type = ModPlatform::DependencyType::OPTIONAL;
-                break;
-            case 3:
+            dependency.type = ModPlatform::DependencyType::OPTIONAL;
+            break;
+        case 3:
 
-                dependency.type = ModPlatform::DependencyType::REQUIRED;
-                break;
-            case 4:
+            dependency.type = ModPlatform::DependencyType::REQUIRED;
+            break;
+        case 4:
 
-                dependency.type = ModPlatform::DependencyType::TOOL;
-                break;
-            case 5:
+            dependency.type = ModPlatform::DependencyType::TOOL;
+            break;
+        case 5:
 
-                dependency.type = ModPlatform::DependencyType::INCOMPATIBLE;
-                break;
-            case 6:
+            dependency.type = ModPlatform::DependencyType::INCOMPATIBLE;
+            break;
+        case 6:
 
-                dependency.type = ModPlatform::DependencyType::INCLUDE;
-                break;
-            default:
-                dependency.type = ModPlatform::DependencyType::UNKNOWN;
-                break;
+            dependency.type = ModPlatform::DependencyType::INCLUDE;
+            break;
+        default:
+            dependency.type = ModPlatform::DependencyType::UNKNOWN;
+            break;
         }
         file.dependencies.append(dependency);
     }

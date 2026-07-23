@@ -41,11 +41,11 @@
 #include <QStandardPaths>
 #include <QTabBar>
 
-#include <FileSystem.h>
-#include <tools/MCEditTool.h>
 #include "Application.h"
 #include "settings/SettingsObject.h"
 #include "tools/BaseProfiler.h"
+#include <FileSystem.h>
+#include <tools/MCEditTool.h>
 
 ExternalToolsPage::ExternalToolsPage(QWidget* parent) : QWidget(parent), ui(new Ui::ExternalToolsPage)
 {
@@ -184,7 +184,8 @@ void ExternalToolsPage::on_mceditCheckBtn_clicked()
 
 void ExternalToolsPage::on_jsonEditorBrowseBtn_clicked()
 {
-    QString raw_file = QFileDialog::getOpenFileName(this, tr("Text Editor"),
+    QString raw_file = QFileDialog::getOpenFileName(this,
+                                                    tr("Text Editor"),
                                                     ui->jsonEditorTextBox->text().isEmpty()
 #if defined(Q_OS_LINUX)
                                                         ? QString("/usr/bin")

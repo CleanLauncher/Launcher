@@ -39,7 +39,7 @@ void Modrinth::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
     }
 
     pack.provider = ModPlatform::ResourceProvider::MODRINTH;
-    pack.name = Json::requireString(obj, "title");
+    pack.name     = Json::requireString(obj, "title");
 
     pack.slug = obj["slug"].toString("");
     if (!pack.slug.isEmpty()) {
@@ -50,14 +50,14 @@ void Modrinth::loadIndexedPack(ModPlatform::IndexedPack& pack, QJsonObject& obj)
 
     pack.description = obj["description"].toString("");
 
-    pack.logoUrl = obj["icon_url"].toString("");
+    pack.logoUrl  = obj["icon_url"].toString("");
     pack.logoName = QString("%1.%2").arg(obj["slug"].toString(), QFileInfo(QUrl(pack.logoUrl).fileName()).suffix());
 
     if (obj.contains("author")) {
         ModPlatform::ModpackAuthor modAuthor;
         modAuthor.name = obj["author"].toString();
-        modAuthor.url = ModrinthAPI::getAuthorURL(modAuthor.name);
-        pack.authors = { modAuthor };
+        modAuthor.url  = ModrinthAPI::getAuthorURL(modAuthor.name);
+        pack.authors   = {modAuthor};
     }
 
     auto client = shouldDownloadOnSide(obj["client_side"].toString());
@@ -99,9 +99,9 @@ void Modrinth::loadExtraPackData(ModPlatform::IndexedPack& pack, QJsonObject& ob
 
         ModPlatform::DonationData donate;
 
-        donate.id = d_obj["id"].toString();
+        donate.id       = d_obj["id"].toString();
         donate.platform = d_obj["platform"].toString();
-        donate.url = d_obj["url"].toString();
+        donate.url      = d_obj["url"].toString();
 
         pack.extraData.donate.append(donate);
     }
@@ -113,21 +113,20 @@ void Modrinth::loadExtraPackData(ModPlatform::IndexedPack& pack, QJsonObject& ob
     pack.extraDataLoaded = true;
 }
 
-ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
-                                                             const QString& preferred_hash_type,
-                                                             const QString& preferred_file_name)
+ModPlatform::IndexedVersion
+Modrinth::loadIndexedPackVersion(QJsonObject& obj, const QString& preferred_hash_type, const QString& preferred_file_name)
 {
     ModPlatform::IndexedVersion file;
 
-    file.addonId = Json::requireString(obj, "project_id");
-    file.fileId = Json::requireString(obj, "id");
-    file.date = Json::requireString(obj, "date_published");
+    file.addonId      = Json::requireString(obj, "project_id");
+    file.fileId       = Json::requireString(obj, "id");
+    file.date         = Json::requireString(obj, "date_published");
     auto versionArray = Json::requireArray(obj, "game_versions");
     if (versionArray.empty()) {
         return {};
     }
     for (auto mcVer : versionArray) {
-        file.mcVersion.append({ ModrinthAPI::mapMCVersionFromModrinth(mcVer.toString()), mcVer.toString() });
+        file.mcVersion.append({ModrinthAPI::mapMCVersionFromModrinth(mcVer.toString()), mcVer.toString()});
     }
     auto loaders = Json::requireArray(obj, "loaders");
     for (auto loader : loaders) {
@@ -145,9 +144,9 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
             file.loaders |= ModPlatform::Quilt;
         }
     }
-    file.version = Json::requireString(obj, "name");
+    file.version        = Json::requireString(obj, "name");
     file.version_number = Json::requireString(obj, "version_number");
-    file.version_type = ModPlatform::IndexedVersionType::fromString(Json::requireString(obj, "version_type"));
+    file.version_type   = ModPlatform::IndexedVersionType::fromString(Json::requireString(obj, "version_type"));
 
     if (obj.contains("changelog")) {
         file.changelog = Json::requireString(obj, "changelog");
@@ -155,11 +154,11 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
 
     auto dependencies = obj["dependencies"].toArray();
     for (auto d : dependencies) {
-        auto dep = d.toObject();
+        auto                    dep = d.toObject();
         ModPlatform::Dependency dependency;
         dependency.addonId = dep["project_id"].toString();
         dependency.version = dep["version_id"].toString();
-        auto depType = Json::requireString(dep, "dependency_type");
+        auto depType       = Json::requireString(dep, "dependency_type");
 
         if (depType == "required") {
             dependency.type = ModPlatform::DependencyType::REQUIRED;
@@ -177,7 +176,7 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
     }
 
     auto files = Json::requireArray(obj, "files");
-    int i = 0;
+    int  i     = 0;
 
     if (files.empty()) {
         qWarning() << "Modrinth returned an unexpected empty list of files:" << obj;
@@ -185,7 +184,7 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
     }
 
     while (i < files.count() - 1) {
-        auto parent = files[i].toObject();
+        auto parent   = files[i].toObject();
         auto fileName = Json::requireString(parent, "filename");
 
         if (!preferred_file_name.isEmpty() && fileName.contains(preferred_file_name)) {
@@ -202,20 +201,20 @@ ModPlatform::IndexedVersion Modrinth::loadIndexedPackVersion(QJsonObject& obj,
 
     auto parent = files[i].toObject();
     if (parent.contains("url")) {
-        file.downloadUrl = Json::requireString(parent, "url");
-        file.fileName = Json::requireString(parent, "filename");
-        file.fileName = FS::RemoveInvalidPathChars(file.fileName);
+        file.downloadUrl  = Json::requireString(parent, "url");
+        file.fileName     = Json::requireString(parent, "filename");
+        file.fileName     = FS::RemoveInvalidPathChars(file.fileName);
         file.is_preferred = Json::requireBoolean(parent, "primary") || (files.count() == 1);
-        auto hash_list = Json::requireObject(parent, "hashes");
+        auto hash_list    = Json::requireObject(parent, "hashes");
 
         if (hash_list.contains(preferred_hash_type)) {
-            file.hash = Json::requireString(hash_list, preferred_hash_type);
+            file.hash      = Json::requireString(hash_list, preferred_hash_type);
             file.hash_type = preferred_hash_type;
         } else {
             auto hash_types = ModPlatform::ProviderCapabilities::hashType(ModPlatform::ResourceProvider::MODRINTH);
             for (auto& hash_type : hash_types) {
                 if (hash_list.contains(hash_type)) {
-                    file.hash = Json::requireString(hash_list, hash_type);
+                    file.hash      = Json::requireString(hash_list, hash_type);
                     file.hash_type = hash_type;
                     break;
                 }

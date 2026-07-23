@@ -82,7 +82,8 @@ class LogModel;
 struct MinecraftTarget;
 class MinecraftAccount;
 
-namespace Meta {
+namespace Meta
+{
 class Index;
 }
 
@@ -96,22 +97,30 @@ class Index;
 #endif
 #define APPLICATION_DYN (dynamic_cast<Application*>(QCoreApplication::instance()))
 
-class Application : public QApplication {
+class Application : public QApplication
+{
     Q_OBJECT
-   public:
-    enum Status { StartingUp, Failed, Succeeded, Initialized };
+public:
+    enum Status
+    {
+        StartingUp,
+        Failed,
+        Succeeded,
+        Initialized
+    };
 
-    enum Capability {
+    enum Capability
+    {
         None = 0,
 
-        SupportsMSA = 1 << 0,
-        SupportsFlame = 1 << 1,
+        SupportsMSA      = 1 << 0,
+        SupportsFlame    = 1 << 1,
         SupportsGameMode = 1 << 2,
         SupportsMangoHud = 1 << 3,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
-   public:
+public:
     Application(int& argc, char** argv);
     virtual ~Application();
 
@@ -178,20 +187,20 @@ class Application : public QApplication {
     bool openJsonEditor(const QString& filename);
 
     InstanceWindow* showInstanceWindow(BaseInstance* instance, QString page = QString());
-    MainWindow* showMainWindow(bool minimized = false);
-    ViewLogWindow* showLogWindow();
+    MainWindow*     showMainWindow(bool minimized = false);
+    ViewLogWindow*  showLogWindow();
 
     void updateIsRunning(bool running);
     bool updatesAreAllowed();
 
     void ShowGlobalSettings(class QWidget* parent, QString open_page = QString());
 
-    bool updaterEnabled();
+    bool    updaterEnabled();
     QString updaterBinaryName();
 
     QUrl normalizeImportUrl(const QString& url);
 
-   signals:
+signals:
     void updateAllowedChanged(bool status);
     void globalSettingsAboutToOpen();
     void globalSettingsApplied();
@@ -204,80 +213,81 @@ class Application : public QApplication {
     void clickedOnDock();
 #endif
 
-   public slots:
-    bool launch(BaseInstance* instance,
-                LaunchMode mode = LaunchMode::Normal,
-                std::shared_ptr<MinecraftTarget> targetToJoin = nullptr,
+public slots:
+    bool launch(BaseInstance*                        instance,
+                LaunchMode                           mode         = LaunchMode::Normal,
+                std::shared_ptr<MinecraftTarget>     targetToJoin = nullptr,
                 shared_qobject_ptr<MinecraftAccount> accountToUse = nullptr,
-                const QString& offlineName = QString());
+                const QString&                       offlineName  = QString());
     bool kill(BaseInstance* instance);
     void closeCurrentWindow();
 
-   private slots:
+private slots:
     void on_windowClose();
     void messageReceived(const QByteArray& message);
     void controllerFinished();
     void setupWizardFinished(int status);
 
-   private:
+private:
     bool handleDataMigration(const QString& currentData, const QString& oldData, const QString& name, const QString& configFile) const;
     bool createSetupWizard();
     void performMainStartupAction();
 
     void showFatalErrorMessage(const QString& title, const QString& content);
 
-   private:
+private:
     void addRunningInstance();
     void subRunningInstance();
     bool shouldExitNow() const;
 
-   private:
+private:
     QHash<QString, int> m_qsaveResources;
-    mutable QMutex m_qsaveResourcesMutex;
+    mutable QMutex      m_qsaveResourcesMutex;
 
-   private:
+private:
     QDateTime m_startTime;
 
     std::unique_ptr<QNetworkAccessManager> m_network;
 
     std::unique_ptr<ExternalUpdater> m_updater;
-    std::unique_ptr<AccountList> m_accounts;
+    std::unique_ptr<AccountList>     m_accounts;
 
     std::unique_ptr<HttpMetaCache> m_metacache;
-    std::unique_ptr<Meta::Index> m_metadataIndex;
+    std::unique_ptr<Meta::Index>   m_metadataIndex;
 
-    std::unique_ptr<SettingsObject> m_settings;
-    std::unique_ptr<InstanceList> m_instances;
-    std::unique_ptr<IconList> m_icons;
-    std::unique_ptr<JavaInstallList> m_javalist;
-    std::unique_ptr<TranslationsModel> m_translations;
+    std::unique_ptr<SettingsObject>      m_settings;
+    std::unique_ptr<InstanceList>        m_instances;
+    std::unique_ptr<IconList>            m_icons;
+    std::unique_ptr<JavaInstallList>     m_javalist;
+    std::unique_ptr<TranslationsModel>   m_translations;
     std::unique_ptr<GenericPageProvider> m_globalSettingsProvider;
-    std::unique_ptr<MCEditTool> m_mcedit;
-    QSet<QString> m_features;
-    std::unique_ptr<ThemeManager> m_themeManager;
+    std::unique_ptr<MCEditTool>          m_mcedit;
+    QSet<QString>                        m_features;
+    std::unique_ptr<ThemeManager>        m_themeManager;
 
     QMap<QString, std::shared_ptr<BaseProfilerFactory>> m_profilers;
 
-    QString m_rootPath;
-    QString m_dataPath;
-    Status m_status = Application::StartingUp;
+    QString      m_rootPath;
+    QString      m_dataPath;
+    Status       m_status = Application::StartingUp;
     Capabilities m_capabilities;
-    bool m_portable = false;
+    bool         m_portable = false;
 
 #ifdef Q_OS_MACOS
     Qt::ApplicationState m_prevAppState = Qt::ApplicationInactive;
 #endif
 
-    struct InstanceXtras {
-        InstanceWindow* window = nullptr;
+    struct InstanceXtras
+    {
+        InstanceWindow*                   window = nullptr;
         std::unique_ptr<LaunchController> controller;
     };
     std::map<QString, InstanceXtras> m_instanceExtras;
-    mutable QMutex m_instanceExtrasMutex;
+    mutable QMutex                   m_instanceExtrasMutex;
 
-    size_t m_openWindows = 0;
+    size_t m_openWindows      = 0;
     size_t m_runningInstances = 0;
-    bool m_updateRunning = false;
+    bool   m_updateRunning    = false;
 
     MainWindow* m_mainWindow = nullptr;
 
@@ -289,23 +299,23 @@ class Application : public QApplication {
 
     std::unique_ptr<NetworkCheck> m_networkCheck;
 
-   public:
-    QString m_detectedGLFWPath;
-    QString m_detectedOpenALPath;
-    QString m_instanceIdToLaunch;
-    QString m_serverToJoin;
-    QString m_worldToJoin;
-    QString m_profileToUse;
-    bool m_launchOffline = false;
-    QString m_offlineName;
-    bool m_liveCheck = false;
-    QList<QUrl> m_urlsToImport;
-    QString m_instanceIdToShowWindowOf;
-    bool m_showMainWindow = false;
-    std::unique_ptr<QFile> logFile;
+public:
+    QString                   m_detectedGLFWPath;
+    QString                   m_detectedOpenALPath;
+    QString                   m_instanceIdToLaunch;
+    QString                   m_serverToJoin;
+    QString                   m_worldToJoin;
+    QString                   m_profileToUse;
+    bool                      m_launchOffline = false;
+    QString                   m_offlineName;
+    bool                      m_liveCheck = false;
+    QList<QUrl>               m_urlsToImport;
+    QString                   m_instanceIdToShowWindowOf;
+    bool                      m_showMainWindow = false;
+    std::unique_ptr<QFile>    logFile;
     std::unique_ptr<LogModel> logModel;
 
-   public:
+public:
     void addQSavePath(QString);
     void removeQSavePath(QString);
     bool checkQSavePath(QString);

@@ -22,15 +22,16 @@
 
 #pragma once
 
-class ExternalUpdater : public QObject {
+class ExternalUpdater : public QObject
+{
     Q_OBJECT
 
-   public:
+public:
     ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir);
     ~ExternalUpdater() override;
 
     virtual void checkForUpdates();
-    void checkForUpdates(bool triggeredByUser) const;
+    void         checkForUpdates(bool triggeredByUser) const;
 
     virtual bool getAutomaticallyChecksForUpdates();
 
@@ -51,13 +52,13 @@ class ExternalUpdater : public QObject {
     void offerUpdate(const QString& versionName, const QString& versionTag, const QString& releaseNotes, bool triggeredByUser) const;
     void performUpdate(const QString& versionTag) const;
 
-   signals:
+signals:
     void canCheckForUpdatesChanged(bool canCheck);
 
-   public slots:
+public slots:
     void autoCheckTimerFired() const;
 
-   private:
+private:
     class Private;
 
     Private* priv;

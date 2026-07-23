@@ -87,7 +87,8 @@ std::strong_ordering Version::Section::operator<=>(const Section& other) const
     return this->value.size() <=> other.value.size();
 }
 
-namespace {
+namespace
+{
 void removeLeadingZeros(QString& s)
 {
     s.remove(0, std::distance(s.begin(), std::ranges::find_if_not(s, [](QChar c) { return c == '0'; })));
@@ -99,7 +100,7 @@ void Version::parse()
     auto len = m_string.size();
     for (int i = 0; i < len;) {
         Section cur(Section::Type::Textual);
-        auto c = m_string.at(i);
+        auto    c = m_string.at(i);
         if (c == '+') {
             break;
         }

@@ -41,50 +41,52 @@
 #include "tasks/Task.h"
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class CustomPage;
 }
 
 class NewInstanceDialog;
 
-class CustomPage : public QWidget, public BasePage {
+class CustomPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CustomPage(NewInstanceDialog* dialog, QWidget* parent = 0);
     virtual ~CustomPage();
     virtual QString displayName() const override { return tr("Custom"); }
-    virtual QIcon icon() const override { return QIcon::fromTheme("minecraft"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("minecraft"); }
     virtual QString id() const override { return "vanilla"; }
     virtual QString helpPage() const override { return "Vanilla-platform"; }
-    virtual bool shouldDisplay() const override;
-    void retranslate() override;
+    virtual bool    shouldDisplay() const override;
+    void            retranslate() override;
 
     void openedImpl() override;
 
     BaseVersion::Ptr selectedVersion() const;
     BaseVersion::Ptr selectedLoaderVersion() const;
-    QString selectedLoader() const;
+    QString          selectedLoader() const;
 
-   public slots:
+public slots:
     void setSelectedVersion(BaseVersion::Ptr version);
     void setSelectedLoaderVersion(BaseVersion::Ptr version);
 
-   private slots:
+private slots:
     void filterChanged();
     void loaderFilterChanged();
 
-   private:
+private:
     void refresh();
     void loaderRefresh();
     void suggestCurrent();
 
-   private:
-    bool initialized = false;
-    NewInstanceDialog* dialog = nullptr;
-    Ui::CustomPage* ui = nullptr;
-    bool m_versionSetByUser = false;
-    BaseVersion::Ptr m_selectedVersion;
-    BaseVersion::Ptr m_selectedLoaderVersion;
-    QString m_selectedLoader;
+private:
+    bool               initialized        = false;
+    NewInstanceDialog* dialog             = nullptr;
+    Ui::CustomPage*    ui                 = nullptr;
+    bool               m_versionSetByUser = false;
+    BaseVersion::Ptr   m_selectedVersion;
+    BaseVersion::Ptr   m_selectedLoaderVersion;
+    QString            m_selectedLoader;
 };

@@ -17,10 +17,10 @@
 #include <launch/LaunchTask.h>
 #include <minecraft/MinecraftInstance.h>
 
-#include <QDir>
 #include "FileSystem.h"
 #include "archive/ArchiveReader.h"
 #include "archive/ArchiveWriter.h"
+#include <QDir>
 
 #ifdef major
 #undef major
@@ -41,14 +41,14 @@ static QString replaceSuffix(QString target, const QString& suffix, const QStrin
 static bool unzipNatives(QString source, QString targetFolder, bool applyJnilibHack)
 {
     MMCZip::ArchiveReader zip(source);
-    QDir directory(targetFolder);
+    QDir                  directory(targetFolder);
 
     auto extPtr = MMCZip::ArchiveWriter::createDiskWriter();
-    auto ext = extPtr.get();
+    auto ext    = extPtr.get();
 
     return zip.parse([applyJnilibHack, directory, ext](MMCZip::ArchiveReader::File* f) {
-        QString name = f->filename();
-        auto lowercase = name.toLower();
+        QString name      = f->filename();
+        auto    lowercase = name.toLower();
         if (applyJnilibHack) {
             name = replaceSuffix(name, ".jnilib", ".dylib");
         }
@@ -59,7 +59,7 @@ static bool unzipNatives(QString source, QString targetFolder, bool applyJnilibH
 
 void ExtractNatives::executeTask()
 {
-    auto instance = m_parent->instance();
+    auto instance  = m_parent->instance();
     auto toExtract = instance->getNativeJars();
     if (toExtract.isEmpty()) {
         emitSucceeded();
@@ -68,12 +68,12 @@ void ExtractNatives::executeTask()
 
     auto outputPath = instance->getNativePath();
     FS::ensureFolderPathExists(outputPath);
-    auto javaVersion = instance->getJavaVersion();
+    auto javaVersion    = instance->getJavaVersion();
     bool jniHackEnabled = javaVersion.major() >= 8;
     for (const auto& source : toExtract) {
         if (!unzipNatives(source, outputPath, jniHackEnabled)) {
             const char* reason = QT_TR_NOOP("Couldn't extract native jar '%1' to destination '%2'");
-            emit logLine(QString(reason).arg(source, outputPath), MessageLevel::Fatal);
+            emit        logLine(QString(reason).arg(source, outputPath), MessageLevel::Fatal);
             emitFailed(tr(reason).arg(source, outputPath));
             return;
         }
@@ -83,8 +83,8 @@ void ExtractNatives::executeTask()
 
 void ExtractNatives::finalize()
 {
-    auto instance = m_parent->instance();
+    auto    instance   = m_parent->instance();
     QString target_dir = FS::PathCombine(instance->instanceRoot(), "natives/");
-    QDir dir(target_dir);
+    QDir    dir(target_dir);
     dir.removeRecursively();
 }

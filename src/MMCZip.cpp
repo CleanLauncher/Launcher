@@ -35,10 +35,10 @@
  */
 
 #include "MMCZip.h"
-#include <archive.h>
 #include "FileSystem.h"
 #include "archive/ArchiveReader.h"
 #include "archive/ArchiveWriter.h"
+#include <archive.h>
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -46,7 +46,8 @@
 #include <QUrl>
 #include <memory>
 
-namespace MMCZip {
+namespace MMCZip
+{
 
 using FilterFunction = std::function<bool(const QString&)>;
 #if defined(LAUNCHER_APPLICATION)
@@ -82,7 +83,7 @@ bool compressDirFiles(ArchiveWriter& zip, QString dir, QFileInfoList files)
 
     for (auto e : files) {
         auto filePath = directory.relativeFilePath(e.absoluteFilePath());
-        auto srcPath = e.absoluteFilePath();
+        auto srcPath  = e.absoluteFilePath();
         if (!zip.addFile(srcPath, filePath))
             return false;
     }
@@ -123,12 +124,12 @@ bool createModdedJar(QString sourceJarPath, QString targetJarPath, const QList<M
             }
             addedFiles.insert(filename.fileName());
         } else if (mod->type() == ResourceType::FOLDER) {
-            auto filename = mod->fileinfo();
+            auto    filename    = mod->fileinfo();
             QString what_to_zip = filename.absoluteFilePath();
-            QDir dir(what_to_zip);
+            QDir    dir(what_to_zip);
             dir.cdUp();
             QString parent_dir = dir.absolutePath();
-            auto files = QFileInfoList();
+            auto    files      = QFileInfoList();
             collectFileListRecursively(what_to_zip, nullptr, &files, nullptr);
 
             for (auto e : files) {
@@ -184,18 +185,18 @@ std::optional<QStringList> extractSubDir(ArchiveReader* zip, const QString& subd
     }
 
     auto extPtr = ArchiveWriter::createDiskWriter();
-    auto ext = extPtr.get();
+    auto ext    = extPtr.get();
 
     if (!zip->parse([&subdir, &target, &target_top_dir, ext, &extracted](ArchiveReader::File* f) {
             QString file_name = f->filename();
-            file_name = FS::RemoveInvalidPathChars(file_name);
+            file_name         = FS::RemoveInvalidPathChars(file_name);
             if (!file_name.startsWith(subdir)) {
                 f->skip();
                 return true;
             }
 
             auto relative_file_name = QDir::fromNativeSeparators(file_name.mid(subdir.size()));
-            auto original_name = relative_file_name;
+            auto original_name      = relative_file_name;
 
             if (relative_file_name.startsWith('/'))
                 relative_file_name = relative_file_name.mid(1);
@@ -266,12 +267,12 @@ bool extractFile(QString fileCompressed, QString file, QString target)
         return true;
     }
     ArchiveReader zip(fileCompressed);
-    auto f = zip.goToFile(file);
+    auto          f = zip.goToFile(file);
     if (!f) {
         return false;
     }
     auto extPtr = ArchiveWriter::createDiskWriter();
-    auto ext = extPtr.get();
+    auto ext    = extPtr.get();
 
     return f->writeFile(ext, target);
 }

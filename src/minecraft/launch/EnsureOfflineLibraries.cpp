@@ -25,10 +25,10 @@ EnsureOfflineLibraries::EnsureOfflineLibraries(LaunchTask* parent, MinecraftInst
 
 void EnsureOfflineLibraries::executeTask()
 {
-    const auto profile = m_instance->getPackProfile()->getProfile();
+    const auto  profile = m_instance->getPackProfile()->getProfile();
     QStringList allJars;
-    profile->getLibraryFiles(m_instance->runtimeContext(), allJars, allJars, m_instance->getLocalLibraryPath(), m_instance->binRoot(),
-                             false);
+    profile->getLibraryFiles(
+        m_instance->runtimeContext(), allJars, allJars, m_instance->getLocalLibraryPath(), m_instance->binRoot(), false);
 
     QStringList missing;
     for (const auto& jar : allJars) {

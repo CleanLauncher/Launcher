@@ -7,22 +7,24 @@
 #include "meta/VersionList.h"
 #include "ui/pages/modplatform/ResourcePackModel.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
-class TexturePackResourceModel : public ResourcePackResourceModel {
+class TexturePackResourceModel : public ResourcePackResourceModel
+{
     Q_OBJECT
 
-   public:
+public:
     TexturePackResourceModel(const BaseInstance& inst, ResourceAPI* api, const QString& debugName, QString metaEntryBase);
 
-    inline ::Version maximumTexturePackVersion() const { return { "1.6" }; }
+    inline ::Version maximumTexturePackVersion() const { return {"1.6"}; }
 
-    ResourceAPI::SearchArgs createSearchArguments() override;
+    ResourceAPI::SearchArgs        createSearchArguments() override;
     ResourceAPI::VersionSearchArgs createVersionsArguments(const QModelIndex&) override;
 
-   protected:
+protected:
     Meta::VersionList::Ptr m_version_list;
-    Task::Ptr m_task;
+    Task::Ptr              m_task;
 };
 
 }  // namespace ResourceDownload

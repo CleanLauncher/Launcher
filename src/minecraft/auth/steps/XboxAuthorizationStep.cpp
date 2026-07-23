@@ -34,14 +34,14 @@ void XboxAuthorizationStep::perform()
     "TokenType": "JWT"
 }
 )XXX";
-    const auto xboxAuthData = xboxAuthTemplate.arg(m_data->userToken.token, m_relyingParty);
+    const auto    xboxAuthData     = xboxAuthTemplate.arg(m_data->userToken.token, m_relyingParty);
 
     const QUrl url("https://xsts.auth.xboxlive.com/xsts/authorize");
-    auto headers = QList<Net::HeaderPair>{ { .headerName = "Content-Type", .headerValue = "application/json" },
-                                           { .headerName = "Accept", .headerValue = "application/json" },
-                                           { .headerName = "x-xbl-contract-version", .headerValue = "1" } };
+    auto       headers       = QList<Net::HeaderPair>{{.headerName = "Content-Type", .headerValue = "application/json"},
+                                                      {.headerName = "Accept", .headerValue = "application/json"},
+                                                      {.headerName = "x-xbl-contract-version", .headerValue = "1"}};
     auto [request, response] = Net::Upload::makeByteArray(url, xboxAuthData.toUtf8());
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
 
@@ -87,7 +87,7 @@ void XboxAuthorizationStep::onRequestDone(QByteArray* response)
         return;
     }
     auto& token = *m_token;
-    token = temp;
+    token       = temp;
 
     emit finished(AccountTaskState::STATE_WORKING, tr("Got authorization to access %1").arg(m_relyingParty));
 }
@@ -95,7 +95,7 @@ void XboxAuthorizationStep::onRequestDone(QByteArray* response)
 bool XboxAuthorizationStep::processSTSError(const QByteArray& response)
 {
     if (m_request->error() == QNetworkReply::AuthenticationRequiredError) {
-        QJsonParseError jsonError;
+        QJsonParseError     jsonError;
         const QJsonDocument doc = QJsonDocument::fromJson(response, &jsonError);
         if (jsonError.error != QJsonParseError::NoError) {
             qWarning() << "Cannot parse error XSTS response as JSON:" << jsonError.errorString();
@@ -105,63 +105,65 @@ bool XboxAuthorizationStep::processSTSError(const QByteArray& response)
         }
 
         int64_t errorCode = -1;
-        auto obj = doc.object();
+        auto    obj       = doc.object();
         if (!Parsers::getNumber(obj.value("XErr"), errorCode)) {
             emit finished(AccountTaskState::STATE_FAILED_SOFT,
                           tr("XErr element is missing from %1 authorization error response.").arg(m_authorizationKind));
             return true;
         }
         switch (errorCode) {
-            case 2148916233: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT,
-                              tr("This Microsoft account does not have an Xbox Live profile. Buy the game on %1 first.")
-                                  .arg("<a href=\"https://www.minecraft.net/en-us/store/minecraft-java-edition\">minecraft.net</a>"));
-                return true;
-            }
-            case 2148916235: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("Xbox Live is not available in your country. You've been blocked."));
-                return true;
-            }
-            case 2148916238: {
-                emit finished(
-                    AccountTaskState::STATE_FAILED_SOFT,
-                    tr("This Microsoft account is underaged and is not linked to a family.\n\nPlease set up your account according to %1.")
-                        .arg("<a href=\"https://help.minecraft.net/hc/en-us/articles/4408968616077\">help.minecraft.net</a>"));
-                return true;
-            }
+        case 2148916233: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account does not have an Xbox Live profile. Buy the game on %1 first.")
+                              .arg("<a href=\"https://www.minecraft.net/en-us/store/minecraft-java-edition\">minecraft.net</a>"));
+            return true;
+        }
+        case 2148916235: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("Xbox Live is not available in your country. You've been blocked."));
+            return true;
+        }
+        case 2148916238: {
+            emit finished(
+                AccountTaskState::STATE_FAILED_SOFT,
+                tr("This Microsoft account is underaged and is not linked to a family.\n\nPlease set up your account according to %1.")
+                    .arg("<a href=\"https://help.minecraft.net/hc/en-us/articles/4408968616077\">help.minecraft.net</a>"));
+            return true;
+        }
 
-            case 2148916236: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT,
-                              tr("This Microsoft account requires proof of age to play. Please login to %1 to provide proof of age.")
-                                  .arg("<a href=\"https://login.live.com/login.srf\">login.live.com</a>"));
-                return true;
-            }
-            case 2148916237:
-                emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("This Microsoft account has reached its limit for playtime. This "
-                                                                      "Microsoft account has been blocked from logging in."));
-                return true;
-            case 2148916227: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT, tr("This Microsoft account was banned by Xbox for violating one or more "
-                                                                      "Community Standards for Xbox and is unable to be used."));
-                return true;
-            }
-            case 2148916229: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT,
-                              tr("This Microsoft account is currently restricted and your guardian has not given you permission to play "
-                                 "online. Login to %1 and have your guardian change your permissions.")
-                                  .arg("<a href=\"https://account.microsoft.com/family/\">account.microsoft.com</a>"));
-                return true;
-            }
-            case 2148916234: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT,
-                              tr("This Microsoft account has not accepted Xbox's Terms of Service. Please login and accept them."));
-                return true;
-            }
-            default: {
-                emit finished(AccountTaskState::STATE_FAILED_SOFT,
-                              tr("XSTS authentication ended with unrecognized error(s):\n\n%1").arg(errorCode));
-                return true;
-            }
+        case 2148916236: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account requires proof of age to play. Please login to %1 to provide proof of age.")
+                              .arg("<a href=\"https://login.live.com/login.srf\">login.live.com</a>"));
+            return true;
+        }
+        case 2148916237:
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account has reached its limit for playtime. This "
+                             "Microsoft account has been blocked from logging in."));
+            return true;
+        case 2148916227: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account was banned by Xbox for violating one or more "
+                             "Community Standards for Xbox and is unable to be used."));
+            return true;
+        }
+        case 2148916229: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account is currently restricted and your guardian has not given you permission to play "
+                             "online. Login to %1 and have your guardian change your permissions.")
+                              .arg("<a href=\"https://account.microsoft.com/family/\">account.microsoft.com</a>"));
+            return true;
+        }
+        case 2148916234: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("This Microsoft account has not accepted Xbox's Terms of Service. Please login and accept them."));
+            return true;
+        }
+        default: {
+            emit finished(AccountTaskState::STATE_FAILED_SOFT,
+                          tr("XSTS authentication ended with unrecognized error(s):\n\n%1").arg(errorCode));
+            return true;
+        }
         }
     }
     return false;

@@ -42,32 +42,34 @@
 
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class ProxyPage;
 }
 
-class ProxyPage : public QWidget, public BasePage {
+class ProxyPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ProxyPage(QWidget* parent = 0);
     ~ProxyPage();
 
     QString displayName() const override { return tr("Proxy"); }
-    QIcon icon() const override { return QIcon::fromTheme("proxy"); }
+    QIcon   icon() const override { return QIcon::fromTheme("proxy"); }
     QString id() const override { return "proxy-settings"; }
     QString helpPage() const override { return "Proxy-settings"; }
-    bool apply() override;
-    void retranslate() override;
+    bool    apply() override;
+    void    retranslate() override;
 
-   private slots:
+private slots:
     void proxyGroupChanged(QAbstractButton* button);
 
-   private:
+private:
     void updateCheckboxStuff();
     void applySettings();
     void loadSettings();
 
-   private:
+private:
     Ui::ProxyPage* ui;
 };

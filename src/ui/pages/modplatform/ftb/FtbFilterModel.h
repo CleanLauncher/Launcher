@@ -18,32 +18,35 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
-namespace Ftb {
+namespace Ftb
+{
 
-class FilterModel : public QSortFilterProxyModel {
+class FilterModel : public QSortFilterProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     FilterModel(QObject* parent = Q_NULLPTR);
-    enum Sorting {
+    enum Sorting
+    {
         ByPlays,
         ByInstalls,
         ByName,
     };
     const QMap<QString, Sorting> getAvailableSortings();
-    QString translateCurrentSorting();
-    void setSorting(Sorting sorting);
-    Sorting getCurrentSorting();
-    void setSearchTerm(const QString& term);
+    QString                      translateCurrentSorting();
+    void                         setSorting(Sorting sorting);
+    Sorting                      getCurrentSorting();
+    void                         setSearchTerm(const QString& term);
 
-   protected:
+protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
 
-   private:
+private:
     QMap<QString, Sorting> m_sortings;
-    Sorting m_currentSorting;
-    QString m_searchTerm{ "" };
+    Sorting                m_currentSorting;
+    QString                m_searchTerm{""};
 };
 
 }  // namespace Ftb

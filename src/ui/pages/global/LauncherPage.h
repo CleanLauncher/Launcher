@@ -38,36 +38,38 @@
 #include <QDialog>
 #include <memory>
 
-#include <translations/TranslationsModel.h>
 #include "java/JavaChecker.h"
 #include "ui/pages/BasePage.h"
+#include <translations/TranslationsModel.h>
 
 class QTextCharFormat;
 class SettingsObject;
 
-namespace Ui {
+namespace Ui
+{
 class LauncherPage;
 }
 
-class LauncherPage : public QWidget, public BasePage {
+class LauncherPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit LauncherPage(QWidget* parent = 0);
     ~LauncherPage();
 
     QString displayName() const override { return tr("General"); }
-    QIcon icon() const override { return QIcon::fromTheme("settings"); }
+    QIcon   icon() const override { return QIcon::fromTheme("settings"); }
     QString id() const override { return "launcher-settings"; }
     QString helpPage() const override { return "Launcher-settings"; }
-    bool apply() override;
-    void retranslate() override;
+    bool    apply() override;
+    void    retranslate() override;
 
-   private:
+private:
     void applySettings();
     void loadSettings();
 
-   private slots:
+private slots:
     void on_instDirBrowseBtn_clicked();
     void on_modsDirBrowseBtn_clicked();
     void on_iconsDirBrowseBtn_clicked();
@@ -76,6 +78,6 @@ class LauncherPage : public QWidget, public BasePage {
     void on_skinsDirBrowseBtn_clicked();
     void on_metadataEnableBtn_clicked();
 
-   private:
+private:
     Ui::LauncherPage* ui;
 };

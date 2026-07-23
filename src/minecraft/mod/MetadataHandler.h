@@ -21,7 +21,8 @@
 
 #include "modplatform/packwiz/Packwiz.h"
 
-namespace Metadata {
+namespace Metadata
+{
 using ModStruct = Packwiz::V1::Mod;
 
 inline ModStruct create(const QDir& index_dir, ModPlatform::IndexedPack& mod_pack, ModPlatform::IndexedVersion& mod_version)

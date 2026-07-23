@@ -20,9 +20,10 @@
 
 #include "net/NetRequest.h"
 
-class SkinUpload : public Net::NetRequest {
+class SkinUpload : public Net::NetRequest
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<SkinUpload>;
 
     SkinUpload(QString path, QString variant);
@@ -30,10 +31,10 @@ class SkinUpload : public Net::NetRequest {
 
     static SkinUpload::Ptr make(QString token, QString path, QString variant);
 
-   protected:
+protected:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
 
-   private:
+private:
     QString m_path;
     QString m_variant;
 };

@@ -38,13 +38,15 @@
 
 #include "Sink.h"
 
-namespace Net {
+namespace Net
+{
 
-class ByteArraySink : public Sink {
-   public:
+class ByteArraySink : public Sink
+{
+public:
     virtual ~ByteArraySink() = default;
 
-   public:
+public:
     auto init(QNetworkRequest& request) -> Task::State override
     {
         m_output.clear();
@@ -82,7 +84,7 @@ class ByteArraySink : public Sink {
 
     QByteArray* output() { return &m_output; }
 
-   protected:
+protected:
     QByteArray m_output;
 };
 }  // namespace Net

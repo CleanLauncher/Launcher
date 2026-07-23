@@ -1,24 +1,27 @@
 #include "POTranslator.h"
 
-#include <QDebug>
 #include "FileSystem.h"
+#include <QDebug>
 
-struct POEntry {
+struct POEntry
+{
     QString text;
-    bool fuzzy;
+    bool    fuzzy;
 };
 
-struct POTranslatorPrivate {
-    QString filename;
+struct POTranslatorPrivate
+{
+    QString                    filename;
     QHash<QByteArray, POEntry> mapping;
     QHash<QByteArray, POEntry> mapping_disambiguatrion;
-    bool loaded = false;
+    bool                       loaded = false;
 
     void reload();
 };
 
-class ParserArray : public QByteArray {
-   public:
+class ParserArray : public QByteArray
+{
+public:
     ParserArray(const QByteArray& in) : QByteArray(in) {}
     bool chomp(const char* data, int length)
     {
@@ -31,7 +34,7 @@ class ParserArray : public QByteArray {
     bool chompString(QByteArray& appendHere)
     {
         QByteArray msg;
-        bool escape = false;
+        bool       escape = false;
         if (size() < 2) {
             qDebug() << "String fragment is too short";
             return false;
@@ -48,69 +51,69 @@ class ParserArray : public QByteArray {
             char c = operator[](i);
             if (escape) {
                 switch (c) {
-                    case 'r':
-                        msg += '\r';
-                        break;
-                    case 'n':
-                        msg += '\n';
-                        break;
-                    case 't':
-                        msg += '\t';
-                        break;
-                    case 'v':
-                        msg += '\v';
-                        break;
-                    case 'a':
-                        msg += '\a';
-                        break;
-                    case 'b':
-                        msg += '\b';
-                        break;
-                    case 'f':
-                        msg += '\f';
-                        break;
-                    case '"':
-                        msg += '"';
-                        break;
-                    case '\\':
-                        msg.append('\\');
-                        break;
-                    case '0':
-                    case '1':
-                    case '2':
-                    case '3':
-                    case '4':
-                    case '5':
-                    case '6':
-                    case '7': {
-                        int octal_start = i;
-                        while ((c = operator[](i)) >= '0' && c <= '7') {
-                            i++;
-                            if (i == length() - 1) {
-                                qDebug() << "Something went bad while parsing an octal escape string...";
-                                return false;
-                            }
-                        }
-                        msg += mid(octal_start, i - octal_start).toUInt(0, 8);
-                        break;
-                    }
-                    case 'x': {
+                case 'r':
+                    msg += '\r';
+                    break;
+                case 'n':
+                    msg += '\n';
+                    break;
+                case 't':
+                    msg += '\t';
+                    break;
+                case 'v':
+                    msg += '\v';
+                    break;
+                case 'a':
+                    msg += '\a';
+                    break;
+                case 'b':
+                    msg += '\b';
+                    break;
+                case 'f':
+                    msg += '\f';
+                    break;
+                case '"':
+                    msg += '"';
+                    break;
+                case '\\':
+                    msg.append('\\');
+                    break;
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7': {
+                    int octal_start = i;
+                    while ((c = operator[](i)) >= '0' && c <= '7') {
                         i++;
-                        int hex_start = i;
-                        while (isxdigit(operator[](i))) {
-                            i++;
-                            if (i == length() - 1) {
-                                qDebug() << "Something went bad while parsing a hex escape string...";
-                                return false;
-                            }
+                        if (i == length() - 1) {
+                            qDebug() << "Something went bad while parsing an octal escape string...";
+                            return false;
                         }
-                        msg += mid(hex_start, i - hex_start).toUInt(0, 16);
-                        break;
                     }
-                    default: {
-                        qDebug() << "Invalid escape sequence character:" << c;
-                        return false;
+                    msg += mid(octal_start, i - octal_start).toUInt(0, 8);
+                    break;
+                }
+                case 'x': {
+                    i++;
+                    int hex_start = i;
+                    while (isxdigit(operator[](i))) {
+                        i++;
+                        if (i == length() - 1) {
+                            qDebug() << "Something went bad while parsing a hex escape string...";
+                            return false;
+                        }
                     }
+                    msg += mid(hex_start, i - hex_start).toUInt(0, 16);
+                    break;
+                }
+                default: {
+                    qDebug() << "Invalid escape sequence character:" << c;
+                    return false;
+                }
                 }
                 escape = false;
             } else if (c == '\\') {
@@ -140,30 +143,36 @@ void POTranslatorPrivate::reload()
     QByteArray disambiguation;
     QByteArray id;
     QByteArray str;
-    bool fuzzy = false;
-    bool nextFuzzy = false;
+    bool       fuzzy     = false;
+    bool       nextFuzzy = false;
 
-    enum class Mode { First, MessageContext, MessageId, MessageString } mode = Mode::First;
+    enum class Mode
+    {
+        First,
+        MessageContext,
+        MessageId,
+        MessageString
+    } mode = Mode::First;
 
-    int lineNumber = 0;
+    int                        lineNumber = 0;
     QHash<QByteArray, POEntry> newMapping;
     QHash<QByteArray, POEntry> newMapping_disambiguation;
-    auto endEntry = [&]() {
+    auto                       endEntry = [&]() {
         auto strStr = QString::fromUtf8(str);
 
         if (!id.isEmpty()) {
             auto normalKey = context + "|" + id;
-            newMapping.insert(normalKey, { strStr, fuzzy });
+            newMapping.insert(normalKey, {strStr, fuzzy});
             if (!disambiguation.isEmpty()) {
                 auto disambiguationKey = context + "|" + id + "@" + disambiguation;
-                newMapping_disambiguation.insert(disambiguationKey, { strStr, fuzzy });
+                newMapping_disambiguation.insert(disambiguationKey, {strStr, fuzzy});
             }
         }
         context.clear();
         disambiguation.clear();
         id.clear();
         str.clear();
-        fuzzy = nextFuzzy;
+        fuzzy     = nextFuzzy;
         nextFuzzy = false;
     };
     while (!file.atEnd()) {
@@ -184,18 +193,18 @@ void POTranslatorPrivate::reload()
             QByteArray* out = nullptr;
 
             switch (mode) {
-                case Mode::First:
-                    qDebug() << "Unexpected escaped string during initial state... line:" << lineNumber;
-                    return;
-                case Mode::MessageString:
-                    out = &str;
-                    break;
-                case Mode::MessageContext:
-                    out = &context;
-                    break;
-                case Mode::MessageId:
-                    out = &id;
-                    break;
+            case Mode::First:
+                qDebug() << "Unexpected escaped string during initial state... line:" << lineNumber;
+                return;
+            case Mode::MessageString:
+                out = &str;
+                break;
+            case Mode::MessageContext:
+                out = &context;
+                break;
+            case Mode::MessageId:
+                out = &id;
+                break;
             }
             if (!line.chompString(*out)) {
                 qDebug() << "Badly formatted string on line:" << lineNumber;
@@ -203,19 +212,19 @@ void POTranslatorPrivate::reload()
             }
         } else if (line.chomp("msgctxt ", 8)) {
             switch (mode) {
-                case Mode::First:
-                    break;
-                case Mode::MessageString:
-                    endEntry();
-                    break;
-                case Mode::MessageContext:
-                case Mode::MessageId:
-                    qDebug() << "Unexpected msgctxt line:" << lineNumber;
-                    return;
+            case Mode::First:
+                break;
+            case Mode::MessageString:
+                endEntry();
+                break;
+            case Mode::MessageContext:
+            case Mode::MessageId:
+                qDebug() << "Unexpected msgctxt line:" << lineNumber;
+                return;
             }
             if (line.chompString(context)) {
                 auto parts = context.split('|');
-                context = parts[0];
+                context    = parts[0];
                 if (parts.size() > 1 && !parts[1].isEmpty()) {
                     disambiguation = parts[1];
                 }
@@ -223,28 +232,28 @@ void POTranslatorPrivate::reload()
             }
         } else if (line.chomp("msgid ", 6)) {
             switch (mode) {
-                case Mode::MessageContext:
-                case Mode::First:
-                    break;
-                case Mode::MessageString:
-                    endEntry();
-                    break;
-                case Mode::MessageId:
-                    qDebug() << "Unexpected msgid line:" << lineNumber;
-                    return;
+            case Mode::MessageContext:
+            case Mode::First:
+                break;
+            case Mode::MessageString:
+                endEntry();
+                break;
+            case Mode::MessageId:
+                qDebug() << "Unexpected msgid line:" << lineNumber;
+                return;
             }
             if (line.chompString(id)) {
                 mode = Mode::MessageId;
             }
         } else if (line.chomp("msgstr ", 7)) {
             switch (mode) {
-                case Mode::First:
-                case Mode::MessageString:
-                case Mode::MessageContext:
-                    qDebug() << "Unexpected msgstr line:" << lineNumber;
-                    return;
-                case Mode::MessageId:
-                    break;
+            case Mode::First:
+            case Mode::MessageString:
+            case Mode::MessageContext:
+                qDebug() << "Unexpected msgstr line:" << lineNumber;
+                return;
+            case Mode::MessageId:
+                break;
             }
             if (line.chompString(str)) {
                 mode = Mode::MessageString;
@@ -255,14 +264,14 @@ void POTranslatorPrivate::reload()
         lineNumber++;
     }
     endEntry();
-    mapping = std::move(newMapping);
+    mapping                 = std::move(newMapping);
     mapping_disambiguatrion = std::move(newMapping_disambiguation);
-    loaded = true;
+    loaded                  = true;
 }
 
 POTranslator::POTranslator(const QString& filename, QObject* parent) : QTranslator(parent)
 {
-    d = new POTranslatorPrivate;
+    d           = new POTranslatorPrivate;
     d->filename = filename;
     d->reload();
 }
@@ -276,7 +285,7 @@ QString POTranslator::translate(const char* context, const char* sourceText, con
 {
     if (disambiguation) {
         auto disambiguationKey = QByteArray(context) + "|" + QByteArray(sourceText) + "@" + QByteArray(disambiguation);
-        auto iter = d->mapping_disambiguatrion.find(disambiguationKey);
+        auto iter              = d->mapping_disambiguatrion.find(disambiguationKey);
         if (iter != d->mapping_disambiguatrion.end()) {
             auto& entry = *iter;
             if (entry.text.isEmpty()) {
@@ -288,7 +297,7 @@ QString POTranslator::translate(const char* context, const char* sourceText, con
             return entry.text;
         }
     }
-    auto key = QByteArray(context) + "|" + QByteArray(sourceText);
+    auto key  = QByteArray(context) + "|" + QByteArray(sourceText);
     auto iter = d->mapping.find(key);
     if (iter != d->mapping.end()) {
         auto& entry = *iter;

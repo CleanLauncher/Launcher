@@ -34,23 +34,23 @@
  *      limitations under the License.
  */
 #include "SystemTheme.h"
+#include "HintOverrideProxyStyle.h"
+#include "ThemeManager.h"
 #include <QApplication>
 #include <QStyle>
 #include <QStyleFactory>
-#include "HintOverrideProxyStyle.h"
-#include "ThemeManager.h"
 
-static const QStringList S_NATIVE_STYLES{ "windows11", "windowsvista", "macos", "system", "windows" };
+static const QStringList S_NATIVE_STYLES{"windows11", "windowsvista", "macos", "system", "windows"};
 
 SystemTheme::SystemTheme(const QString& styleName, const QPalette& defaultPalette, bool isDefaultTheme)
 {
-    m_themeName = isDefaultTheme ? "system" : styleName;
+    m_themeName   = isDefaultTheme ? "system" : styleName;
     m_widgetTheme = styleName;
 
     if (S_NATIVE_STYLES.contains(m_themeName)) {
         m_colorPalette = defaultPalette;
     } else {
-        auto style = QStyleFactory::create(styleName);
+        auto style     = QStyleFactory::create(styleName);
         m_colorPalette = style != nullptr ? style->standardPalette() : defaultPalette;
         delete style;
     }

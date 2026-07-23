@@ -43,19 +43,13 @@
 #include <QThread>
 #include <utility>
 
-ResourceFolderLoadTask::ResourceFolderLoadTask(const QDir& resourceDir,
-                                               const QDir& indexDir,
-                                               bool isIndexed,
-                                               bool cleanOrphan,
+ResourceFolderLoadTask::ResourceFolderLoadTask(const QDir&                                resourceDir,
+                                               const QDir&                                indexDir,
+                                               bool                                       isIndexed,
+                                               bool                                       cleanOrphan,
                                                std::function<Resource*(const QFileInfo&)> createFunction)
-    : Task(false)
-    , m_resource_dir(resourceDir)
-    , m_index_dir(indexDir)
-    , m_is_indexed(isIndexed)
-    , m_clean_orphan(cleanOrphan)
-    , m_create_func(std::move(createFunction))
-    , m_result(new Result())
-    , m_thread_to_spawn_into(thread())
+    : Task(false), m_resource_dir(resourceDir), m_index_dir(indexDir), m_is_indexed(isIndexed), m_clean_orphan(cleanOrphan),
+      m_create_func(std::move(createFunction)), m_result(new Result()), m_thread_to_spawn_into(thread())
 {}
 
 void ResourceFolderLoadTask::executeTask()

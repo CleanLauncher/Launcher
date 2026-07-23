@@ -3,21 +3,23 @@
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class ScrollMessageBox;
 }
 QT_END_NAMESPACE
 
-class ScrollMessageBox : public QDialog {
+class ScrollMessageBox : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     ScrollMessageBox(QWidget* parent, const QString& title, const QString& text, const QString& body, const QString& option = {});
 
     ~ScrollMessageBox() override;
 
     bool isOptionChecked() const;
 
-   private:
+private:
     Ui::ScrollMessageBox* ui;
 };

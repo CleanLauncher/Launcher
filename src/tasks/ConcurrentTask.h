@@ -43,9 +43,10 @@
 
 #include "tasks/Task.h"
 
-class ConcurrentTask : public Task {
+class ConcurrentTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<ConcurrentTask>;
 
     explicit ConcurrentTask(QString task_name = "", int max_concurrent = 6);
@@ -56,35 +57,35 @@ class ConcurrentTask : public Task {
     bool canAbort() const override { return true; }
 
     inline auto isMultiStep() const -> bool override { return totalSize() > 1; }
-    auto getStepProgress() const -> TaskStepProgressList override;
+    auto        getStepProgress() const -> TaskStepProgressList override;
 
     void addTask(Task::Ptr task);
 
-   public slots:
+public slots:
     bool abort() override;
 
     void clear();
 
-   protected slots:
+protected slots:
     void executeTask() override;
 
     virtual void executeNextSubTask();
 
-    void subTaskSucceeded(Task::Ptr);
+    void         subTaskSucceeded(Task::Ptr);
     virtual void subTaskFailed(Task::Ptr, const QString& msg);
-    void subTaskFinished(Task::Ptr, TaskStepState);
-    void subTaskStatus(Task::Ptr task, const QString& msg);
-    void subTaskDetails(Task::Ptr task, const QString& msg);
-    void subTaskProgress(Task::Ptr task, qint64 current, qint64 total);
+    void         subTaskFinished(Task::Ptr, TaskStepState);
+    void         subTaskStatus(Task::Ptr task, const QString& msg);
+    void         subTaskDetails(Task::Ptr task, const QString& msg);
+    void         subTaskProgress(Task::Ptr task, qint64 current, qint64 total);
 
-   protected:
+protected:
     unsigned int totalSize() const { return static_cast<unsigned int>(m_queue.size() + m_doing.size() + m_done.size()); }
 
     virtual void updateState();
 
     void startSubTask(Task::Ptr task);
 
-   protected:
+protected:
     QQueue<Task::Ptr> m_queue;
 
     QHash<Task*, Task::Ptr> m_doing;

@@ -5,10 +5,11 @@
 #include "net/Download.h"
 #include "net/NetJob.h"
 
-class GetSkinStep : public AuthStep {
+class GetSkinStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit GetSkinStep(AccountData* data);
     virtual ~GetSkinStep() noexcept = default;
 
@@ -16,10 +17,10 @@ class GetSkinStep : public AuthStep {
 
     QString describe() override;
 
-   private slots:
+private slots:
     void onRequestDone(QByteArray* response);
 
-   private:
+private:
     Net::Download::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr        m_task;
 };

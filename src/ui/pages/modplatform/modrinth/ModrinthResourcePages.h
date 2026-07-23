@@ -46,9 +46,11 @@
 #include "ui/pages/modplatform/ShaderPackPage.h"
 #include "ui/pages/modplatform/TexturePackPage.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
-namespace Modrinth {
+namespace Modrinth
+{
 static inline QString displayName()
 {
     return "Modrinth";
@@ -71,10 +73,11 @@ static inline QString metaEntryBase()
 }
 }  // namespace Modrinth
 
-class ModrinthModPage : public ModPage {
+class ModrinthModPage : public ModPage
+{
     Q_OBJECT
 
-   public:
+public:
     static ModrinthModPage* create(ModDownloadDialog* dialog, BaseInstance& instance)
     {
         return ModPage::create<ModrinthModPage>(dialog, instance);
@@ -95,15 +98,16 @@ class ModrinthModPage : public ModPage {
 
     std::unique_ptr<ModFilterWidget> createFilterWidget() override;
 
-   protected:
+protected:
     virtual void prepareProviderCategories() override;
-    Task::Ptr m_categoriesTask;
+    Task::Ptr    m_categoriesTask;
 };
 
-class ModrinthResourcePackPage : public ResourcePackResourcePage {
+class ModrinthResourcePackPage : public ResourcePackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static ModrinthResourcePackPage* create(ResourcePackDownloadDialog* dialog, BaseInstance& instance)
     {
         return ResourcePackResourcePage::create<ModrinthResourcePackPage>(dialog, instance);
@@ -123,10 +127,11 @@ class ModrinthResourcePackPage : public ResourcePackResourcePage {
     inline auto helpPage() const -> QString override { return ""; }
 };
 
-class ModrinthTexturePackPage : public TexturePackResourcePage {
+class ModrinthTexturePackPage : public TexturePackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static ModrinthTexturePackPage* create(TexturePackDownloadDialog* dialog, BaseInstance& instance)
     {
         return TexturePackResourcePage::create<ModrinthTexturePackPage>(dialog, instance);
@@ -146,10 +151,11 @@ class ModrinthTexturePackPage : public TexturePackResourcePage {
     inline auto helpPage() const -> QString override { return ""; }
 };
 
-class ModrinthShaderPackPage : public ShaderPackResourcePage {
+class ModrinthShaderPackPage : public ShaderPackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static ModrinthShaderPackPage* create(ShaderPackDownloadDialog* dialog, BaseInstance& instance)
     {
         return ShaderPackResourcePage::create<ModrinthShaderPackPage>(dialog, instance);
@@ -169,10 +175,11 @@ class ModrinthShaderPackPage : public ShaderPackResourcePage {
     inline auto helpPage() const -> QString override { return ""; }
 };
 
-class ModrinthDataPackPage : public DataPackResourcePage {
+class ModrinthDataPackPage : public DataPackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static ModrinthDataPackPage* create(DataPackDownloadDialog* dialog, BaseInstance& instance)
     {
         return DataPackResourcePage::create<ModrinthDataPackPage>(dialog, instance);

@@ -18,12 +18,13 @@
 
 #pragma once
 
-#include <QSet>
-#include <QString>
 #include "SysInfo.h"
 #include "settings/SettingsObject.h"
+#include <QSet>
+#include <QString>
 
-struct RuntimeContext {
+struct RuntimeContext
+{
     QString javaArchitecture;
     QString javaRealArchitecture;
     QString system = SysInfo::currentSystem();
@@ -43,7 +44,7 @@ struct RuntimeContext {
 
     void updateFromInstanceSettings(SettingsObject* instanceSettings)
     {
-        javaArchitecture = instanceSettings->get("JavaArchitecture").toString();
+        javaArchitecture     = instanceSettings->get("JavaArchitecture").toString();
         javaRealArchitecture = instanceSettings->get("JavaRealArchitecture").toString();
     }
 

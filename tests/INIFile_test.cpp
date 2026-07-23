@@ -1,17 +1,18 @@
 #include <QTest>
 
-#include <settings/INIFile.h>
+#include "FileSystem.h"
 #include <QList>
 #include <QSettings>
 #include <QTemporaryFile>
 #include <QVariant>
-#include "FileSystem.h"
+#include <settings/INIFile.h>
 
 #include <QVariantUtils.h>
 
-class IniFileTest : public QObject {
+class IniFileTest : public QObject
+{
     Q_OBJECT
-   private slots:
+private slots:
     void initTestCase() {}
     void cleanupTestCase() {}
 
@@ -29,8 +30,8 @@ class IniFileTest : public QObject {
 
     void test_SaveLoad()
     {
-        QString a = "a";
-        QString b = "a\nb\t\n\\\\\\C:\\Program files\\terrible\\name\\of something\\#thisIsNotAComment";
+        QString a        = "a";
+        QString b        = "a\nb\t\n\\\\\\C:\\Program files\\terrible\\name\\of something\\#thisIsNotAComment";
         QString filename = "test_SaveLoad.ini";
 
         INIFile f;
@@ -46,11 +47,11 @@ class IniFileTest : public QObject {
 
     void test_SaveLoadLists()
     {
-        QString slist_strings = "(\"a\",\"b\",\"c\")";
-        QStringList list_strings = { "a", "b", "c" };
+        QString     slist_strings = "(\"a\",\"b\",\"c\")";
+        QStringList list_strings  = {"a", "b", "c"};
 
-        QString slist_numbers = "(1,2,3,10)";
-        QList<int> list_numbers = { 1, 2, 3, 10 };
+        QString    slist_numbers = "(1,2,3,10)";
+        QList<int> list_numbers  = {1, 2, 3, 10};
 
         QString filename = "test_SaveLoadLists.ini";
 
@@ -85,7 +86,7 @@ Wrapperommand=)";
         fileContent += "\"\n";
 #if defined(Q_OS_WIN)
         QString fileName = "test_SaveAlreadyExistingFile.ini";
-        QFile file(fileName);
+        QFile   file(fileName);
         QCOMPARE(file.open(QFile::WriteOnly | QFile::Text), true);
 #else
         QTemporaryFile file;
@@ -123,7 +124,7 @@ Wrapperommand=)";
         QString fileName = file.fileName();
         file.close();
 #endif
-        QSettings settings{ fileName, QSettings::Format::IniFormat };
+        QSettings settings{fileName, QSettings::Format::IniFormat};
         settings.setFallbacksEnabled(false);
 
         settings.setValue("simple", "value1");
@@ -164,7 +165,7 @@ PreLaunchCommand=)";
 
 #if defined(Q_OS_WIN)
         QString fileName = "test_SaveAlreadyExistingFileWithSpecialCharsV1.ini";
-        QFile file(fileName);
+        QFile   file(fileName);
         QCOMPARE(file.open(QFile::WriteOnly | QFile::Text), true);
 #else
         QTemporaryFile file;

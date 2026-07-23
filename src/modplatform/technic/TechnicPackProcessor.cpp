@@ -21,19 +21,19 @@
 #include <minecraft/PackProfile.h>
 #include <settings/INISettingsObject.h>
 
-#include <memory>
 #include "archive/ArchiveReader.h"
+#include <memory>
 
-void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
-                                        const QString& instName,
-                                        const QString& instIcon,
-                                        const QString& stagingPath,
-                                        const QString& minecraftVersion,
+void Technic::TechnicPackProcessor::run(SettingsObject*             globalSettings,
+                                        const QString&              instName,
+                                        const QString&              instIcon,
+                                        const QString&              stagingPath,
+                                        const QString&              minecraftVersion,
                                         [[maybe_unused]] const bool isSolder)
 {
-    QString minecraftPath = FS::PathCombine(stagingPath, "minecraft");
-    QString configPath = FS::PathCombine(stagingPath, "instance.cfg");
-    auto instanceSettings = std::make_unique<INISettingsObject>(configPath);
+    QString           minecraftPath    = FS::PathCombine(stagingPath, "minecraft");
+    QString           configPath       = FS::PathCombine(stagingPath, "instance.cfg");
+    auto              instanceSettings = std::make_unique<INISettingsObject>(configPath);
     MinecraftInstance instance(globalSettings, std::move(instanceSettings), stagingPath);
 
     instance.setName(instName);
@@ -47,7 +47,7 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
 
     QByteArray data;
 
-    QString modpackJar = FS::PathCombine(minecraftPath, "bin", "modpack.jar");
+    QString modpackJar  = FS::PathCombine(minecraftPath, "bin", "modpack.jar");
     QString versionJson = FS::PathCombine(minecraftPath, "bin", "version.json");
     QString fmlMinecraftVersion;
     if (QFile::exists(modpackJar)) {
@@ -64,7 +64,7 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                     return;
                 }
                 QByteArray fmlVersionData = file->readAll();
-                INIFile iniFile;
+                INIFile    iniFile;
                 iniFile.loadFile(fmlVersionData);
 
                 fmlMinecraftVersion = iniFile["fmlbuild.mcversion"].toString();
@@ -81,7 +81,7 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                 return;
             }
             components->setComponentVersion("net.minecraft", minecraftVersion, true);
-            components->installJarMods({ modpackJar });
+            components->installJarMods({modpackJar});
 
             if (zipFile.exists("/forgeversion.properties")) {
                 auto file = zipFile.goToFile("forgeversion.properties");
@@ -89,14 +89,14 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                     emit failed(tr("Unable to open \"forgeversion.properties\""));
                     return;
                 }
-                auto forgeVersionData = file->readAll();
+                auto    forgeVersionData = file->readAll();
                 INIFile iniFile;
                 iniFile.loadFile(forgeVersionData);
                 QString major, minor, revision, build;
-                major = iniFile["forge.major.number"].toString();
-                minor = iniFile["forge.minor.number"].toString();
+                major    = iniFile["forge.major.number"].toString();
+                minor    = iniFile["forge.minor.number"].toString();
                 revision = iniFile["forge.revision.number"].toString();
-                build = iniFile["forge.build.number"].toString();
+                build    = iniFile["forge.build.number"].toString();
 
                 if (major.isEmpty() || minor.isEmpty() || revision.isEmpty() || build.isEmpty()) {
                     emit failed(tr("Invalid \"forgeversion.properties\"!"));
@@ -126,9 +126,9 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
     }
 
     try {
-        QJsonDocument doc = Json::requireDocument(data);
-        QJsonObject root = Json::requireObject(doc, "version.json");
-        QString packMinecraftVersion = root["inheritsFrom"].toString();
+        QJsonDocument doc                  = Json::requireDocument(data);
+        QJsonObject   root                 = Json::requireObject(doc, "version.json");
+        QString       packMinecraftVersion = root["inheritsFrom"].toString();
         if (packMinecraftVersion.isEmpty()) {
             if (fmlMinecraftVersion.isEmpty()) {
                 emit failed(tr("Could not understand \"version.json\":\ninheritsFrom is missing"));
@@ -143,11 +143,11 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
             }
 
             auto libraryObject = library.toObject();
-            auto libraryName = libraryObject["name"].toString();
+            auto libraryName   = libraryObject["name"].toString();
 
             if (libraryName.startsWith("net.neoforged.fancymodloader:")) {
-                auto arguments = root["arguments"].toObject();
-                bool isVersionArg = false;
+                auto    arguments    = root["arguments"].toObject();
+                bool    isVersionArg = false;
                 QString neoforgeVersion;
                 for (auto arg : arguments["game"].toArray()) {
                     auto argument = arg.toString("");
@@ -172,9 +172,9 @@ void Technic::TechnicPackProcessor::run(SettingsObject* globalSettings,
                 }
                 break;
             } else {
-                static QMap<QString, QString> loaderMap{ { "net.minecraftforge:minecraftforge:", "net.minecraftforge" },
-                                                         { "net.fabricmc:fabric-loader:", "net.fabricmc.fabric-loader" },
-                                                         { "org.quiltmc:quilt-loader:", "org.quiltmc.quilt-loader" } };
+                static QMap<QString, QString> loaderMap{{"net.minecraftforge:minecraftforge:", "net.minecraftforge"},
+                                                        {"net.fabricmc:fabric-loader:", "net.fabricmc.fabric-loader"},
+                                                        {"org.quiltmc:quilt-loader:", "org.quiltmc.quilt-loader"}};
                 for (const auto& loader : loaderMap.keys()) {
                     if (libraryName.startsWith(loader)) {
                         components->setComponentVersion(loaderMap.value(loader), libraryName.section(':', 2));

@@ -35,8 +35,8 @@
  */
 #include "SequentialTask.h"
 
-#include <QDebug>
 #include "tasks/ConcurrentTask.h"
+#include <QDebug>
 
 SequentialTask::SequentialTask(QString task_name) : ConcurrentTask(task_name, 1) {}
 

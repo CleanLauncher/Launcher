@@ -43,7 +43,8 @@
 
 #include <minecraft/mod/tasks/LocalDataPackParseTask.h>
 
-class MetaComponentParseTest : public QObject {
+class MetaComponentParseTest : public QObject
+{
     Q_OBJECT
 
     void doTest(QString name)
@@ -59,10 +60,10 @@ class MetaComponentParseTest : public QObject {
         file.close();
 
         QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8());
-        QJsonObject obj = doc.object();
+        QJsonObject   obj = doc.object();
 
         QJsonValue description_json = obj.value("description");
-        QJsonValue expected_json = obj.value("expected_output");
+        QJsonValue expected_json    = obj.value("expected_output");
 
         QVERIFY(!description_json.isUndefined());
         QVERIFY(expected_json.isString());
@@ -74,7 +75,7 @@ class MetaComponentParseTest : public QObject {
         QCOMPARE(processed, expected);
     }
 
-   private slots:
+private slots:
     void test_parseComponentBasic() { doTest("component_basic.json"); }
     void test_parseComponentWithFormat() { doTest("component_with_format.json"); }
     void test_parseComponentWithExtra() { doTest("component_with_extra.json"); }

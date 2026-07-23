@@ -97,7 +97,7 @@ auto ImgurUpload::Sink::abort() -> Task::State
 auto ImgurUpload::Sink::finalize(QNetworkReply&) -> Task::State
 {
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(m_output, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(m_output, &jsonError);
     if (jsonError.error != QJsonParseError::NoError) {
         qDebug() << "imgur server did not reply with JSON" << jsonError.errorString();
         m_fail_reason = "Invalid json reply";
@@ -109,18 +109,18 @@ auto ImgurUpload::Sink::finalize(QNetworkReply&) -> Task::State
         m_fail_reason = "Screenshot was not uploaded successfully";
         return Task::State::Failed;
     }
-    m_shot->m_imgurId = object.value("data").toObject().value("id").toString();
-    m_shot->m_url = object.value("data").toObject().value("link").toString();
+    m_shot->m_imgurId         = object.value("data").toObject().value("id").toString();
+    m_shot->m_url             = object.value("data").toObject().value("link").toString();
     m_shot->m_imgurDeleteHash = object.value("data").toObject().value("deletehash").toString();
     return Task::State::Succeeded;
 }
 
 Net::NetRequest::Ptr ImgurUpload::make(ScreenShot::Ptr m_shot)
 {
-    auto up = makeShared<ImgurUpload>(m_shot->m_file);
+    auto up   = makeShared<ImgurUpload>(m_shot->m_file);
     up->m_url = BuildConfig.IMGUR_BASE_URL + "image";
     up->m_sink.reset(new Sink(m_shot));
     up->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(QList<Net::HeaderPair>{
-        { "Authorization", QString("Client-ID %1").arg(BuildConfig.IMGUR_CLIENT_ID).toUtf8() }, { "Accept", "application/json" } }));
+        {"Authorization", QString("Client-ID %1").arg(BuildConfig.IMGUR_CLIENT_ID).toUtf8()}, {"Accept", "application/json"}}));
     return up;
 }

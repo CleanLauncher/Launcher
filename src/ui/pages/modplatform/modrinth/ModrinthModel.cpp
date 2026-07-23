@@ -49,7 +49,8 @@
 #include <QMessageBox>
 #include <memory>
 
-namespace Modrinth {
+namespace Modrinth
+{
 
 ModpackListModel::ModpackListModel(ModrinthPage* parent) : QAbstractListModel(parent), m_parent(parent) {}
 
@@ -78,38 +79,38 @@ auto ModpackListModel::data(const QModelIndex& index, int role) const -> QVarian
 
     auto pack = m_modpacks.at(pos);
     switch (role) {
-        case Qt::ToolTipRole: {
-            if (pack->description.length() > 100) {
-                QString edit = pack->description.left(97);
-                edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
-                return edit;
-            }
-            return pack->description;
+    case Qt::ToolTipRole: {
+        if (pack->description.length() > 100) {
+            QString edit = pack->description.left(97);
+            edit         = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
+            return edit;
         }
-        case Qt::DecorationRole: {
-            if (m_logoMap.contains(pack->logoName))
-                return m_logoMap.value(pack->logoName);
+        return pack->description;
+    }
+    case Qt::DecorationRole: {
+        if (m_logoMap.contains(pack->logoName))
+            return m_logoMap.value(pack->logoName);
 
-            QIcon icon = QIcon::fromTheme("screenshot-placeholder");
-            ((ModpackListModel*)this)->requestLogo(pack->logoName, pack->logoUrl);
-            return icon;
-        }
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
-        }
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
+        QIcon icon = QIcon::fromTheme("screenshot-placeholder");
+        ((ModpackListModel*)this)->requestLogo(pack->logoName, pack->logoUrl);
+        return icon;
+    }
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
 
-        case UserDataTypes::TITLE:
-            return pack->name;
-        case UserDataTypes::DESCRIPTION:
-            return pack->description;
-        case UserDataTypes::INSTALLED:
-            return false;
-        default:
-            break;
+    case UserDataTypes::TITLE:
+        return pack->name;
+    case UserDataTypes::DESCRIPTION:
+        return pack->description;
+    case UserDataTypes::INSTALLED:
+        return false;
+    default:
+        break;
     }
 
     return {};
@@ -144,13 +145,13 @@ void ModpackListModel::performPaginatedSearch()
                 searchRequestFailed(reason, network_error_code);
             };
             callbacks.on_succeed = [this](auto& pack) { searchRequestForOneSucceeded(pack); };
-            callbacks.on_abort = [this] {
+            callbacks.on_abort   = [this] {
                 qCritical() << "Search task aborted by an unknown reason!";
                 searchRequestFailed("Aborted", 0);
             };
-            auto project = std::make_shared<ModPlatform::IndexedPack>();
+            auto project     = std::make_shared<ModPlatform::IndexedPack>();
             project->addonId = projectId;
-            if (auto job = api.getProjectInfo({ project }, std::move(callbacks), false); job) {
+            if (auto job = api.getProjectInfo({project}, std::move(callbacks), false); job) {
                 m_jobPtr = job;
                 m_jobPtr->start();
             }
@@ -164,14 +165,21 @@ void ModpackListModel::performPaginatedSearch()
     ResourceAPI::Callback<QList<ModPlatform::IndexedPack::Ptr>> callbacks{};
 
     callbacks.on_succeed = [this](auto& doc) { searchRequestFinished(doc); };
-    callbacks.on_fail = [this](QString reason, int network_error_code) { searchRequestFailed(reason, network_error_code); };
-    callbacks.on_abort = [this] {
+    callbacks.on_fail    = [this](QString reason, int network_error_code) { searchRequestFailed(reason, network_error_code); };
+    callbacks.on_abort   = [this] {
         qCritical() << "Search task aborted by an unknown reason!";
         searchRequestFailed("Aborted", 0);
     };
 
-    auto netJob = api.searchProjects({ ModPlatform::ResourceType::Modpack, m_nextSearchOffset, m_currentSearchTerm, sort, m_filter->loaders,
-                                       m_filter->versions, ModPlatform::Side::NoSide, m_filter->categoryIds, m_filter->openSource },
+    auto netJob = api.searchProjects({ModPlatform::ResourceType::Modpack,
+                                      m_nextSearchOffset,
+                                      m_currentSearchTerm,
+                                      sort,
+                                      m_filter->loaders,
+                                      m_filter->versions,
+                                      ModPlatform::Side::NoSide,
+                                      m_filter->categoryIds,
+                                      m_filter->openSource},
                                      std::move(callbacks));
 
     m_jobPtr = netJob;
@@ -198,24 +206,24 @@ void ModpackListModel::refresh()
 static auto sortFromIndex(int index) -> QString
 {
     switch (index) {
-        default:
-        case 0:
-            return "relevance";
-        case 1:
-            return "downloads";
-        case 2:
-            return "follows";
-        case 3:
-            return "newest";
-        case 4:
-            return "updated";
+    default:
+    case 0:
+        return "relevance";
+    case 1:
+        return "downloads";
+    case 2:
+        return "follows";
+    case 3:
+        return "newest";
+    case 4:
+        return "updated";
     }
 }
 
-void ModpackListModel::searchWithTerm(const QString& term,
-                                      const int sort,
+void ModpackListModel::searchWithTerm(const QString&                           term,
+                                      const int                                sort,
                                       std::shared_ptr<ModFilterWidget::Filter> filter,
-                                      bool filterChanged)
+                                      bool                                     filterChanged)
 {
     if (sort > 5 || sort < 0)
         return;
@@ -227,8 +235,8 @@ void ModpackListModel::searchWithTerm(const QString& term,
     }
 
     m_currentSearchTerm = term;
-    m_currentSort = sort_str;
-    m_filter = filter;
+    m_currentSort       = sort_str;
+    m_filter            = filter;
 
     refresh();
 }
@@ -249,7 +257,7 @@ void ModpackListModel::requestLogo(QString logo, QString url)
     }
 
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry(m_parent->metaEntryBase(), QString("logos/%1").arg(logo));
-    auto job = new NetJob(QString("%1 Icon Download %2").arg(m_parent->debugName()).arg(logo), APPLICATION->network());
+    auto         job   = new NetJob(QString("%1 Icon Download %2").arg(m_parent->debugName()).arg(logo), APPLICATION->network());
     job->setAskRetry(false);
     job->addNetAction(Net::ApiDownload::makeCached(QUrl(url), entry));
 
@@ -277,7 +285,7 @@ void ModpackListModel::logoLoaded(QString logo, QIcon out)
     m_logoMap.insert(logo, out);
     for (int i = 0; i < m_modpacks.size(); i++) {
         if (m_modpacks[i]->logoName == logo) {
-            emit dataChanged(createIndex(i, 0), createIndex(i, 0), { Qt::DecorationRole });
+            emit dataChanged(createIndex(i, 0), createIndex(i, 0), {Qt::DecorationRole});
         }
     }
 }
@@ -321,7 +329,8 @@ void ModpackListModel::searchRequestFailed(QString reason, int network_error_cod
     if (network_error_code == -1) {
         QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load modpacks."));
     } else if (network_error_code == 409) {
-        QMessageBox::critical(nullptr, tr("Error"),
+        QMessageBox::critical(nullptr,
+                              tr("Error"),
 
                               QString("%1 %2")
                                   .arg(m_parent->displayName())

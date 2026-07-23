@@ -26,33 +26,29 @@
 #include "IconTheme.h"
 #include "ui/themes/ITheme.h"
 
-inline auto themeDebugLog() {
-    return qDebug() << "[Theme]";
-}
-inline auto themeWarningLog() {
-    return qWarning() << "[Theme]";
-}
+inline auto themeDebugLog() { return qDebug() << "[Theme]"; }
+inline auto themeWarningLog() { return qWarning() << "[Theme]"; }
 
 class ThemeManager {
-   public:
+  public:
     ThemeManager();
     ~ThemeManager();
 
-    QList<IconTheme*> getValidIconThemes();
-    QList<ITheme*> getValidApplicationThemes();
-    bool isValidIconTheme(const QString& id);
-    bool isValidApplicationTheme(const QString& id);
+    QList<IconTheme *> getValidIconThemes();
+    QList<ITheme *> getValidApplicationThemes();
+    bool isValidIconTheme(const QString &id);
+    bool isValidApplicationTheme(const QString &id);
     QDir getIconThemesFolder();
     QDir getApplicationThemesFolder();
     void applyCurrentlySelectedTheme(bool initial = false);
-    void setIconTheme(const QString& name);
-    void setApplicationTheme(const QString& name, bool initial = false);
+    void setIconTheme(const QString &name);
+    void setApplicationTheme(const QString &name, bool initial = false);
 
-    const LogColors& getLogColors() { return m_logColors; }
+    const LogColors &getLogColors() { return m_logColors; }
 
     void refresh();
 
-   private:
+  private:
     std::map<QString, std::unique_ptr<ITheme>> m_themes;
     std::map<QString, IconTheme> m_icons;
     QDir m_iconThemeFolder{"iconthemes"};
@@ -63,7 +59,7 @@ class ThemeManager {
 
     void initializeThemes();
     QString addTheme(std::unique_ptr<ITheme> theme);
-    ITheme* getTheme(QString themeId);
+    ITheme *getTheme(QString themeId);
     QString addIconTheme(IconTheme theme);
     void initializeIcons();
     void initializeWidgets();
@@ -74,7 +70,7 @@ class ThemeManager {
 
     void stopSettingNewWindowColorsOnMac();
 #ifdef Q_OS_MACOS
-    NSObject* m_windowTitlebarObserver = nullptr;
+    NSObject *m_windowTitlebarObserver = nullptr;
 #endif
 
     const QStringList builtinIcons{"breeze_dark", "breeze_light"};

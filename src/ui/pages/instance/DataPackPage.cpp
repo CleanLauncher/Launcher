@@ -56,9 +56,9 @@ DataPackPage::DataPackPage(BaseInstance* instance, DataPackFolderModel* model, Q
 
 void DataPackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
-    int row = sourceCurrent.row();
-    auto& dp = m_model->at(row);
+    auto  sourceCurrent = m_filterModel->mapToSource(current);
+    int   row           = sourceCurrent.row();
+    auto& dp            = m_model->at(row);
     ui->frame->updateWithDataPack(dp);
 }
 
@@ -127,11 +127,14 @@ void DataPackPage::updateDataPacks()
     }
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response =
-            CustomMessageBox::selectable(this, tr("Confirm Update"),
+            CustomMessageBox::selectable(this,
+                                         tr("Confirm Update"),
                                          tr("Updating data packs while the game is running may cause pack duplication and game crashes.\n"
                                             "The old files may not be deleted as they are in use.\n"
                                             "Are you sure you want to do this?"),
-                                         QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                         QMessageBox::Warning,
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::No)
                 ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -141,12 +144,12 @@ void DataPackPage::updateDataPacks()
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
 
     auto modsList = m_model->selectedResources(selection);
-    bool useAll = modsList.empty();
+    bool useAll   = modsList.empty();
     if (useAll) {
         modsList = m_model->allResources();
     }
 
-    ResourceUpdateDialog updateDialog(this, m_instance, m_model, modsList, false, { ModPlatform::ModLoaderType::DataPack });
+    ResourceUpdateDialog updateDialog(this, m_instance, m_model, modsList, false, {ModPlatform::ModLoaderType::DataPack});
     updateDialog.checkCandidates();
 
     if (updateDialog.aborted()) {
@@ -154,7 +157,7 @@ void DataPackPage::updateDataPacks()
         return;
     }
     if (updateDialog.noUpdates()) {
-        QString message{ tr("'%1' is up-to-date! :)").arg(modsList.front()->name()) };
+        QString message{tr("'%1' is up-to-date! :)").arg(modsList.front()->name())};
         if (modsList.size() > 1) {
             if (useAll) {
                 message = tr("All data packs are up-to-date! :)");
@@ -198,17 +201,20 @@ void DataPackPage::updateDataPacks()
 
 void DataPackPage::deleteDataPackMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection      = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectionCount = m_model->selectedDataPacks(selection).length();
     if (selectionCount == 0) {
         return;
     }
     if (selectionCount > 1) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove the metadata for %1 data packs.\n"
                                                         "Are you sure?")
                                                          .arg(selectionCount),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -288,8 +294,8 @@ GlobalDataPackPage::GlobalDataPackPage(MinecraftInstance* instance, QWidget* par
         }
     });
 
-    connect(instance->settings()->getSetting("GlobalDataPacksPath").get(), &Setting::SettingChanged, this,
-            &GlobalDataPackPage::updateContent);
+    connect(
+        instance->settings()->getSetting("GlobalDataPacksPath").get(), &Setting::SettingChanged, this, &GlobalDataPackPage::updateContent);
 }
 
 QString GlobalDataPackPage::displayName() const

@@ -19,14 +19,15 @@
 #pragma once
 #include "MSALoginDialog.h"
 
-class ElyLoginDialog : public MSALoginDialog {
+class ElyLoginDialog : public MSALoginDialog
+{
     Q_OBJECT
 
-   public:
+public:
     ~ElyLoginDialog() = default;
 
     static MinecraftAccountPtr newAccount(QWidget* parent);
 
-   private:
+private:
     explicit ElyLoginDialog(QWidget* parent = 0);
 };

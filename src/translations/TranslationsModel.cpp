@@ -53,8 +53,14 @@
 
 static constexpr QLatin1String g_defaultLangCode("en_US");
 
-namespace {
-enum class FileType : std::uint8_t { None, Qm, Po };
+namespace
+{
+enum class FileType : std::uint8_t
+{
+    None,
+    Qm,
+    Po
+};
 
 QString getSystemLocaleName()
 {
@@ -67,7 +73,8 @@ QString getSystemLanguage()
 }
 }  // namespace
 
-struct Language {
+struct Language
+{
     Language() : updated(true) {}
 
     explicit Language(QString _key) : key(std::move(_key)), updated(key == g_defaultLangCode) { locale = QLocale(key); }
@@ -111,10 +118,10 @@ struct Language {
 
     void setTranslationStats(const unsigned _translated, const unsigned _untranslated, const unsigned _fuzzy)
     {
-        translated = _translated;
+        translated   = _translated;
         untranslated = _untranslated;
-        fuzzy = _fuzzy;
-        total = translated + untranslated + fuzzy;
+        fuzzy        = _fuzzy;
+        total        = translated + untranslated + fuzzy;
     }
 
     bool isOfSameNameAs(const Language& other) const { return key == other.key; }
@@ -130,46 +137,47 @@ struct Language {
         if (!isOfSameNameAs(other)) {
             return *this;
         }
-        fileName = other.fileName;
-        fileSize = other.fileSize;
-        fileSha1 = other.fileSha1;
-        translated = other.translated;
-        fuzzy = other.fuzzy;
-        total = other.total;
+        fileName      = other.fileName;
+        fileSize      = other.fileSize;
+        fileSha1      = other.fileSha1;
+        translated    = other.translated;
+        fuzzy         = other.fuzzy;
+        total         = other.total;
         localFileType = other.localFileType;
         return *this;
     }
 
     QString key;
     QLocale locale;
-    bool updated;
+    bool    updated;
 
-    QString fileName = QString();
+    QString     fileName = QString();
     std::size_t fileSize = 0;
-    QString fileSha1 = QString();
+    QString     fileSha1 = QString();
 
-    unsigned translated = 0;
+    unsigned translated   = 0;
     unsigned untranslated = 0;
-    unsigned fuzzy = 0;
-    unsigned total = 0;
+    unsigned fuzzy        = 0;
+    unsigned total        = 0;
 
     FileType localFileType = FileType::None;
 };
 
-struct TranslationsModel::Private {
+struct TranslationsModel::Private
+{
     QDir m_dir;
 
-    QList<Language> m_languages = { Language(g_defaultLangCode) };
+    QList<Language> m_languages = {Language(g_defaultLangCode)};
 
-    QString m_selectedLanguage = g_defaultLangCode;
+    QString                      m_selectedLanguage = g_defaultLangCode;
     std::unique_ptr<QTranslator> m_qtTranslator;
     std::unique_ptr<QTranslator> m_appTranslator;
 
     Net::Download* m_indexTask = nullptr;
-    QString m_downloadingTranslation;
-    NetJob::Ptr m_downloadJob;
-    NetJob::Ptr m_indexJob;
-    QString m_nextDownload;
+    QString        m_downloadingTranslation;
+    NetJob::Ptr    m_downloadJob;
+    NetJob::Ptr    m_indexJob;
+    QString        m_nextDownload;
 
     QFileSystemWatcher* watcher = nullptr;
 
@@ -221,7 +229,8 @@ void TranslationsModel::indexReceived()
     }
 }
 
-namespace {
+namespace
+{
 void readIndex(const QString& path, QMap<QString, Language>& languages)
 {
     QByteArray data;
@@ -234,8 +243,8 @@ void readIndex(const QString& path, QMap<QString, Language>& languages)
 
     try {
         auto toplevelDoc = Json::requireDocument(data);
-        auto doc = Json::requireObject(toplevelDoc);
-        auto fileType = Json::requireString(doc, "file_type");
+        auto doc         = Json::requireObject(toplevelDoc);
+        auto fileType    = Json::requireString(doc, "file_type");
         if (fileType != "MMC-TRANSLATION-INDEX") {
             qCritical() << "Translations Download Failed: index file is of unknown file type" << fileType;
             return;
@@ -265,7 +274,7 @@ void readIndex(const QString& path, QMap<QString, Language>& languages)
 
 void TranslationsModel::reloadLocalFiles()
 {
-    QMap<QString, Language> languages = { { g_defaultLangCode, Language(g_defaultLangCode) } };
+    QMap<QString, Language> languages = {{g_defaultLangCode, Language(g_defaultLangCode)}};
 
     const auto indexPath = d->m_dir.absoluteFilePath("index_v2.json");
     if (!QFileInfo::exists(indexPath)) {
@@ -273,10 +282,10 @@ void TranslationsModel::reloadLocalFiles()
         return;
     }
     readIndex(indexPath, languages);
-    auto entries = d->m_dir.entryInfoList({ "mmc_*.qm", "*.po" }, QDir::Files | QDir::NoDotAndDotDot);
+    auto entries = d->m_dir.entryInfoList({"mmc_*.qm", "*.po"}, QDir::Files | QDir::NoDotAndDotDot);
     for (auto& entry : entries) {
-        auto completeSuffix = entry.completeSuffix();
-        QString langCode;
+        auto     completeSuffix = entry.completeSuffix();
+        QString  langCode;
         FileType fileType = FileType::None;
         if (completeSuffix == "qm") {
             langCode = entry.baseName().remove(0, 4);
@@ -306,7 +315,7 @@ void TranslationsModel::reloadLocalFiles()
 
     for (auto iter = d->m_languages.begin(); iter != d->m_languages.end();) {
         auto& language = *iter;
-        auto row = iter - d->m_languages.begin();
+        auto  row      = iter - d->m_languages.begin();
 
         auto updatedLanguageIter = languages.find(language.key);
         if (updatedLanguageIter != languages.end()) {
@@ -348,8 +357,13 @@ void TranslationsModel::reloadLocalFiles()
     endInsertRows();
 }
 
-namespace {
-enum class Column : std::uint8_t { Language, Completeness };
+namespace
+{
+enum class Column : std::uint8_t
+{
+    Language,
+    Completeness
+};
 }
 
 QVariant TranslationsModel::data(const QModelIndex& index, const int role) const
@@ -358,7 +372,7 @@ QVariant TranslationsModel::data(const QModelIndex& index, const int role) const
         return {};
     }
 
-    const int row = index.row();
+    const int  row    = index.row();
     const auto column = static_cast<Column>(index.column());
 
     if (row < 0 || row >= d->m_languages.size()) {
@@ -367,25 +381,25 @@ QVariant TranslationsModel::data(const QModelIndex& index, const int role) const
 
     auto& lang = d->m_languages[row];
     switch (role) {
-        case Qt::DisplayRole: {
-            switch (column) {
-                case Column::Language: {
-                    return lang.languageName();
-                }
-                case Column::Completeness: {
-                    return QString("%1%").arg(lang.percentTranslated(), 3, 'f', 1);
-                }
-            }
-            qWarning("TranslationModel::data not implemented when role is DisplayRole");
+    case Qt::DisplayRole: {
+        switch (column) {
+        case Column::Language: {
+            return lang.languageName();
         }
-        case Qt::ToolTipRole: {
-            return tr("%1:\n%2 translated\n%3 fuzzy\n%4 total")
-                .arg(lang.key, QString::number(lang.translated), QString::number(lang.fuzzy), QString::number(lang.total));
+        case Column::Completeness: {
+            return QString("%1%").arg(lang.percentTranslated(), 3, 'f', 1);
         }
-        case Qt::UserRole:
-            return lang.key;
-        default:
-            return {};
+        }
+        qWarning("TranslationModel::data not implemented when role is DisplayRole");
+    }
+    case Qt::ToolTipRole: {
+        return tr("%1:\n%2 translated\n%3 fuzzy\n%4 total")
+            .arg(lang.key, QString::number(lang.translated), QString::number(lang.fuzzy), QString::number(lang.total));
+    }
+    case Qt::UserRole:
+        return lang.key;
+    default:
+        return {};
     }
 }
 
@@ -394,21 +408,21 @@ QVariant TranslationsModel::headerData(int section, const Qt::Orientation orient
     auto column = static_cast<Column>(section);
     if (role == Qt::DisplayRole) {
         switch (column) {
-            case Column::Language: {
-                return tr("Language");
-            }
-            case Column::Completeness: {
-                return tr("Completeness");
-            }
+        case Column::Language: {
+            return tr("Language");
+        }
+        case Column::Completeness: {
+            return tr("Completeness");
+        }
         }
     } else if (role == Qt::ToolTipRole) {
         switch (column) {
-            case Column::Language: {
-                return tr("The native language name.");
-            }
-            case Column::Completeness: {
-                return tr("Completeness is the percentage of fully translated strings, not counting automatically guessed ones.");
-            }
+        case Column::Language: {
+            return tr("The native language name.");
+        }
+        case Column::Completeness: {
+            return tr("Completeness is the percentage of fully translated strings, not counting automatically guessed ones.");
+        }
         }
     }
     return QAbstractListModel::headerData(section, orientation, role);
@@ -447,7 +461,7 @@ void TranslationsModel::setUseSystemLocale(const bool useSystemLocale) const
 bool TranslationsModel::selectLanguage(QString key) const
 {
     QString& langCode = key;
-    auto langPtr = findLanguageAsOptional(key);
+    auto     langPtr  = findLanguageAsOptional(key);
 
     if (langCode.isEmpty()) {
         d->m_noLanguageSet = true;
@@ -549,7 +563,7 @@ void TranslationsModel::downloadIndex()
     d->m_indexJob.reset(new NetJob("Translations Index", APPLICATION->network()));
     const MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("translations", "index_v2.json");
     entry->setStale(true);
-    auto task = Net::Download::makeCached(QUrl(BuildConfig.TRANSLATION_FILES_URL + "index_v2.json"), entry);
+    auto task      = Net::Download::makeCached(QUrl(BuildConfig.TRANSLATION_FILES_URL + "index_v2.json"), entry);
     d->m_indexTask = task.get();
     d->m_indexJob->addNetAction(task);
     d->m_indexJob->setAskRetry(false);
@@ -587,7 +601,7 @@ void TranslationsModel::downloadTranslation(const QString& key)
     }
 
     d->m_downloadingTranslation = key;
-    const MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("translations", "mmc_" + key + ".qm");
+    const MetaEntryPtr entry    = APPLICATION->metacache()->resolveEntry("translations", "mmc_" + key + ".qm");
     entry->setStale(true);
 
     auto dl = Net::Download::makeCached(QUrl(BuildConfig.TRANSLATION_FILES_URL + lang->fileName), entry);

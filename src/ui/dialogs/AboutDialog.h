@@ -17,17 +17,19 @@
 
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class AboutDialog;
 }
 
-class AboutDialog : public QDialog {
+class AboutDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit AboutDialog(QWidget* parent = 0);
     ~AboutDialog();
 
-   private:
+private:
     Ui::AboutDialog* ui;
 };

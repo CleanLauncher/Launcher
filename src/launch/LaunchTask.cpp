@@ -36,15 +36,15 @@
  */
 
 #include "launch/LaunchTask.h"
-#include <assert.h>
+#include "MessageLevel.h"
+#include "tasks/Task.h"
 #include <QAnyStringView>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QStandardPaths>
+#include <assert.h>
 #include <variant>
-#include "MessageLevel.h"
-#include "tasks/Task.h"
 
 void LaunchTask::init()
 {
@@ -154,17 +154,17 @@ void LaunchTask::proceed()
 bool LaunchTask::canAbort() const
 {
     switch (state) {
-        case LaunchTask::Aborted:
-        case LaunchTask::Failed:
-        case LaunchTask::Finished:
-            return false;
-        case LaunchTask::NotStarted:
-            return true;
-        case LaunchTask::Running:
-        case LaunchTask::Waiting: {
-            auto step = m_steps[currentStep];
-            return step->canAbort();
-        }
+    case LaunchTask::Aborted:
+    case LaunchTask::Failed:
+    case LaunchTask::Finished:
+        return false;
+    case LaunchTask::NotStarted:
+        return true;
+    case LaunchTask::Running:
+    case LaunchTask::Waiting: {
+        auto step = m_steps[currentStep];
+        return step->canAbort();
+    }
     }
     return false;
 }
@@ -172,28 +172,28 @@ bool LaunchTask::canAbort() const
 bool LaunchTask::abort()
 {
     switch (state) {
-        case LaunchTask::Aborted:
-        case LaunchTask::Failed:
-        case LaunchTask::Finished:
-            return true;
-        case LaunchTask::NotStarted: {
+    case LaunchTask::Aborted:
+    case LaunchTask::Failed:
+    case LaunchTask::Finished:
+        return true;
+    case LaunchTask::NotStarted: {
+        state = LaunchTask::Aborted;
+        emitAborted();
+        return true;
+    }
+    case LaunchTask::Running:
+    case LaunchTask::Waiting: {
+        auto step = m_steps[currentStep];
+        if (!step->canAbort()) {
+            return false;
+        }
+        if (step->abort()) {
             state = LaunchTask::Aborted;
-            emitAborted();
             return true;
         }
-        case LaunchTask::Running:
-        case LaunchTask::Waiting: {
-            auto step = m_steps[currentStep];
-            if (!step->canAbort()) {
-                return false;
-            }
-            if (step->abort()) {
-                state = LaunchTask::Aborted;
-                return true;
-            }
-        }
-        default:
-            break;
+    }
+    default:
+        break;
     }
     return false;
 }
@@ -217,14 +217,14 @@ bool LaunchTask::parseXmlLogs(const QString& line, MessageLevel level)
 {
     LogParser* parser;
     switch (static_cast<MessageLevel::Enum>(level)) {
-        case MessageLevel::StdErr:
-            parser = &m_stderrParser;
-            break;
-        case MessageLevel::StdOut:
-            parser = &m_stdoutParser;
-            break;
-        default:
-            return false;
+    case MessageLevel::StdErr:
+        parser = &m_stderrParser;
+        break;
+    case MessageLevel::StdOut:
+        parser = &m_stdoutParser;
+        break;
+    default:
+        return false;
     }
 
     parser->appendLine(line);
@@ -242,7 +242,7 @@ bool LaunchTask::parseXmlLogs(const QString& line, MessageLevel level)
     for (const auto& item : items) {
         if (std::holds_alternative<LogParser::LogEntry>(item)) {
             auto entry = std::get<LogParser::LogEntry>(item);
-            auto msg = QString("[%1] [%2/%3] [%4]: %5")
+            auto msg   = QString("[%1] [%2/%3] [%4]: %5")
                            .arg(entry.timestamp.toString("HH:mm:ss"))
                            .arg(entry.thread)
                            .arg(entry.levelText)
@@ -302,46 +302,52 @@ QString expandVariables(const QString& input, QProcessEnvironment dict)
 {
     QString result = input;
 
-    enum { base, maybeBrace, variable, brace } state = base;
+    enum
+    {
+        base,
+        maybeBrace,
+        variable,
+        brace
+    } state      = base;
     int startIdx = -1;
     for (int i = 0; i < result.length();) {
         QChar c = result.at(i++);
         switch (state) {
-            case base:
-                if (c == '$')
-                    state = maybeBrace;
-                break;
-            case maybeBrace:
-                if (c == '{') {
-                    state = brace;
-                    startIdx = i;
-                } else if (c.isLetterOrNumber() || c == '_') {
-                    state = variable;
-                    startIdx = i - 1;
-                } else {
-                    state = base;
+        case base:
+            if (c == '$')
+                state = maybeBrace;
+            break;
+        case maybeBrace:
+            if (c == '{') {
+                state    = brace;
+                startIdx = i;
+            } else if (c.isLetterOrNumber() || c == '_') {
+                state    = variable;
+                startIdx = i - 1;
+            } else {
+                state = base;
+            }
+            break;
+        case brace:
+            if (c == '}') {
+                const auto res = dict.value(result.mid(startIdx, i - 1 - startIdx), "");
+                if (!res.isEmpty()) {
+                    result.replace(startIdx - 2, i - startIdx + 2, res);
+                    i = startIdx - 2 + res.length();
                 }
-                break;
-            case brace:
-                if (c == '}') {
-                    const auto res = dict.value(result.mid(startIdx, i - 1 - startIdx), "");
-                    if (!res.isEmpty()) {
-                        result.replace(startIdx - 2, i - startIdx + 2, res);
-                        i = startIdx - 2 + res.length();
-                    }
-                    state = base;
+                state = base;
+            }
+            break;
+        case variable:
+            if (!c.isLetterOrNumber() && c != '_') {
+                const auto res = dict.value(result.mid(startIdx, i - startIdx - 1), "");
+                if (!res.isEmpty()) {
+                    result.replace(startIdx - 1, i - startIdx, res);
+                    i = startIdx - 1 + res.length();
                 }
-                break;
-            case variable:
-                if (!c.isLetterOrNumber() && c != '_') {
-                    const auto res = dict.value(result.mid(startIdx, i - startIdx - 1), "");
-                    if (!res.isEmpty()) {
-                        result.replace(startIdx - 1, i - startIdx, res);
-                        i = startIdx - 1 + res.length();
-                    }
-                    state = base;
-                }
-                break;
+                state = base;
+            }
+            break;
         }
     }
     if (state == variable) {

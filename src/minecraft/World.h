@@ -18,29 +18,38 @@
 #include <QFileInfo>
 #include <optional>
 
-struct GameType {
+struct GameType
+{
     GameType() = default;
     GameType(std::optional<int> original);
 
     QString toTranslatedString() const;
     QString toLogString() const;
 
-    enum { Unknown = -1, Survival, Creative, Adventure, Spectator } type = Unknown;
+    enum
+    {
+        Unknown = -1,
+        Survival,
+        Creative,
+        Adventure,
+        Spectator
+    } type = Unknown;
     std::optional<int> original;
 };
 
-class World {
-   public:
+class World
+{
+public:
     World(const QFileInfo& file);
-    QString folderName() const { return m_folderName; }
-    QString name() const { return m_actualName; }
-    QString iconFile() const { return m_iconFile; }
-    int64_t bytes() const { return m_size; }
+    QString   folderName() const { return m_folderName; }
+    QString   name() const { return m_actualName; }
+    QString   iconFile() const { return m_iconFile; }
+    int64_t   bytes() const { return m_size; }
     QDateTime lastPlayed() const { return m_lastPlayed; }
-    GameType gameType() const { return m_gameType; }
-    int64_t seed() const { return m_randomSeed; }
-    bool isValid() const { return m_isValid; }
-    bool isOnFS() const { return m_containerFile.isDir(); }
+    GameType  gameType() const { return m_gameType; }
+    int64_t   seed() const { return m_randomSeed; }
+    bool      isValid() const { return m_isValid; }
+    bool      isOnFS() const { return m_containerFile.isDir(); }
     QFileInfo container() const { return m_containerFile; }
 
     bool destroy();
@@ -66,21 +75,21 @@ class World {
 
     QString canonicalFilePath() const { return m_containerFile.canonicalFilePath(); }
 
-   private:
+private:
     void readFromZip(const QFileInfo& file);
     void readFromFS(const QFileInfo& file);
     void loadFromLevelDat(QByteArray data);
 
-   protected:
+protected:
     QFileInfo m_containerFile;
-    QString m_containerOffsetPath;
-    QString m_folderName;
-    QString m_actualName;
-    QString m_iconFile;
+    QString   m_containerOffsetPath;
+    QString   m_folderName;
+    QString   m_actualName;
+    QString   m_iconFile;
     QDateTime m_levelDatTime;
     QDateTime m_lastPlayed;
-    int64_t m_size = 0;
-    int64_t m_randomSeed = 0;
-    GameType m_gameType;
-    bool m_isValid = false;
+    int64_t   m_size       = 0;
+    int64_t   m_randomSeed = 0;
+    GameType  m_gameType;
+    bool      m_isValid = false;
 };

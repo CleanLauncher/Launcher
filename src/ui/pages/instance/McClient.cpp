@@ -57,7 +57,7 @@ void McClient::readRawResponse()
 
     m_resp.append(m_socket.readAll());
     if (m_responseReadState == ResponseReadState::Waiting && m_resp.size() >= 5) {
-        m_wantedRespLength = readVarInt(m_resp);
+        m_wantedRespLength  = readVarInt(m_resp);
         m_responseReadState = ResponseReadState::GotLength;
     }
 
@@ -86,7 +86,7 @@ void McClient::parseResponse()
 
     Q_UNUSED(readVarInt(m_resp));
 
-    QJsonParseError parseError;
+    QJsonParseError     parseError;
     const QJsonDocument doc = Json::parseUntilGarbage(m_resp, &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         qDebug() << "Failed to parse JSON:" << parseError.errorString();
@@ -99,7 +99,7 @@ void McClient::parseResponse()
 // NOLINTBEGIN(*-signed-bitwise)
 
 constexpr uint8_t g_varIntValueMask = 0x7F;
-constexpr uint8_t g_varIntContinue = 0x80;
+constexpr uint8_t g_varIntContinue  = 0x80;
 
 void McClient::writeVarInt(QByteArray& data, int value)
 {
@@ -113,7 +113,7 @@ void McClient::writeVarInt(QByteArray& data, int value)
 
 int McClient::readVarInt(QByteArray& data)
 {
-    int value = 0;
+    int value    = 0;
     int position = 0;
 
     while (position < 32) {

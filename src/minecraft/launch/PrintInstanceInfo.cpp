@@ -16,16 +16,17 @@
 #include <fstream>
 #include <string>
 
-#include <launch/LaunchTask.h>
 #include "PrintInstanceInfo.h"
+#include <launch/LaunchTask.h>
 
 #include "HardwareInfo.h"
 
 #if defined(Q_OS_FREEBSD)
-namespace {
+namespace
+{
 void runSysctlHwModel(QStringList& log)
 {
-    char buff[512];
+    char  buff[512];
     FILE* hwmodel = popen("sysctl hw.model", "r");
     while (fgets(buff, 512, hwmodel) != NULL) {
         log << QString::fromUtf8(buff);
@@ -36,9 +37,9 @@ void runSysctlHwModel(QStringList& log)
 
 void runPciconf(QStringList& log)
 {
-    char buff[512];
+    char        buff[512];
     std::string strcard;
-    FILE* pciconf = popen("pciconf -lv -a vgapci0", "r");
+    FILE*       pciconf = popen("pciconf -lv -a vgapci0", "r");
     while (fgets(buff, 512, pciconf) != NULL) {
         if (strncmp(buff, "    vendor", 10) == 0) {
             std::string str(buff);
@@ -59,7 +60,7 @@ void runPciconf(QStringList& log)
 
 void PrintInstanceInfo::executeTask()
 {
-    auto instance = m_parent->instance();
+    auto        instance = m_parent->instance();
     QStringList log;
 
     log << "";

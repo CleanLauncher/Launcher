@@ -23,22 +23,23 @@ class QLabel;
 class Setting;
 class QCheckBox;
 
-class LanguageSelectionWidget : public QWidget {
+class LanguageSelectionWidget : public QWidget
+{
     Q_OBJECT
-   public:
+public:
     explicit LanguageSelectionWidget(QWidget* parent = 0);
     virtual ~LanguageSelectionWidget() {};
 
     QString getSelectedLanguageKey() const;
-    void retranslate();
+    void    retranslate();
 
-   protected slots:
+protected slots:
     void languageRowChanged(const QModelIndex& current, const QModelIndex& previous);
     void languageSettingChanged(const Setting&, const QVariant&);
 
-   private:
+private:
     QVBoxLayout* verticalLayout = nullptr;
-    QTreeView* languageView = nullptr;
-    QLabel* helpUsLabel = nullptr;
-    QCheckBox* formatCheckbox = nullptr;
+    QTreeView*   languageView   = nullptr;
+    QLabel*      helpUsLabel    = nullptr;
+    QCheckBox*   formatCheckbox = nullptr;
 };

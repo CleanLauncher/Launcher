@@ -41,7 +41,8 @@
 #include <QUrl>
 #include <utility>
 
-namespace StringUtils {
+namespace StringUtils
+{
 
 #if defined Q_OS_WIN32
 using string = std::wstring;

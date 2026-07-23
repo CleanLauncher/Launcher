@@ -34,12 +34,12 @@
  */
 
 #include "CheckJava.h"
+#include "java/JavaUtils.h"
 #include <FileSystem.h>
-#include <launch/LaunchTask.h>
 #include <QCryptographicHash>
 #include <QFileInfo>
 #include <QStandardPaths>
-#include "java/JavaUtils.h"
+#include <launch/LaunchTask.h>
 
 void CheckJava::executeTask()
 {
@@ -47,7 +47,7 @@ void CheckJava::executeTask()
     auto settings = instance->settings();
 
     QString javaPathSetting = settings->get("JavaPath").toString();
-    m_javaPath = FS::ResolveExecutable(javaPathSetting);
+    m_javaPath              = FS::ResolveExecutable(javaPathSetting);
 
     bool perInstance = settings->get("OverrideJava").toBool() || settings->get("OverrideJavaLocation").toBool();
 
@@ -72,18 +72,18 @@ void CheckJava::executeTask()
 
     if (JavaUtils::getJavaCheckPath().isEmpty()) {
         const char* reason = QT_TR_NOOP("Java checker library could not be found. Please check your installation.");
-        emit logLine(tr(reason), MessageLevel::Fatal);
+        emit        logLine(tr(reason), MessageLevel::Fatal);
         emitFailed(tr(reason));
         return;
     }
 
     QFileInfo javaInfo(realJavaPath);
-    qint64 javaUnixTime = javaInfo.lastModified().toMSecsSinceEpoch();
-    auto storedSignature = settings->get("JavaSignature").toString();
-    auto storedArchitecture = settings->get("JavaArchitecture").toString();
-    auto storedRealArchitecture = settings->get("JavaRealArchitecture").toString();
-    auto storedVersion = settings->get("JavaVersion").toString();
-    auto storedVendor = settings->get("JavaVendor").toString();
+    qint64    javaUnixTime           = javaInfo.lastModified().toMSecsSinceEpoch();
+    auto      storedSignature        = settings->get("JavaSignature").toString();
+    auto      storedArchitecture     = settings->get("JavaArchitecture").toString();
+    auto      storedRealArchitecture = settings->get("JavaRealArchitecture").toString();
+    auto      storedVersion          = settings->get("JavaVersion").toString();
+    auto      storedVendor           = settings->get("JavaVendor").toString();
 
     QCryptographicHash hash(QCryptographicHash::Sha1);
     hash.addData(QByteArray::number(javaUnixTime));
@@ -98,10 +98,10 @@ void CheckJava::executeTask()
         m_JavaChecker->start();
         return;
     } else {
-        auto verString = instance->settings()->get("JavaVersion").toString();
-        auto archString = instance->settings()->get("JavaArchitecture").toString();
+        auto verString      = instance->settings()->get("JavaVersion").toString();
+        auto archString     = instance->settings()->get("JavaArchitecture").toString();
         auto realArchString = settings->get("JavaRealArchitecture").toString();
-        auto vendorString = instance->settings()->get("JavaVendor").toString();
+        auto vendorString   = instance->settings()->get("JavaVendor").toString();
         printJavaInfo(verString, archString, realArchString, vendorString);
     }
     m_parent->instance()->updateRuntimeContext();
@@ -111,33 +111,33 @@ void CheckJava::executeTask()
 void CheckJava::checkJavaFinished(const JavaChecker::Result& result)
 {
     switch (result.validity) {
-        case JavaChecker::Result::Validity::Errored: {
-            emit logLine(QString("Could not start java:"), MessageLevel::Error);
-            emit logLines(result.errorLog.split('\n'), MessageLevel::Error);
-            emit logLine(QString("\nCheck your Java settings."), MessageLevel::Launcher);
-            emitFailed(QString("Could not start java!"));
-            return;
-        }
-        case JavaChecker::Result::Validity::ReturnedInvalidData: {
-            emit logLine(QString("Java checker returned some invalid data we don't understand:"), MessageLevel::Error);
-            emit logLines(result.outLog.split('\n'), MessageLevel::Warning);
-            emit logLine("\nMinecraft might not start properly.", MessageLevel::Launcher);
-            m_parent->instance()->updateRuntimeContext();
-            emitSucceeded();
-            return;
-        }
-        case JavaChecker::Result::Validity::Valid: {
-            auto instance = m_parent->instance();
-            printJavaInfo(result.javaVersion.toString(), result.mojangPlatform, result.realPlatform, result.javaVendor);
-            instance->settings()->set("JavaVersion", result.javaVersion.toString());
-            instance->settings()->set("JavaArchitecture", result.mojangPlatform);
-            instance->settings()->set("JavaRealArchitecture", result.realPlatform);
-            instance->settings()->set("JavaVendor", result.javaVendor);
-            instance->settings()->set("JavaSignature", m_javaSignature);
-            m_parent->instance()->updateRuntimeContext();
-            emitSucceeded();
-            return;
-        }
+    case JavaChecker::Result::Validity::Errored: {
+        emit logLine(QString("Could not start java:"), MessageLevel::Error);
+        emit logLines(result.errorLog.split('\n'), MessageLevel::Error);
+        emit logLine(QString("\nCheck your Java settings."), MessageLevel::Launcher);
+        emitFailed(QString("Could not start java!"));
+        return;
+    }
+    case JavaChecker::Result::Validity::ReturnedInvalidData: {
+        emit logLine(QString("Java checker returned some invalid data we don't understand:"), MessageLevel::Error);
+        emit logLines(result.outLog.split('\n'), MessageLevel::Warning);
+        emit logLine("\nMinecraft might not start properly.", MessageLevel::Launcher);
+        m_parent->instance()->updateRuntimeContext();
+        emitSucceeded();
+        return;
+    }
+    case JavaChecker::Result::Validity::Valid: {
+        auto instance = m_parent->instance();
+        printJavaInfo(result.javaVersion.toString(), result.mojangPlatform, result.realPlatform, result.javaVendor);
+        instance->settings()->set("JavaVersion", result.javaVersion.toString());
+        instance->settings()->set("JavaArchitecture", result.mojangPlatform);
+        instance->settings()->set("JavaRealArchitecture", result.realPlatform);
+        instance->settings()->set("JavaVendor", result.javaVendor);
+        instance->settings()->set("JavaSignature", m_javaSignature);
+        m_parent->instance()->updateRuntimeContext();
+        emitSucceeded();
+        return;
+    }
     }
 }
 

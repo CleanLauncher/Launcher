@@ -77,7 +77,7 @@ void JavaChecker::executeTask()
         args << QString("-XX:PermSize=%1m").arg(m_permGen);
     }
 
-    args.append({ "-jar", checkerJar });
+    args.append({"-jar", checkerJar});
     process->setArguments(args);
     process->setProgram(m_path);
     process->setProcessChannelMode(QProcess::SeparateChannels);
@@ -96,16 +96,16 @@ void JavaChecker::executeTask()
 
 void JavaChecker::stdoutReady()
 {
-    QByteArray data = process->readAllStandardOutput();
-    QString added = QString::fromLocal8Bit(data);
+    QByteArray data  = process->readAllStandardOutput();
+    QString    added = QString::fromLocal8Bit(data);
     added.remove('\r');
     m_stdout += added;
 }
 
 void JavaChecker::stderrReady()
 {
-    QByteArray data = process->readAllStandardError();
-    QString added = QString::fromLocal8Bit(data);
+    QByteArray data  = process->readAllStandardError();
+    QString    added = QString::fromLocal8Bit(data);
     added.remove('\r');
     m_stderr += added;
 }
@@ -121,7 +121,7 @@ void JavaChecker::finished(int exitcode, QProcess::ExitStatus status)
         m_id,
     };
     result.errorLog = m_stderr;
-    result.outLog = m_stdout;
+    result.outLog   = m_stdout;
     qDebug() << "STDOUT" << m_stdout;
     qWarning() << "STDERR" << m_stderr;
     qDebug() << "Java checker finished with status" << status << "exit code" << exitcode;
@@ -160,18 +160,18 @@ void JavaChecker::finished(int exitcode, QProcess::ExitStatus status)
         return;
     }
 
-    auto os_arch = results["os.arch"];
+    auto os_arch      = results["os.arch"];
     auto java_version = results["java.version"];
-    auto java_vendor = results["java.vendor"];
-    bool is_64 = os_arch == "x86_64" || os_arch == "amd64" || os_arch == "aarch64" || os_arch == "arm64" || os_arch == "riscv64" ||
+    auto java_vendor  = results["java.vendor"];
+    bool is_64        = os_arch == "x86_64" || os_arch == "amd64" || os_arch == "aarch64" || os_arch == "arm64" || os_arch == "riscv64" ||
                  os_arch == "ppc64le" || os_arch == "ppc64";
 
-    result.validity = Result::Validity::Valid;
-    result.is_64bit = is_64;
+    result.validity       = Result::Validity::Valid;
+    result.is_64bit       = is_64;
     result.mojangPlatform = is_64 ? "64" : "32";
-    result.realPlatform = os_arch;
-    result.javaVersion = java_version;
-    result.javaVendor = java_vendor;
+    result.realPlatform   = os_arch;
+    result.javaVersion    = java_version;
+    result.javaVendor     = java_vendor;
     qDebug() << "Java checker succeeded.";
     emit checkFinished(result);
     emitSucceeded();

@@ -19,14 +19,15 @@
 #ifndef LAUNCHER_MACSPARKLEUPDATER_H
 #define LAUNCHER_MACSPARKLEUPDATER_H
 
+#include "ExternalUpdater.h"
 #include <QObject>
 #include <QSet>
-#include "ExternalUpdater.h"
 
-class MacSparkleUpdater : public ExternalUpdater {
+class MacSparkleUpdater : public ExternalUpdater
+{
     Q_OBJECT
 
-   public:
+public:
     MacSparkleUpdater();
     ~MacSparkleUpdater() override;
 
@@ -52,7 +53,7 @@ class MacSparkleUpdater : public ExternalUpdater {
 
     void setBetaAllowed(bool allowed) override;
 
-   private:
+private:
     class Private;
 
     Private* priv;

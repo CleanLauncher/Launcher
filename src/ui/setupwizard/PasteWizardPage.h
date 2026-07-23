@@ -1,17 +1,19 @@
 #ifndef PASTEDEFAULTSCONFIRMATIONWIZARD_H
 #define PASTEDEFAULTSCONFIRMATIONWIZARD_H
 
-#include <QWidget>
 #include "BaseWizardPage.h"
+#include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class PasteWizardPage;
 }
 
-class PasteWizardPage : public BaseWizardPage {
+class PasteWizardPage : public BaseWizardPage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit PasteWizardPage(QWidget* parent = nullptr);
     ~PasteWizardPage();
 
@@ -19,7 +21,7 @@ class PasteWizardPage : public BaseWizardPage {
     bool validatePage() override;
     void retranslate() override;
 
-   private:
+private:
     Ui::PasteWizardPage* ui;
 };
 

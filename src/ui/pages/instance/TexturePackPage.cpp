@@ -79,9 +79,9 @@ TexturePackPage::TexturePackPage(MinecraftInstance* instance, TexturePackFolderM
 
 void TexturePackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
-    int row = sourceCurrent.row();
-    auto& rp = m_model->at(row);
+    auto  sourceCurrent = m_filterModel->mapToSource(current);
+    int   row           = sourceCurrent.row();
+    auto& rp            = m_model->at(row);
     ui->frame->updateWithTexturePack(rp);
 }
 
@@ -149,11 +149,14 @@ void TexturePackPage::updateTexturePacks()
     }
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response = CustomMessageBox::selectable(
-                            this, tr("Confirm Update"),
+                            this,
+                            tr("Confirm Update"),
                             tr("Updating texture packs while the game is running may cause pack duplication and game crashes.\n"
                                "The old files may not be deleted as they are in use.\n"
                                "Are you sure you want to do this?"),
-                            QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                            QMessageBox::Warning,
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -163,7 +166,7 @@ void TexturePackPage::updateTexturePacks()
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
 
     auto modsList = m_model->selectedResources(selection);
-    bool useAll = modsList.empty();
+    bool useAll   = modsList.empty();
     if (useAll) {
         modsList = m_model->allResources();
     }
@@ -176,7 +179,7 @@ void TexturePackPage::updateTexturePacks()
         return;
     }
     if (updateDialog.noUpdates()) {
-        QString message{ tr("'%1' is up-to-date! :)").arg(modsList.front()->name()) };
+        QString message{tr("'%1' is up-to-date! :)").arg(modsList.front()->name())};
         if (modsList.size() > 1) {
             if (useAll) {
                 message = tr("All texture packs are up-to-date! :)");
@@ -220,17 +223,20 @@ void TexturePackPage::updateTexturePacks()
 
 void TexturePackPage::deleteTexturePackMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection      = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectionCount = m_model->selectedTexturePacks(selection).length();
     if (selectionCount == 0) {
         return;
     }
     if (selectionCount > 1) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove the metadata for %1 texture packs.\n"
                                                         "Are you sure?")
                                                          .arg(selectionCount),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {

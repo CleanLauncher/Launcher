@@ -37,7 +37,8 @@
 #include "Library.h"
 #include "VersionFile.h"
 
-namespace ProfileUtils {
+namespace ProfileUtils
+{
 using PatchOrder = QStringList;
 
 bool readOverrideOrders(QString path, PatchOrder& order);

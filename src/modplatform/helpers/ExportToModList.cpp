@@ -20,12 +20,13 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-namespace ExportToModList {
+namespace ExportToModList
+{
 QString toHTML(QList<Mod*> mods, OptionalData extraData)
 {
     QStringList lines;
     for (auto mod : mods) {
-        auto meta = mod->metadata();
+        auto meta    = mod->metadata();
         auto modName = mod->name().toHtmlEscaped();
         if (extraData & Url) {
             auto url = mod->homepage().toHtmlEscaped();
@@ -62,7 +63,7 @@ QString toMarkdown(QList<Mod*> mods, OptionalData extraData)
     QStringList lines;
 
     for (auto mod : mods) {
-        auto meta = mod->metadata();
+        auto meta    = mod->metadata();
         auto modName = toMarkdownEscaped(mod->name());
         if (extraData & Url) {
             auto url = mod->homepage();
@@ -90,7 +91,7 @@ QString toPlainTXT(QList<Mod*> mods, OptionalData extraData)
 {
     QStringList lines;
     for (auto mod : mods) {
-        auto meta = mod->metadata();
+        auto meta    = mod->metadata();
         auto modName = mod->name();
 
         auto line = modName;
@@ -119,8 +120,8 @@ QString toJSON(QList<Mod*> mods, OptionalData extraData)
 {
     QJsonArray lines;
     for (auto mod : mods) {
-        auto meta = mod->metadata();
-        auto modName = mod->name();
+        auto        meta    = mod->metadata();
+        auto        modName = mod->name();
         QJsonObject line;
         line["name"] = modName;
         if (extraData & Url) {
@@ -151,8 +152,8 @@ QString toCSV(QList<Mod*> mods, OptionalData extraData)
     QStringList lines;
     for (auto mod : mods) {
         QStringList data;
-        auto meta = mod->metadata();
-        auto modName = mod->name();
+        auto        meta    = mod->metadata();
+        auto        modName = mod->name();
 
         data << modName;
         if (extraData & Url)
@@ -181,19 +182,19 @@ QString toCSV(QList<Mod*> mods, OptionalData extraData)
 QString exportToModList(QList<Mod*> mods, Formats format, OptionalData extraData)
 {
     switch (format) {
-        case HTML:
-            return toHTML(mods, extraData);
-        case MARKDOWN:
-            return toMarkdown(mods, extraData);
-        case PLAINTXT:
-            return toPlainTXT(mods, extraData);
-        case JSON:
-            return toJSON(mods, extraData);
-        case CSV:
-            return toCSV(mods, extraData);
-        default: {
-            return QString("unknown format:%1").arg(format);
-        }
+    case HTML:
+        return toHTML(mods, extraData);
+    case MARKDOWN:
+        return toMarkdown(mods, extraData);
+    case PLAINTXT:
+        return toPlainTXT(mods, extraData);
+    case JSON:
+        return toJSON(mods, extraData);
+    case CSV:
+        return toCSV(mods, extraData);
+    default: {
+        return QString("unknown format:%1").arg(format);
+    }
     }
 }
 
@@ -201,14 +202,14 @@ QString exportToModList(QList<Mod*> mods, QString lineTemplate)
 {
     QStringList lines;
     for (auto mod : mods) {
-        auto meta = mod->metadata();
+        auto meta    = mod->metadata();
         auto modName = mod->name();
-        auto modID = mod->mod_id();
-        auto url = mod->homepage();
-        auto ver = mod->version();
+        auto modID   = mod->mod_id();
+        auto url     = mod->homepage();
+        auto ver     = mod->version();
         if (ver.isEmpty() && meta != nullptr)
             ver = meta->version().toString();
-        auto authors = mod->authors().join(", ");
+        auto authors  = mod->authors().join(", ");
         auto filename = mod->fileinfo().fileName();
         lines << QString(lineTemplate)
                      .replace("{name}", modName)

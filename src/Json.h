@@ -47,9 +47,11 @@
 
 #include "Exception.h"
 
-namespace Json {
-class JsonException : public ::Exception {
-   public:
+namespace Json
+{
+class JsonException : public ::Exception
+{
+public:
     JsonException(const QString& message) : Exception(message) {}
 };
 
@@ -159,7 +161,7 @@ template <typename T>
 QList<T> requireIsArrayOf(const QJsonDocument& doc)
 {
     const QJsonArray array = requireArray(doc);
-    QList<T> out;
+    QList<T>         out;
     for (const QJsonValue val : array) {
         out.append(requireIsType<T>(val, "Document"));
     }
@@ -175,7 +177,7 @@ QList<T> requireIsArrayOf(const QJsonObject& parent, const QString& key, const Q
     }
 
     const QJsonArray array = parent[key].toArray();
-    QList<T> out;
+    QList<T>         out;
     for (const QJsonValue val : array) {
         out.append(requireIsType<T>(val, "Document"));
     }
@@ -209,10 +211,10 @@ JSON_HELPERFUNCTIONS(Variant, QVariant)
 #undef JSON_HELPERFUNCTIONS
 
 QStringList toStringList(const QString& jsonString);
-QString fromStringList(const QStringList& list);
+QString     fromStringList(const QStringList& list);
 
 QVariantMap toMap(const QString& jsonString);
-QString fromMap(const QVariantMap& map);
+QString     fromMap(const QVariantMap& map);
 
 }  // namespace Json
 

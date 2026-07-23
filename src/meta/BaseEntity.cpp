@@ -30,14 +30,16 @@
 #include "settings/SettingsObject.h"
 #include "tasks/Task.h"
 
-namespace Meta {
+namespace Meta
+{
 
-class ParsingValidator : public Net::Validator {
-   public:
+class ParsingValidator : public Net::Validator
+{
+public:
     ParsingValidator(BaseEntity* entity) : m_entity(entity) {};
     virtual ~ParsingValidator() = default;
 
-   public:
+public:
     bool init(QNetworkRequest&) override
     {
         m_data.clear();
@@ -67,14 +69,14 @@ class ParsingValidator : public Net::Validator {
         }
     }
 
-   private:
-    QByteArray m_data;
+private:
+    QByteArray  m_data;
     BaseEntity* m_entity;
 };
 
 QUrl BaseEntity::url() const
 {
-    auto s = APPLICATION->settings();
+    auto    s            = APPLICATION->settings();
     QString metaOverride = s->get("MetaURLOverride").toString();
     if (metaOverride.isEmpty()) {
         return QUrl(BuildConfig.META_URL).resolved(localFilename());
@@ -112,8 +114,8 @@ BaseEntityLoadTask::BaseEntityLoadTask(BaseEntity* parent, Net::Mode mode, bool 
 
 void BaseEntityLoadTask::executeTask()
 {
-    const QString fname = QDir("meta").absoluteFilePath(m_entity->localFilename());
-    auto hashMatches = false;
+    const QString fname       = QDir("meta").absoluteFilePath(m_entity->localFilename());
+    auto          hashMatches = false;
 
     if (QFile::exists(fname)) {
         try {
@@ -121,13 +123,13 @@ void BaseEntityLoadTask::executeTask()
 
             if (m_entity->m_load_status == BaseEntity::LoadStatus::NotLoaded || m_entity->m_file_sha256.isEmpty()) {
                 setStatus(tr("Loading local file"));
-                fileData = FS::read(fname);
+                fileData                = FS::read(fname);
                 m_entity->m_file_sha256 = Hashing::hash(fileData, Hashing::Algorithm::Sha256);
             }
 
             const auto& expected = m_entity->m_sha256;
-            const auto& actual = m_entity->m_file_sha256;
-            hashMatches = expected == actual;
+            const auto& actual   = m_entity->m_file_sha256;
+            hashMatches          = expected == actual;
             if (m_mode == Net::Mode::Online && !m_entity->m_sha256.isEmpty() && !hashMatches) {
                 throw Exception(QString("Checksum mismatch, expected sha256: %1, got: %2").arg(expected, actual));
             }
@@ -155,7 +157,7 @@ void BaseEntityLoadTask::executeTask()
         return;
     }
     m_task.reset(new NetJob(QObject::tr("Download of meta file %1").arg(m_entity->localFilename()), APPLICATION->network()));
-    auto url = m_entity->url();
+    auto url   = m_entity->url();
     auto entry = APPLICATION->metacache()->resolveEntry("meta", m_entity->localFilename());
     if (m_force_reload) {
         entry->setETag({});

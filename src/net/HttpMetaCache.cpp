@@ -82,14 +82,14 @@ auto HttpMetaCache::getEntry(QString base, QString resource_path) -> MetaEntryPt
 auto HttpMetaCache::resolveEntry(QString base, QString resource_path, QString expected_etag) -> MetaEntryPtr
 {
     resource_path = FS::RemoveInvalidPathChars(resource_path);
-    auto entry = getEntry(base, resource_path);
+    auto entry    = getEntry(base, resource_path);
 
     if (!entry) {
         return staleEntry(base, resource_path);
     }
 
-    auto& selected_base = m_entries[base];
-    QString real_path = FS::PathCombine(selected_base.base_path, resource_path);
+    auto&     selected_base = m_entries[base];
+    QString   real_path     = FS::PathCombine(selected_base.base_path, resource_path);
     QFileInfo finfo(real_path);
 
     if (!finfo.isFile() || !finfo.isReadable()) {
@@ -189,11 +189,11 @@ bool HttpMetaCache::softEvict()
 
 auto HttpMetaCache::staleEntry(QString base, QString resource_path) -> MetaEntryPtr
 {
-    auto foo = new MetaEntry();
-    foo->m_baseId = base;
-    foo->m_basePath = getBasePath(base);
+    auto foo            = new MetaEntry();
+    foo->m_baseId       = base;
+    foo->m_basePath     = getBasePath(base);
     foo->m_relativePath = resource_path;
-    foo->m_stale = true;
+    foo->m_stale        = true;
 
     return MetaEntryPtr(foo);
 }
@@ -204,7 +204,7 @@ void HttpMetaCache::addBase(QString base, QString base_root)
         return;
 
     EntryMap foo;
-    foo.base_path = base_root;
+    foo.base_path   = base_root;
     m_entries[base] = foo;
 }
 
@@ -227,7 +227,7 @@ void HttpMetaCache::Load()
         return;
 
     QJsonParseError parseError;
-    QJsonDocument json = QJsonDocument::fromJson(index.readAll(), &parseError);
+    QJsonDocument   json = QJsonDocument::fromJson(index.readAll(), &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
         qCritical() << QString("Failed to parse HttpMetaCache file: %1 at offset %2")
@@ -250,24 +250,24 @@ void HttpMetaCache::Load()
     auto array = root["entries"].toArray();
     for (auto element : array) {
         auto element_obj = element.toObject();
-        auto base = element_obj["base"].toString();
+        auto base        = element_obj["base"].toString();
         if (!m_entries.contains(base))
             continue;
 
         auto& entrymap = m_entries[base];
 
-        auto foo = new MetaEntry();
-        foo->m_baseId = base;
-        foo->m_relativePath = element_obj["path"].toString();
-        foo->m_md5sum = element_obj["md5sum"].toString();
-        foo->m_etag = element_obj["etag"].toString();
-        foo->m_local_changed_timestamp = element_obj["last_changed_timestamp"].toDouble();
+        auto foo                        = new MetaEntry();
+        foo->m_baseId                   = base;
+        foo->m_relativePath             = element_obj["path"].toString();
+        foo->m_md5sum                   = element_obj["md5sum"].toString();
+        foo->m_etag                     = element_obj["etag"].toString();
+        foo->m_local_changed_timestamp  = element_obj["last_changed_timestamp"].toDouble();
         foo->m_remote_changed_timestamp = element_obj["remote_changed_timestamp"].toString();
 
         foo->makeEternal(element_obj[QStringLiteral("eternal")].toBool());
         if (!foo->isEternal()) {
             foo->m_current_age = element_obj["current_age"].toDouble();
-            foo->m_max_age = element_obj["max_age"].toDouble();
+            foo->m_max_age     = element_obj["max_age"].toDouble();
         }
 
         foo->m_stale = false;

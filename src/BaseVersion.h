@@ -19,8 +19,9 @@
 #include <QString>
 #include <memory>
 
-class BaseVersion {
-   public:
+class BaseVersion
+{
+public:
     using Ptr = std::shared_ptr<BaseVersion>;
     virtual ~BaseVersion() {}
 
@@ -29,8 +30,8 @@ class BaseVersion {
     virtual QString name() const = 0;
 
     virtual QString typeString() const = 0;
-    virtual bool operator<(BaseVersion& a) const { return name() < a.name(); }
-    virtual bool operator>(BaseVersion& a) const { return name() > a.name(); }
+    virtual bool    operator<(BaseVersion& a) const { return name() < a.name(); }
+    virtual bool    operator>(BaseVersion& a) const { return name() > a.name(); }
 };
 
 Q_DECLARE_METATYPE(BaseVersion::Ptr)

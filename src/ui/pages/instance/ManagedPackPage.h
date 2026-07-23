@@ -17,17 +17,19 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class ManagedPackPage;
 }
 
 class InstanceTask;
 class InstanceWindow;
 
-class ManagedPackPage : public QWidget, public BasePage {
+class ManagedPackPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     inline static ManagedPackPage* createPage(BaseInstance* inst, QWidget* parent = nullptr)
     {
         return ManagedPackPage::createPage(inst, inst->getManagedPackType(), parent);
@@ -37,10 +39,10 @@ class ManagedPackPage : public QWidget, public BasePage {
     ~ManagedPackPage() override;
 
     QString displayName() const override;
-    QIcon icon() const override;
+    QIcon   icon() const override;
     QString helpPage() const override;
     QString id() const override { return "managed_pack"; }
-    bool shouldDisplay() const override;
+    bool    shouldDisplay() const override;
 
     void openedImpl() override;
 
@@ -53,39 +55,40 @@ class ManagedPackPage : public QWidget, public BasePage {
 
     void setInstanceWindow(InstanceWindow* window) { m_instance_window = window; }
 
-   public slots:
+public slots:
 
     virtual void suggestVersion();
 
     virtual void update() {};
     virtual void updateFromFile() {};
 
-   protected slots:
+protected slots:
 
     void setFailState();
 
-   protected:
+protected:
     ManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent = nullptr);
 
     bool runUpdateTask(InstanceTask*);
 
     void updatePack(const QUrl& url, QString versionID = {}, QString versionName = {});
 
-   protected:
+protected:
     InstanceWindow* m_instance_window = nullptr;
 
     Ui::ManagedPackPage* ui;
-    BaseInstance* m_inst;
+    BaseInstance*        m_inst;
 
     bool m_loaded = false;
 
     void onUpdateTaskCompleted(bool did_succeed) const;
 };
 
-class GenericManagedPackPage final : public ManagedPackPage {
+class GenericManagedPackPage final : public ManagedPackPage
+{
     Q_OBJECT
 
-   public:
+public:
     GenericManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent = nullptr)
         : ManagedPackPage(inst, instance_window, parent)
     {}
@@ -94,50 +97,52 @@ class GenericManagedPackPage final : public ManagedPackPage {
     bool shouldDisplay() const override { return false; };
 };
 
-class ModrinthManagedPackPage final : public ManagedPackPage {
+class ModrinthManagedPackPage final : public ManagedPackPage
+{
     Q_OBJECT
 
-   public:
+public:
     ModrinthManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent = nullptr);
     ~ModrinthManagedPackPage() override = default;
 
-    void parseManagedPack() override;
+    void    parseManagedPack() override;
     QString url() const override;
     QString helpPage() const override { return "modrinth-managed-pack"; }
 
-   public slots:
+public slots:
     void suggestVersion() override;
 
     void update() override;
     void updateFromFile() override;
 
-   private:
+private:
     Task::Ptr m_fetch_job = nullptr;
 
     ModPlatform::IndexedPack m_pack;
-    ModrinthAPI m_api;
+    ModrinthAPI              m_api;
 };
 
-class FlameManagedPackPage final : public ManagedPackPage {
+class FlameManagedPackPage final : public ManagedPackPage
+{
     Q_OBJECT
 
-   public:
+public:
     FlameManagedPackPage(BaseInstance* inst, InstanceWindow* instance_window, QWidget* parent = nullptr);
     ~FlameManagedPackPage() override = default;
 
-    void parseManagedPack() override;
+    void    parseManagedPack() override;
     QString url() const override;
     QString helpPage() const override { return "curseforge-managed-pack"; }
 
-   public slots:
+public slots:
     void suggestVersion() override;
 
     void update() override;
     void updateFromFile() override;
 
-   private:
+private:
     Task::Ptr m_fetch_job = nullptr;
 
     ModPlatform::IndexedPack m_pack;
-    FlameAPI m_api;
+    FlameAPI                 m_api;
 };

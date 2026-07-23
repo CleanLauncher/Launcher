@@ -5,7 +5,8 @@
 
 class QFileInfo;
 
-namespace DesktopServices {
+namespace DesktopServices
+{
 
 bool openPath(const QFileInfo& path, bool ensureFolderPathExists = false);
 

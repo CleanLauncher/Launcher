@@ -22,7 +22,8 @@
 
 #include "StringUtils.h"
 
-namespace Ftb {
+namespace Ftb
+{
 
 FilterModel::FilterModel(QObject* parent) : QSortFilterProxyModel(parent)
 {
@@ -66,13 +67,13 @@ bool FilterModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParen
     }
 
     auto index = sourceModel()->index(sourceRow, 0, sourceParent);
-    auto pack = sourceModel()->data(index, Qt::UserRole).value<FTB::Modpack>();
+    auto pack  = sourceModel()->data(index, Qt::UserRole).value<FTB::Modpack>();
     return pack.name.contains(m_searchTerm, Qt::CaseInsensitive);
 }
 
 bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) const
 {
-    FTB::Modpack leftPack = sourceModel()->data(left, Qt::UserRole).value<FTB::Modpack>();
+    FTB::Modpack leftPack  = sourceModel()->data(left, Qt::UserRole).value<FTB::Modpack>();
     FTB::Modpack rightPack = sourceModel()->data(right, Qt::UserRole).value<FTB::Modpack>();
 
     if (m_currentSorting == ByPlays) {

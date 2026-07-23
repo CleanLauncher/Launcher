@@ -46,9 +46,11 @@
 
 class NewInstanceDialog;
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
-namespace Ui {
+namespace Ui
+{
 class Page;
 }
 
@@ -56,29 +58,30 @@ class ListModel;
 class FilterModel;
 class PrivatePackManager;
 
-class Page : public QWidget, public ModpackProviderBasePage {
+class Page : public QWidget, public ModpackProviderBasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit Page(NewInstanceDialog* dialog, QWidget* parent = 0);
     virtual ~Page();
     QString displayName() const override { return "FTB Legacy"; }
-    QIcon icon() const override { return QIcon::fromTheme("ftb_logo"); }
+    QIcon   icon() const override { return QIcon::fromTheme("ftb_logo"); }
     QString id() const override { return "legacy_ftb"; }
     QString helpPage() const override { return "FTB-legacy"; }
-    bool shouldDisplay() const override;
-    void openedImpl() override;
-    void retranslate() override;
+    bool    shouldDisplay() const override;
+    void    openedImpl() override;
+    void    retranslate() override;
 
     virtual void setSearchTerm(QString) override;
 
     virtual QString getSerachTerm() const override;
 
-   private:
+private:
     void suggestCurrent();
     void onPackSelectionChanged(Modpack* pack = nullptr);
 
-   private slots:
+private slots:
     void ftbPackDataDownloadSuccessfully(ModpackList publicPacks, ModpackList thirdPartyPacks);
     void ftbPackDataDownloadFailed(QString reason);
     void ftbPackDataDownloadAborted();
@@ -100,25 +103,25 @@ class Page : public QWidget, public ModpackProviderBasePage {
 
     void triggerSearch();
 
-   private:
-    FilterModel* currentModel = nullptr;
-    QTreeView* currentList = nullptr;
+private:
+    FilterModel*  currentModel       = nullptr;
+    QTreeView*    currentList        = nullptr;
     QTextBrowser* currentModpackInfo = nullptr;
 
-    bool initialized = false;
+    bool    initialized = false;
     Modpack selected;
     QString selectedVersion;
 
-    ListModel* publicListModel = nullptr;
+    ListModel*   publicListModel   = nullptr;
     FilterModel* publicFilterModel = nullptr;
 
-    ListModel* thirdPartyModel = nullptr;
+    ListModel*   thirdPartyModel       = nullptr;
     FilterModel* thirdPartyFilterModel = nullptr;
 
-    ListModel* privateListModel = nullptr;
+    ListModel*   privateListModel   = nullptr;
     FilterModel* privateFilterModel = nullptr;
 
-    unique_qobject_ptr<PackFetchTask> ftbFetchTask;
+    unique_qobject_ptr<PackFetchTask>   ftbFetchTask;
     std::unique_ptr<PrivatePackManager> ftbPrivatePacks;
 
     NewInstanceDialog* dialog = nullptr;

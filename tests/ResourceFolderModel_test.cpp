@@ -33,10 +33,10 @@
  *      limitations under the License.
  */
 
+#include "BaseInstance.h"
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTimer>
-#include "BaseInstance.h"
 
 #include <FileSystem.h>
 
@@ -61,10 +61,11 @@
                                                                                         \
     disconnect(&model, nullptr, &loop, nullptr);
 
-class ResourceFolderModelTest : public QObject {
+class ResourceFolderModelTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
 
     void test_1178()
     {
@@ -79,7 +80,7 @@ class ResourceFolderModelTest : public QObject {
         };
 
         {
-            QString folder = source;
+            QString       folder = source;
             QTemporaryDir tempDir;
 
             QEventLoop loop;
@@ -104,9 +105,9 @@ class ResourceFolderModelTest : public QObject {
         }
 
         {
-            QString folder = source + '/';
-            QTemporaryDir tempDir;
-            QEventLoop loop;
+            QString        folder = source + '/';
+            QTemporaryDir  tempDir;
+            QEventLoop     loop;
             ModFolderModel m(tempDir.path(), nullptr, true, true);
 
             connect(&m, &ModFolderModel::updateFinished, &loop, &QEventLoop::quit);
@@ -129,7 +130,7 @@ class ResourceFolderModelTest : public QObject {
 
     void test_addFromWatch()
     {
-        QString source = QFINDTESTDATA("testdata/Resources");
+        QString        source = QFINDTESTDATA("testdata/Resources");
         ModFolderModel model(source, nullptr, false, true);
 
         QCOMPARE(model.size(), 0);
@@ -147,24 +148,24 @@ class ResourceFolderModelTest : public QObject {
     void test_removeResource()
     {
         QString folder_resource = QFINDTESTDATA("testdata/Resources/test_folder");
-        QString file_mod = QFINDTESTDATA("testdata/Resources/supercoolmod.jar");
+        QString file_mod        = QFINDTESTDATA("testdata/Resources/supercoolmod.jar");
 
-        QTemporaryDir tmp;
+        QTemporaryDir       tmp;
         ResourceFolderModel model(QDir(tmp.path()), nullptr, false, false);
 
         QCOMPARE(model.size(), 0);
 
-        { EXEC_UPDATE_TASK(model.installResource(file_mod), QVERIFY) }
+        {EXEC_UPDATE_TASK(model.installResource(file_mod), QVERIFY)}
 
         QCOMPARE(model.size(), 1);
         qDebug() << "Added first mod.";
 
-        { EXEC_UPDATE_TASK(model.startWatching(), ) }
+        {EXEC_UPDATE_TASK(model.startWatching(), )}
 
         QCOMPARE(model.size(), 1);
         qDebug() << "Started watching the temp folder.";
 
-        { EXEC_UPDATE_TASK(model.installResource(folder_resource), QVERIFY) }
+        {EXEC_UPDATE_TASK(model.installResource(folder_resource), QVERIFY)}
 
         QCOMPARE(model.size(), 2);
         qDebug() << "Added second mod.";
@@ -176,7 +177,7 @@ class ResourceFolderModelTest : public QObject {
         QCOMPARE(model.size(), 1);
         qDebug() << "Removed first mod.";
 
-        QString mod_file_name{ model.at(0).fileinfo().fileName() };
+        QString mod_file_name{model.at(0).fileinfo().fileName()};
         QVERIFY(!mod_file_name.isEmpty());
 
         {
@@ -192,9 +193,9 @@ class ResourceFolderModelTest : public QObject {
     void test_enable_disable()
     {
         QString folder_resource = QFINDTESTDATA("testdata/Resources/test_folder");
-        QString file_mod = QFINDTESTDATA("testdata/Resources/supercoolmod.jar");
+        QString file_mod        = QFINDTESTDATA("testdata/Resources/supercoolmod.jar");
 
-        QTemporaryDir tmp;
+        QTemporaryDir       tmp;
         ResourceFolderModel model(tmp.path(), nullptr, false, false);
 
         QCOMPARE(model.size(), 0);
@@ -211,12 +212,12 @@ class ResourceFolderModelTest : public QObject {
 
         QCOMPARE(model.size(), 2);
 
-        auto& res_1 = model.at(0).type() != ResourceType::FOLDER ? model.at(0) : model.at(1);
-        auto& res_2 = model.at(0).type() == ResourceType::FOLDER ? model.at(0) : model.at(1);
-        auto id_1 = res_1.internalId();
-        auto id_2 = res_2.internalId();
-        bool initial_enabled_res_2 = res_2.enabled();
-        bool initial_enabled_res_1 = res_1.enabled();
+        auto& res_1                 = model.at(0).type() != ResourceType::FOLDER ? model.at(0) : model.at(1);
+        auto& res_2                 = model.at(0).type() == ResourceType::FOLDER ? model.at(0) : model.at(1);
+        auto  id_1                  = res_1.internalId();
+        auto  id_2                  = res_2.internalId();
+        bool  initial_enabled_res_2 = res_2.enabled();
+        bool  initial_enabled_res_1 = res_1.enabled();
 
         QVERIFY(res_1.type() != ResourceType::FOLDER && res_1.type() != ResourceType::UNKNOWN);
         qDebug() << "res_1 is of the correct type.";

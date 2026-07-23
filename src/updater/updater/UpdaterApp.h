@@ -45,17 +45,25 @@
 
 #include "GitHubRelease.h"
 
-class UpdaterApp : public QApplication {
+class UpdaterApp : public QApplication
+{
     Q_OBJECT
-   public:
-    enum Status { Starting, Failed, Succeeded, Initialized, Aborted };
+public:
+    enum Status
+    {
+        Starting,
+        Failed,
+        Succeeded,
+        Initialized,
+        Aborted
+    };
     UpdaterApp(int& argc, char** argv);
     virtual ~UpdaterApp();
-    void loadReleaseList();
-    void run();
+    void   loadReleaseList();
+    void   run();
     Status status() const { return m_status; }
 
-   private:
+private:
     void fail(const QString& reason);
     void abort(const QString& reason);
     void showFatalErrorMessage(const QString& title, const QString& content);
@@ -63,34 +71,34 @@ class UpdaterApp : public QApplication {
     bool loadVersionFromExe(const QString& exe_path);
 
     void downloadReleasePage(const QString& api_url, int page);
-    int parseReleasePage(const QByteArray* response);
+    int  parseReleasePage(const QByteArray* response);
 
     bool needUpdate(const GitHubRelease& release);
 
-    GitHubRelease getLatestRelease();
-    GitHubRelease selectRelease();
+    GitHubRelease        getLatestRelease();
+    GitHubRelease        selectRelease();
     QList<GitHubRelease> newerReleases();
     QList<GitHubRelease> nonDraftReleases();
 
     void printReleases();
 
     QList<GitHubReleaseAsset> validReleaseArtifacts(const GitHubRelease& release);
-    GitHubReleaseAsset selectAsset(const QList<GitHubReleaseAsset>& assets);
-    void performUpdate(const GitHubRelease& release);
-    void performInstall(QFileInfo file);
-    void unpackAndInstall(QFileInfo file);
-    void backupAppDir();
-    std::optional<QDir> unpackArchive(QFileInfo file);
+    GitHubReleaseAsset        selectAsset(const QList<GitHubReleaseAsset>& assets);
+    void                      performUpdate(const GitHubRelease& release);
+    void                      performInstall(QFileInfo file);
+    void                      unpackAndInstall(QFileInfo file);
+    void                      backupAppDir();
+    std::optional<QDir>       unpackArchive(QFileInfo file);
 
     QFileInfo downloadAsset(const GitHubReleaseAsset& asset);
-    bool callAppImageUpdate();
+    bool      callAppImageUpdate();
 
     void moveAndFinishUpdate(QDir target);
 
-   public slots:
+public slots:
     void downloadError(QString reason);
 
-   private:
+private:
     const QString& root() { return m_rootPath; }
 
     bool isPortable() { return m_isPortable; }
@@ -100,41 +108,41 @@ class UpdaterApp : public QApplication {
 
     QString m_rootPath;
     QString m_dataPath;
-    bool m_isPortable = false;
-    bool m_isAppimage = false;
-    bool m_isFlatpak = false;
+    bool    m_isPortable = false;
+    bool    m_isAppimage = false;
+    bool    m_isFlatpak  = false;
     QString m_appimagePath;
     QString m_executable;
-    QUrl m_repoUrl;
+    QUrl    m_repoUrl;
     Version m_userSelectedVersion;
-    bool m_checkOnly;
-    bool m_forceUpdate;
-    bool m_printOnly;
-    bool m_selectUI;
-    bool m_allowDowngrade;
-    bool m_allowPreRelease;
+    bool    m_checkOnly;
+    bool    m_forceUpdate;
+    bool    m_printOnly;
+    bool    m_selectUI;
+    bool    m_allowDowngrade;
+    bool    m_allowPreRelease;
 
     QString m_updateLogPath;
 
     QString m_binaryName;
     QString m_version;
-    int m_versionMajor = -1;
-    int m_versionMinor = -1;
-    int m_versionPatch = -1;
+    int     m_versionMajor = -1;
+    int     m_versionMinor = -1;
+    int     m_versionPatch = -1;
     QString m_versionChannel;
     QString m_gitCommit;
 
     GitHubRelease m_install_release;
 
-    Status m_status = Status::Starting;
+    Status                                 m_status = Status::Starting;
     std::unique_ptr<QNetworkAccessManager> m_network;
-    QString m_current_url;
-    Task::Ptr m_current_task;
-    QList<GitHubRelease> m_releases;
+    QString                                m_current_url;
+    Task::Ptr                              m_current_task;
+    QList<GitHubRelease>                   m_releases;
 
-   public:
+public:
     std::unique_ptr<QFile> logFile;
-    bool logToConsole = false;
+    bool                   logToConsole = false;
 
 #if defined Q_OS_WIN32
 

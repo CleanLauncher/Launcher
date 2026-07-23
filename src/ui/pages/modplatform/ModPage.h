@@ -12,22 +12,25 @@
 #include "ui/pages/modplatform/ResourcePage.h"
 #include "ui/widgets/ModFilterWidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ModDownloadDialog;
 
-class ModPage : public ResourcePage {
+class ModPage : public ResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     template <typename T>
     static T* create(ModDownloadDialog* dialog, BaseInstance& instance)
     {
-        auto page = new T(dialog, instance);
+        auto  page  = new T(dialog, instance);
         auto* model = static_cast<ModModel*>(page->getModel());
 
         auto filterWidget = page->createFilterWidget();
@@ -58,17 +61,17 @@ class ModPage : public ResourcePage {
     auto getFilter() const -> std::shared_ptr<ModFilterWidget::Filter> { return m_filter; }
     void setFilterWidget(std::unique_ptr<ModFilterWidget>&);
 
-   protected:
+protected:
     ModPage(ModDownloadDialog* dialog, BaseInstance& instance);
 
     virtual void prepareProviderCategories() {};
 
-   protected slots:
+protected slots:
     virtual void filterMods();
-    void triggerSearch() override;
+    void         triggerSearch() override;
 
-   protected:
-    std::unique_ptr<ModFilterWidget> m_filter_widget;
+protected:
+    std::unique_ptr<ModFilterWidget>         m_filter_widget;
     std::shared_ptr<ModFilterWidget::Filter> m_filter;
 };
 

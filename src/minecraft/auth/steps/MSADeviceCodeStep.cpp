@@ -61,11 +61,11 @@ void MSADeviceCodeStep::perform()
     data.addQueryItem("scope", m_scopes);
     auto payload = data.query(QUrl::FullyEncoded).toUtf8();
     auto headers = QList<Net::HeaderPair>{
-        { "Content-Type", "application/x-www-form-urlencoded" },
-        { "Accept", "application/json" },
+        {"Content-Type", "application/x-www-form-urlencoded"},
+        {"Accept", "application/json"},
     };
     auto [request, response] = Net::Upload::makeByteArray(m_deviceCodeUrl, payload);
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
 
@@ -78,12 +78,13 @@ void MSADeviceCodeStep::perform()
     m_task->start();
 }
 
-struct DeviceAuthorizationResponse {
+struct DeviceAuthorizationResponse
+{
     QString device_code;
     QString user_code;
     QString verification_uri;
-    int expires_in;
-    int interval;
+    int     expires_in;
+    int     interval;
 
     QString error;
     QString error_description;
@@ -92,7 +93,7 @@ struct DeviceAuthorizationResponse {
 DeviceAuthorizationResponse parseDeviceAuthorizationResponse(const QByteArray& data)
 {
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &err);
     if (err.error != QJsonParseError::NoError) {
         qWarning() << "Failed to parse device authorization response due to err:" << err.errorString();
         return {};
@@ -104,8 +105,13 @@ DeviceAuthorizationResponse parseDeviceAuthorizationResponse(const QByteArray& d
     }
     auto obj = doc.object();
     return {
-        obj["device_code"].toString(), obj["user_code"].toString(), obj["verification_uri"].toString(),  obj["expires_in"].toInt(),
-        obj["interval"].toInt(),       obj["error"].toString(),     obj["error_description"].toString(),
+        obj["device_code"].toString(),
+        obj["user_code"].toString(),
+        obj["verification_uri"].toString(),
+        obj["expires_in"].toInt(),
+        obj["interval"].toInt(),
+        obj["error"].toString(),
+        obj["error_description"].toString(),
     };
 }
 
@@ -176,11 +182,11 @@ void MSADeviceCodeStep::authenticateUser()
     data.addQueryItem("device_code", m_device_code);
     auto payload = data.query(QUrl::FullyEncoded).toUtf8();
     auto headers = QList<Net::HeaderPair>{
-        { "Content-Type", "application/x-www-form-urlencoded" },
-        { "Accept", "application/json" },
+        {"Content-Type", "application/x-www-form-urlencoded"},
+        {"Accept", "application/json"},
     };
     auto [request, response] = Net::Upload::makeByteArray(m_tokenUrl, payload);
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
 
     connect(m_request.get(), &Task::finished, this, [this, response] { authenticationFinished(response); });
@@ -189,11 +195,12 @@ void MSADeviceCodeStep::authenticateUser()
     m_request->start();
 }
 
-struct AuthenticationResponse {
+struct AuthenticationResponse
+{
     QString access_token;
     QString token_type;
     QString refresh_token;
-    int expires_in;
+    int     expires_in;
 
     QString error;
     QString error_description;
@@ -204,7 +211,7 @@ struct AuthenticationResponse {
 AuthenticationResponse parseAuthenticationResponse(const QByteArray& data)
 {
     QJsonParseError err;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &err);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &err);
     if (err.error != QJsonParseError::NoError) {
         qWarning() << "Failed to parse device authorization response due to err:" << err.errorString();
         return {};
@@ -215,13 +222,13 @@ AuthenticationResponse parseAuthenticationResponse(const QByteArray& data)
         return {};
     }
     auto obj = doc.object();
-    return { obj["access_token"].toString(),
-             obj["token_type"].toString(),
-             obj["refresh_token"].toString(),
-             obj["expires_in"].toInt(),
-             obj["error"].toString(),
-             obj["error_description"].toString(),
-             obj.toVariantMap() };
+    return {obj["access_token"].toString(),
+            obj["token_type"].toString(),
+            obj["refresh_token"].toString(),
+            obj["expires_in"].toInt(),
+            obj["error"].toString(),
+            obj["error_description"].toString(),
+            obj.toVariantMap()};
 }
 
 void MSADeviceCodeStep::authenticationFinished(QByteArray* response)
@@ -254,11 +261,11 @@ void MSADeviceCodeStep::authenticationFinished(QByteArray* response)
     }
 
     m_expiration_timer.stop();
-    m_data->msaClientID = m_clientId;
-    m_data->msaToken.issueInstant = QDateTime::currentDateTimeUtc();
-    m_data->msaToken.notAfter = QDateTime::currentDateTime().addSecs(rsp.expires_in);
-    m_data->msaToken.extra = rsp.extra;
+    m_data->msaClientID            = m_clientId;
+    m_data->msaToken.issueInstant  = QDateTime::currentDateTimeUtc();
+    m_data->msaToken.notAfter      = QDateTime::currentDateTime().addSecs(rsp.expires_in);
+    m_data->msaToken.extra         = rsp.extra;
     m_data->msaToken.refresh_token = rsp.refresh_token;
-    m_data->msaToken.token = rsp.access_token;
+    m_data->msaToken.token         = rsp.access_token;
     emit finished(AccountTaskState::STATE_WORKING, tr("Got MSA token"));
 }

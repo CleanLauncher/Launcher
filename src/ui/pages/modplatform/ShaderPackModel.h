@@ -14,12 +14,14 @@
 
 class Version;
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
-class ShaderPackResourceModel : public ResourceModel {
+class ShaderPackResourceModel : public ResourceModel
+{
     Q_OBJECT
 
-   public:
+public:
     ShaderPackResourceModel(const BaseInstance&, ResourceAPI*, const QString& debugName, QString metaEntryBase);
 
     void searchWithTerm(const QString& term, unsigned int sort);
@@ -27,15 +29,15 @@ class ShaderPackResourceModel : public ResourceModel {
     [[nodiscard]] QString debugName() const override { return m_debugName; }
     [[nodiscard]] QString metaEntryBase() const override { return m_metaEntryBase; }
 
-   public slots:
-    ResourceAPI::SearchArgs createSearchArguments() override;
+public slots:
+    ResourceAPI::SearchArgs        createSearchArguments() override;
     ResourceAPI::VersionSearchArgs createVersionsArguments(const QModelIndex&) override;
-    ResourceAPI::ProjectInfoArgs createInfoArguments(const QModelIndex&) override;
+    ResourceAPI::ProjectInfoArgs   createInfoArguments(const QModelIndex&) override;
 
-   protected:
+protected:
     const BaseInstance& m_base_instance;
 
-   private:
+private:
     QString m_debugName;
     QString m_metaEntryBase;
 };

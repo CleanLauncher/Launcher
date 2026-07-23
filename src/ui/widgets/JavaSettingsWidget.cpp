@@ -37,8 +37,6 @@
 
 #include "JavaSettingsWidget.h"
 
-#include <QFileDialog>
-#include <QFileInfo>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "FileSystem.h"
@@ -52,6 +50,8 @@
 #include "ui/dialogs/CustomMessageBox.h"
 #include "ui/dialogs/VersionSelectDialog.h"
 #include "ui/java/InstallJavaDialog.h"
+#include <QFileDialog>
+#include <QFileInfo>
 
 #include "ui_JavaSettingsWidget.h"
 
@@ -83,10 +83,13 @@ JavaSettingsWidget::JavaSettingsWidget(BaseInstance* instance, QWidget* parent)
 
         SettingsObject* settings = m_instance->settings();
 
-        connect(settings->getSetting("OverrideJavaLocation").get(), &Setting::SettingChanged, m_ui->javaInstallationGroupBox,
+        connect(settings->getSetting("OverrideJavaLocation").get(),
+                &Setting::SettingChanged,
+                m_ui->javaInstallationGroupBox,
                 [this, settings] { m_ui->javaInstallationGroupBox->setChecked(settings->get("OverrideJavaLocation").toBool()); });
-        connect(settings->getSetting("JavaPath").get(), &Setting::SettingChanged, m_ui->javaInstallationGroupBox,
-                [this, settings] { m_ui->javaPathTextBox->setText(settings->get("JavaPath").toString()); });
+        connect(settings->getSetting("JavaPath").get(), &Setting::SettingChanged, m_ui->javaInstallationGroupBox, [this, settings] {
+            m_ui->javaPathTextBox->setText(settings->get("JavaPath").toString());
+        });
 
         connect(m_ui->javaDownloadBtn, &QPushButton::clicked, this, [this] {
             auto javaDialog = new Java::InstallDialog({}, m_instance, this);
@@ -165,18 +168,18 @@ void JavaSettingsWidget::loadSettings()
 
     m_ui->optimizedArgsCheckBox->setChecked(settings->get("UseOptimizedJvmArgs").toBool());
     switch (const auto presetString = settings->get("GarbageCollectorPreset").toString(); JavaPerformance::presetFromString(presetString)) {
-        case JavaPerformance::GarbageCollectorPreset::None:
-            m_ui->noPresetRadioButton->toggle();
-            break;
-        case JavaPerformance::GarbageCollectorPreset::G1GC:
-            m_ui->g1gcPresetRadioButton->toggle();
-            break;
-        case JavaPerformance::GarbageCollectorPreset::Shenandoah:
-            m_ui->shenandoahPresetRadioButton->toggle();
-            break;
-        case JavaPerformance::GarbageCollectorPreset::ZGC:
-            m_ui->zgcPresetRadioButton->toggle();
-            break;
+    case JavaPerformance::GarbageCollectorPreset::None:
+        m_ui->noPresetRadioButton->toggle();
+        break;
+    case JavaPerformance::GarbageCollectorPreset::G1GC:
+        m_ui->g1gcPresetRadioButton->toggle();
+        break;
+    case JavaPerformance::GarbageCollectorPreset::Shenandoah:
+        m_ui->shenandoahPresetRadioButton->toggle();
+        break;
+    case JavaPerformance::GarbageCollectorPreset::ZGC:
+        m_ui->zgcPresetRadioButton->toggle();
+        break;
     }
 }
 
@@ -258,7 +261,7 @@ void JavaSettingsWidget::onJavaBrowse()
         return;
     }
 
-    QString cookedPath = FS::NormalizePath(rawPath);
+    QString   cookedPath = FS::NormalizePath(rawPath);
     QFileInfo javaInfo(cookedPath);
     if (!javaInfo.exists() || !javaInfo.isExecutable()) {
         return;
@@ -278,8 +281,12 @@ void JavaSettingsWidget::onJavaTest()
     else
         jvmArgs = APPLICATION->settings()->get("JvmArgs").toString();
 
-    m_checker.reset(new JavaCommon::TestCheck(this, m_ui->javaPathTextBox->text(), jvmArgs, m_ui->minMemSpinBox->value(),
-                                              m_ui->maxMemSpinBox->value(), m_ui->permGenSpinBox->value()));
+    m_checker.reset(new JavaCommon::TestCheck(this,
+                                              m_ui->javaPathTextBox->text(),
+                                              jvmArgs,
+                                              m_ui->minMemSpinBox->value(),
+                                              m_ui->maxMemSpinBox->value(),
+                                              m_ui->permGenSpinBox->value()));
     connect(m_checker.get(), &JavaCommon::TestCheck::finished, this, [this] { m_checker.reset(); });
     m_checker->run();
 }
@@ -300,18 +307,21 @@ void JavaSettingsWidget::onJavaAutodetect()
         m_ui->javaPathTextBox->setText(java->path);
 
         if (!java->is_64bit && m_ui->maxMemSpinBox->value() > 2048) {
-            CustomMessageBox::selectable(this, tr("Confirm Selection"),
+            CustomMessageBox::selectable(this,
+                                         tr("Confirm Selection"),
                                          tr("You selected a 32-bit version of Java.\n"
                                             "This installation does not support more than 2048MiB of RAM.\n"
                                             "Please make sure that the maximum memory value is lower."),
-                                         QMessageBox::Warning, QMessageBox::Ok, QMessageBox::Ok)
+                                         QMessageBox::Warning,
+                                         QMessageBox::Ok,
+                                         QMessageBox::Ok)
                 ->exec();
         }
     }
 }
 void JavaSettingsWidget::updateThresholds()
 {
-    auto sysMiB = HardwareInfo::totalRamMiB();
+    auto         sysMiB = HardwareInfo::totalRamMiB();
     unsigned int maxMem = m_ui->maxMemSpinBox->value();
     unsigned int minMem = m_ui->minMemSpinBox->value();
 

@@ -21,9 +21,10 @@
 
 struct Language;
 
-class TranslationsModel : public QAbstractListModel {
+class TranslationsModel : public QAbstractListModel
+{
     Q_OBJECT
-   public:
+public:
     explicit TranslationsModel(const QString& path, QObject* parent = nullptr);
     ~TranslationsModel() override;
 
@@ -31,34 +32,34 @@ class TranslationsModel : public QAbstractListModel {
 
     TranslationsModel& operator=(const TranslationsModel&) = delete;
 
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;  // NOLINT(*-default-arguments)
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;  // NOLINT(*-default-arguments)
-    bool selectLanguage(QString key) const;
-    void updateLanguage(const QString& key);
+    QVariant    data(const QModelIndex& index, int role = Qt::DisplayRole) const override;  // NOLINT(*-default-arguments)
+    QVariant    headerData(int section, Qt::Orientation orientation, int role) const override;
+    int         rowCount(const QModelIndex& parent = QModelIndex()) const override;  // NOLINT(*-default-arguments)
+    bool        selectLanguage(QString key) const;
+    void        updateLanguage(const QString& key);
     QModelIndex selectedIndex() const;
-    QString selectedLanguage() const;
+    QString     selectedLanguage() const;
 
     void downloadIndex();
     void setUseSystemLocale(bool useSystemLocale) const;
 
-   private:
+private:
     int columnCount(const QModelIndex& parent) const override;
 
     QList<Language>::Iterator findLanguage(const QString& key) const;
-    std::optional<Language> findLanguageAsOptional(const QString& key) const;
-    void reloadLocalFiles();
-    void downloadTranslation(const QString& key);
-    void downloadNext();
+    std::optional<Language>   findLanguageAsOptional(const QString& key) const;
+    void                      reloadLocalFiles();
+    void                      downloadTranslation(const QString& key);
+    void                      downloadNext();
 
-   private slots:
+private slots:
     void indexReceived();
     void indexFailed(const QString& reason) const;
     void dlFailed(const QString& reason);
     void dlGood();
     void translationDirChanged(const QString& path);
 
-   private:
+private:
     struct Private;
     std::unique_ptr<Private> d;
 };

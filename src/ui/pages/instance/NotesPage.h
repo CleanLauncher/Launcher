@@ -40,18 +40,20 @@
 #include "BaseInstance.h"
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class NotesPage;
 }
 
-class NotesPage : public QWidget, public BasePage {
+class NotesPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit NotesPage(BaseInstance* inst, QWidget* parent = 0);
     virtual ~NotesPage();
     virtual QString displayName() const override { return tr("Notes"); }
-    virtual QIcon icon() const override
+    virtual QIcon   icon() const override
     {
         auto icon = QIcon::fromTheme("notes");
         if (icon.isNull())
@@ -59,11 +61,11 @@ class NotesPage : public QWidget, public BasePage {
         return icon;
     }
     virtual QString id() const override { return "notes"; }
-    virtual bool apply() override;
+    virtual bool    apply() override;
     virtual QString helpPage() const override { return "Notes"; }
-    void retranslate() override;
+    void            retranslate() override;
 
-   private:
+private:
     Ui::NotesPage* ui;
-    BaseInstance* m_inst;
+    BaseInstance*  m_inst;
 };

@@ -38,6 +38,7 @@
 #pragma once
 #include <cassert>
 
+#include "QObjectPtr.h"
 #include <QDataStream>
 #include <QDateTime>
 #include <QList>
@@ -45,7 +46,6 @@
 #include <QObject>
 #include <QProcess>
 #include <QSet>
-#include "QObjectPtr.h"
 
 #include "settings/SettingsObject.h"
 
@@ -64,30 +64,38 @@ class Task;
 class LaunchTask;
 class BaseInstance;
 
-enum class ShortcutTarget { Desktop, Applications, Other };
+enum class ShortcutTarget
+{
+    Desktop,
+    Applications,
+    Other
+};
 
-struct ShortcutData {
-    QString name;
-    QString filePath;
+struct ShortcutData
+{
+    QString        name;
+    QString        filePath;
     ShortcutTarget target = ShortcutTarget::Other;
 };
 
-int getConsoleMaxLines(SettingsObject* settings);
+int  getConsoleMaxLines(SettingsObject* settings);
 bool shouldStopOnConsoleOverflow(SettingsObject* settings);
 
-class BaseInstance : public QObject {
+class BaseInstance : public QObject
+{
     Q_OBJECT
-   protected:
+protected:
     BaseInstance(SettingsObject* globalSettings, std::unique_ptr<SettingsObject> settings, const QString& rootDir);
 
-   public:
-    enum class Status {
+public:
+    enum class Status
+    {
         Present,
         Gone
 
     };
 
-   public:
+public:
     virtual ~BaseInstance();
 
     virtual void saveNow() = 0;
@@ -96,12 +104,12 @@ class BaseInstance : public QObject {
 
     virtual QString id() const;
 
-    void setMinecraftRunning(bool running);
-    void setRunning(bool running);
-    bool isRunning() const;
+    void    setMinecraftRunning(bool running);
+    void    setRunning(bool running);
+    bool    isRunning() const;
     int64_t totalTimePlayed() const;
     int64_t lastTimePlayed() const;
-    void resetTimePlayed();
+    void    resetTimePlayed();
 
     QString instanceType() const;
 
@@ -112,34 +120,34 @@ class BaseInstance : public QObject {
     virtual QString modsRoot() const = 0;
 
     QString name() const;
-    void setName(QString val);
+    void    setName(QString val);
 
     bool syncInstanceDirName(const QString& newRoot) const;
 
-    void registerShortcut(const ShortcutData& data);
+    void                registerShortcut(const ShortcutData& data);
     QList<ShortcutData> shortcuts() const;
-    void setShortcuts(const QList<ShortcutData>& shortcuts);
+    void                setShortcuts(const QList<ShortcutData>& shortcuts);
 
     QString windowTitle() const;
 
     QString iconKey() const;
-    void setIconKey(QString val);
+    void    setIconKey(QString val);
 
     QString notes() const;
-    void setNotes(QString val);
+    void    setNotes(QString val);
 
     QString getPreLaunchCommand();
     QString getPostExitCommand();
     QString getWrapperCommand();
 
-    bool isManagedPack() const;
+    bool    isManagedPack() const;
     QString getManagedPackType() const;
     QString getManagedPackID() const;
     QString getManagedPackName() const;
     QString getManagedPackVersionID() const;
     QString getManagedPackVersionName() const;
-    void setManagedPack(const QString& type, const QString& id, const QString& name, const QString& versionId, const QString& version);
-    void copyManagedPack(BaseInstance& other);
+    void    setManagedPack(const QString& type, const QString& id, const QString& name, const QString& versionId, const QString& version);
+    void    copyManagedPack(BaseInstance& other);
 
     virtual QStringList extraArguments();
 
@@ -159,7 +167,7 @@ class BaseInstance : public QObject {
 
     LaunchTask* getLaunchTask();
 
-    virtual QProcessEnvironment createEnvironment() = 0;
+    virtual QProcessEnvironment createEnvironment()       = 0;
     virtual QProcessEnvironment createLaunchEnvironment() = 0;
 
     virtual QStringList getLogFileSearchPaths() = 0;
@@ -172,7 +180,7 @@ class BaseInstance : public QObject {
 
     virtual QString typeName() const = 0;
 
-    virtual void updateRuntimeContext();
+    virtual void   updateRuntimeContext();
     RuntimeContext runtimeContext() const { return m_runtimeContext; }
 
     bool hasVersionBroken() const { return m_hasBrokenVersion; }
@@ -203,7 +211,7 @@ class BaseInstance : public QObject {
     }
 
     virtual bool canLaunch() const;
-    virtual bool canEdit() const = 0;
+    virtual bool canEdit() const   = 0;
     virtual bool canExport() const = 0;
 
     virtual void populateLaunchMenu(QMenu* menu) = 0;
@@ -215,14 +223,14 @@ class BaseInstance : public QObject {
     Status currentStatus() const;
 
     QStringList getLinkedInstances() const;
-    void setLinkedInstances(const QStringList& list);
-    void addLinkedInstanceId(const QString& id);
-    bool removeLinkedInstanceId(const QString& id);
-    bool isLinkedToInstanceId(const QString& id) const;
+    void        setLinkedInstances(const QStringList& list);
+    void        addLinkedInstanceId(const QString& id);
+    bool        removeLinkedInstanceId(const QString& id);
+    bool        isLinkedToInstanceId(const QString& id) const;
 
     bool isLegacy();
 
-   protected:
+protected:
     void changeStatus(Status newStatus);
 
     SettingsObject* globalSettings() const { return m_global_settings; }
@@ -230,7 +238,7 @@ class BaseInstance : public QObject {
     bool isSpecificSettingsLoaded() const { return m_specific_settings_loaded; }
     void setSpecificSettingsLoaded(bool loaded) { m_specific_settings_loaded = loaded; }
 
-   signals:
+signals:
 
     void propertiesChanged(BaseInstance* inst);
 
@@ -242,26 +250,26 @@ class BaseInstance : public QObject {
 
     void statusChanged(Status from, Status to);
 
-   protected slots:
+protected slots:
     void iconUpdated(QString key);
 
-   protected:
-    QString m_rootDir;
+protected:
+    QString                         m_rootDir;
     std::unique_ptr<SettingsObject> m_settings;
 
-    bool m_isRunning = false;
+    bool                        m_isRunning = false;
     std::unique_ptr<LaunchTask> m_launchProcess;
-    QDateTime m_timeStarted;
-    RuntimeContext m_runtimeContext;
+    QDateTime                   m_timeStarted;
+    RuntimeContext              m_runtimeContext;
 
-   private:
-    Status m_status = Status::Present;
-    bool m_crashed = false;
-    bool m_hasUpdate = false;
-    bool m_hasBrokenVersion = false;
+private:
+    Status m_status           = Status::Present;
+    bool   m_crashed          = false;
+    bool   m_hasUpdate        = false;
+    bool   m_hasBrokenVersion = false;
 
     SettingsObject* m_global_settings;
-    bool m_specific_settings_loaded = false;
+    bool            m_specific_settings_loaded = false;
 };
 
 Q_DECLARE_METATYPE(shared_qobject_ptr<BaseInstance>)

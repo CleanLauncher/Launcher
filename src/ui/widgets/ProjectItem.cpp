@@ -2,10 +2,10 @@
 
 #include <QApplication>
 
+#include "Common.h"
 #include <QDebug>
 #include <QIcon>
 #include <QPainter>
-#include "Common.h"
 
 ProjectItemDelegate::ProjectItemDelegate(QWidget* parent) : QStyledItemDelegate(parent) {}
 
@@ -17,8 +17,8 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
     initStyleOption(&opt, index);
 
     auto isInstalled = index.data(UserDataTypes::INSTALLED).toBool();
-    auto isChecked = opt.checkState == Qt::Checked;
-    auto isSelected = option.state & QStyle::State_Selected;
+    auto isChecked   = opt.checkState == Qt::Checked;
+    auto isSelected  = option.state & QStyle::State_Selected;
 
     const QStyle* style = opt.widget == nullptr ? QApplication::style() : opt.widget->style();
 
@@ -47,15 +47,15 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
         painter->setOpacity(0.4);
     }
 
-    auto icon_width = rect.height();
-    int icon_x_margin = (rect.height() - icon_width) / 2;
+    auto icon_width    = rect.height();
+    int  icon_x_margin = (rect.height() - icon_width) / 2;
 
     if (!opt.icon.isNull()) {
         auto icon_height = 0;
         {
             auto icon_size = opt.decorationSize;
-            icon_width = icon_size.width();
-            icon_height = icon_size.height();
+            icon_width     = icon_size.width();
+            icon_height    = icon_size.height();
 
             icon_x_margin = (rect.height() - icon_height) / 2;
         }
@@ -105,10 +105,10 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
 
         QTextLayout text_layout(description, opt.font);
 
-        qreal height = 0;
-        auto cut_text = viewItemTextLayout(text_layout, remaining_width, height);
+        qreal height   = 0;
+        auto  cut_text = viewItemTextLayout(text_layout, remaining_width, height);
 
-        description = cut_text.first().second;
+        description    = cut_text.first().second;
         auto num_lines = 1;
 
         if (cut_text.size() > 1) {
@@ -132,17 +132,17 @@ void ProjectItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& o
         else
             description_y -= opt.fontMetrics.height();
 
-        painter->drawText(description_x, description_y, remaining_width, num_lines * opt.fontMetrics.height(), Qt::TextWordWrap,
-                          description);
+        painter->drawText(
+            description_x, description_y, remaining_width, num_lines * opt.fontMetrics.height(), Qt::TextWordWrap, description);
     }
 
     painter->restore();
 }
 
-bool ProjectItemDelegate::editorEvent(QEvent* event,
-                                      QAbstractItemModel* model,
+bool ProjectItemDelegate::editorEvent(QEvent*                     event,
+                                      QAbstractItemModel*         model,
                                       const QStyleOptionViewItem& option,
-                                      const QModelIndex& index)
+                                      const QModelIndex&          index)
 {
     if (!(event->type() == QEvent::MouseButtonRelease || event->type() == QEvent::MouseButtonPress ||
           event->type() == QEvent::MouseButtonDblClick))
@@ -183,8 +183,8 @@ QStyleOptionViewItem ProjectItemDelegate::makeCheckboxStyleOption(const QStyleOp
 
     QRect checkboxRect = style->subElementRect(QStyle::SE_ItemViewItemCheckIndicator, &checkboxOpt, opt.widget);
 
-    checkboxOpt.rect = QRect(opt.rect.x() + 5, opt.rect.y() + (opt.rect.height() / 2 - checkboxRect.height() / 2), checkboxRect.width(),
-                             checkboxRect.height());
+    checkboxOpt.rect = QRect(
+        opt.rect.x() + 5, opt.rect.y() + (opt.rect.height() / 2 - checkboxRect.height() / 2), checkboxRect.width(), checkboxRect.height());
 
     return checkboxOpt;
 }

@@ -22,10 +22,10 @@
 
 ElyDeviceCodeStep::ElyDeviceCodeStep(AccountData* data) : MSADeviceCodeStep(data)
 {
-    m_clientId = APPLICATION->getElyClientID();
-    m_scopes = "account_info offline_access minecraft_server_session";
+    m_clientId      = APPLICATION->getElyClientID();
+    m_scopes        = "account_info offline_access minecraft_server_session";
     m_deviceCodeUrl = QUrl("https://account.ely.by/api/oauth2/v1/devicecode");
-    m_tokenUrl = QUrl("https://account.ely.by/api/oauth2/v1/token");
+    m_tokenUrl      = QUrl("https://account.ely.by/api/oauth2/v1/token");
 }
 
 QString ElyDeviceCodeStep::describe()

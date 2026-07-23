@@ -37,15 +37,22 @@
 #define LAUNCHER_EXTERNAL_EXE
 #include "FileSystem.h"
 
-class FileLinkApp : public QCoreApplication {
+class FileLinkApp : public QCoreApplication
+{
     Q_OBJECT
-   public:
-    enum Status { Starting, Failed, Succeeded, Initialized };
+public:
+    enum Status
+    {
+        Starting,
+        Failed,
+        Succeeded,
+        Initialized
+    };
     FileLinkApp(int& argc, char** argv);
     virtual ~FileLinkApp();
     Status status() const { return m_status; }
 
-   private:
+private:
     void joinServer(QString server);
     void readPathPairs();
     void runLink();
@@ -55,11 +62,11 @@ class FileLinkApp : public QCoreApplication {
 
     bool m_useHardLinks = false;
 
-    QDateTime m_startTime;
+    QDateTime    m_startTime;
     QLocalSocket socket;
-    QDataStream in;
-    quint32 blockSize;
+    QDataStream  in;
+    quint32      blockSize;
 
-    QList<FS::LinkPair> m_links_to_make;
+    QList<FS::LinkPair>   m_links_to_make;
     QList<FS::LinkResult> m_path_results;
 };

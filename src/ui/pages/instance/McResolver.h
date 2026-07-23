@@ -1,26 +1,27 @@
-#include <QtNetwork/qtcpsocket.h>
 #include <QDnsLookup>
 #include <QHostInfo>
 #include <QObject>
 #include <QString>
+#include <QtNetwork/qtcpsocket.h>
 
-class McResolver : public QObject {
+class McResolver : public QObject
+{
     Q_OBJECT
 
     QString m_constrDomain;
-    int m_constrPort;
+    int     m_constrPort;
 
-   public:
+public:
     explicit McResolver(QObject* parent, QString domain, int port);
     void ping();
 
-   private:
+private:
     void pingWithDomainSRV(QString domain, int port);
     void pingWithDomainA(QString domain, int port);
     void emitFail(QString error);
     void emitSucceed(QString ip, int port);
 
-   signals:
+signals:
     void succeeded(QString ip, int port);
     void failed(QString error);
     void finished();

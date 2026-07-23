@@ -36,31 +36,32 @@
 
 #pragma once
 
+#include "ui/pages/BasePage.h"
 #include <QWidget>
 #include <memory>
-#include "ui/pages/BasePage.h"
 
 class LanguageSelectionWidget;
 
-class LanguagePage : public QWidget, public BasePage {
+class LanguagePage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit LanguagePage(QWidget* parent = 0);
     virtual ~LanguagePage();
 
     QString displayName() const override { return tr("Language"); }
-    QIcon icon() const override { return QIcon::fromTheme("language"); }
+    QIcon   icon() const override { return QIcon::fromTheme("language"); }
     QString id() const override { return "language-settings"; }
     QString helpPage() const override { return "Language-settings"; }
-    bool apply() override;
+    bool    apply() override;
 
     void retranslate() override;
 
-   private:
+private:
     void applySettings();
     void loadSettings();
 
-   private:
+private:
     LanguageSelectionWidget* mainWidget;
 };

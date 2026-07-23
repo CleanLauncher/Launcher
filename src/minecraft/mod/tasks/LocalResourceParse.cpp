@@ -30,7 +30,8 @@
 #include "LocalWorldSaveParseTask.h"
 #include "modplatform/ResourceType.h"
 
-namespace ResourceUtils {
+namespace ResourceUtils
+{
 ModPlatform::ResourceType identify(QFileInfo file)
 {
     if (file.exists() && file.isFile()) {

@@ -41,14 +41,16 @@ class ResourcePackFolderModel;
 class TexturePackFolderModel;
 class ShaderPackFolderModel;
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ResourcePage;
 
-class ResourceDownloadDialog : public QDialog, public BasePageProvider {
+class ResourceDownloadDialog : public QDialog, public BasePageProvider
+{
     Q_OBJECT
 
-   public:
+public:
     using DownloadTaskPtr = shared_qobject_ptr<ResourceDownloadTask>;
 
     ResourceDownloadDialog(QWidget* parent, ResourceFolderModel* baseModel, bool suppressInitialSearch = false);
@@ -60,69 +62,71 @@ class ResourceDownloadDialog : public QDialog, public BasePageProvider {
 
     QString dialogTitle() override { return tr("Download %1").arg(resourcesString()); };
 
-    bool selectPage(QString pageId);
+    bool          selectPage(QString pageId);
     ResourcePage* selectedPage();
 
     void addResource(ModPlatform::IndexedPack::Ptr, ModPlatform::IndexedVersion&, QString downloadReason = "standalone");
     void removeResource(const QString&);
 
     QList<DownloadTaskPtr> getTasks();
-    ResourceFolderModel* getBaseModel() const { return m_base_model; }
+    ResourceFolderModel*   getBaseModel() const { return m_base_model; }
 
     void setResourceMetadata(const std::shared_ptr<Metadata::ModStruct>& meta);
 
-   public slots:
+public slots:
     void accept() override;
     void reject() override;
 
-   protected slots:
+protected slots:
     void selectedPageChanged(BasePage* previous, BasePage* selected);
 
     virtual void confirm();
 
-   protected:
+protected:
     virtual QString geometrySaveKey() const { return ""; }
-    void setButtonStatus();
+    void            setButtonStatus();
 
     virtual GetModDependenciesTask::Ptr getModDependenciesTask() { return nullptr; }
 
-   protected:
+protected:
     ResourceFolderModel* m_base_model;
 
     PageContainer* m_container = nullptr;
 
     QDialogButtonBox m_buttons;
-    QVBoxLayout m_vertical_layout;
+    QVBoxLayout      m_vertical_layout;
 
-   protected:
+protected:
     bool m_suppressInitialSearch = false;
 };
 
-class ModDownloadDialog final : public ResourceDownloadDialog {
+class ModDownloadDialog final : public ResourceDownloadDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ModDownloadDialog(QWidget* parent, ModFolderModel* mods, BaseInstance* instance, bool suppressInitialSearch = false);
     ~ModDownloadDialog() override = default;
 
     QString resourcesString() const override { return tr("mods"); }
     QString geometrySaveKey() const override { return "ModDownloadGeometry"; }
 
-    QList<BasePage*> getPages() override;
+    QList<BasePage*>            getPages() override;
     GetModDependenciesTask::Ptr getModDependenciesTask() override;
 
-   private:
+private:
     BaseInstance* m_instance;
 };
 
-class ResourcePackDownloadDialog final : public ResourceDownloadDialog {
+class ResourcePackDownloadDialog final : public ResourceDownloadDialog
+{
     Q_OBJECT
 
-   public:
-    explicit ResourcePackDownloadDialog(QWidget* parent,
+public:
+    explicit ResourcePackDownloadDialog(QWidget*                 parent,
                                         ResourcePackFolderModel* resourcePacks,
-                                        BaseInstance* instance,
-                                        bool suppressInitialSearch = false);
+                                        BaseInstance*            instance,
+                                        bool                     suppressInitialSearch = false);
     ~ResourcePackDownloadDialog() override = default;
 
     QString resourcesString() const override { return tr("resource packs"); }
@@ -130,18 +134,19 @@ class ResourcePackDownloadDialog final : public ResourceDownloadDialog {
 
     QList<BasePage*> getPages() override;
 
-   private:
+private:
     BaseInstance* m_instance;
 };
 
-class TexturePackDownloadDialog final : public ResourceDownloadDialog {
+class TexturePackDownloadDialog final : public ResourceDownloadDialog
+{
     Q_OBJECT
 
-   public:
-    explicit TexturePackDownloadDialog(QWidget* parent,
+public:
+    explicit TexturePackDownloadDialog(QWidget*                parent,
                                        TexturePackFolderModel* resourcePacks,
-                                       BaseInstance* instance,
-                                       bool suppressInitialSearch = false);
+                                       BaseInstance*           instance,
+                                       bool                    suppressInitialSearch = false);
     ~TexturePackDownloadDialog() override = default;
 
     QString resourcesString() const override { return tr("texture packs"); }
@@ -149,18 +154,19 @@ class TexturePackDownloadDialog final : public ResourceDownloadDialog {
 
     QList<BasePage*> getPages() override;
 
-   private:
+private:
     BaseInstance* m_instance;
 };
 
-class ShaderPackDownloadDialog final : public ResourceDownloadDialog {
+class ShaderPackDownloadDialog final : public ResourceDownloadDialog
+{
     Q_OBJECT
 
-   public:
-    explicit ShaderPackDownloadDialog(QWidget* parent,
+public:
+    explicit ShaderPackDownloadDialog(QWidget*               parent,
                                       ShaderPackFolderModel* shaders,
-                                      BaseInstance* instance,
-                                      bool suppressInitialSearch = false);
+                                      BaseInstance*          instance,
+                                      bool                   suppressInitialSearch = false);
     ~ShaderPackDownloadDialog() override = default;
 
     QString resourcesString() const override { return tr("shader packs"); }
@@ -168,18 +174,19 @@ class ShaderPackDownloadDialog final : public ResourceDownloadDialog {
 
     QList<BasePage*> getPages() override;
 
-   private:
+private:
     BaseInstance* m_instance;
 };
 
-class DataPackDownloadDialog final : public ResourceDownloadDialog {
+class DataPackDownloadDialog final : public ResourceDownloadDialog
+{
     Q_OBJECT
 
-   public:
-    explicit DataPackDownloadDialog(QWidget* parent,
+public:
+    explicit DataPackDownloadDialog(QWidget*             parent,
                                     DataPackFolderModel* dataPacks,
-                                    BaseInstance* instance,
-                                    bool suppressInitialSearch = false);
+                                    BaseInstance*        instance,
+                                    bool                 suppressInitialSearch = false);
     ~DataPackDownloadDialog() override = default;
 
     QString resourcesString() const override { return tr("data packs"); }
@@ -187,7 +194,7 @@ class DataPackDownloadDialog final : public ResourceDownloadDialog {
 
     QList<BasePage*> getPages() override;
 
-   private:
+private:
     BaseInstance* m_instance;
 };
 

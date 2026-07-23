@@ -18,6 +18,11 @@
  */
 #include "ThemeManager.h"
 
+#include "Exception.h"
+#include "ui/themes/BrightTheme.h"
+#include "ui/themes/CustomTheme.h"
+#include "ui/themes/DarkTheme.h"
+#include "ui/themes/SystemTheme.h"
 #include <QApplication>
 #include <QDir>
 #include <QDirIterator>
@@ -25,11 +30,6 @@
 #include <QImageReader>
 #include <QStyle>
 #include <QStyleFactory>
-#include "Exception.h"
-#include "ui/themes/BrightTheme.h"
-#include "ui/themes/CustomTheme.h"
-#include "ui/themes/DarkTheme.h"
-#include "ui/themes/SystemTheme.h"
 
 #include "Application.h"
 #include "settings/SettingsObject.h"
@@ -41,7 +41,7 @@ ThemeManager::ThemeManager()
 
     themeDebugLog() << "Determining System Widget Theme...";
     const auto& style = QApplication::style();
-    m_defaultStyle = style->objectName();
+    m_defaultStyle    = style->objectName();
     themeDebugLog() << "System theme seems to be:" << m_defaultStyle;
 
     m_defaultPalette = QApplication::palette();
@@ -107,7 +107,7 @@ void ThemeManager::initializeIcons()
 
     QDirIterator directoryIterator(m_iconThemeFolder.path(), QDir::Dirs | QDir::NoDotAndDotDot);
     while (directoryIterator.hasNext()) {
-        QDir dir(directoryIterator.next());
+        QDir      dir(directoryIterator.next());
         IconTheme theme(dir.dirName(), dir.path());
         if (!theme.load())
             continue;
@@ -187,7 +187,7 @@ void ThemeManager::setIconTheme(const QString& name)
 void ThemeManager::setApplicationTheme(const QString& name, bool initial)
 {
     auto systemPalette = qApp->palette();
-    auto themeIter = m_themes.find(name);
+    auto themeIter     = m_themes.find(name);
     if (themeIter != m_themes.end()) {
         auto& theme = themeIter->second;
         themeDebugLog() << "applying theme" << theme->name();
@@ -202,14 +202,14 @@ void ThemeManager::setApplicationTheme(const QString& name, bool initial)
 
 void ThemeManager::applyCurrentlySelectedTheme(bool initial)
 {
-    auto settings = APPLICATION->settings();
+    auto settings         = APPLICATION->settings();
     auto applicationTheme = settings->get("ApplicationTheme").toString();
     if (applicationTheme == "") {
         applicationTheme = m_defaultStyle;
     }
     setApplicationTheme(applicationTheme, initial);
 
-    auto themeIter = m_themes.find(applicationTheme);
+    auto    themeIter = m_themes.find(applicationTheme);
     QString iconTheme;
     if (themeIter != m_themes.end() && themeIter->second->isDark()) {
         iconTheme = "breeze_dark";

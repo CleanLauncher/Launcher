@@ -74,6 +74,7 @@
 #include <QWidgetAction>
 #include <memory>
 
+#include "InstanceWindow.h"
 #include <BaseInstance.h>
 #include <BuildConfig.h>
 #include <DesktopServices.h>
@@ -90,7 +91,6 @@
 #include <news/NewsChecker.h>
 #include <tools/BaseProfiler.h>
 #include <updater/ExternalUpdater.h>
-#include "InstanceWindow.h"
 
 #include "ui/GuiUtil.h"
 #include "ui/ViewLogWindow.h"
@@ -135,7 +135,8 @@
 
 #include "MMCTime.h"
 
-namespace {
+namespace
+{
 QString profileInUseFilter(const QString& profile, bool used)
 {
     if (used) {
@@ -157,8 +158,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 #endif
 
     {
-        connect(ui->instanceToolBar, &QToolBar::orientationChanged,
-                [this](Qt::Orientation) { ui->instanceToolBar->setOrientation(Qt::Vertical); });
+        connect(ui->instanceToolBar, &QToolBar::orientationChanged, [this](Qt::Orientation) {
+            ui->instanceToolBar->setOrientation(Qt::Vertical);
+        });
 
         changeIconButton = new LabeledToolButton(this);
         changeIconButton->setObjectName(QStringLiteral("changeIconButton"));
@@ -176,7 +178,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->instanceToolBar->insertSeparator(ui->actionLaunchInstance);
 
         const auto setting_name = QString("WideBarVisibility_%1").arg(ui->instanceToolBar->objectName());
-        instanceToolbarSetting = APPLICATION->settings()->getOrRegisterSetting(setting_name);
+        instanceToolbarSetting  = APPLICATION->settings()->getOrRegisterSetting(setting_name);
 
         ui->instanceToolBar->setVisibilityState(QByteArray::fromBase64(instanceToolbarSetting->get().toString().toUtf8()));
 
@@ -242,7 +244,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         ui->actionAddInstance->setShortcut(QKeySequence::New);
         ui->actionSettings->setShortcut(QKeySequence::Preferences);
         ui->actionUndoTrashInstance->setShortcut(QKeySequence::Undo);
-        ui->actionDeleteInstance->setShortcuts({ QKeySequence(tr("Backspace")), QKeySequence::Delete });
+        ui->actionDeleteInstance->setShortcuts({QKeySequence(tr("Backspace")), QKeySequence::Delete});
         ui->actionCloseWindow->setShortcut(QKeySequence::Close);
         connect(ui->actionCloseWindow, &QAction::triggered, APPLICATION, &Application::closeCurrentWindow);
 
@@ -282,10 +284,10 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
         view->setAttribute(Qt::WA_MacShowFocusRect, false);
         connect(delegate, &ListViewDelegate::textChanged, this, [this](QString before, QString after) {
             if (auto newRoot = askToUpdateInstanceDirName(m_selectedInstance, before, after, this); !newRoot.isEmpty()) {
-                auto oldID = m_selectedInstance->id();
-                auto newID = QFileInfo(newRoot).fileName();
+                auto    oldID = m_selectedInstance->id();
+                auto    newID = QFileInfo(newRoot).fileName();
                 QString origGroup(APPLICATION->instances()->getInstanceGroup(oldID));
-                bool syncGroup = origGroup != GroupId() && oldID != newID;
+                bool    syncGroup = origGroup != GroupId() && oldID != newID;
                 if (syncGroup)
                     APPLICATION->instances()->setInstanceGroup(oldID, GroupId());
 
@@ -340,7 +342,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     connect(APPLICATION, &Application::globalSettingsApplied, this, &MainWindow::globalSettingsClosed);
 
-    m_statusLeft = new QLabel(tr("No instance selected"), this);
+    m_statusLeft   = new QLabel(tr("No instance selected"), this);
     m_statusCenter = new QLabel(tr("Total playtime: 0s"), this);
     statusBar()->addPermanentWidget(m_statusLeft, 1);
     statusBar()->addPermanentWidget(m_statusCenter, 0);
@@ -592,7 +594,7 @@ void MainWindow::repopulateAccountsMenu()
         ui->actionAccountsButton->setMenu(accountsButtonMenu);
     }
 
-    auto accounts = APPLICATION->accounts();
+    auto                accounts       = APPLICATION->accounts();
     MinecraftAccountPtr defaultAccount = accounts->defaultAccount();
 
     bool canChangeSkin = defaultAccount && (defaultAccount->accountType() == AccountType::MSA) && !defaultAccount->isActive();
@@ -613,9 +615,9 @@ void MainWindow::repopulateAccountsMenu()
         ui->accountsMenu->addAction(ui->actionNoAccountsAdded);
     } else {
         for (int i = 0; i < accounts->count(); i++) {
-            MinecraftAccountPtr account = accounts->at(i);
-            auto profileLabel = profileInUseFilter(account->displayName(), account->isInUse());
-            QAction* action = new QAction(profileLabel, this);
+            MinecraftAccountPtr account      = accounts->at(i);
+            auto                profileLabel = profileInUseFilter(account->displayName(), account->isInUse());
+            QAction*            action       = new QAction(profileLabel, this);
             action->setData(i);
             action->setCheckable(true);
             action->setActionGroup(accountsGroup);
@@ -673,8 +675,8 @@ void MainWindow::changeActiveAccount()
         return;
 
     QVariant action_data = sAction->data();
-    bool valid = false;
-    int index = action_data.toInt(&valid);
+    bool     valid       = false;
+    int      index       = action_data.toInt(&valid);
     if (!valid) {
         index = -1;
     }
@@ -712,17 +714,17 @@ bool MainWindow::eventFilter(QObject* obj, QEvent* ev)
             secretEventFilter->input(ev);
             QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
             switch (keyEvent->key()) {
-                case Qt::Key_Delete:
-                    on_actionDeleteInstance_triggered();
-                    return true;
-                case Qt::Key_F5:
-                    refreshInstances();
-                    return true;
-                case Qt::Key_F2:
-                    on_actionRenameInstance_triggered();
-                    return true;
-                default:
-                    break;
+            case Qt::Key_Delete:
+                on_actionDeleteInstance_triggered();
+                return true;
+            case Qt::Key_F5:
+                refreshInstances();
+                return true;
+            case Qt::Key_F2:
+                on_actionRenameInstance_triggered();
+                return true;
+            default:
+                break;
             }
         }
     }
@@ -752,7 +754,7 @@ void MainWindow::updateNewsLabel()
 QList<int> stringToIntList(const QString& string)
 {
     QStringList split = string.split(',', Qt::SkipEmptyParts);
-    QList<int> out;
+    QList<int>  out;
     for (int i = 0; i < split.size(); ++i) {
         out.append(split.at(i).toInt());
     }
@@ -769,8 +771,9 @@ QString intListToString(const QList<int>& list)
 
 void MainWindow::runModalTask(Task* task)
 {
-    connect(task, &Task::failed,
-            [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+    connect(task, &Task::failed, [this](QString reason) {
+        CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+    });
     connect(task, &Task::succeeded, [this, task]() {
         QStringList warnings = task->warnings();
         if (warnings.count()) {
@@ -858,8 +861,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
             url.setScheme("file");
 
         ModPlatform::IndexedVersion version;
-        QMap<QString, QString> extra_info;
-        QUrl local_url;
+        QMap<QString, QString>      extra_info;
+        QUrl                        local_url;
         if (!url.isLocalFile()) {
             const bool isExternalURLImport = (url.host().toLower() == "import") || (url.path().startsWith("/import", Qt::CaseInsensitive));
 
@@ -880,28 +883,30 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 }
 
                 auto addonId = query.allQueryItemValues("addonId")[0];
-                auto fileId = query.allQueryItemValues("fileId")[0];
+                auto fileId  = query.allQueryItemValues("fileId")[0];
 
                 extra_info.insert("pack_id", addonId);
                 extra_info.insert("pack_version_id", fileId);
 
-                auto api = FlameAPI();
+                auto api          = FlameAPI();
                 auto [job, array] = api.getFile(addonId, fileId);
 
-                connect(job.get(), &Task::failed, this,
-                        [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+                connect(job.get(), &Task::failed, this, [this](QString reason) {
+                    CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+                });
                 connect(job.get(), &Task::succeeded, this, [this, array, addonId, fileId, &dl_url, &version] {
                     qDebug() << "Returned CFURL Json:\n" << array->toStdString().c_str();
-                    auto doc = Json::requireDocument(*array);
+                    auto doc  = Json::requireDocument(*array);
                     auto data = doc.object()["data"].toObject();
 
-                    version = FlameMod::loadIndexedPackVersion(data);
+                    version       = FlameMod::loadIndexedPackVersion(data);
                     auto fileName = version.fileName;
 
                     dl_url = QUrl(version.downloadUrl);
                     if (!dl_url.isValid()) {
                         CustomMessageBox::selectable(
-                            this, tr("Error"),
+                            this,
+                            tr("Error"),
                             tr("The modpack, mod, or resource %1 is blocked for third-parties! Please download it manually.").arg(fileName),
                             QMessageBox::Critical)
                             ->show();
@@ -918,9 +923,9 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 }
 
             } else if (url.scheme() == BuildConfig.LAUNCHER_APP_BINARY_NAME && !isExternalURLImport) {
-                QVariantMap receivedData;
+                QVariantMap     receivedData;
                 const QUrlQuery query(url.query());
-                const auto items = query.queryItems();
+                const auto      items = query.queryItems();
                 for (auto it = items.begin(), end = items.end(); it != end; ++it)
                     receivedData.insert(it->first, it->second);
                 emit APPLICATION->oauthReplyRecieved(receivedData);
@@ -932,7 +937,7 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 QString encodedTarget;
 
                 {
-                    QUrlQuery query(url);
+                    QUrlQuery  query(url);
                     const auto values = query.allQueryItemValues("url");
                     if (!values.isEmpty()) {
                         encodedTarget = values.first();
@@ -954,8 +959,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 }
 
                 if (encodedTarget.isEmpty()) {
-                    CustomMessageBox::selectable(this, tr("Error"), tr("Invalid import link: missing 'url' parameter."),
-                                                 QMessageBox::Critical)
+                    CustomMessageBox::selectable(
+                        this, tr("Error"), tr("Invalid import link: missing 'url' parameter."), QMessageBox::Critical)
                         ->show();
                     continue;
                 }
@@ -971,9 +976,11 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 }
 
                 const auto res = QMessageBox::question(
-                    this, tr("Install modpack"),
+                    this,
+                    tr("Install modpack"),
                     tr("Do you want to download and import a modpack from:\n%1\n\nURL:\n%2").arg(target.host(), target.toString()),
-                    QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+                    QMessageBox::Yes | QMessageBox::No,
+                    QMessageBox::Yes);
                 if (res != QMessageBox::Yes) {
                     continue;
                 }
@@ -987,16 +994,17 @@ void MainWindow::processURLs(QList<QUrl> urls)
                 continue;
             }
 
-            const QString path = dl_url.host() + '/' + dl_url.path();
-            auto entry = APPLICATION->metacache()->resolveEntry("general", path);
+            const QString path  = dl_url.host() + '/' + dl_url.path();
+            auto          entry = APPLICATION->metacache()->resolveEntry("general", path);
             entry->setStale(true);
             auto dl_job = unique_qobject_ptr<NetJob>(new NetJob(tr("Modpack download"), APPLICATION->network()));
             dl_job->addNetAction(Net::ApiDownload::makeCached(dl_url, entry));
             auto archivePath = entry->getFullPath();
 
             bool dl_success = false;
-            connect(dl_job.get(), &Task::failed, this,
-                    [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+            connect(dl_job.get(), &Task::failed, this, [this](QString reason) {
+                CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+            });
             connect(dl_job.get(), &Task::succeeded, this, [&dl_success] { dl_success = true; });
 
             {
@@ -1014,7 +1022,7 @@ void MainWindow::processURLs(QList<QUrl> urls)
             local_url = url;
         }
 
-        auto localFileName = QDir::toNativeSeparators(local_url.toLocalFile());
+        auto      localFileName = QDir::toNativeSeparators(local_url.toLocalFile());
         QFileInfo localFileInfo(localFileName);
 
         if (localFileName.isEmpty() || !localFileInfo.exists()) {
@@ -1030,7 +1038,8 @@ void MainWindow::processURLs(QList<QUrl> urls)
         }
 
         if (APPLICATION->instances()->count() <= 0) {
-            CustomMessageBox::selectable(this, tr("No instance!"),
+            CustomMessageBox::selectable(this,
+                                         tr("No instance!"),
                                          tr("No instance available to add the resource to.\nPlease create a new instance before "
                                             "attempting to install this resource again."),
                                          QMessageBox::Critical)
@@ -1044,32 +1053,32 @@ void MainWindow::processURLs(QList<QUrl> urls)
 
         qDebug() << "Adding resource" << localFileName << "to" << dlg.selectedInstanceKey;
 
-        auto inst = APPLICATION->instances()->getInstanceById(dlg.selectedInstanceKey);
+        auto inst          = APPLICATION->instances()->getInstanceById(dlg.selectedInstanceKey);
         auto minecraftInst = dynamic_cast<MinecraftInstance*>(inst);
 
         switch (type) {
-            case ModPlatform::ResourceType::ResourcePack:
-                minecraftInst->resourcePackList()->installResourceWithFlameMetadata(localFileName, version);
-                break;
-            case ModPlatform::ResourceType::TexturePack:
-                minecraftInst->texturePackList()->installResourceWithFlameMetadata(localFileName, version);
-                break;
-            case ModPlatform::ResourceType::DataPack:
-                qWarning() << "Importing of Data Packs not supported at this time. Ignoring" << localFileName;
-                break;
-            case ModPlatform::ResourceType::Mod:
-                minecraftInst->loaderModList()->installResourceWithFlameMetadata(localFileName, version);
-                break;
-            case ModPlatform::ResourceType::ShaderPack:
-                minecraftInst->shaderPackList()->installResourceWithFlameMetadata(localFileName, version);
-                break;
-            case ModPlatform::ResourceType::World:
-                minecraftInst->worldList()->installWorld(localFileInfo);
-                break;
-            case ModPlatform::ResourceType::Unknown:
-            default:
-                qDebug() << "Can't Identify" << localFileName << "Ignoring it.";
-                break;
+        case ModPlatform::ResourceType::ResourcePack:
+            minecraftInst->resourcePackList()->installResourceWithFlameMetadata(localFileName, version);
+            break;
+        case ModPlatform::ResourceType::TexturePack:
+            minecraftInst->texturePackList()->installResourceWithFlameMetadata(localFileName, version);
+            break;
+        case ModPlatform::ResourceType::DataPack:
+            qWarning() << "Importing of Data Packs not supported at this time. Ignoring" << localFileName;
+            break;
+        case ModPlatform::ResourceType::Mod:
+            minecraftInst->loaderModList()->installResourceWithFlameMetadata(localFileName, version);
+            break;
+        case ModPlatform::ResourceType::ShaderPack:
+            minecraftInst->shaderPackList()->installResourceWithFlameMetadata(localFileName, version);
+            break;
+        case ModPlatform::ResourceType::World:
+            minecraftInst->worldList()->installWorld(localFileInfo);
+            break;
+        case ModPlatform::ResourceType::Unknown:
+        default:
+            qDebug() << "Can't Identify" << localFileName << "Ignoring it.";
+            break;
         }
     }
 }
@@ -1101,7 +1110,7 @@ void MainWindow::iconUpdated(QString icon)
 void MainWindow::updateInstanceToolIcon(QString new_icon)
 {
     m_currentInstIcon = new_icon;
-    auto icon = APPLICATION->icons()->getIcon(m_currentInstIcon);
+    auto icon         = APPLICATION->icons()->getIcon(m_currentInstIcon);
     ui->actionChangeInstIcon->setIcon(icon);
     changeIconButton->setIcon(icon);
 }
@@ -1124,14 +1133,14 @@ void MainWindow::on_actionChangeInstGroup_triggered()
         return;
 
     InstanceId instId = m_selectedInstance->id();
-    QString src(APPLICATION->instances()->getInstanceGroup(instId));
+    QString    src(APPLICATION->instances()->getInstanceGroup(instId));
 
     QStringList groups = APPLICATION->instances()->getGroups();
     groups.prepend("");
-    int index = groups.indexOf(src);
-    bool ok = false;
-    QString dst = QInputDialog::getItem(this, tr("Group name"), tr("Enter a new group name."), groups, index, true, &ok);
-    dst = dst.simplified();
+    int     index = groups.indexOf(src);
+    bool    ok    = false;
+    QString dst   = QInputDialog::getItem(this, tr("Group name"), tr("Enter a new group name."), groups, index, true, &ok);
+    dst           = dst.simplified();
 
     if (ok) {
         APPLICATION->instances()->setInstanceGroup(instId, dst);
@@ -1142,8 +1151,8 @@ void MainWindow::deleteGroup(QString group)
 {
     Q_ASSERT(!group.isEmpty());
 
-    const int reply = QMessageBox::question(this, tr("Delete group"), tr("Are you sure you want to delete the group '%1'?").arg(group),
-                                            QMessageBox::Yes | QMessageBox::No);
+    const int reply = QMessageBox::question(
+        this, tr("Delete group"), tr("Are you sure you want to delete the group '%1'?").arg(group), QMessageBox::Yes | QMessageBox::No);
     if (reply == QMessageBox::Yes)
         APPLICATION->instances()->deleteGroup(group);
 }
@@ -1153,11 +1162,11 @@ void MainWindow::renameGroup(QString group)
     Q_ASSERT(!group.isEmpty());
 
     QString name = QInputDialog::getText(this, tr("Rename group"), tr("Enter a new group name."), QLineEdit::Normal, group);
-    name = name.simplified();
+    name         = name.simplified();
     if (name.isNull() || name == group)
         return;
 
-    const bool empty = name.isEmpty();
+    const bool empty     = name.isEmpty();
     const bool duplicate = APPLICATION->instances()->getGroups().contains(name, Qt::CaseInsensitive) && group.toLower() != name.toLower();
 
     if (empty || duplicate) {
@@ -1172,7 +1181,8 @@ void MainWindow::undoTrashInstance()
 {
     if (!APPLICATION->instances()->undoTrashInstance())
         QMessageBox::warning(
-            this, tr("Failed to undo trashing instance"),
+            this,
+            tr("Failed to undo trashing instance"),
             tr("Some instances and shortcuts could not be restored.\nPlease check your trashbin to manually restore them."));
     ui->actionUndoTrashInstance->setEnabled(APPLICATION->instances()->trashedSomething());
 }
@@ -1264,7 +1274,8 @@ void MainWindow::on_actionEditInstance_triggered()
     if (m_selectedInstance->canEdit()) {
         APPLICATION->showInstanceWindow(m_selectedInstance);
     } else {
-        CustomMessageBox::selectable(this, tr("Instance not editable"),
+        CustomMessageBox::selectable(this,
+                                     tr("Instance not editable"),
                                      tr("This instance is not editable. It may be broken, invalid, or too old. Check logs for details."),
                                      QMessageBox::Critical)
             ->show();
@@ -1294,7 +1305,8 @@ void MainWindow::on_actionReportBug_triggered()
 void MainWindow::on_actionClearMetadata_triggered()
 {
     if (!APPLICATION->metacache()->evictAll()) {
-        CustomMessageBox::selectable(this, tr("Error"),
+        CustomMessageBox::selectable(this,
+                                     tr("Error"),
                                      tr("Metadata cache clear Failed!\nTo clear the metadata cache manually, press Folders -> View "
                                         "Launcher Root Folder, and after closing the launcher delete the folder named \"meta\"\n"),
                                      QMessageBox::Warning)
@@ -1317,11 +1329,13 @@ void MainWindow::on_actionAddToPATH_triggered()
                 .arg(binaryPath, targetPath);
     auto outcome = QProcess::execute("/usr/bin/osascript", args);
     if (!outcome) {
-        QMessageBox::information(this, tr("Successfully added %1 to PATH").arg(BuildConfig.LAUNCHER_DISPLAYNAME),
+        QMessageBox::information(this,
+                                 tr("Successfully added %1 to PATH").arg(BuildConfig.LAUNCHER_DISPLAYNAME),
                                  tr("%1 was successfully added to your PATH. You can now start it by running `%2`.")
                                      .arg(BuildConfig.LAUNCHER_DISPLAYNAME, BuildConfig.LAUNCHER_APP_BINARY_NAME));
     } else {
-        QMessageBox::critical(this, tr("Failed to add %1 to PATH").arg(BuildConfig.LAUNCHER_DISPLAYNAME),
+        QMessageBox::critical(this,
+                              tr("Failed to add %1 to PATH").arg(BuildConfig.LAUNCHER_DISPLAYNAME),
                               tr("An error occurred while trying to add %1 to PATH").arg(BuildConfig.LAUNCHER_DISPLAYNAME));
     }
 }
@@ -1334,14 +1348,14 @@ void MainWindow::on_actionOpenWiki_triggered()
 
 void MainWindow::on_actionMoreNews_triggered()
 {
-    auto entries = m_newsChecker->getNewsEntries();
+    auto       entries = m_newsChecker->getNewsEntries();
     NewsDialog news_dialog(entries, this);
     news_dialog.exec();
 }
 
 void MainWindow::newsButtonClicked()
 {
-    auto entries = m_newsChecker->getNewsEntries();
+    auto       entries = m_newsChecker->getNewsEntries();
     NewsDialog news_dialog(entries, this);
     news_dialog.toggleArticleList();
     news_dialog.exec();
@@ -1360,25 +1374,30 @@ void MainWindow::on_actionDeleteInstance_triggered()
     }
 
     if (m_selectedInstance->isRunning()) {
-        CustomMessageBox::selectable(this, tr("Cannot Delete Running Instance"),
+        CustomMessageBox::selectable(this,
+                                     tr("Cannot Delete Running Instance"),
                                      tr("The selected instance is currently running and cannot be deleted. Please stop the instance before "
                                         "attempting to delete it."),
-                                     QMessageBox::Warning, QMessageBox::Ok)
+                                     QMessageBox::Warning,
+                                     QMessageBox::Ok)
             ->exec();
         return;
     }
     auto id = m_selectedInstance->id();
 
     QString shortcutStr;
-    auto shortcuts = m_selectedInstance->shortcuts();
+    auto    shortcuts = m_selectedInstance->shortcuts();
     if (!shortcuts.isEmpty())
         shortcutStr = tr(" and its %n registered shortcut(s)", "", shortcuts.size());
-    auto response = CustomMessageBox::selectable(this, tr("Confirm Deletion"),
+    auto response = CustomMessageBox::selectable(this,
+                                                 tr("Confirm Deletion"),
                                                  tr("You are about to delete \"%1\"%2.\n"
                                                     "This may be permanent and will completely delete the instance.\n\n"
                                                     "Are you sure?")
                                                      .arg(m_selectedInstance->name(), shortcutStr),
-                                                 QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                 QMessageBox::Warning,
+                                                 QMessageBox::Yes | QMessageBox::No,
+                                                 QMessageBox::No)
                         ->exec();
 
     if (response != QMessageBox::Yes)
@@ -1469,7 +1488,7 @@ void MainWindow::instanceActivated(QModelIndex index)
 {
     if (!index.isValid())
         return;
-    QString id = index.data(InstanceList::InstanceIDRole).toString();
+    QString       id   = index.data(InstanceList::InstanceIDRole).toString();
     BaseInstance* inst = APPLICATION->instances()->getInstanceById(id);
     if (!inst)
         return;
@@ -1534,7 +1553,7 @@ void MainWindow::instanceChanged(const QModelIndex& current, [[maybe_unused]] co
         disconnect(m_selectedInstance, &BaseInstance::runningStatusChanged, this, &MainWindow::refreshCurrentInstance);
         disconnect(m_selectedInstance, &BaseInstance::profilerChanged, this, &MainWindow::refreshCurrentInstance);
     }
-    QString id = current.data(InstanceList::InstanceIDRole).toString();
+    QString id         = current.data(InstanceList::InstanceIDRole).toString();
     m_selectedInstance = APPLICATION->instances()->getInstanceById(id);
     if (m_selectedInstance) {
         ui->instanceToolBar->setEnabled(true);
@@ -1568,7 +1587,7 @@ void MainWindow::instanceSelectRequest(QString id)
 
 void MainWindow::instanceDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    auto current = view->selectionModel()->currentIndex();
+    auto           current = view->selectionModel()->currentIndex();
     QItemSelection test(topLeft, bottomRight);
     if (test.contains(current)) {
         instanceChanged(current, current);
@@ -1603,10 +1622,9 @@ void MainWindow::checkInstancePathForProblems()
         warning.setDefaultButton(QMessageBox::Ok);
         warning.exec();
     }
-    auto tempFolderText =
-        tr("This is a problem: <br/>"
-           " - The launcher will likely be deleted without warning by the operating system <br/>"
-           " - close the launcher now and extract it to a real location, not a temporary folder");
+    auto    tempFolderText = tr("This is a problem: <br/>"
+                                " - The launcher will likely be deleted without warning by the operating system <br/>"
+                                " - close the launcher now and extract it to a real location, not a temporary folder");
     QString pathfoldername = QDir(instanceFolder).absolutePath();
     if (pathfoldername.contains("Rar$", Qt::CaseInsensitive)) {
         QMessageBox warning(this);

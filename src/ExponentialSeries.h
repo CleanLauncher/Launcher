@@ -11,15 +11,16 @@ inline void clamp(T& current, T min, T max)
     }
 }
 
-class ExponentialSeries {
-   public:
+class ExponentialSeries
+{
+public:
     ExponentialSeries(unsigned min, unsigned max, unsigned exponent = 2)
     {
         m_current = m_min = min;
-        m_max = max;
-        m_exponent = exponent;
+        m_max             = max;
+        m_exponent        = exponent;
     }
-    void reset() { m_current = m_min; }
+    void     reset() { m_current = m_min; }
     unsigned operator()()
     {
         unsigned retval = m_current;

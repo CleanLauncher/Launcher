@@ -29,45 +29,48 @@
 
 class NewInstanceDialog;
 
-namespace FTBImportAPP {
-namespace Ui {
+namespace FTBImportAPP
+{
+namespace Ui
+{
 class ImportFTBPage;
 }
 
-class ImportFTBPage : public QWidget, public ModpackProviderBasePage {
+class ImportFTBPage : public QWidget, public ModpackProviderBasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ImportFTBPage(NewInstanceDialog* dialog, QWidget* parent = 0);
     virtual ~ImportFTBPage();
     QString displayName() const override { return tr("FTB App Import"); }
-    QIcon icon() const override { return QIcon::fromTheme("ftb_logo"); }
+    QIcon   icon() const override { return QIcon::fromTheme("ftb_logo"); }
     QString id() const override { return "import_ftb"; }
     QString helpPage() const override { return "FTB-import"; }
-    bool shouldDisplay() const override { return true; }
-    void openedImpl() override;
-    void retranslate() override;
+    bool    shouldDisplay() const override { return true; }
+    void    openedImpl() override;
+    void    retranslate() override;
 
     virtual void setSearchTerm(QString) override;
 
     virtual QString getSerachTerm() const override;
 
-   private:
+private:
     void suggestCurrent();
     void onPackSelectionChanged(Modpack* pack = nullptr);
-   private slots:
+private slots:
     void onSortingSelectionChanged(QString data);
     void onPublicPackSelectionChanged(QModelIndex first, QModelIndex second);
     void triggerSearch();
 
-   private:
-    bool initialized = false;
-    Modpack selected;
-    ListModel* listModel = nullptr;
+private:
+    bool         initialized = false;
+    Modpack      selected;
+    ListModel*   listModel    = nullptr;
     FilterModel* currentModel = nullptr;
 
     NewInstanceDialog* dialog = nullptr;
-    Ui::ImportFTBPage* ui = nullptr;
+    Ui::ImportFTBPage* ui     = nullptr;
 };
 
 }  // namespace FTBImportAPP

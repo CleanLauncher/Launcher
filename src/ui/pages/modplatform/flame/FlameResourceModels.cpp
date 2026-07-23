@@ -10,7 +10,8 @@
 #include "modplatform/flame/FlameAPI.h"
 #include "ui/pages/modplatform/flame/FlameResourcePages.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 static bool isOptedOut(const ModPlatform::IndexedVersion& ver)
 {
@@ -25,10 +26,10 @@ ResourceAPI::SearchArgs FlameTexturePackModel::createSearchArguments()
 {
     auto args = TexturePackResourceModel::createSearchArguments();
 
-    auto profile = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
+    auto    profile                    = static_cast<const MinecraftInstance&>(m_base_instance).getPackProfile();
     QString instance_minecraft_version = profile->getComponentVersion("net.minecraft");
 
-    args.versions = { instance_minecraft_version };
+    args.versions = {instance_minecraft_version};
 
     return args;
 }

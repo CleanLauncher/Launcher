@@ -17,9 +17,9 @@
  */
 
 #include "ui/themes/CatPainter.h"
-#include <QPixmap>
 #include "Application.h"
 #include "settings/SettingsObject.h"
+#include <QPixmap>
 
 CatPainter::CatPainter(const QString& path, QObject* parent) : QObject(parent)
 {
@@ -44,8 +44,8 @@ void CatPainter::paint(QPainter* painter, const QRect& viewport)
 
     auto fit = APPLICATION->settings()->get("CatFit").toString();
     painter->setOpacity(APPLICATION->settings()->get("CatOpacity").toFloat() / 100);
-    int widWidth = viewport.width();
-    int widHeight = viewport.height();
+    int  widWidth   = viewport.width();
+    int  widHeight  = viewport.height();
     auto aspectMode = Qt::IgnoreAspectRatio;
     if (fit == "fill") {
         aspectMode = Qt::KeepAspectRatio;
@@ -56,7 +56,7 @@ void CatPainter::paint(QPainter* painter, const QRect& viewport)
         if (frame.height() < widHeight)
             widHeight = frame.height();
     }
-    auto pixmap = frame.scaled(widWidth, widHeight, aspectMode, Qt::SmoothTransformation);
+    auto  pixmap       = frame.scaled(widWidth, widHeight, aspectMode, Qt::SmoothTransformation);
     QRect rectOfPixmap = pixmap.rect();
     rectOfPixmap.moveBottomRight(viewport.bottomRight());
     painter->drawPixmap(rectOfPixmap.topLeft(), pixmap);

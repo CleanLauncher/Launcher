@@ -22,25 +22,29 @@
 #include <QList>
 #include <QString>
 
-namespace TechnicSolder {
+namespace TechnicSolder
+{
 
-struct Pack {
-    QString recommended;
-    QString latest;
+struct Pack
+{
+    QString        recommended;
+    QString        latest;
     QList<QString> builds;
 };
 
 void loadPack(Pack& v, QJsonObject& obj);
 
-struct PackBuildMod {
+struct PackBuildMod
+{
     QString name;
     QString version;
     QString md5;
     QString url;
 };
 
-struct PackBuild {
-    QString minecraft;
+struct PackBuild
+{
+    QString             minecraft;
     QList<PackBuildMod> mods;
 };
 

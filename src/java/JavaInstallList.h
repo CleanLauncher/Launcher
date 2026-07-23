@@ -28,52 +28,59 @@
 
 class JavaListLoadTask;
 
-class JavaInstallList : public BaseVersionList {
+class JavaInstallList : public BaseVersionList
+{
     Q_OBJECT
-    enum class Status { NotDone, InProgress, Done };
+    enum class Status
+    {
+        NotDone,
+        InProgress,
+        Done
+    };
 
-   public:
+public:
     explicit JavaInstallList(QObject* parent = 0, bool onlyManagedVersions = false);
 
-    Task::Ptr getLoadTask(bool forceReload = false) override;
-    bool isLoaded() override;
+    Task::Ptr              getLoadTask(bool forceReload = false) override;
+    bool                   isLoaded() override;
     const BaseVersion::Ptr at(int i) const override;
-    int count() const override;
-    void sortVersions() override;
+    int                    count() const override;
+    void                   sortVersions() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     RoleList providesRoles() const override;
 
-   public slots:
+public slots:
     void updateListData(QList<BaseVersion::Ptr> versions) override;
 
-   protected:
-    void load();
+protected:
+    void      load();
     Task::Ptr getCurrentTask();
 
-   protected:
-    Status m_status = Status::NotDone;
+protected:
+    Status                               m_status = Status::NotDone;
     shared_qobject_ptr<JavaListLoadTask> m_load_task;
-    QList<BaseVersion::Ptr> m_vlist;
-    bool m_only_managed_versions;
+    QList<BaseVersion::Ptr>              m_vlist;
+    bool                                 m_only_managed_versions;
 };
 
-class JavaListLoadTask : public Task {
+class JavaListLoadTask : public Task
+{
     Q_OBJECT
 
-   public:
+public:
     explicit JavaListLoadTask(JavaInstallList* vlist, bool onlyManagedVersions = false);
     virtual ~JavaListLoadTask() = default;
 
-   protected:
+protected:
     void executeTask() override;
-   public slots:
+public slots:
     void javaCheckerFinished();
 
-   protected:
-    Task::Ptr m_job;
-    JavaInstallList* m_list;
-    JavaInstall* m_current_recommended;
+protected:
+    Task::Ptr                  m_job;
+    JavaInstallList*           m_list;
+    JavaInstall*               m_current_recommended;
     QList<JavaChecker::Result> m_results;
-    bool m_only_managed_versions;
+    bool                       m_only_managed_versions;
 };

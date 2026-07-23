@@ -35,46 +35,49 @@
 
 class QPushButton;
 
-struct BlockedMod {
+struct BlockedMod
+{
     QString name;
     QString websiteUrl;
     QString hash;
-    bool matched;
+    bool    matched;
     QString localPath;
     QString targetFolder;
-    bool disabled = false;
-    bool move = false;
+    bool    disabled = false;
+    bool    move     = false;
 };
 
 QT_BEGIN_NAMESPACE
-namespace Ui {
+namespace Ui
+{
 class BlockedModsDialog;
 }
 QT_END_NAMESPACE
 
-class BlockedModsDialog : public QDialog {
+class BlockedModsDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     BlockedModsDialog(QWidget* parent, const QString& title, const QString& text, QList<BlockedMod>& mods, QString hash_type = "sha1");
 
     ~BlockedModsDialog() override;
 
-   protected:
+protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
 
-   protected slots:
+protected slots:
     void done(int r) override;
 
-   private:
-    Ui::BlockedModsDialog* ui;
-    QList<BlockedMod>& m_mods;
-    QFileSystemWatcher m_watcher;
+private:
+    Ui::BlockedModsDialog*             ui;
+    QList<BlockedMod>&                 m_mods;
+    QFileSystemWatcher                 m_watcher;
     shared_qobject_ptr<ConcurrentTask> m_hashingTask;
-    QSet<QString> m_pendingHashPaths;
-    bool m_rehashPending;
-    QString m_hashType;
+    QSet<QString>                      m_pendingHashPaths;
+    bool                               m_rehashPending;
+    QString                            m_hashType;
 
     void openAll(bool missingOnly);
     void addDownloadFolder();

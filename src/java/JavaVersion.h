@@ -9,10 +9,11 @@
 #undef minor
 #endif
 
-class JavaVersion {
+class JavaVersion
+{
     friend class JavaVersionTest;
 
-   public:
+public:
     JavaVersion() {}
     JavaVersion(const QString& rhs);
     JavaVersion(int major, int minor, int security, int build = 0, QString name = "");
@@ -29,18 +30,18 @@ class JavaVersion {
 
     QString toString() const;
 
-    int major() const { return m_major; }
-    int minor() const { return m_minor; }
-    int security() const { return m_security; }
+    int     major() const { return m_major; }
+    int     minor() const { return m_minor; }
+    int     security() const { return m_security; }
     QString build() const { return m_prerelease; }
     QString name() const { return m_name; }
 
-   private:
+private:
     QString m_string;
-    int m_major = 0;
-    int m_minor = 0;
-    int m_security = 0;
-    QString m_name = "";
-    bool m_parseable = false;
+    int     m_major     = 0;
+    int     m_minor     = 0;
+    int     m_security  = 0;
+    QString m_name      = "";
+    bool    m_parseable = false;
     QString m_prerelease;
 };

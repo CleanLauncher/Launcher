@@ -44,24 +44,26 @@ class InstanceView;
 class QPainter;
 class QModelIndex;
 
-struct VisualRow {
-    QList<QModelIndex> items;
-    int height = 0;
-    int top = 0;
-    inline int size() const { return items.size(); }
+struct VisualRow
+{
+    QList<QModelIndex>  items;
+    int                 height = 0;
+    int                 top    = 0;
+    inline int          size() const { return items.size(); }
     inline QModelIndex& operator[](int i) { return items[i]; }
 };
 
-struct VisualGroup {
+struct VisualGroup
+{
     VisualGroup(QString text, InstanceView* view);
     explicit VisualGroup(const VisualGroup* other);
 
-    InstanceView* view = nullptr;
-    QString text;
-    bool collapsed = false;
+    InstanceView*    view = nullptr;
+    QString          text;
+    bool             collapsed = false;
     QList<VisualRow> rows;
-    int firstItemIndex = 0;
-    int m_verticalPosition = 0;
+    int              firstItemIndex     = 0;
+    int              m_verticalPosition = 0;
 
     void update();
 
@@ -85,7 +87,14 @@ struct VisualGroup {
 
     QPair<int, int> positionOf(const QModelIndex& index) const;
 
-    enum HitResult { NoHit = 0x0, TextHit = 0x1, CheckboxHit = 0x2, HeaderHit = 0x4, BodyHit = 0x8 };
+    enum HitResult
+    {
+        NoHit       = 0x0,
+        TextHit     = 0x1,
+        CheckboxHit = 0x2,
+        HeaderHit   = 0x4,
+        BodyHit     = 0x8
+    };
     Q_DECLARE_FLAGS(HitResults, HitResult)
 
     HitResults hitScan(const QPoint& pos) const;

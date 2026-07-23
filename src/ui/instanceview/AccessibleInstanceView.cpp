@@ -199,25 +199,25 @@ bool AccessibleInstanceView::selectRow(int row)
     }
 
     switch (view()->selectionMode()) {
-        case QAbstractItemView::NoSelection: {
+    case QAbstractItemView::NoSelection: {
+        return false;
+    }
+    case QAbstractItemView::SingleSelection: {
+        if (view()->selectionBehavior() != QAbstractItemView::SelectRows && columnCount() > 1)
             return false;
-        }
-        case QAbstractItemView::SingleSelection: {
-            if (view()->selectionBehavior() != QAbstractItemView::SelectRows && columnCount() > 1)
-                return false;
+        view()->clearSelection();
+        break;
+    }
+    case QAbstractItemView::ContiguousSelection: {
+        if ((!row || !view()->selectionModel()->isRowSelected(row - 1, view()->rootIndex())) &&
+            !view()->selectionModel()->isRowSelected(row + 1, view()->rootIndex())) {
             view()->clearSelection();
-            break;
         }
-        case QAbstractItemView::ContiguousSelection: {
-            if ((!row || !view()->selectionModel()->isRowSelected(row - 1, view()->rootIndex())) &&
-                !view()->selectionModel()->isRowSelected(row + 1, view()->rootIndex())) {
-                view()->clearSelection();
-            }
-            break;
-        }
-        default: {
-            break;
-        }
+        break;
+    }
+    default: {
+        break;
+    }
     }
 
     view()->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
@@ -236,26 +236,26 @@ bool AccessibleInstanceView::selectColumn(int column)
     }
 
     switch (view()->selectionMode()) {
-        case QAbstractItemView::NoSelection: {
+    case QAbstractItemView::NoSelection: {
+        return false;
+    }
+    case QAbstractItemView::SingleSelection: {
+        if (view()->selectionBehavior() != QAbstractItemView::SelectColumns && rowCount() > 1) {
             return false;
         }
-        case QAbstractItemView::SingleSelection: {
-            if (view()->selectionBehavior() != QAbstractItemView::SelectColumns && rowCount() > 1) {
-                return false;
-            }
-            [[fallthrough]];
-        }
+        [[fallthrough]];
+    }
 
-        case QAbstractItemView::ContiguousSelection: {
-            if ((!column || !view()->selectionModel()->isColumnSelected(column - 1, view()->rootIndex())) &&
-                !view()->selectionModel()->isColumnSelected(column + 1, view()->rootIndex())) {
-                view()->clearSelection();
-            }
-            break;
+    case QAbstractItemView::ContiguousSelection: {
+        if ((!column || !view()->selectionModel()->isColumnSelected(column - 1, view()->rootIndex())) &&
+            !view()->selectionModel()->isColumnSelected(column + 1, view()->rootIndex())) {
+            view()->clearSelection();
         }
-        default: {
-            break;
-        }
+        break;
+    }
+    default: {
+        break;
+    }
     }
 
     view()->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Columns);
@@ -274,28 +274,28 @@ bool AccessibleInstanceView::unselectRow(int row)
     }
 
     QItemSelection selection(index, index);
-    auto selectionModel = view()->selectionModel();
+    auto           selectionModel = view()->selectionModel();
 
     switch (view()->selectionMode()) {
-        case QAbstractItemView::SingleSelection:
+    case QAbstractItemView::SingleSelection:
 
-            if (selectedRowCount() == 1) {
-                return false;
-            }
-            break;
-        case QAbstractItemView::ContiguousSelection: {
-            if (selectedRowCount() == 1) {
-                return false;
-            }
+        if (selectedRowCount() == 1) {
+            return false;
+        }
+        break;
+    case QAbstractItemView::ContiguousSelection: {
+        if (selectedRowCount() == 1) {
+            return false;
+        }
 
-            if ((!row || selectionModel->isRowSelected(row - 1, view()->rootIndex())) &&
-                selectionModel->isRowSelected(row + 1, view()->rootIndex())) {
-                selection = QItemSelection(index, view()->model()->index(rowCount() - 1, 0, view()->rootIndex()));
-            }
+        if ((!row || selectionModel->isRowSelected(row - 1, view()->rootIndex())) &&
+            selectionModel->isRowSelected(row + 1, view()->rootIndex())) {
+            selection = QItemSelection(index, view()->model()->index(rowCount() - 1, 0, view()->rootIndex()));
         }
-        default: {
-            break;
-        }
+    }
+    default: {
+        break;
+    }
     }
 
     selectionModel->select(selection, QItemSelectionModel::Deselect | QItemSelectionModel::Rows);
@@ -317,23 +317,23 @@ bool AccessibleInstanceView::unselectColumn(int column)
     QItemSelection selection(index, index);
 
     switch (view()->selectionMode()) {
-        case QAbstractItemView::SingleSelection: {
-            if (selectedColumnCount() == 1) {
-                return false;
-            }
-            break;
+    case QAbstractItemView::SingleSelection: {
+        if (selectedColumnCount() == 1) {
+            return false;
         }
-        case QAbstractItemView::ContiguousSelection:
-            if (selectedColumnCount() == 1) {
-                return false;
-            }
+        break;
+    }
+    case QAbstractItemView::ContiguousSelection:
+        if (selectedColumnCount() == 1) {
+            return false;
+        }
 
-            if ((!column || view()->selectionModel()->isColumnSelected(column - 1, view()->rootIndex())) &&
-                view()->selectionModel()->isColumnSelected(column + 1, view()->rootIndex())) {
-                selection = QItemSelection(index, model->index(0, columnCount() - 1, view()->rootIndex()));
-            }
-        default:
-            break;
+        if ((!column || view()->selectionModel()->isColumnSelected(column - 1, view()->rootIndex())) &&
+            view()->selectionModel()->isColumnSelected(column + 1, view()->rootIndex())) {
+            selection = QItemSelection(index, model->index(0, columnCount() - 1, view()->rootIndex()));
+        }
+    default:
+        break;
     }
 
     view()->selectionModel()->select(selection, QItemSelectionModel::Deselect | QItemSelectionModel::Columns);
@@ -353,7 +353,7 @@ QAccessible::State AccessibleInstanceView::state() const
 QAccessibleInterface* AccessibleInstanceView::childAt(int x, int y) const
 {
     QPoint viewportOffset = view()->viewport()->mapTo(view(), QPoint(0, 0));
-    QPoint indexPosition = view()->mapFromGlobal(QPoint(x, y) - viewportOffset);
+    QPoint indexPosition  = view()->mapFromGlobal(QPoint(x, y) - viewportOffset);
 
     QModelIndex index = view()->indexAt(indexPosition);
     if (index.isValid()) {
@@ -431,7 +431,7 @@ QAccessibleInterface* AccessibleInstanceView::child(int logicalIndex) const
 
     int columns = view()->model()->columnCount();
 
-    int row = logicalIndex / columns;
+    int row    = logicalIndex / columns;
     int column = logicalIndex % columns;
 
     QAccessibleInterface* iface = 0;
@@ -461,58 +461,58 @@ void AccessibleInstanceView::modelChange(QAccessibleTableModelChangeEvent* event
         return;
 
     switch (event->modelChangeType()) {
-        case QAccessibleTableModelChangeEvent::ModelReset:
-            for (QAccessible::Id id : childToId)
+    case QAccessibleTableModelChangeEvent::ModelReset:
+        for (QAccessible::Id id : childToId)
+            QAccessible::deleteAccessibleInterface(id);
+        childToId.clear();
+        break;
+
+    case QAccessibleTableModelChangeEvent::RowsInserted:
+    case QAccessibleTableModelChangeEvent::ColumnsInserted: {
+        ChildCache                newCache;
+        ChildCache::ConstIterator iter = childToId.constBegin();
+
+        while (iter != childToId.constEnd()) {
+            QAccessible::Id       id    = iter.value();
+            QAccessibleInterface* iface = QAccessible::accessibleInterface(id);
+            Q_ASSERT(iface);
+            if (indexOfChild(iface) >= 0) {
+                newCache.insert(indexOfChild(iface), id);
+            } else {
                 QAccessible::deleteAccessibleInterface(id);
-            childToId.clear();
-            break;
+            }
+            ++iter;
+        }
+        childToId = newCache;
+        break;
+    }
 
-        case QAccessibleTableModelChangeEvent::RowsInserted:
-        case QAccessibleTableModelChangeEvent::ColumnsInserted: {
-            ChildCache newCache;
-            ChildCache::ConstIterator iter = childToId.constBegin();
+    case QAccessibleTableModelChangeEvent::ColumnsRemoved:
+    case QAccessibleTableModelChangeEvent::RowsRemoved: {
+        ChildCache                newCache;
+        ChildCache::ConstIterator iter = childToId.constBegin();
+        while (iter != childToId.constEnd()) {
+            QAccessible::Id       id    = iter.value();
+            QAccessibleInterface* iface = QAccessible::accessibleInterface(id);
+            Q_ASSERT(iface);
+            if (iface->role() == QAccessible::Cell || iface->role() == QAccessible::ListItem) {
+                Q_ASSERT(iface->tableCellInterface());
+                AccessibleInstanceViewItem* cell = static_cast<AccessibleInstanceViewItem*>(iface->tableCellInterface());
 
-            while (iter != childToId.constEnd()) {
-                QAccessible::Id id = iter.value();
-                QAccessibleInterface* iface = QAccessible::accessibleInterface(id);
-                Q_ASSERT(iface);
-                if (indexOfChild(iface) >= 0) {
-                    newCache.insert(indexOfChild(iface), id);
-                } else {
+                if (cell->m_index.isValid())
+                    newCache.insert(indexOfChild(cell), id);
+                else
                     QAccessible::deleteAccessibleInterface(id);
-                }
-                ++iter;
             }
-            childToId = newCache;
-            break;
+            ++iter;
         }
+        childToId = newCache;
+        break;
+    }
 
-        case QAccessibleTableModelChangeEvent::ColumnsRemoved:
-        case QAccessibleTableModelChangeEvent::RowsRemoved: {
-            ChildCache newCache;
-            ChildCache::ConstIterator iter = childToId.constBegin();
-            while (iter != childToId.constEnd()) {
-                QAccessible::Id id = iter.value();
-                QAccessibleInterface* iface = QAccessible::accessibleInterface(id);
-                Q_ASSERT(iface);
-                if (iface->role() == QAccessible::Cell || iface->role() == QAccessible::ListItem) {
-                    Q_ASSERT(iface->tableCellInterface());
-                    AccessibleInstanceViewItem* cell = static_cast<AccessibleInstanceViewItem*>(iface->tableCellInterface());
+    case QAccessibleTableModelChangeEvent::DataChanged:
 
-                    if (cell->m_index.isValid())
-                        newCache.insert(indexOfChild(cell), id);
-                    else
-                        QAccessible::deleteAccessibleInterface(id);
-                }
-                ++iter;
-            }
-            childToId = newCache;
-            break;
-        }
-
-        case QAccessibleTableModelChangeEvent::DataChanged:
-
-            break;
+        break;
     }
 }
 
@@ -614,16 +614,16 @@ void AccessibleInstanceViewItem::selectCell()
     QAccessibleTableInterface* cellTable = table()->tableInterface();
 
     switch (view->selectionBehavior()) {
-        case QAbstractItemView::SelectItems:
-            break;
-        case QAbstractItemView::SelectColumns:
-            if (cellTable)
-                cellTable->selectColumn(m_index.column());
-            return;
-        case QAbstractItemView::SelectRows:
-            if (cellTable)
-                cellTable->selectRow(m_index.row());
-            return;
+    case QAbstractItemView::SelectItems:
+        break;
+    case QAbstractItemView::SelectColumns:
+        if (cellTable)
+            cellTable->selectColumn(m_index.column());
+        return;
+    case QAbstractItemView::SelectRows:
+        if (cellTable)
+            cellTable->selectRow(m_index.row());
+        return;
     }
 
     if (selectionMode == QAbstractItemView::SingleSelection) {
@@ -644,16 +644,16 @@ void AccessibleInstanceViewItem::unselectCell()
     QAccessibleTableInterface* cellTable = table()->tableInterface();
 
     switch (view->selectionBehavior()) {
-        case QAbstractItemView::SelectItems:
-            break;
-        case QAbstractItemView::SelectColumns:
-            if (cellTable)
-                cellTable->unselectColumn(m_index.column());
-            return;
-        case QAbstractItemView::SelectRows:
-            if (cellTable)
-                cellTable->unselectRow(m_index.row());
-            return;
+    case QAbstractItemView::SelectItems:
+        break;
+    case QAbstractItemView::SelectColumns:
+        if (cellTable)
+            cellTable->unselectColumn(m_index.column());
+        return;
+    case QAbstractItemView::SelectRows:
+        if (cellTable)
+            cellTable->unselectRow(m_index.row());
+        return;
     }
 
     if ((selectionMode != QAbstractItemView::MultiSelection) && (selectionMode != QAbstractItemView::ExtendedSelection) &&
@@ -694,7 +694,7 @@ QAccessible::State AccessibleInstanceViewItem::state() const
     Qt::ItemFlags flags = m_index.flags();
     if (flags & Qt::ItemIsSelectable) {
         st.selectable = true;
-        st.focusable = true;
+        st.focusable  = true;
         if (view->selectionMode() == QAbstractItemView::MultiSelection)
             st.multiSelectable = true;
         if (view->selectionMode() == QAbstractItemView::ExtendedSelection)
@@ -724,16 +724,16 @@ QString AccessibleInstanceViewItem::text(QAccessible::Text t) const
         return value;
     QAbstractItemModel* model = view->model();
     switch (t) {
-        case QAccessible::Name:
-            value = model->data(m_index, Qt::AccessibleTextRole).toString();
-            if (value.isEmpty())
-                value = model->data(m_index, Qt::DisplayRole).toString();
-            break;
-        case QAccessible::Description:
-            value = model->data(m_index, Qt::AccessibleDescriptionRole).toString();
-            break;
-        default:
-            break;
+    case QAccessible::Name:
+        value = model->data(m_index, Qt::AccessibleTextRole).toString();
+        if (value.isEmpty())
+            value = model->data(m_index, Qt::DisplayRole).toString();
+        break;
+    case QAccessible::Description:
+        value = model->data(m_index, Qt::AccessibleDescriptionRole).toString();
+        break;
+    default:
+        break;
     }
     return value;
 }

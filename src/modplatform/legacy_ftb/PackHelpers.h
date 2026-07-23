@@ -5,19 +5,26 @@
 #include <QString>
 #include <QStringList>
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
-enum class PackType { Public, ThirdParty, Private };
+enum class PackType
+{
+    Public,
+    ThirdParty,
+    Private
+};
 
-struct Modpack {
-    QString name;
-    QString description;
-    QString author;
+struct Modpack
+{
+    QString     name;
+    QString     description;
+    QString     author;
     QStringList oldVersions;
-    QString currentVersion;
-    QString mcVersion;
-    QString mods;
-    QString logo;
+    QString     currentVersion;
+    QString     mcVersion;
+    QString     mods;
+    QString     logo;
 
     QString dir;
     QString file;
@@ -26,7 +33,7 @@ struct Modpack {
     bool broken = false;
 
     PackType type;
-    QString packCode;
+    QString  packCode;
 };
 
 using ModpackList = QList<Modpack>;

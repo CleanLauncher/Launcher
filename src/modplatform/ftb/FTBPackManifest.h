@@ -42,109 +42,121 @@
 #include <QUrl>
 #include <QVector>
 
-namespace FTB {
+namespace FTB
+{
 
-struct Specs {
+struct Specs
+{
     int id;
     int minimum;
     int recommended;
 };
 
-struct Tag {
-    int id;
+struct Tag
+{
+    int     id;
     QString name;
 };
 
-struct Art {
-    int id;
+struct Art
+{
+    int     id;
     QString url;
     QString type;
-    int width;
-    int height;
-    bool compressed;
+    int     width;
+    int     height;
+    bool    compressed;
     QString sha1;
-    int size;
+    int     size;
     int64_t updated;
 };
 
-struct Author {
-    int id;
+struct Author
+{
+    int     id;
     QString name;
     QString type;
     QString website;
     int64_t updated;
 };
 
-struct VersionInfo {
-    int id;
+struct VersionInfo
+{
+    int     id;
     QString name;
     QString type;
     int64_t updated;
-    Specs specs;
+    Specs   specs;
 };
 
-struct Modpack {
-    int id;
-    QString name;
-    QString synopsis;
-    QString description;
-    QString type;
-    bool featured;
-    int installs;
-    int plays;
-    int64_t updated;
-    int64_t refreshed;
-    QVector<Art> art;
-    QVector<Author> authors;
+struct Modpack
+{
+    int                  id;
+    QString              name;
+    QString              synopsis;
+    QString              description;
+    QString              type;
+    bool                 featured;
+    int                  installs;
+    int                  plays;
+    int64_t              updated;
+    int64_t              refreshed;
+    QVector<Art>         art;
+    QVector<Author>      authors;
     QVector<VersionInfo> versions;
-    QVector<Tag> tags;
-    QString safeName;
+    QVector<Tag>         tags;
+    QString              safeName;
 };
 
-struct VersionTarget {
-    int id;
+struct VersionTarget
+{
+    int     id;
     QString type;
     QString name;
     QString version;
     int64_t updated;
 };
 
-struct VersionFileCurseForge {
+struct VersionFileCurseForge
+{
     int project_id;
     int file_id;
 };
 
-struct VersionFile {
-    int id;
-    QString type;
-    QString path;
-    QString name;
-    QString version;
-    QString url;
-    QString sha1;
-    int size;
-    bool clientOnly;
-    bool serverOnly;
-    bool optional;
-    int64_t updated;
+struct VersionFile
+{
+    int                   id;
+    QString               type;
+    QString               path;
+    QString               name;
+    QString               version;
+    QString               url;
+    QString               sha1;
+    int                   size;
+    bool                  clientOnly;
+    bool                  serverOnly;
+    bool                  optional;
+    int64_t               updated;
     VersionFileCurseForge curseforge;
 };
 
-struct Version {
-    int id;
-    int parent;
-    QString name;
-    QString type;
-    int installs;
-    int plays;
-    int64_t updated;
-    int64_t refreshed;
-    Specs specs;
+struct Version
+{
+    int                    id;
+    int                    parent;
+    QString                name;
+    QString                type;
+    int                    installs;
+    int                    plays;
+    int64_t                updated;
+    int64_t                refreshed;
+    Specs                  specs;
     QVector<VersionTarget> targets;
-    QVector<VersionFile> files;
+    QVector<VersionFile>   files;
 };
 
-struct VersionChangelog {
+struct VersionChangelog
+{
     QString content;
     int64_t updated;
 };

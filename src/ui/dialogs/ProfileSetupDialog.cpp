@@ -45,9 +45,9 @@
 
 #include "ui/dialogs/ProgressDialog.h"
 
-#include <Application.h>
 #include "minecraft/auth/Parsers.h"
 #include "net/Upload.h"
+#include <Application.h>
 
 ProfileSetupDialog::ProfileSetupDialog(MinecraftAccountPtr accountToSetup, QWidget* parent)
     : QDialog(parent), m_accountToSetup(accountToSetup), ui(new Ui::ProfileSetupDialog)
@@ -55,12 +55,12 @@ ProfileSetupDialog::ProfileSetupDialog(MinecraftAccountPtr accountToSetup, QWidg
     ui->setupUi(this);
     ui->errorLabel->setVisible(false);
 
-    goodIcon = QIcon::fromTheme("status-good");
+    goodIcon   = QIcon::fromTheme("status-good");
     yellowIcon = QIcon::fromTheme("status-yellow");
-    badIcon = QIcon::fromTheme("status-bad");
+    badIcon    = QIcon::fromTheme("status-bad");
 
     static const QRegularExpression s_permittedNames("[a-zA-Z0-9_]{3,16}");
-    auto nameEdit = ui->nameEdit;
+    auto                            nameEdit = ui->nameEdit;
     nameEdit->setValidator(new QRegularExpressionValidator(s_permittedNames));
     nameEdit->setClearButtonEnabled(true);
     validityAction = nameEdit->addAction(yellowIcon, QLineEdit::LeadingPosition);
@@ -92,23 +92,23 @@ void ProfileSetupDialog::on_buttonBox_rejected()
 
 void ProfileSetupDialog::setNameStatus(ProfileSetupDialog::NameStatus status, QString errorString = QString())
 {
-    nameStatus = status;
+    nameStatus    = status;
     auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
     switch (nameStatus) {
-        case NameStatus::Available: {
-            validityAction->setIcon(goodIcon);
-            okButton->setEnabled(true);
-        } break;
-        case NameStatus::NotSet:
-        case NameStatus::Pending:
-            validityAction->setIcon(yellowIcon);
-            okButton->setEnabled(false);
-            break;
-        case NameStatus::Exists:
-        case NameStatus::Error:
-            validityAction->setIcon(badIcon);
-            okButton->setEnabled(false);
-            break;
+    case NameStatus::Available: {
+        validityAction->setIcon(goodIcon);
+        okButton->setEnabled(true);
+    } break;
+    case NameStatus::NotSet:
+    case NameStatus::Pending:
+        validityAction->setIcon(yellowIcon);
+        okButton->setEnabled(false);
+        break;
+    case NameStatus::Exists:
+    case NameStatus::Error:
+        validityAction->setIcon(badIcon);
+        okButton->setEnabled(false);
+        break;
     }
     if (!errorString.isEmpty()) {
         ui->errorLabel->setText(errorString);
@@ -152,12 +152,12 @@ void ProfileSetupDialog::checkName(const QString& name)
     }
 
     currentCheck = name;
-    isChecking = true;
+    isChecking   = true;
 
     QUrl url(QString("https://api.minecraftservices.com/minecraft/profile/name/%1/available").arg(name));
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
-                                           { "Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8() } };
+    auto headers = QList<Net::HeaderPair>{{"Content-Type", "application/json"},
+                                          {"Accept", "application/json"},
+                                          {"Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8()}};
 
     if (m_check_task)
         disconnect(m_check_task.get(), nullptr, this, nullptr);
@@ -175,8 +175,8 @@ void ProfileSetupDialog::checkName(const QString& name)
 void ProfileSetupDialog::checkFinished(QByteArray* response)
 {
     if (m_check_task->error() == QNetworkReply::NoError) {
-        auto doc = QJsonDocument::fromJson(*response);
-        auto root = doc.object();
+        auto doc         = QJsonDocument::fromJson(*response);
+        auto root        = doc.object();
         auto statusValue = root.value("status").toString("INVALID");
         if (statusValue == "AVAILABLE") {
             setNameStatus(NameStatus::Available);
@@ -202,12 +202,12 @@ void ProfileSetupDialog::setupProfile(const QString& profileName)
     QString payloadTemplate("{\"profileName\":\"%1\"}");
 
     QUrl url("https://api.minecraftservices.com/minecraft/profile");
-    auto headers = QList<Net::HeaderPair>{ { "Content-Type", "application/json" },
-                                           { "Accept", "application/json" },
-                                           { "Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8() } };
+    auto headers = QList<Net::HeaderPair>{{"Content-Type", "application/json"},
+                                          {"Accept", "application/json"},
+                                          {"Authorization", QString("Bearer %1").arg(m_accountToSetup->accessToken()).toUtf8()}};
 
     auto [task, response] = Net::Upload::makeByteArray(url, payloadTemplate.arg(profileName).toUtf8());
-    m_profile_task = task;
+    m_profile_task        = task;
     m_profile_task->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
 
     connect(m_profile_task.get(), &Task::finished, this, [this, response] { setupProfileFinished(response); });
@@ -221,18 +221,20 @@ void ProfileSetupDialog::setupProfile(const QString& profileName)
     button->setEnabled(false);
 }
 
-namespace {
+namespace
+{
 
-struct MojangError {
+struct MojangError
+{
     static MojangError fromJSON(QByteArray data)
     {
         MojangError out;
         out.rawError = QString::fromUtf8(data);
-        auto doc = QJsonDocument::fromJson(data, &out.parseError);
+        auto doc     = QJsonDocument::fromJson(data, &out.parseError);
 
         out.fullyParsed = false;
         if (!out.parseError.error) {
-            auto object = doc.object();
+            auto object     = doc.object();
             out.fullyParsed = true;
             out.fullyParsed &= Parsers::getString(object.value("path"), out.path);
             out.fullyParsed &= Parsers::getString(object.value("error"), out.error);
@@ -242,9 +244,9 @@ struct MojangError {
         return out;
     }
 
-    QString rawError;
+    QString         rawError;
     QJsonParseError parseError;
-    bool fullyParsed;
+    bool            fullyParsed;
 
     QString path;
     QString error;

@@ -73,7 +73,7 @@ void LookupServerAddress::on_dnsLookupFinished()
     }
 
     const auto& firstRecord = records.at(0);
-    quint16 port = firstRecord.port();
+    quint16     port        = firstRecord.port();
 
     emit logLine(
         QString("Resolved server address %1 to %2 with port %3\n").arg(m_dnsLookup->name(), firstRecord.target(), QString::number(port)),
@@ -84,7 +84,7 @@ void LookupServerAddress::on_dnsLookupFinished()
 void LookupServerAddress::resolve(const QString& address, quint16 port)
 {
     m_output->address = address;
-    m_output->port = port;
+    m_output->port    = port;
 
     m_dnsLookup->deleteLater();
     emitSucceeded();

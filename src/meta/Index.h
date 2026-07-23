@@ -23,27 +23,34 @@
 
 class Task;
 
-namespace Meta {
+namespace Meta
+{
 
-class Index : public QAbstractListModel, public BaseEntity {
+class Index : public QAbstractListModel, public BaseEntity
+{
     Q_OBJECT
-   public:
+public:
     explicit Index(QObject* parent = nullptr);
     explicit Index(const QList<VersionList::Ptr>& lists, QObject* parent = nullptr);
     virtual ~Index() = default;
 
-    enum { UidRole = Qt::UserRole, NameRole, ListPtrRole };
+    enum
+    {
+        UidRole = Qt::UserRole,
+        NameRole,
+        ListPtrRole
+    };
 
     QVariant data(const QModelIndex& index, int role) const override;
-    int rowCount(const QModelIndex& parent) const override;
-    int columnCount(const QModelIndex& parent) const override;
+    int      rowCount(const QModelIndex& parent) const override;
+    int      columnCount(const QModelIndex& parent) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     QString localFilename() const override { return "index.json"; }
 
     VersionList::Ptr get(const QString& uid);
-    Version::Ptr get(const QString& uid, const QString& version);
-    bool hasUid(const QString& uid) const;
+    Version::Ptr     get(const QString& uid, const QString& version);
+    bool             hasUid(const QString& uid) const;
 
     QList<VersionList::Ptr> lists() const { return m_lists; }
 
@@ -51,14 +58,14 @@ class Index : public QAbstractListModel, public BaseEntity {
 
     Version::Ptr getLoadedVersion(const QString& uid, const QString& version);
 
-   public:
+public:
     void merge(const std::shared_ptr<Index>& other);
 
-   protected:
+protected:
     void parse(const QJsonObject& obj) override;
 
-   private:
-    QList<VersionList::Ptr> m_lists;
+private:
+    QList<VersionList::Ptr>          m_lists;
     QHash<QString, VersionList::Ptr> m_uids;
 
     void connectVersionList(int row, const VersionList::Ptr& list);

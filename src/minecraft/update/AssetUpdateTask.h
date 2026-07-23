@@ -3,9 +3,10 @@
 #include "tasks/Task.h"
 class MinecraftInstance;
 
-class AssetUpdateTask : public Task {
+class AssetUpdateTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     AssetUpdateTask(MinecraftInstance* inst);
     virtual ~AssetUpdateTask() = default;
 
@@ -13,18 +14,18 @@ class AssetUpdateTask : public Task {
 
     bool canAbort() const override;
 
-   public:
+public:
     static QString resourceUrl();
 
-   private slots:
+private slots:
     void assetIndexFinished();
     void assetIndexFailed(QString reason);
     void assetsFailed(QString reason);
 
-   public slots:
+public slots:
     bool abort() override;
 
-   private:
+private:
     MinecraftInstance* m_inst;
-    NetJob::Ptr downloadJob;
+    NetJob::Ptr        downloadJob;
 };

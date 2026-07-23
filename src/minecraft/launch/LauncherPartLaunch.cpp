@@ -49,12 +49,12 @@
 #endif
 
 LauncherPartLaunch::LauncherPartLaunch(LaunchTask* parent)
-    : LaunchStep(parent)
-    , m_process(parent->instance()->getJavaVersion().defaultsToUtf8() ? QStringConverter::Utf8 : QStringConverter::System)
+    : LaunchStep(parent),
+      m_process(parent->instance()->getJavaVersion().defaultsToUtf8() ? QStringConverter::Utf8 : QStringConverter::System)
 {
     if (parent->instance()->settings()->get("CloseAfterLaunch").toBool()) {
-        static const QRegularExpression s_settingUser(".*Setting user.+", QRegularExpression::CaseInsensitiveOption);
-        std::shared_ptr<QMetaObject::Connection> connection{ new QMetaObject::Connection };
+        static const QRegularExpression          s_settingUser(".*Setting user.+", QRegularExpression::CaseInsensitiveOption);
+        std::shared_ptr<QMetaObject::Connection> connection{new QMetaObject::Connection};
         *connection =
             connect(&m_process, &LoggedProcess::log, this, [connection](const QStringList& lines, [[maybe_unused]] MessageLevel level) {
                 qDebug() << lines;
@@ -74,7 +74,7 @@ void LauncherPartLaunch::executeTask()
     QString jarPath = APPLICATION->getJarPath("NewLaunch.jar");
     if (jarPath.isEmpty()) {
         const char* reason = QT_TR_NOOP("Launcher library could not be found. Please check your installation.");
-        emit logLine(tr(reason), MessageLevel::Fatal);
+        emit        logLine(tr(reason), MessageLevel::Fatal);
         emitFailed(tr(reason));
         return;
     }
@@ -86,16 +86,16 @@ void LauncherPartLaunch::executeTask()
         legacyJarPath = APPLICATION->getJarPath("NewLaunchLegacy.jar");
         if (legacyJarPath.isEmpty()) {
             const char* reason = QT_TR_NOOP("Legacy launcher library could not be found. Please check your installation.");
-            emit logLine(tr(reason), MessageLevel::Fatal);
+            emit        logLine(tr(reason), MessageLevel::Fatal);
             emitFailed(tr(reason));
             return;
         }
     }
 
-    m_launchScript = instance->createLaunchScript(m_session, m_targetToJoin);
-    QStringList args = instance->javaArguments();
-    QString allArgs = args.join(" ");
-    emit logLine("Java arguments:\n  " + m_parent->censorPrivateInfo(allArgs) + "\n", MessageLevel::Launcher);
+    m_launchScript      = instance->createLaunchScript(m_session, m_targetToJoin);
+    QStringList args    = instance->javaArguments();
+    QString     allArgs = args.join(" ");
+    emit        logLine("Java arguments:\n  " + m_parent->censorPrivateInfo(allArgs) + "\n", MessageLevel::Launcher);
 
     auto javaPath = FS::ResolveExecutable(instance->settings()->get("JavaPath").toString());
 
@@ -131,13 +131,13 @@ void LauncherPartLaunch::executeTask()
 
     QString wrapperCommandStr = instance->getWrapperCommand().trimmed();
     if (!wrapperCommandStr.isEmpty()) {
-        wrapperCommandStr = m_parent->substituteVariables(wrapperCommandStr);
-        auto wrapperArgs = Commandline::splitArgs(wrapperCommandStr);
-        auto wrapperCommand = wrapperArgs.takeFirst();
+        wrapperCommandStr       = m_parent->substituteVariables(wrapperCommandStr);
+        auto wrapperArgs        = Commandline::splitArgs(wrapperCommandStr);
+        auto wrapperCommand     = wrapperArgs.takeFirst();
         auto realWrapperCommand = QStandardPaths::findExecutable(wrapperCommand);
         if (realWrapperCommand.isEmpty()) {
             const char* reason = QT_TR_NOOP("The wrapper command \"%1\" couldn't be found.");
-            emit logLine(QString(reason).arg(wrapperCommand), MessageLevel::Fatal);
+            emit        logLine(QString(reason).arg(wrapperCommand), MessageLevel::Fatal);
             emitFailed(tr(reason).arg(wrapperCommand));
             return;
         }
@@ -161,47 +161,47 @@ void LauncherPartLaunch::executeTask()
 void LauncherPartLaunch::on_state(LoggedProcess::State state)
 {
     switch (state) {
-        case LoggedProcess::FailedToStart: {
-            const char* reason = QT_TR_NOOP("Could not launch Minecraft: %1");
-            emit logLine(QString(reason).arg(m_process.errorString()), MessageLevel::Fatal);
-            emitFailed(tr(reason).arg(m_process.errorString()));
-            return;
-        }
-        case LoggedProcess::Aborted:
-        case LoggedProcess::Crashed: {
-            m_parent->setPid(-1);
-            m_parent->instance()->setMinecraftRunning(false);
+    case LoggedProcess::FailedToStart: {
+        const char* reason = QT_TR_NOOP("Could not launch Minecraft: %1");
+        emit        logLine(QString(reason).arg(m_process.errorString()), MessageLevel::Fatal);
+        emitFailed(tr(reason).arg(m_process.errorString()));
+        return;
+    }
+    case LoggedProcess::Aborted:
+    case LoggedProcess::Crashed: {
+        m_parent->setPid(-1);
+        m_parent->instance()->setMinecraftRunning(false);
+        emitFailed(tr("Game crashed."));
+        return;
+    }
+    case LoggedProcess::Finished: {
+        auto instance = m_parent->instance();
+        if (instance->settings()->get("CloseAfterLaunch").toBool())
+            APPLICATION->showMainWindow();
+
+        m_parent->setPid(-1);
+        m_parent->instance()->setMinecraftRunning(false);
+
+        auto exitCode = m_process.exitCode();
+        if (exitCode != 0) {
             emitFailed(tr("Game crashed."));
             return;
         }
-        case LoggedProcess::Finished: {
-            auto instance = m_parent->instance();
-            if (instance->settings()->get("CloseAfterLaunch").toBool())
-                APPLICATION->showMainWindow();
 
-            m_parent->setPid(-1);
-            m_parent->instance()->setMinecraftRunning(false);
+        emitSucceeded();
+        break;
+    }
+    case LoggedProcess::Running:
+        emit logLine(QString("Minecraft process ID: %1\n\n").arg(m_process.processId()), MessageLevel::Launcher);
+        m_parent->setPid(m_process.processId());
 
-            auto exitCode = m_process.exitCode();
-            if (exitCode != 0) {
-                emitFailed(tr("Game crashed."));
-                return;
-            }
+        m_process.write(m_launchScript.toUtf8());
 
-            emitSucceeded();
-            break;
-        }
-        case LoggedProcess::Running:
-            emit logLine(QString("Minecraft process ID: %1\n\n").arg(m_process.processId()), MessageLevel::Launcher);
-            m_parent->setPid(m_process.processId());
-
-            m_process.write(m_launchScript.toUtf8());
-
-            mayProceed = true;
-            emit readyForLaunch();
-            break;
-        default:
-            break;
+        mayProceed = true;
+        emit readyForLaunch();
+        break;
+    default:
+        break;
     }
 }
 

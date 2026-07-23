@@ -35,21 +35,28 @@
 
 #pragma once
 
+#include "VisualGroup.h"
 #include <QCache>
 #include <QLineEdit>
 #include <QListView>
 #include <QScrollBar>
 #include <functional>
-#include "VisualGroup.h"
 
-struct InstanceViewRoles {
-    enum { GroupRole = Qt::UserRole, ProgressValueRole, ProgressMaximumRole };
+struct InstanceViewRoles
+{
+    enum
+    {
+        GroupRole = Qt::UserRole,
+        ProgressValueRole,
+        ProgressMaximumRole
+    };
 };
 
-class InstanceView : public QAbstractItemView {
+class InstanceView : public QAbstractItemView
+{
     Q_OBJECT
 
-   public:
+public:
     InstanceView(QWidget* parent = 0);
     ~InstanceView();
 
@@ -63,11 +70,11 @@ class InstanceView : public QAbstractItemView {
     virtual QRect visualRect(const QModelIndex& index) const override;
 
     virtual QModelIndex indexAt(const QPoint& point) const override;
-    QString groupNameAt(const QPoint& point);
-    void setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags commands) override;
+    QString             groupNameAt(const QPoint& point);
+    void                setSelection(const QRect& rect, QItemSelectionModel::SelectionFlags commands) override;
 
-    virtual int horizontalOffset() const override;
-    virtual int verticalOffset() const override;
+    virtual int  horizontalOffset() const override;
+    virtual int  verticalOffset() const override;
     virtual void scrollContentsBy(int dx, int dy) override;
     virtual void scrollTo(const QModelIndex& index, ScrollHint hint = EnsureVisible) override;
 
@@ -77,22 +84,22 @@ class InstanceView : public QAbstractItemView {
 
     int spacing() const { return m_spacing; };
 
-   public slots:
+public slots:
     virtual void updateGeometries() override;
 
-   protected slots:
+protected slots:
     virtual void dataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QList<int>& roles) override;
     virtual void rowsInserted(const QModelIndex& parent, int start, int end) override;
     virtual void rowsAboutToBeRemoved(const QModelIndex& parent, int start, int end) override;
-    void modelReset();
-    void rowsRemoved();
-    void currentChanged(const QModelIndex& current, const QModelIndex& previous) override;
+    void         modelReset();
+    void         rowsRemoved();
+    void         currentChanged(const QModelIndex& current, const QModelIndex& previous) override;
 
-   signals:
+signals:
     void droppedURLs(QList<QUrl> urls);
     void groupStateChanged(QString group, bool collapsed);
 
-   protected:
+protected:
     bool isIndexHidden(const QModelIndex& index) const override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
@@ -110,28 +117,28 @@ class InstanceView : public QAbstractItemView {
 
     void updateScrollbar();
 
-   private:
+private:
     friend struct VisualGroup;
     QList<VisualGroup*> m_groups;
 
     visibilityFunction m_fVisibility;
 
-    int m_leftMargin = 5;
-    int m_rightMargin = 5;
-    int m_bottomMargin = 5;
-    int m_categoryMargin = 5;
-    int m_spacing = 5;
-    int m_itemWidth = 100;
-    int m_currentItemsPerRow = -1;
-    int m_currentCursorColumn = -1;
+    int                        m_leftMargin          = 5;
+    int                        m_rightMargin         = 5;
+    int                        m_bottomMargin        = 5;
+    int                        m_categoryMargin      = 5;
+    int                        m_spacing             = 5;
+    int                        m_itemWidth           = 100;
+    int                        m_currentItemsPerRow  = -1;
+    int                        m_currentCursorColumn = -1;
     mutable QCache<int, QRect> m_geometryCache;
 
-    QPoint m_pressedPosition;
-    QPersistentModelIndex m_pressedIndex;
-    bool m_pressedAlreadySelected;
-    VisualGroup* m_pressedCategory;
+    QPoint                             m_pressedPosition;
+    QPersistentModelIndex              m_pressedIndex;
+    bool                               m_pressedAlreadySelected;
+    VisualGroup*                       m_pressedCategory;
     QItemSelectionModel::SelectionFlag m_ctrlDragSelectionFlag;
-    QPoint m_lastDragPosition;
+    QPoint                             m_lastDragPosition;
 
     VisualGroup* category(const QModelIndex& index) const;
     VisualGroup* category(const QString& cat) const;
@@ -140,10 +147,10 @@ class InstanceView : public QAbstractItemView {
     int itemsPerRow() const { return m_currentItemsPerRow; };
     int contentWidth() const;
 
-   private:
-    int itemWidth() const;
-    int calculateItemsPerRow() const;
-    int verticalScrollToValue(const QModelIndex& index, const QRect& rect, QListView::ScrollHint hint) const;
+private:
+    int     itemWidth() const;
+    int     calculateItemsPerRow() const;
+    int     verticalScrollToValue(const QModelIndex& index, const QRect& rect, QListView::ScrollHint hint) const;
     QPixmap renderToPixmap(const QModelIndexList& indices, QRect* r) const;
     QList<std::pair<QRect, QModelIndex>> draggablePaintPairs(const QModelIndexList& indices, QRect* r) const;
 

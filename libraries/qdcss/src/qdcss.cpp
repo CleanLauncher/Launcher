@@ -13,17 +13,16 @@ static const QRegularExpression s_ruleRe(R"((\S+?)\s*:\s*(?:\"(.*?)(?<!\\)\"|'(.
 
 QDCSS::QDCSS(QString s)
 {
-
     QRegularExpressionMatchIterator ruleset_i = s_rulesetRe.globalMatch(s);
     while (ruleset_i.hasNext()) {
-        QRegularExpressionMatch ruleset = ruleset_i.next();
-        QString selector = ruleset.captured(1);
-        QString rules = ruleset.captured(2);
-        QRegularExpressionMatchIterator rule_i = s_ruleRe.globalMatch(rules);
+        QRegularExpressionMatch         ruleset  = ruleset_i.next();
+        QString                         selector = ruleset.captured(1);
+        QString                         rules    = ruleset.captured(2);
+        QRegularExpressionMatchIterator rule_i   = s_ruleRe.globalMatch(rules);
         while (rule_i.hasNext()) {
-            QRegularExpressionMatch rule = rule_i.next();
-            QString property = rule.captured(1);
-            QString value;
+            QRegularExpressionMatch rule     = rule_i.next();
+            QString                 property = rule.captured(1);
+            QString                 value;
             if (!rule.captured(2).isNull()) {
                 value = rule.captured(2);
             } else if (!rule.captured(3).isNull()) {

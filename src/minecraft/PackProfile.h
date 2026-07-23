@@ -55,32 +55,39 @@ class MinecraftInstance;
 struct PackProfileData;
 class ComponentUpdateTask;
 
-class PackProfile : public QAbstractListModel {
+class PackProfile : public QAbstractListModel
+{
     Q_OBJECT
     friend ComponentUpdateTask;
 
-   public:
-    enum Columns { NameColumn = 0, VersionColumn, NUM_COLUMNS };
+public:
+    enum Columns
+    {
+        NameColumn = 0,
+        VersionColumn,
+        NUM_COLUMNS
+    };
 
-    struct Result {
-        bool success;
+    struct Result
+    {
+        bool    success;
         QString error;
 
         operator bool() const { return success; }
 
-        static Result Success() { return { true, "" }; }
+        static Result Success() { return {true, ""}; }
 
-        static Result Error(const QString& errorMessage) { return { false, errorMessage }; }
+        static Result Error(const QString& errorMessage) { return {false, errorMessage}; }
     };
 
     explicit PackProfile(MinecraftInstance* instance);
     virtual ~PackProfile();
 
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual int columnCount(const QModelIndex& parent) const override;
+    virtual QVariant      data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool          setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override;
+    virtual QVariant      headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual int           rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual int           columnCount(const QModelIndex& parent) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
 
     void buildingFromScratch();
@@ -93,7 +100,11 @@ class PackProfile : public QAbstractListModel {
 
     void installAgents(QStringList selectedFiles);
 
-    enum MoveDirection { MoveUp, MoveDown };
+    enum MoveDirection
+    {
+        MoveUp,
+        MoveDown
+    };
 
     void move(int index, MoveDirection direction);
 
@@ -127,10 +138,10 @@ class PackProfile : public QAbstractListModel {
 
     RuntimeContext runtimeContext();
 
-   signals:
+signals:
     void minecraftChanged();
 
-   public:
+public:
     ComponentPtr getComponent(const QString& id);
 
     ComponentPtr getComponent(size_t index);
@@ -140,11 +151,11 @@ class PackProfile : public QAbstractListModel {
     std::optional<ModPlatform::ModLoaderTypes> getModLoaders();
 
     std::optional<ModPlatform::ModLoaderTypes> getSupportedModLoaders();
-    QList<ModPlatform::ModLoaderType> getModLoadersList();
+    QList<ModPlatform::ModLoaderType>          getModLoadersList();
 
     void invalidateLaunchProfile();
 
-   private:
+private:
     void scheduleSave();
     bool saveIsScheduled() const;
 
@@ -153,20 +164,20 @@ class PackProfile : public QAbstractListModel {
     QString componentsFilePath() const;
     QString patchesPattern() const;
 
-   private slots:
+private slots:
     bool save_internal();
     void updateSucceeded();
     void updateFailed(const QString& error);
     void componentDataChanged();
     void disableInteraction(bool disable);
 
-   private:
+private:
     Result load();
-    bool installJarMods_internal(QStringList filepaths);
-    bool installCustomJar_internal(QString filepath);
-    bool installAgents_internal(QStringList filepaths);
-    bool removeComponent_internal(ComponentPtr patch);
+    bool   installJarMods_internal(QStringList filepaths);
+    bool   installCustomJar_internal(QString filepath);
+    bool   installAgents_internal(QStringList filepaths);
+    bool   removeComponent_internal(ComponentPtr patch);
 
-   private:
+private:
     std::unique_ptr<PackProfileData> d;
 };

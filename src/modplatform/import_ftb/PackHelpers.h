@@ -17,30 +17,32 @@
  */
 #pragma once
 
+#include "modplatform/ResourceAPI.h"
 #include <QIcon>
 #include <QList>
 #include <QMetaType>
 #include <QString>
 #include <QVariant>
-#include "modplatform/ResourceAPI.h"
 
-namespace FTBImportAPP {
+namespace FTBImportAPP
+{
 
-struct Modpack {
+struct Modpack
+{
     QString path;
 
     QString uuid;
-    int id;
-    int versionId;
+    int     id;
+    int     versionId;
     QString name;
     QString version;
     QString mcVersion;
-    int totalPlayTime;
+    int     totalPlayTime;
 
     QVariant jvmArgs;
 
     std::optional<ModPlatform::ModLoaderType> loaderType;
-    QString loaderVersion;
+    QString                                   loaderVersion;
 
     QIcon icon;
 };
@@ -48,7 +50,7 @@ struct Modpack {
 using ModpackList = QList<Modpack>;
 
 Modpack parseDirectory(QString path);
-void legacyInstanceParsing(QString path, std::optional<ModPlatform::ModLoaderType>* loaderType, QString* loaderVersion);
+void    legacyInstanceParsing(QString path, std::optional<ModPlatform::ModLoaderType>* loaderType, QString* loaderVersion);
 }  // namespace FTBImportAPP
 
 Q_DECLARE_METATYPE(FTBImportAPP::Modpack)

@@ -37,34 +37,36 @@
 
 #include <QWidget>
 
-#include <Application.h>
-#include <QFileSystemWatcher>
 #include "LogPage.h"
 #include "ui/pages/BasePage.h"
+#include <Application.h>
+#include <QFileSystemWatcher>
 
-namespace Ui {
+namespace Ui
+{
 class OtherLogsPage;
 }
 
 class RecursiveFileSystemWatcher;
 
-class OtherLogsPage : public QWidget, public BasePage {
+class OtherLogsPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit OtherLogsPage(QString id, QString displayName, QString helpPage, BaseInstance* instance = nullptr, QWidget* parent = 0);
     ~OtherLogsPage();
 
     QString id() const override { return m_id; }
     QString displayName() const override { return m_displayName; }
-    QIcon icon() const override { return QIcon::fromTheme("log"); }
+    QIcon   icon() const override { return QIcon::fromTheme("log"); }
     QString helpPage() const override { return m_helpPage; }
-    void retranslate() override;
+    void    retranslate() override;
 
     void openedImpl() override;
     void closedImpl() override;
 
-   private slots:
+private slots:
     void populateSelectLogBox();
     void on_selectLogBox_currentIndexChanged(int index);
     void on_btnReload_clicked();
@@ -83,7 +85,7 @@ class OtherLogsPage : public QWidget, public BasePage {
     void findNextActivated();
     void findPreviousActivated();
 
-   private:
+private:
     void reload();
     void modelStateToUI();
     void UIToModelState();
@@ -91,19 +93,19 @@ class OtherLogsPage : public QWidget, public BasePage {
 
     QStringList getPaths();
 
-   private:
+private:
     QString m_id;
     QString m_displayName;
     QString m_helpPage;
 
     Ui::OtherLogsPage* ui;
-    BaseInstance* m_instance;
+    BaseInstance*      m_instance;
 
-    QString m_basePath;
-    QStringList m_logSearchPaths;
-    QString m_currentFile;
+    QString            m_basePath;
+    QStringList        m_logSearchPaths;
+    QString            m_currentFile;
     QFileSystemWatcher m_watcher;
 
     LogFormatProxyModel* m_proxy;
-    LogModel* m_model;
+    LogModel*            m_model;
 };

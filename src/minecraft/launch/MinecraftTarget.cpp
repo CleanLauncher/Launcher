@@ -33,16 +33,16 @@ MinecraftTarget MinecraftTarget::parse(const QString& fullAddress, bool useWorld
             QString port = fullAddress.mid(bracket + 1).trimmed();
 
             if (port.startsWith(":") && !ipv6.isEmpty()) {
-                port = port.mid(1);
-                split = QStringList({ ipv6, port });
+                port  = port.mid(1);
+                split = QStringList({ipv6, port});
             } else {
-                split = QStringList({ ipv6 });
+                split = QStringList({ipv6});
             }
         }
     }
 
     if (split.size() > 2) {
-        split = QStringList({ fullAddress });
+        split = QStringList({fullAddress});
     }
 
     QString realAddress = split[0];
@@ -57,5 +57,5 @@ MinecraftTarget MinecraftTarget::parse(const QString& fullAddress, bool useWorld
         }
     }
 
-    return MinecraftTarget{ realAddress, realPort };
+    return MinecraftTarget{realAddress, realPort};
 }

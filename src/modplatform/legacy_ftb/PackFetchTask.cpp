@@ -36,13 +36,14 @@
 #include "PackFetchTask.h"
 #include "PrivatePackManager.h"
 
-#include <QDomDocument>
 #include "Application.h"
 #include "BuildConfig.h"
+#include <QDomDocument>
 
 #include "net/ApiDownload.h"
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
 void PackFetchTask::fetch()
 {
@@ -63,8 +64,9 @@ void PackFetchTask::fetch()
     auto [thirdPartyAction, thirdPartyResponse] = Net::Download::makeByteArray(thirdPartyUrl);
     jobPtr->addNetAction(thirdPartyAction);
 
-    connect(jobPtr.get(), &NetJob::succeeded, this,
-            [this, publicResponse, thirdPartyResponse] { fileDownloadFinished(publicResponse, thirdPartyResponse); });
+    connect(jobPtr.get(), &NetJob::succeeded, this, [this, publicResponse, thirdPartyResponse] {
+        fileDownloadFinished(publicResponse, thirdPartyResponse);
+    });
     connect(jobPtr.get(), &NetJob::failed, this, &PackFetchTask::fileDownloadFailed);
     connect(jobPtr.get(), &NetJob::aborted, this, &PackFetchTask::fileDownloadAborted);
 
@@ -133,9 +135,9 @@ bool PackFetchTask::parseAndAddPacks(QByteArray& data, PackType packType, Modpac
 {
     QDomDocument doc;
 
-    QString errorMsg = "Unknown error.";
-    int errorLine = -1;
-    int errorCol = -1;
+    QString errorMsg  = "Unknown error.";
+    int     errorLine = -1;
+    int     errorCol  = -1;
 
     if (!doc.setContent(data, false, &errorMsg, &errorLine, &errorCol)) {
         auto fullErrMsg = QString("Failed to fetch modpack data: %1 %2:%3!").arg(errorMsg).arg(errorLine).arg(errorCol);
@@ -148,15 +150,15 @@ bool PackFetchTask::parseAndAddPacks(QByteArray& data, PackType packType, Modpac
         QDomElement element = nodes.at(i).toElement();
 
         Modpack modpack;
-        modpack.name = element.attribute("name");
+        modpack.name           = element.attribute("name");
         modpack.currentVersion = element.attribute("version");
-        modpack.mcVersion = element.attribute("mcVersion");
-        modpack.description = element.attribute("description");
-        modpack.mods = element.attribute("mods");
-        modpack.logo = element.attribute("logo");
-        modpack.oldVersions = element.attribute("oldVersions").split(";");
-        modpack.broken = false;
-        modpack.bugged = false;
+        modpack.mcVersion      = element.attribute("mcVersion");
+        modpack.description    = element.attribute("description");
+        modpack.mods           = element.attribute("mods");
+        modpack.logo           = element.attribute("logo");
+        modpack.oldVersions    = element.attribute("oldVersions").split(";");
+        modpack.broken         = false;
+        modpack.bugged         = false;
 
         for (QString curr : modpack.oldVersions) {
             if (curr.isNull() || curr.isEmpty()) {
@@ -178,7 +180,7 @@ bool PackFetchTask::parseAndAddPacks(QByteArray& data, PackType packType, Modpac
 
         modpack.author = element.attribute("author");
 
-        modpack.dir = element.attribute("dir");
+        modpack.dir  = element.attribute("dir");
         modpack.file = element.attribute("url");
 
         modpack.type = packType;

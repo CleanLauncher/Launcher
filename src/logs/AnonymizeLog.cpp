@@ -37,10 +37,11 @@
 
 #include <QRegularExpression>
 
-struct RegReplace {
+struct RegReplace
+{
     RegReplace(QRegularExpression r, QString w) : reg(r), with(w) { reg.optimize(); }
     QRegularExpression reg;
-    QString with;
+    QString            with;
 };
 
 static const QVector<RegReplace> anonymizeRules = {

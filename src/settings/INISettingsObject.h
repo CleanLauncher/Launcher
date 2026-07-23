@@ -21,9 +21,10 @@
 
 #include "settings/SettingsObject.h"
 
-class INISettingsObject : public SettingsObject {
+class INISettingsObject : public SettingsObject
+{
     Q_OBJECT
-   public:
+public:
     explicit INISettingsObject(QStringList paths, QObject* parent = nullptr);
 
     explicit INISettingsObject(QString path, QObject* parent = nullptr);
@@ -37,15 +38,15 @@ class INISettingsObject : public SettingsObject {
     void suspendSave() override;
     void resumeSave() override;
 
-   protected slots:
+protected slots:
     virtual void changeSetting(const Setting& setting, QVariant value) override;
     virtual void resetSetting(const Setting& setting) override;
 
-   protected:
+protected:
     virtual QVariant retrieveValue(const Setting& setting) override;
-    void doSave();
+    void             doSave();
 
-   protected:
+protected:
     INIFile m_ini;
     QString m_filePath;
 };

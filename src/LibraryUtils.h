@@ -21,7 +21,8 @@
 #include <QString>
 #include <QStringList>
 
-namespace LibraryUtils {
+namespace LibraryUtils
+{
 
 QString findMangoHud();
 

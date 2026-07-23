@@ -35,13 +35,13 @@
  */
 
 #pragma once
-#include <java/JavaVersion.h>
-#include <minecraft/mod/DataPackFolderModel.h>
-#include <QDir>
-#include <QProcess>
 #include "BaseInstance.h"
 #include "minecraft/launch/MinecraftTarget.h"
 #include "minecraft/mod/Mod.h"
+#include <QDir>
+#include <QProcess>
+#include <java/JavaVersion.h>
+#include <minecraft/mod/DataPackFolderModel.h>
 
 class ModFolderModel;
 class ResourceFolderModel;
@@ -53,9 +53,10 @@ class LaunchStep;
 class LaunchProfile;
 class PackProfile;
 
-class MinecraftInstance : public BaseInstance {
+class MinecraftInstance : public BaseInstance
+{
     Q_OBJECT
-   public:
+public:
     MinecraftInstance(SettingsObject* globalSettings, std::unique_ptr<SettingsObject> settings, const QString& rootDir);
     virtual ~MinecraftInstance();
     virtual void saveNow() override;
@@ -84,9 +85,9 @@ class MinecraftInstance : public BaseInstance {
     QString libDir() const;
     QString worldDir() const;
     QString resourcesDir() const;
-    QDir jarmodsPath() const;
-    QDir librariesPath() const;
-    QDir versionsPath() const;
+    QDir    jarmodsPath() const;
+    QDir    librariesPath() const;
+    QDir    versionsPath() const;
     QString instanceConfigFolder() const override;
 
     QString gameRoot() const override;
@@ -103,26 +104,26 @@ class MinecraftInstance : public BaseInstance {
 
     PackProfile* getPackProfile() const;
 
-    ModFolderModel* loaderModList();
-    ModFolderModel* coreModList();
-    ModFolderModel* nilModList();
-    ResourcePackFolderModel* resourcePackList();
-    TexturePackFolderModel* texturePackList();
-    ShaderPackFolderModel* shaderPackList();
-    DataPackFolderModel* dataPackList();
+    ModFolderModel*             loaderModList();
+    ModFolderModel*             coreModList();
+    ModFolderModel*             nilModList();
+    ResourcePackFolderModel*    resourcePackList();
+    TexturePackFolderModel*     texturePackList();
+    ShaderPackFolderModel*      shaderPackList();
+    DataPackFolderModel*        dataPackList();
     QList<ResourceFolderModel*> resourceLists();
-    WorldList* worldList();
+    WorldList*                  worldList();
 
     QList<Task::Ptr> createUpdateTask() override;
-    LaunchTask* createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) override;
-    QStringList extraArguments() override;
-    QStringList verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
-    QList<Mod*> getJarMods() const;
-    QString createLaunchScript(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin);
+    LaunchTask*      createLaunchTask(AuthSessionPtr account, MinecraftTarget::Ptr targetToJoin) override;
+    QStringList      extraArguments() override;
+    QStringList      verboseDescription(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin) override;
+    QList<Mod*>      getJarMods() const;
+    QString          createLaunchScript(AuthSessionPtr session, MinecraftTarget::Ptr targetToJoin);
 
     QStringList javaArguments();
-    QString getLauncher();
-    bool shouldApplyOnlineFixes();
+    QString     getLauncher();
+    bool        shouldApplyOnlineFixes();
 
     QMap<QString, QString> getVariables() override;
 
@@ -143,18 +144,18 @@ class MinecraftInstance : public BaseInstance {
 
     virtual JavaVersion getJavaVersion();
 
-   protected:
+protected:
     QMap<QString, QString> createCensorFilterFromSession(AuthSessionPtr session);
     QMap<QString, QString> makeProfileVarMapping(std::shared_ptr<LaunchProfile> profile) const;
 
-   protected:
-    std::unique_ptr<PackProfile> m_components;
-    std::unique_ptr<ModFolderModel> m_loader_mod_list;
-    std::unique_ptr<ModFolderModel> m_core_mod_list;
-    std::unique_ptr<ModFolderModel> m_nil_mod_list;
+protected:
+    std::unique_ptr<PackProfile>             m_components;
+    std::unique_ptr<ModFolderModel>          m_loader_mod_list;
+    std::unique_ptr<ModFolderModel>          m_core_mod_list;
+    std::unique_ptr<ModFolderModel>          m_nil_mod_list;
     std::unique_ptr<ResourcePackFolderModel> m_resource_pack_list;
-    std::unique_ptr<ShaderPackFolderModel> m_shader_pack_list;
-    std::unique_ptr<TexturePackFolderModel> m_texture_pack_list;
-    std::unique_ptr<DataPackFolderModel> m_data_pack_list;
-    std::unique_ptr<WorldList> m_world_list;
+    std::unique_ptr<ShaderPackFolderModel>   m_shader_pack_list;
+    std::unique_ptr<TexturePackFolderModel>  m_texture_pack_list;
+    std::unique_ptr<DataPackFolderModel>     m_data_pack_list;
+    std::unique_ptr<WorldList>               m_world_list;
 };

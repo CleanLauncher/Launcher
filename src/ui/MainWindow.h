@@ -62,13 +62,15 @@ class KonamiCode;
 class InstanceTask;
 class LabeledToolButton;
 
-namespace Ui {
+namespace Ui
+{
 class MainWindow;
 }
-class MainWindow : public QMainWindow {
+class MainWindow : public QMainWindow
+{
     Q_OBJECT
 
-   public:
+public:
     explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
@@ -81,13 +83,13 @@ class MainWindow : public QMainWindow {
     void updatesAllowedChanged(bool allowed);
 
     void processURLs(QList<QUrl> urls);
-   signals:
+signals:
     void isClosing();
 
-   protected:
+protected:
     QMenu* createPopupMenu() override;
 
-   private slots:
+private slots:
     void on_actionAbout_triggered();
 
     void on_actionAddInstance_triggered();
@@ -148,9 +150,9 @@ class MainWindow : public QMainWindow {
     void undoTrashInstance();
 
     inline void on_actionExportInstance_triggered() { on_actionExportInstanceZip_triggered(); }
-    void on_actionExportInstanceZip_triggered();
-    void on_actionExportInstanceMrPack_triggered();
-    void on_actionExportInstanceFlamePack_triggered();
+    void        on_actionExportInstanceZip_triggered();
+    void        on_actionExportInstanceMrPack_triggered();
+    void        on_actionExportInstanceFlamePack_triggered();
 
     void on_actionRenameInstance_triggered();
 
@@ -204,7 +206,7 @@ class MainWindow : public QMainWindow {
 
     void refreshCurrentInstance();
 
-   private:
+private:
     void retranslateUi();
 
     void addInstance(const QString& url = QString(), const QMap<QString, QString>& extra_info = {});
@@ -217,25 +219,25 @@ class MainWindow : public QMainWindow {
     void runModalTask(Task* task);
     void instanceFromInstanceTask(InstanceTask* task);
 
-   private:
+private:
     Ui::MainWindow* ui;
 
-    InstanceView* view = nullptr;
-    InstanceProxyModel* proxymodel = nullptr;
-    QToolButton* newsLabel = nullptr;
-    QLabel* m_statusLeft = nullptr;
-    QLabel* m_statusCenter = nullptr;
-    LabeledToolButton* changeIconButton = nullptr;
-    LabeledToolButton* renameButton = nullptr;
-    QToolButton* helpMenuButton = nullptr;
-    KonamiCode* secretEventFilter = nullptr;
+    InstanceView*       view              = nullptr;
+    InstanceProxyModel* proxymodel        = nullptr;
+    QToolButton*        newsLabel         = nullptr;
+    QLabel*             m_statusLeft      = nullptr;
+    QLabel*             m_statusCenter    = nullptr;
+    LabeledToolButton*  changeIconButton  = nullptr;
+    LabeledToolButton*  renameButton      = nullptr;
+    QToolButton*        helpMenuButton    = nullptr;
+    KonamiCode*         secretEventFilter = nullptr;
 
     std::shared_ptr<Setting> instanceToolbarSetting = nullptr;
 
     unique_qobject_ptr<NewsChecker> m_newsChecker;
 
     BaseInstance* m_selectedInstance = nullptr;
-    QString m_currentInstIcon;
+    QString       m_currentInstIcon;
 
     Task* m_versionLoadTask = nullptr;
 };

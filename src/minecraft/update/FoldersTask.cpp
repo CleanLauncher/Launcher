@@ -34,8 +34,8 @@
  */
 
 #include "FoldersTask.h"
-#include <QDir>
 #include "minecraft/MinecraftInstance.h"
+#include <QDir>
 
 FoldersTask::FoldersTask(MinecraftInstance* inst)
 {

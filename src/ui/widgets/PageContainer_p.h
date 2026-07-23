@@ -23,8 +23,9 @@
 class BasePage;
 const int pageIconSize = 24;
 
-class PageViewDelegate : public QStyledItemDelegate {
-   public:
+class PageViewDelegate : public QStyledItemDelegate
+{
+public:
     PageViewDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
     QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
     {
@@ -34,8 +35,9 @@ class PageViewDelegate : public QStyledItemDelegate {
     }
 };
 
-class PageModel : public QAbstractListModel {
-   public:
+class PageModel : public QAbstractListModel
+{
+public:
     PageModel(QObject* parent = 0) : QAbstractListModel(parent)
     {
         QPixmap empty(pageIconSize, pageIconSize);
@@ -44,19 +46,19 @@ class PageModel : public QAbstractListModel {
     }
     virtual ~PageModel() {}
 
-    int rowCount(const QModelIndex& parent = QModelIndex()) const { return parent.isValid() ? 0 : m_pages.size(); }
+    int      rowCount(const QModelIndex& parent = QModelIndex()) const { return parent.isValid() ? 0 : m_pages.size(); }
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
     {
         switch (role) {
-            case Qt::DisplayRole:
-                return m_pages.at(index.row())->displayName();
-            case Qt::DecorationRole: {
-                QIcon icon = m_pages.at(index.row())->icon();
-                if (icon.isNull())
-                    icon = m_emptyIcon;
+        case Qt::DisplayRole:
+            return m_pages.at(index.row())->displayName();
+        case Qt::DecorationRole: {
+            QIcon icon = m_pages.at(index.row())->icon();
+            if (icon.isNull())
+                icon = m_emptyIcon;
 
-                return QIcon(icon.pixmap(QSize(48, 48)));
-            }
+            return QIcon(icon.pixmap(QSize(48, 48)));
+        }
         }
         return QVariant();
     }
@@ -79,11 +81,12 @@ class PageModel : public QAbstractListModel {
     }
 
     QList<BasePage*> m_pages;
-    QIcon m_emptyIcon;
+    QIcon            m_emptyIcon;
 };
 
-class PageView : public QListView {
-   public:
+class PageView : public QListView
+{
+public:
     PageView(QWidget* parent = 0) : QListView(parent)
     {
         setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);

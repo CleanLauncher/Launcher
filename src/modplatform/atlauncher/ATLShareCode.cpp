@@ -20,23 +20,24 @@
 
 #include "Json.h"
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
 static void loadShareCodeMod(ShareCodeMod& m, QJsonObject& obj)
 {
     m.selected = Json::requireBoolean(obj, "selected");
-    m.name = Json::requireString(obj, "name");
+    m.name     = Json::requireString(obj, "name");
 }
 
 static void loadShareCode(ShareCode& c, QJsonObject& obj)
 {
-    c.pack = Json::requireString(obj, "pack");
+    c.pack    = Json::requireString(obj, "pack");
     c.version = Json::requireString(obj, "version");
 
-    auto mods = Json::requireObject(obj, "mods");
+    auto mods     = Json::requireObject(obj, "mods");
     auto optional = Json::requireArray(mods, "optional");
     for (const auto modRaw : optional) {
-        auto modObj = Json::requireObject(modRaw);
+        auto         modObj = Json::requireObject(modRaw);
         ShareCodeMod mod;
         loadShareCodeMod(mod, modObj);
         c.mods.append(mod);
@@ -46,7 +47,7 @@ static void loadShareCode(ShareCode& c, QJsonObject& obj)
 void loadShareCodeResponse(ShareCodeResponse& r, QJsonObject& obj)
 {
     r.error = Json::requireBoolean(obj, "error");
-    r.code = Json::requireInteger(obj, "code");
+    r.code  = Json::requireInteger(obj, "code");
 
     if (obj.contains("message") && !obj.value("message").isNull())
         r.message = Json::requireString(obj, "message");

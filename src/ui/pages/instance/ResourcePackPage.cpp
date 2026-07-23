@@ -73,9 +73,9 @@ ResourcePackPage::ResourcePackPage(MinecraftInstance* instance, ResourcePackFold
 
 void ResourcePackPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
-    int row = sourceCurrent.row();
-    auto& rp = m_model->at(row);
+    auto  sourceCurrent = m_filterModel->mapToSource(current);
+    int   row           = sourceCurrent.row();
+    auto& rp            = m_model->at(row);
     ui->frame->updateWithResourcePack(rp);
 }
 
@@ -144,11 +144,14 @@ void ResourcePackPage::updateResourcePacks()
     }
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response = CustomMessageBox::selectable(
-                            this, tr("Confirm Update"),
+                            this,
+                            tr("Confirm Update"),
                             tr("Updating resource packs while the game is running may cause pack duplication and game crashes.\n"
                                "The old files may not be deleted as they are in use.\n"
                                "Are you sure you want to do this?"),
-                            QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                            QMessageBox::Warning,
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -158,7 +161,7 @@ void ResourcePackPage::updateResourcePacks()
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
 
     auto modsList = m_model->selectedResources(selection);
-    bool useAll = modsList.empty();
+    bool useAll   = modsList.empty();
     if (useAll) {
         modsList = m_model->allResources();
     }
@@ -171,7 +174,7 @@ void ResourcePackPage::updateResourcePacks()
         return;
     }
     if (updateDialog.noUpdates()) {
-        QString message{ tr("'%1' is up-to-date! :)").arg(modsList.front()->name()) };
+        QString message{tr("'%1' is up-to-date! :)").arg(modsList.front()->name())};
         if (modsList.size() > 1) {
             if (useAll) {
                 message = tr("All resource packs are up-to-date! :)");
@@ -215,17 +218,20 @@ void ResourcePackPage::updateResourcePacks()
 
 void ResourcePackPage::deleteResourcePackMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection      = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectionCount = m_model->selectedResourcePacks(selection).length();
     if (selectionCount == 0) {
         return;
     }
     if (selectionCount > 1) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove the metadata for %1 resource packs.\n"
                                                         "Are you sure?")
                                                          .arg(selectionCount),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {

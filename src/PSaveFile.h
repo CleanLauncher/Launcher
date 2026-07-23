@@ -17,14 +17,15 @@
  */
 #pragma once
 
+#include "Application.h"
 #include <QFileInfo>
 #include <QSaveFile>
-#include "Application.h"
 
 #if defined(LAUNCHER_APPLICATION)
 
-class PSaveFile : public QSaveFile {
-   public:
+class PSaveFile : public QSaveFile
+{
+public:
     PSaveFile(const QString& name) : QSaveFile(name) { addPath(name); }
     PSaveFile(const QString& name, QObject* parent) : QSaveFile(name, parent) { addPath(name); }
     virtual ~PSaveFile()
@@ -34,7 +35,7 @@ class PSaveFile : public QSaveFile {
         }
     }
 
-   private:
+private:
     void addPath(const QString& path)
     {
         m_absoluteFilePath = QFileInfo(path).absoluteFilePath() + ".";

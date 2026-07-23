@@ -21,34 +21,36 @@
 #include "minecraft/auth/AuthFlow.h"
 #include "minecraft/auth/MinecraftAccount.h"
 
-namespace Ui {
+namespace Ui
+{
 class MSALoginDialog;
 }
 
-class MSALoginDialog : public QDialog {
+class MSALoginDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     ~MSALoginDialog();
 
     static MinecraftAccountPtr newAccount(QWidget* parent);
-    int exec() override;
+    int                        exec() override;
 
-   protected:
+protected:
     explicit MSALoginDialog(QWidget* parent = 0);
-    AccountType m_accountType = AccountType::MSA;
-    QString m_linkUrl = "https://www.microsoft.com/link";
+    AccountType         m_accountType = AccountType::MSA;
+    QString             m_linkUrl     = "https://www.microsoft.com/link";
     Ui::MSALoginDialog* ui;
     MinecraftAccountPtr m_account;
 
-   protected slots:
+protected slots:
     void onTaskFailed(QString reason);
     void onDeviceFlowStatus(QString status);
     void onAuthFlowStatus(QString status);
     void authorizeWithBrowser(const QUrl& url);
     void authorizeWithBrowserWithExtra(QString url, QString code, int expiresIn);
 
-   private:
+private:
     shared_qobject_ptr<AuthFlow> m_devicecode_task;
     shared_qobject_ptr<AuthFlow> m_authflow_task;
 

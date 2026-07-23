@@ -91,8 +91,9 @@ ModFolderPage::ModFolderPage(BaseInstance* inst, ModFolderModel* model, QWidget*
 
     auto depsDisabled = APPLICATION->settings()->getSetting("ModDependenciesDisabled");
     ui->actionVerifyItemDependencies->setVisible(!depsDisabled->get().toBool());
-    connect(depsDisabled.get(), &Setting::SettingChanged, this,
-            [this](const Setting&, const QVariant& value) { ui->actionVerifyItemDependencies->setVisible(!value.toBool()); });
+    connect(depsDisabled.get(), &Setting::SettingChanged, this, [this](const Setting&, const QVariant& value) {
+        ui->actionVerifyItemDependencies->setVisible(!value.toBool());
+    });
 
     updateMenu->addAction(ui->actionResetItemMetadata);
     connect(ui->actionResetItemMetadata, &QAction::triggered, this, &ModFolderPage::deleteModMetadata);
@@ -119,19 +120,22 @@ bool ModFolderPage::shouldDisplay() const
 
 void ModFolderPage::updateFrame(const QModelIndex& current, [[maybe_unused]] const QModelIndex& previous)
 {
-    auto sourceCurrent = m_filterModel->mapToSource(current);
-    int row = sourceCurrent.row();
-    const Mod& mod = m_model->at(row);
+    auto       sourceCurrent = m_filterModel->mapToSource(current);
+    int        row           = sourceCurrent.row();
+    const Mod& mod           = m_model->at(row);
     ui->frame->updateWithMod(mod);
 }
 
 void ModFolderPage::removeItems(const QItemSelection& selection)
 {
     if (m_instance != nullptr && m_instance->isRunning()) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Delete"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Delete"),
                                                      tr("If you remove mods while the game is running it may crash your game.\n"
                                                         "Are you sure you want to do this?"),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -139,14 +143,16 @@ void ModFolderPage::removeItems(const QItemSelection& selection)
         }
     }
 
-    auto indexes = selection.indexes();
+    auto indexes  = selection.indexes();
     auto affected = m_model->getAffectedMods(indexes, EnableAction::DISABLE);
     if (!affected.isEmpty()) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Disable"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Disable"),
                                                      tr("The mods you are trying to delete are required by %1 mods.\n"
                                                         "Do you want to disable them?")
                                                          .arg(affected.length()),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
                                                      QMessageBox::Cancel)
                             ->exec();
 
@@ -238,11 +244,14 @@ void ModFolderPage::updateMods(bool includeDeps)
     }
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response =
-            CustomMessageBox::selectable(this, tr("Confirm Update"),
+            CustomMessageBox::selectable(this,
+                                         tr("Confirm Update"),
                                          tr("Updating mods while the game is running may cause mod duplication and game crashes.\n"
                                             "The old files may not be deleted as they are in use.\n"
                                             "Are you sure you want to do this?"),
-                                         QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                         QMessageBox::Warning,
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::No)
                 ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -252,7 +261,7 @@ void ModFolderPage::updateMods(bool includeDeps)
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
 
     auto modsList = m_model->selectedResources(selection);
-    bool useAll = modsList.empty();
+    bool useAll   = modsList.empty();
     if (useAll) {
         modsList = m_model->allResources();
     }
@@ -265,7 +274,7 @@ void ModFolderPage::updateMods(bool includeDeps)
         return;
     }
     if (updateDialog.noUpdates()) {
-        QString message{ tr("'%1' is up-to-date! :)").arg(modsList.front()->name()) };
+        QString message{tr("'%1' is up-to-date! :)").arg(modsList.front()->name())};
         if (modsList.size() > 1) {
             if (useAll) {
                 message = tr("All mods are up-to-date! :)");
@@ -309,17 +318,20 @@ void ModFolderPage::updateMods(bool includeDeps)
 
 void ModFolderPage::deleteModMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection      = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectionCount = m_model->selectedMods(selection).length();
     if (selectionCount == 0) {
         return;
     }
     if (selectionCount > 1) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove the metadata for %1 mods.\n"
                                                         "Are you sure?")
                                                          .arg(selectionCount),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -347,7 +359,7 @@ void ModFolderPage::changeModVersion()
         return;
     }
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
-    auto modsList = m_model->selectedMods(selection);
+    auto modsList  = m_model->selectedMods(selection);
     if (modsList.length() != 1 || modsList[0]->metadata() == nullptr) {
         return;
     }
@@ -362,7 +374,7 @@ void ModFolderPage::changeModVersion()
 
 void ModFolderPage::exportModMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection    = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectedMods = m_model->selectedMods(selection);
     if (selectedMods.length() == 0) {
         selectedMods = m_model->allMods();
@@ -426,13 +438,15 @@ bool NilModFolderPage::shouldDisplay() const
 inline bool ModFolderPage::handleNoModLoader()
 {
     int resp = QMessageBox::question(
-        this, ModFolderPage::tr("Missing Mod Loader"),
+        this,
+        ModFolderPage::tr("Missing Mod Loader"),
         ModFolderPage::tr("You need to install a compatible mod loader before installing mods. Would you like to do so?"),
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        QMessageBox::Yes | QMessageBox::No,
+        QMessageBox::Yes);
     if (resp == QMessageBox::Yes) {
-        auto* profile = static_cast<MinecraftInstance*>(this->m_instance)->getPackProfile();
+        auto*               profile = static_cast<MinecraftInstance*>(this->m_instance)->getPackProfile();
         InstallLoaderDialog dialog(profile, QString(), this);
-        bool ret = dialog.exec() != 0;
+        bool                ret = dialog.exec() != 0;
         this->m_container->refreshContainer();
 
         return !ret;

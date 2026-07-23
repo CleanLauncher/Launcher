@@ -35,50 +35,55 @@
 
 #pragma once
 
+#include "modplatform/ModIndex.h"
+#include "modplatform/ResourceType.h"
 #include <QJsonObject>
 #include <QList>
 #include <QMap>
 #include <QString>
 #include <QUrl>
-#include "modplatform/ModIndex.h"
-#include "modplatform/ResourceType.h"
 
-namespace Flame {
-struct File {
+namespace Flame
+{
+struct File
+{
     int projectId = 0;
-    int fileId = 0;
+    int fileId    = 0;
 
     bool required = true;
 
-    ModPlatform::IndexedPack pack;
+    ModPlatform::IndexedPack    pack;
     ModPlatform::IndexedVersion version;
 
-    QString targetFolder = QStringLiteral("mods");
+    QString                   targetFolder = QStringLiteral("mods");
     ModPlatform::ResourceType resourceType;
 };
 
-struct Modloader {
+struct Modloader
+{
     QString id;
-    bool primary = false;
+    bool    primary = false;
 };
 
-struct Minecraft {
-    QString version;
-    QString libraries;
+struct Minecraft
+{
+    QString                 version;
+    QString                 libraries;
     QList<Flame::Modloader> modLoaders;
-    int recommendedRAM;
+    int                     recommendedRAM;
 };
 
-struct Manifest {
-    QString manifestType;
-    int manifestVersion = 0;
+struct Manifest
+{
+    QString          manifestType;
+    int              manifestVersion = 0;
     Flame::Minecraft minecraft;
-    QString name;
-    QString version;
-    QString author;
+    QString          name;
+    QString          version;
+    QString          author;
 
     QMap<int, Flame::File> files;
-    QString overrides;
+    QString                overrides;
 
     bool is_loaded = false;
 };

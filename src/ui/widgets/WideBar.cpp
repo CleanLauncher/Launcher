@@ -4,9 +4,10 @@
 #include <QCryptographicHash>
 #include <QToolButton>
 
-class ActionButton : public QToolButton {
+class ActionButton : public QToolButton
+{
     Q_OBJECT
-   public:
+public:
     ActionButton(QAction* action, QWidget* parent = nullptr, bool use_default_action = false)
         : QToolButton(parent), m_action(action), m_use_default_action(use_default_action)
     {
@@ -24,7 +25,7 @@ class ActionButton : public QToolButton {
 
         actionChanged();
     };
-   public slots:
+public slots:
     void actionChanged()
     {
         setEnabled(m_action->isEnabled());
@@ -43,9 +44,9 @@ class ActionButton : public QToolButton {
         setFocusPolicy(Qt::NoFocus);
     }
 
-   private:
+private:
     QAction* m_action;
-    bool m_use_default_action;
+    bool     m_use_default_action;
 };
 
 WideBar::WideBar(const QString& title, QWidget* parent) : QToolBar(title, parent)
@@ -69,9 +70,9 @@ WideBar::WideBar(QWidget* parent) : QToolBar(parent)
 void WideBar::addAction(QAction* action)
 {
     BarEntry entry;
-    entry.bar_action = addWidget(new ActionButton(action, this, m_use_default_action));
+    entry.bar_action  = addWidget(new ActionButton(action, this, m_use_default_action));
     entry.menu_action = action;
-    entry.type = BarEntry::Type::Action;
+    entry.type        = BarEntry::Type::Action;
 
     m_entries.push_back(entry);
 
@@ -82,7 +83,7 @@ void WideBar::addSeparator()
 {
     BarEntry entry;
     entry.bar_action = QToolBar::addSeparator();
-    entry.type = BarEntry::Type::Separator;
+    entry.type       = BarEntry::Type::Separator;
 
     m_entries.push_back(entry);
 }
@@ -101,9 +102,9 @@ void WideBar::insertActionBefore(QAction* before, QAction* action)
         return;
 
     BarEntry entry;
-    entry.bar_action = insertWidget(iter->bar_action, new ActionButton(action, this, m_use_default_action));
+    entry.bar_action  = insertWidget(iter->bar_action, new ActionButton(action, this, m_use_default_action));
     entry.menu_action = action;
-    entry.type = BarEntry::Type::Action;
+    entry.type        = BarEntry::Type::Action;
 
     m_entries.insert(iter, entry);
 
@@ -124,9 +125,9 @@ void WideBar::insertActionAfter(QAction* after, QAction* action)
     }
 
     BarEntry entry;
-    entry.bar_action = insertWidget(iter->bar_action, new ActionButton(action, this, m_use_default_action));
+    entry.bar_action  = insertWidget(iter->bar_action, new ActionButton(action, this, m_use_default_action));
     entry.menu_action = action;
-    entry.type = BarEntry::Type::Action;
+    entry.type        = BarEntry::Type::Action;
 
     m_entries.insert(iter, entry);
 
@@ -153,7 +154,7 @@ void WideBar::insertSpacer(QAction* action)
 
     BarEntry entry;
     entry.bar_action = insertWidget(iter->bar_action, spacer);
-    entry.type = BarEntry::Type::Spacer;
+    entry.type       = BarEntry::Type::Spacer;
     m_entries.insert(iter, entry);
 }
 
@@ -165,7 +166,7 @@ void WideBar::insertSeparator(QAction* before)
 
     BarEntry entry;
     entry.bar_action = QToolBar::insertSeparator(iter->bar_action);
-    entry.type = BarEntry::Type::Separator;
+    entry.type       = BarEntry::Type::Separator;
 
     m_entries.insert(iter, entry);
 }
@@ -175,16 +176,16 @@ QMenu* WideBar::createContextMenu(QWidget* parent, const QString& title)
     auto* contextMenu = new QMenu(title, parent);
     for (auto& item : m_entries) {
         switch (item.type) {
-            default:
-            case BarEntry::Type::None:
-                break;
-            case BarEntry::Type::Separator:
-            case BarEntry::Type::Spacer:
-                contextMenu->addSeparator();
-                break;
-            case BarEntry::Type::Action:
-                contextMenu->addAction(item.menu_action);
-                break;
+        default:
+        case BarEntry::Type::None:
+            break;
+        case BarEntry::Type::Separator:
+        case BarEntry::Type::Spacer:
+            contextMenu->addSeparator();
+            break;
+        case BarEntry::Type::Action:
+            contextMenu->addAction(item.menu_action);
+            break;
         }
     }
     return contextMenu;

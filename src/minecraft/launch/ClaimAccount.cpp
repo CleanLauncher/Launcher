@@ -8,7 +8,7 @@ ClaimAccount::ClaimAccount(LaunchTask* parent, AuthSessionPtr session) : LaunchS
 {
     if (session->launchMode == LaunchMode::Normal) {
         auto accounts = APPLICATION->accounts();
-        m_account = accounts->at(accounts->findAccountByProfileId(session->uuid));
+        m_account     = accounts->at(accounts->findAccountByProfileId(session->uuid));
     }
 }
 

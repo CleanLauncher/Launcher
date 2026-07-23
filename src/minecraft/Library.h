@@ -54,32 +54,33 @@ class MinecraftInstance;
 
 using LibraryPtr = std::shared_ptr<Library>;
 
-class Library {
+class Library
+{
     friend class OneSixVersionFormat;
     friend class MojangVersionFormat;
     friend class LibraryTest;
 
-   public:
+public:
     Library() {}
     Library(const QString& name) { m_name = name; }
 
     static LibraryPtr limitedCopy(LibraryPtr base)
     {
-        auto newlib = std::make_shared<Library>();
-        newlib->m_name = base->m_name;
-        newlib->m_repositoryURL = base->m_repositoryURL;
-        newlib->m_hint = base->m_hint;
-        newlib->m_absoluteURL = base->m_absoluteURL;
-        newlib->m_extractExcludes = base->m_extractExcludes;
+        auto newlib                 = std::make_shared<Library>();
+        newlib->m_name              = base->m_name;
+        newlib->m_repositoryURL     = base->m_repositoryURL;
+        newlib->m_hint              = base->m_hint;
+        newlib->m_absoluteURL       = base->m_absoluteURL;
+        newlib->m_extractExcludes   = base->m_extractExcludes;
         newlib->m_nativeClassifiers = base->m_nativeClassifiers;
-        newlib->m_rules = base->m_rules;
-        newlib->m_storagePrefix = base->m_storagePrefix;
-        newlib->m_mojangDownloads = base->m_mojangDownloads;
-        newlib->m_filename = base->m_filename;
+        newlib->m_rules             = base->m_rules;
+        newlib->m_storagePrefix     = base->m_storagePrefix;
+        newlib->m_mojangDownloads   = base->m_mojangDownloads;
+        newlib->m_filename          = base->m_filename;
         return newlib;
     }
 
-   public:
+public:
     const GradleSpecifier& rawName() const { return m_name; }
 
     void setRawName(const GradleSpecifier& spec) { m_name = spec; }
@@ -99,11 +100,11 @@ class Library {
     void setRepositoryURL(const QString& base_url) { m_repositoryURL = base_url; }
 
     void getApplicableFiles(const RuntimeContext& runtimeContext,
-                            QStringList& jar,
-                            QStringList& native,
-                            QStringList& native32,
-                            QStringList& native64,
-                            const QString& overridePath) const;
+                            QStringList&          jar,
+                            QStringList&          native,
+                            QStringList&          native32,
+                            QStringList&          native64,
+                            const QString&        overridePath) const;
 
     void setAbsoluteUrl(const QString& absolute_url) { m_absoluteURL = absolute_url; }
 
@@ -130,13 +131,13 @@ class Library {
     bool isForge() const;
 
     QList<Net::NetRequest::Ptr> getDownloads(const RuntimeContext& runtimeContext,
-                                             class HttpMetaCache* cache,
-                                             QStringList& failedLocalFiles,
-                                             const QString& overridePath) const;
+                                             class HttpMetaCache*  cache,
+                                             QStringList&          failedLocalFiles,
+                                             const QString&        overridePath) const;
 
     QString getCompatibleNative(const RuntimeContext& runtimeContext) const;
 
-   private:
+private:
     static QString defaultStoragePrefix();
 
     QString storagePrefix() const;
@@ -145,7 +146,7 @@ class Library {
 
     QString hint() const { return m_hint; }
 
-   protected:
+protected:
     GradleSpecifier m_name;
 
     QString m_repositoryURL;

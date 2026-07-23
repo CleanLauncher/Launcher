@@ -9,30 +9,33 @@
 
 #include <array>
 
-class BasicTask : public Task {
+class BasicTask : public Task
+{
     Q_OBJECT
 
     friend class TaskTest;
 
-   public:
+public:
     BasicTask(bool show_debug_log = true) : Task(show_debug_log) {}
 
-   private:
+private:
     void executeTask() override { emitSucceeded(); }
 };
 
-class BasicTask_MultiStep : public Task {
+class BasicTask_MultiStep : public Task
+{
     Q_OBJECT
 
     friend class TaskTest;
 
-   private:
+private:
     auto isMultiStep() const -> bool override { return true; }
 
     void executeTask() override {}
 };
 
-class BigConcurrentTask : public ConcurrentTask {
+class BigConcurrentTask : public ConcurrentTask
+{
     Q_OBJECT
 
     void executeNextSubTask() override
@@ -43,11 +46,12 @@ class BigConcurrentTask : public ConcurrentTask {
     }
 };
 
-class BigConcurrentTaskThread : public QThread {
+class BigConcurrentTaskThread : public QThread
+{
     Q_OBJECT
 
     QTimer m_deadline;
-    void run() override
+    void   run() override
     {
         BigConcurrentTask big_task;
         m_deadline.setInterval(10000);
@@ -73,18 +77,19 @@ class BigConcurrentTaskThread : public QThread {
     }
     void start_timer() { m_deadline.start(); }
 
-   public:
+public:
     bool passed_the_deadline = false;
 };
 
-class TaskTest : public QObject {
+class TaskTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
     void test_SetStatus_NoMultiStep()
     {
         BasicTask t;
-        QString status{ "test status" };
+        QString   status{"test status"};
 
         t.setStatus(status);
 
@@ -95,7 +100,7 @@ class TaskTest : public QObject {
     void test_SetStatus_MultiStep()
     {
         BasicTask_MultiStep t;
-        QString status{ "test status" };
+        QString             status{"test status"};
 
         t.setStatus(status);
 
@@ -107,8 +112,8 @@ class TaskTest : public QObject {
     void test_SetProgress()
     {
         BasicTask t;
-        int current = 42;
-        int total = 207;
+        int       current = 42;
+        int       total   = 207;
 
         t.setProgress(current, total);
 
@@ -119,8 +124,8 @@ class TaskTest : public QObject {
     void test_basicRun()
     {
         BasicTask t;
-        connect(&t, &Task::finished,
-                [&t] { QVERIFY2(t.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+        connect(
+            &t, &Task::finished, [&t] { QVERIFY2(t.wasSuccessful(), "Task finished but was not successful when it should have been."); });
         t.start();
 
         QVERIFY2(QTest::qWaitFor([&t]() { return t.isFinished(); }, 1000), "Task didn't finish as it should.");

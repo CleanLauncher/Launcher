@@ -16,12 +16,13 @@
  *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "ExtractZipTask.h"
-#include <QtConcurrent>
 #include "FileSystem.h"
 #include "archive/ArchiveReader.h"
 #include "archive/ArchiveWriter.h"
+#include <QtConcurrent>
 
-namespace MMCZip {
+namespace MMCZip
+{
 
 void ExtractZipTask::executeTask()
 {
@@ -32,7 +33,7 @@ void ExtractZipTask::executeTask()
 
 auto ExtractZipTask::extractZip() -> ZipResult
 {
-    auto target = m_outputDir.absolutePath();
+    auto target         = m_outputDir.absolutePath();
     auto target_top_dir = QUrl::fromLocalFile(target);
 
     QStringList extracted;
@@ -47,12 +48,12 @@ auto ExtractZipTask::extractZip() -> ZipResult
     }
 
     auto extPtr = ArchiveWriter::createDiskWriter();
-    auto ext = extPtr.get();
+    auto ext    = extPtr.get();
 
     setStatus("Extracting files...");
     setProgress(0, m_input.getFiles().count());
     ZipResult result;
-    auto fileName = m_input.getZipName();
+    auto      fileName = m_input.getZipName();
     if (!m_input.parse([this, &result, &target, &target_top_dir, ext, &extracted](ArchiveReader::File* f) {
             if (m_zipFuture.isCanceled())
                 return false;
@@ -64,7 +65,7 @@ auto ExtractZipTask::extractZip() -> ZipResult
             }
 
             auto relative_file_name = QDir::fromNativeSeparators(file_name.mid(m_subdirectory.size()));
-            auto original_name = relative_file_name;
+            auto original_name      = relative_file_name;
             setStatus("Unpacking: " + relative_file_name);
 
             if (relative_file_name.startsWith('/'))

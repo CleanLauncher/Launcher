@@ -40,17 +40,19 @@
 
 #include "ui/pages/BasePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class GameOptionsPage;
 }
 
 class GameOptions;
 class MinecraftInstance;
 
-class GameOptionsPage : public QWidget, public BasePage {
+class GameOptionsPage : public QWidget, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit GameOptionsPage(MinecraftInstance* inst, QWidget* parent = 0);
     virtual ~GameOptionsPage();
 
@@ -58,12 +60,12 @@ class GameOptionsPage : public QWidget, public BasePage {
     void closedImpl() override;
 
     virtual QString displayName() const override { return tr("Game Options"); }
-    virtual QIcon icon() const override { return QIcon::fromTheme("settings"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("settings"); }
     virtual QString id() const override { return "gameoptions"; }
     virtual QString helpPage() const override { return "Game-Options-management"; }
-    void retranslate() override;
+    void            retranslate() override;
 
-   private:
-    Ui::GameOptionsPage* ui = nullptr;
+private:
+    Ui::GameOptionsPage*         ui = nullptr;
     std::shared_ptr<GameOptions> m_model;
 };

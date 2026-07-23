@@ -26,7 +26,8 @@
 
 #include "ui/widgets/ProjectItem.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 QHash<ResourceModel*, bool> ResourceModel::s_running_models;
 
@@ -52,43 +53,43 @@ auto ResourceModel::data(const QModelIndex& index, int role) const -> QVariant
 
     auto pack = m_packs.at(pos);
     switch (role) {
-        case Qt::ToolTipRole: {
-            if (pack->description.length() > 100) {
-                QString edit = pack->description.left(97);
-                edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
-                return edit;
+    case Qt::ToolTipRole: {
+        if (pack->description.length() > 100) {
+            QString edit = pack->description.left(97);
+            edit         = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
+            return edit;
+        }
+        return pack->description;
+    }
+    case Qt::DecorationRole: {
+        if (APPLICATION_DYN) {
+            if (auto iconOrNone = const_cast<ResourceModel*>(this)->getIcon(const_cast<QModelIndex&>(index), pack->logoUrl);
+                iconOrNone.has_value()) {
+                return iconOrNone.value();
             }
-            return pack->description;
-        }
-        case Qt::DecorationRole: {
-            if (APPLICATION_DYN) {
-                if (auto iconOrNone = const_cast<ResourceModel*>(this)->getIcon(const_cast<QModelIndex&>(index), pack->logoUrl);
-                    iconOrNone.has_value()) {
-                    return iconOrNone.value();
-                }
 
-                return QIcon::fromTheme("screenshot-placeholder");
-            }
-            return {};
+            return QIcon::fromTheme("screenshot-placeholder");
         }
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
-        }
+        return {};
+    }
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
 
-        case UserDataTypes::TITLE:
-            return pack->name;
-        case UserDataTypes::DESCRIPTION:
-            return pack->description;
-        case Qt::CheckStateRole:
-            return pack->isAnyVersionSelected() ? Qt::Checked : Qt::Unchecked;
-        case UserDataTypes::INSTALLED:
-            return this->isPackInstalled(pack);
-        default:
-            break;
+    case UserDataTypes::TITLE:
+        return pack->name;
+    case UserDataTypes::DESCRIPTION:
+        return pack->description;
+    case Qt::CheckStateRole:
+        return pack->isAnyVersionSelected() ? Qt::Checked : Qt::Unchecked;
+    case UserDataTypes::INSTALLED:
+        return this->isPackInstalled(pack);
+    default:
+        break;
     }
 
     return {};
@@ -98,13 +99,13 @@ QHash<int, QByteArray> ResourceModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
 
-    roles[Qt::ToolTipRole] = "toolTip";
-    roles[Qt::DecorationRole] = "decoration";
-    roles[Qt::SizeHintRole] = "sizeHint";
-    roles[Qt::UserRole] = "pack";
-    roles[UserDataTypes::TITLE] = "title";
+    roles[Qt::ToolTipRole]            = "toolTip";
+    roles[Qt::DecorationRole]         = "decoration";
+    roles[Qt::SizeHintRole]           = "sizeHint";
+    roles[Qt::UserRole]               = "pack";
+    roles[UserDataTypes::TITLE]       = "title";
     roles[UserDataTypes::DESCRIPTION] = "description";
-    roles[UserDataTypes::INSTALLED] = "installed";
+    roles[UserDataTypes::INSTALLED]   = "installed";
 
     return roles;
 }
@@ -169,15 +170,15 @@ void ResourceModel::search()
                 }
                 searchRequestForOneSucceeded(pack);
             };
-            auto project = std::make_shared<ModPlatform::IndexedPack>();
+            auto project     = std::make_shared<ModPlatform::IndexedPack>();
             project->addonId = projectId;
-            if (auto job = m_api->getProjectInfo({ project }, std::move(callbacks), false); job) {
+            if (auto job = m_api->getProjectInfo({project}, std::move(callbacks), false); job) {
                 runSearchJob(job);
             }
             return;
         }
     }
-    auto args{ createSearchArguments() };
+    auto args{createSearchArguments()};
 
     ResourceAPI::Callback<QList<ModPlatform::IndexedPack::Ptr>> callbacks{};
 
@@ -214,7 +215,7 @@ void ResourceModel::loadEntry(const QModelIndex& entry)
     }
 
     if (!pack->versionsLoaded) {
-        auto args{ createVersionsArguments(entry) };
+        auto                                                        args{createVersionsArguments(entry)};
         ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
         auto addonId = pack->addonId;
@@ -229,8 +230,8 @@ void ResourceModel::loadEntry(const QModelIndex& entry)
         }
         if (!callbacks.on_fail) {
             callbacks.on_fail = [](const QString& reason, int) {
-                QMessageBox::critical(nullptr, tr("Error"),
-                                      tr("A network error occurred. Could not load project versions: %1").arg(reason));
+                QMessageBox::critical(
+                    nullptr, tr("Error"), tr("A network error occurred. Could not load project versions: %1").arg(reason));
             };
         }
 
@@ -240,7 +241,7 @@ void ResourceModel::loadEntry(const QModelIndex& entry)
     }
 
     if (!pack->extraDataLoaded) {
-        auto args{ createInfoArguments(entry) };
+        auto                                                 args{createInfoArguments(entry)};
         ResourceAPI::Callback<ModPlatform::IndexedPack::Ptr> callbacks{};
 
         callbacks.on_succeed = [this, entry](auto& newpack) {
@@ -326,8 +327,8 @@ std::optional<ResourceAPI::SortingMethod> ResourceModel::getCurrentSortingMethod
 
     {
         auto sortingMethods = getSortingMethods();
-        auto method = std::find_if(sortingMethods.constBegin(), sortingMethods.constEnd(),
-                                   [this](const auto& e) { return m_current_sort_index == e.index; });
+        auto method         = std::find_if(
+            sortingMethods.constBegin(), sortingMethods.constEnd(), [this](const auto& e) { return m_current_sort_index == e.index; });
         if (method != sortingMethods.constEnd()) {
             sort = *method;
         }
@@ -340,7 +341,7 @@ std::optional<QIcon> ResourceModel::getIcon(QModelIndex& index, const QUrl& url)
 {
     QPixmap pixmap;
     if (QPixmapCache::find(url.toString(), &pixmap)) {
-        return { pixmap };
+        return {pixmap};
     }
 
     if (!m_current_icon_job) {
@@ -363,11 +364,11 @@ std::optional<QIcon> ResourceModel::getIcon(QModelIndex& index, const QUrl& url)
     auto fullFilePath = cacheEntry->getFullPath();
     connect(iconFetchAction.get(), &Task::succeeded, this, [this, url, fullFilePath, index] {
         auto icon = QIcon(fullFilePath);
-        QPixmapCache::insert(url.toString(), icon.pixmap(icon.actualSize({ 64, 64 })));
+        QPixmapCache::insert(url.toString(), icon.pixmap(icon.actualSize({64, 64})));
 
         m_currently_running_icon_actions.remove(url);
 
-        emit dataChanged(index, index, { Qt::DecorationRole });
+        emit dataChanged(index, index, {Qt::DecorationRole});
     });
     connect(iconFetchAction.get(), &Task::failed, this, [this, url] {
         m_currently_running_icon_actions.remove(url);
@@ -432,18 +433,18 @@ void ResourceModel::searchRequestForOneSucceeded(ModPlatform::IndexedPack::Ptr p
 void ResourceModel::searchRequestFailed([[maybe_unused]] QString reason, int networkErrorCode)
 {
     switch (networkErrorCode) {
-        default:
+    default:
 
-            QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load mods."));
-            break;
-        case 404:
+        QMessageBox::critical(nullptr, tr("Error"), tr("A network error occurred. Could not load mods."));
+        break;
+    case 404:
 
-            break;
-        case 409:
+        break;
+    case 409:
 
-            QMessageBox::critical(nullptr, tr("Error"),
-                                  QString("%1").arg(tr("API version too old!\nPlease update %1!").arg(BuildConfig.LAUNCHER_DISPLAYNAME)));
-            break;
+        QMessageBox::critical(
+            nullptr, tr("Error"), QString("%1").arg(tr("API version too old!\nPlease update %1!").arg(BuildConfig.LAUNCHER_DISPLAYNAME)));
+        break;
     }
 
     if (m_search_state == SearchState::ResetRequested) {
@@ -476,7 +477,7 @@ void ResourceModel::versionRequestSucceeded(QVector<ModPlatform::IndexedVersion>
         return;
     }
 
-    currentPack->versions = doc;
+    currentPack->versions       = doc;
     currentPack->versionsLoaded = true;
 
     QVariant newPack;
@@ -508,10 +509,10 @@ void ResourceModel::infoRequestSucceeded(ModPlatform::IndexedPack::Ptr pack, con
 }
 
 void ResourceModel::addPack(ModPlatform::IndexedPack::Ptr pack,
-                            ModPlatform::IndexedVersion& version,
-                            ResourceFolderModel* packs,
-                            bool isIndexed,
-                            QString downloadReason)
+                            ModPlatform::IndexedVersion&  version,
+                            ResourceFolderModel*          packs,
+                            bool                          isIndexed,
+                            QString                       downloadReason)
 {
     version.is_currently_selected = true;
     m_selected.append(makeShared<ResourceDownloadTask>(std::move(pack), version, packs, isIndexed, std::move(downloadReason)));

@@ -29,14 +29,15 @@
 #include <QStringList>
 #include <QStylePainter>
 
-class CheckComboModel : public QIdentityProxyModel {
+class CheckComboModel : public QIdentityProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CheckComboModel(QObject* parent = nullptr) : QIdentityProxyModel(parent) {}
 
     virtual Qt::ItemFlags flags(const QModelIndex& index) const { return QIdentityProxyModel::flags(index) | Qt::ItemIsUserCheckable; }
-    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const
+    virtual QVariant      data(const QModelIndex& index, int role = Qt::DisplayRole) const
     {
         if (role == Qt::CheckStateRole) {
             auto txt = QIdentityProxyModel::data(index, Qt::DisplayRole).toString();
@@ -63,10 +64,10 @@ class CheckComboModel : public QIdentityProxyModel {
     }
     QStringList getChecked() { return m_checked; }
 
-   signals:
+signals:
     void checkStateChanged();
 
-   private:
+private:
     QStringList m_checked;
 };
 
@@ -124,27 +125,27 @@ void CheckComboBox::setSeparator(const QString& separator)
 bool CheckComboBox::eventFilter(QObject* receiver, QEvent* event)
 {
     switch (event->type()) {
-        case QEvent::KeyPress:
-        case QEvent::KeyRelease: {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-            if (receiver == this && (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down)) {
-                showPopup();
-                return true;
-            } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Escape) {
-                QComboBox::hidePopup();
-                return (keyEvent->key() != Qt::Key_Escape);
-            }
-            break;
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease: {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        if (receiver == this && (keyEvent->key() == Qt::Key_Up || keyEvent->key() == Qt::Key_Down)) {
+            showPopup();
+            return true;
+        } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Escape) {
+            QComboBox::hidePopup();
+            return (keyEvent->key() != Qt::Key_Escape);
         }
-        case QEvent::MouseButtonPress: {
-            auto ev = static_cast<QMouseEvent*>(event);
-            m_containerMousePress = ev && view()->indexAt(ev->pos()).isValid() && view()->rect().contains(ev->pos());
-            break;
-        }
-        case QEvent::Wheel:
-            return receiver == this;
-        default:
-            break;
+        break;
+    }
+    case QEvent::MouseButtonPress: {
+        auto ev               = static_cast<QMouseEvent*>(event);
+        m_containerMousePress = ev && view()->indexAt(ev->pos()).isValid() && view()->rect().contains(ev->pos());
+        break;
+    }
+    case QEvent::Wheel:
+        return receiver == this;
+    default:
+        break;
     }
     return false;
 }

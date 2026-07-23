@@ -4,7 +4,8 @@
 
 #include "FileSystem.h"
 
-namespace Override {
+namespace Override
+{
 
 void createOverrides(const QString& name, const QString& parent_folder, const QString& override_path)
 {
@@ -22,7 +23,7 @@ void createOverrides(const QString& name, const QString& parent_folder, const QS
 
     QDirIterator override_iterator(override_path, QDirIterator::Subdirectories);
     while (override_iterator.hasNext()) {
-        auto override_file_path = override_iterator.next();
+        auto      override_file_path = override_iterator.next();
         QFileInfo info(override_file_path);
         if (info.isFile()) {
             override_file_path = override_file_path.split(name).last().remove(0, 1);

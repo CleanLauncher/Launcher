@@ -112,12 +112,12 @@ int StringUtils::naturalCompare(const QString& s1, const QString& s2, Qt::CaseSe
 QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_limit)
 {
     auto display_options = QUrl::RemoveUserInfo | QUrl::RemoveFragment | QUrl::NormalizePathSegments;
-    auto str_url = url.toDisplayString(display_options);
+    auto str_url         = url.toDisplayString(display_options);
 
     if (str_url.length() <= max_len)
         return str_url;
 
-    auto url_path_parts = url.path().split('/');
+    auto    url_path_parts    = url.path().split('/');
     QString last_path_segment = url_path_parts.takeLast();
 
     if (url_path_parts.size() >= 1 && url_path_parts.first().isEmpty())
@@ -128,22 +128,24 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
 
     auto url_template = QStringLiteral("%1://%2/%3%4");
 
-    auto url_compact = url_path_parts.isEmpty()
-                           ? url_template.arg(url.scheme(), url.host(), QStringList({ "...", last_path_segment }).join('/'), url.query())
-                           : url_template.arg(url.scheme(), url.host(),
-                                              QStringList({ url_path_parts.join('/'), "...", last_path_segment }).join('/'), url.query());
+    auto url_compact =
+        url_path_parts.isEmpty()
+            ? url_template.arg(url.scheme(), url.host(), QStringList({"...", last_path_segment}).join('/'), url.query())
+            : url_template.arg(
+                  url.scheme(), url.host(), QStringList({url_path_parts.join('/'), "...", last_path_segment}).join('/'), url.query());
 
     while (url_compact.length() > max_len && url_path_parts.size() >= 1) {
         url_path_parts.removeLast();
 
-        url_compact = url_path_parts.isEmpty()
-                          ? url_template.arg(url.scheme(), url.host(), QStringList({ "...", last_path_segment }).join('/'), url.query())
-                          : url_template.arg(url.scheme(), url.host(),
-                                             QStringList({ url_path_parts.join('/'), "...", last_path_segment }).join('/'), url.query());
+        url_compact =
+            url_path_parts.isEmpty()
+                ? url_template.arg(url.scheme(), url.host(), QStringList({"...", last_path_segment}).join('/'), url.query())
+                : url_template.arg(
+                      url.scheme(), url.host(), QStringList({url_path_parts.join('/'), "...", last_path_segment}).join('/'), url.query());
     }
 
     if ((url_compact.length() >= max_len) && hard_limit) {
-        url_compact = QString(str_url);
+        url_compact    = QString(str_url);
         auto to_remove = url_compact.length() - max_len + 3;
         url_compact.remove(url_compact.length() - to_remove - 1, to_remove);
         url_compact.append("...");
@@ -152,15 +154,15 @@ QString StringUtils::truncateUrlHumanFriendly(QUrl& url, int max_len, bool hard_
     return url_compact;
 }
 
-static const QStringList s_units_si{ "KB", "MB", "GB", "TB" };
-static const QStringList s_units_kibi{ "KiB", "MiB", "GiB", "TiB" };
+static const QStringList s_units_si{"KB", "MB", "GB", "TB"};
+static const QStringList s_units_kibi{"KiB", "MiB", "GiB", "TiB"};
 
 QString StringUtils::humanReadableFileSize(double bytes, bool use_si, int decimal_points)
 {
     const QStringList units = use_si ? s_units_si : s_units_kibi;
-    const int scale = use_si ? 1000 : 1024;
+    const int         scale = use_si ? 1000 : 1024;
 
-    int u = -1;
+    int    u = -1;
     double r = pow(10, decimal_points);
 
     do {
@@ -179,37 +181,37 @@ QString StringUtils::getRandomAlphaNumeric()
 QPair<QString, QString> StringUtils::splitFirst(const QString& s, const QString& sep, Qt::CaseSensitivity cs)
 {
     QString left, right;
-    auto index = s.indexOf(sep, 0, cs);
-    left = s.mid(0, index);
-    right = s.mid(index + sep.length());
+    auto    index = s.indexOf(sep, 0, cs);
+    left          = s.mid(0, index);
+    right         = s.mid(index + sep.length());
     return qMakePair(left, right);
 }
 
 QPair<QString, QString> StringUtils::splitFirst(const QString& s, QChar sep, Qt::CaseSensitivity cs)
 {
     QString left, right;
-    auto index = s.indexOf(sep, 0, cs);
-    left = s.mid(0, index);
-    right = s.mid(left.length() + 1);
+    auto    index = s.indexOf(sep, 0, cs);
+    left          = s.mid(0, index);
+    right         = s.mid(left.length() + 1);
     return qMakePair(left, right);
 }
 
 QPair<QString, QString> StringUtils::splitFirst(const QString& s, const QRegularExpression& re)
 {
-    QString left, right;
+    QString                 left, right;
     QRegularExpressionMatch match;
-    auto index = s.indexOf(re, 0, &match);
-    left = s.mid(0, index);
-    auto end = match.hasMatch() ? left.length() + match.capturedLength() : left.length() + 1;
-    right = s.mid(end);
+    auto                    index = s.indexOf(re, 0, &match);
+    left                          = s.mid(0, index);
+    auto end                      = match.hasMatch() ? left.length() + match.capturedLength() : left.length() + 1;
+    right                         = s.mid(end);
     return qMakePair(left, right);
 }
 
 QString StringUtils::htmlListPatch(QString htmlStr)
 {
     static const QRegularExpression s_ulMatcher("<\\s*/\\s*ul\\s*>");
-    int pos = htmlStr.indexOf(s_ulMatcher);
-    int imgPos;
+    int                             pos = htmlStr.indexOf(s_ulMatcher);
+    int                             imgPos;
     while (pos != -1) {
         pos = htmlStr.indexOf(">", pos) + 1;
 

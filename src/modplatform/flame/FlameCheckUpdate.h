@@ -2,27 +2,28 @@
 
 #include "modplatform/CheckUpdateTask.h"
 
-class FlameCheckUpdate : public CheckUpdateTask {
+class FlameCheckUpdate : public CheckUpdateTask
+{
     Q_OBJECT
 
-   public:
-    FlameCheckUpdate(QList<Resource*>& resources,
-                     std::vector<Version>& mcVersions,
+public:
+    FlameCheckUpdate(QList<Resource*>&                 resources,
+                     std::vector<Version>&             mcVersions,
                      QList<ModPlatform::ModLoaderType> loadersList,
-                     ResourceFolderModel* resourceModel)
+                     ResourceFolderModel*              resourceModel)
         : CheckUpdateTask(resources, mcVersions, std::move(loadersList), resourceModel)
     {}
 
-   public slots:
+public slots:
     bool abort() override;
 
-   protected slots:
+protected slots:
     void executeTask() override;
-   private slots:
+private slots:
     void getLatestVersionCallback(Resource* resource, QByteArray* response);
     void collectBlockedMods();
 
-   private:
+private:
     Task::Ptr m_task = nullptr;
 
     QHash<Resource*, QString> m_blocked;

@@ -17,15 +17,16 @@
  */
 #pragma once
 
-#include <ui/widgets/AppearanceWidget.h>
+#include "BaseWizardPage.h"
 #include <QHBoxLayout>
 #include <QWidget>
-#include "BaseWizardPage.h"
+#include <ui/widgets/AppearanceWidget.h>
 
-class ThemeWizardPage : public BaseWizardPage {
+class ThemeWizardPage : public BaseWizardPage
+{
     Q_OBJECT
 
-   public:
+public:
     ThemeWizardPage(QWidget* parent = nullptr) : BaseWizardPage(parent)
     {
         auto layout = new QVBoxLayout(this);
@@ -41,6 +42,6 @@ class ThemeWizardPage : public BaseWizardPage {
     bool validatePage() override { return true; };
     void retranslate() override { widget.retranslateUi(); }
 
-   private:
-    AppearanceWidget widget{ true };
+private:
+    AppearanceWidget widget{true};
 };

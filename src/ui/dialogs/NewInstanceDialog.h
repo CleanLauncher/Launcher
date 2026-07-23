@@ -40,7 +40,8 @@
 #include "InstanceTask.h"
 #include "ui/pages/BasePageProvider.h"
 
-namespace Ui {
+namespace Ui
+{
 class NewInstanceDialog;
 }
 
@@ -49,14 +50,15 @@ class QDialogButtonBox;
 class ImportPage;
 class FlamePage;
 
-class NewInstanceDialog : public QDialog, public BasePageProvider {
+class NewInstanceDialog : public QDialog, public BasePageProvider
+{
     Q_OBJECT
 
-   public:
-    explicit NewInstanceDialog(const QString& initialGroup,
-                               const QString& url = QString(),
+public:
+    explicit NewInstanceDialog(const QString&                initialGroup,
+                               const QString&                url        = QString(),
                                const QMap<QString, QString>& extra_info = {},
-                               QWidget* parent = 0);
+                               QWidget*                      parent     = 0);
     ~NewInstanceDialog();
 
     void updateDialogState();
@@ -68,32 +70,32 @@ class NewInstanceDialog : public QDialog, public BasePageProvider {
 
     InstanceTask* extractTask();
 
-    QString dialogTitle() override;
+    QString          dialogTitle() override;
     QList<BasePage*> getPages() override;
 
     QString instName() const;
     QString instGroup() const;
     QString iconKey() const;
 
-   public slots:
+public slots:
     void accept() override;
     void reject() override;
 
-   private slots:
+private slots:
     void on_iconButton_clicked();
     void on_instNameTextBox_textChanged(const QString& arg1);
     void selectedPageChanged(BasePage* previous, BasePage* selected);
 
-   private:
-    Ui::NewInstanceDialog* ui = nullptr;
-    PageContainer* m_container = nullptr;
-    QDialogButtonBox* m_buttons = nullptr;
+private:
+    Ui::NewInstanceDialog* ui          = nullptr;
+    PageContainer*         m_container = nullptr;
+    QDialogButtonBox*      m_buttons   = nullptr;
 
-    QString InstIconKey;
-    ImportPage* importPage = nullptr;
+    QString                       InstIconKey;
+    ImportPage*                   importPage = nullptr;
     std::unique_ptr<InstanceTask> creationTask;
 
-    bool importIcon = false;
+    bool    importIcon = false;
     QString importIconPath;
     QString importIconName;
 

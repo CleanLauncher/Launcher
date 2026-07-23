@@ -6,18 +6,19 @@
 
 class OtherLogsPage;
 
-class ViewLogWindow : public QMainWindow {
+class ViewLogWindow : public QMainWindow
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ViewLogWindow(QWidget* parent = nullptr);
 
-   signals:
+signals:
     void isClosing();
 
-   protected:
+protected:
     void closeEvent(QCloseEvent*) override;
 
-   private:
+private:
     OtherLogsPage* m_page;
 };

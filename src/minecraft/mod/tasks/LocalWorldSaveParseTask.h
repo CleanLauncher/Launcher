@@ -28,9 +28,14 @@
 
 #include "tasks/Task.h"
 
-namespace WorldSaveUtils {
+namespace WorldSaveUtils
+{
 
-enum class ProcessingLevel { Full, BasicInfoOnly };
+enum class ProcessingLevel
+{
+    Full,
+    BasicInfoOnly
+};
 
 bool process(WorldSave& save, ProcessingLevel level = ProcessingLevel::Full);
 
@@ -41,9 +46,10 @@ bool validate(QFileInfo file);
 
 }  // namespace WorldSaveUtils
 
-class LocalWorldSaveParseTask : public Task {
+class LocalWorldSaveParseTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LocalWorldSaveParseTask(int token, WorldSave& save);
 
     bool canAbort() const override { return true; }
@@ -53,7 +59,7 @@ class LocalWorldSaveParseTask : public Task {
 
     int token() const { return m_token; }
 
-   private:
+private:
     int m_token;
 
     WorldSave& m_save;

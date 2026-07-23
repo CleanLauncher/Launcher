@@ -4,22 +4,26 @@
 #include <QDialog>
 #include <cstdint>
 
-namespace Ui {
+namespace Ui
+{
 class ChooseProviderDialog;
 }
 
-namespace ModPlatform {
+namespace ModPlatform
+{
 enum class ResourceProvider : std::uint8_t;
 }
 
 class Mod;
 class NetJob;
 
-class ChooseProviderDialog : public QDialog {
+class ChooseProviderDialog : public QDialog
+{
     Q_OBJECT
 
-    struct Response {
-        bool skip_all = false;
+    struct Response
+    {
+        bool skip_all    = false;
         bool confirm_all = false;
 
         bool try_others = false;
@@ -27,7 +31,7 @@ class ChooseProviderDialog : public QDialog {
         ModPlatform::ResourceProvider chosen;
     };
 
-   public:
+public:
     explicit ChooseProviderDialog(QWidget* parent, bool single_choice = false, bool allow_skipping = true);
     ~ChooseProviderDialog();
 
@@ -35,19 +39,19 @@ class ChooseProviderDialog : public QDialog {
 
     void setDescription(QString desc);
 
-   private slots:
+private slots:
     void skipOne();
     void skipAll();
     void confirmOne();
     void confirmAll();
 
-   private:
+private:
     void addProviders();
     void disableInput();
 
     auto getSelectedProvider() const -> ModPlatform::ResourceProvider;
 
-   private:
+private:
     Ui::ChooseProviderDialog* ui;
 
     QButtonGroup m_providers;

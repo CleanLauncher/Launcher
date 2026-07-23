@@ -29,20 +29,23 @@
 #include "net/ApiDownload.h"
 #include "net/NetJob.h"
 
-enum FormatProperties { ImageData = QTextFormat::UserProperty + 1 };
+enum FormatProperties
+{
+    ImageData = QTextFormat::UserProperty + 1
+};
 
 QSizeF VariableSizedImageObject::intrinsicSize(QTextDocument* doc, int posInDocument, const QTextFormat& format)
 {
     Q_UNUSED(posInDocument);
 
     auto image = qvariant_cast<QImage>(format.property(ImageData));
-    auto size = image.size();
+    auto size  = image.size();
     if (size.isEmpty())
 
-        return { size };
+        return {size};
 
-    int width = 0;
-    int height = 0;
+    int  width    = 0;
+    int  height   = 0;
     auto widthVar = format.property(QTextFormat::ImageWidth);
     if (widthVar.isValid()) {
         width = widthVar.toInt();
@@ -67,23 +70,20 @@ QSizeF VariableSizedImageObject::intrinsicSize(QTextDocument* doc, int posInDocu
     if (size.width() > doc_width)
         size *= doc_width / (double)size.width();
 
-    return { size };
+    return {size};
 }
 
-void VariableSizedImageObject::drawObject(QPainter* painter,
-                                          const QRectF& rect,
-                                          QTextDocument* doc,
-                                          int posInDocument,
-                                          const QTextFormat& format)
+void VariableSizedImageObject::drawObject(
+    QPainter* painter, const QRectF& rect, QTextDocument* doc, int posInDocument, const QTextFormat& format)
 {
     if (!format.hasProperty(ImageData)) {
-        QUrl image_url{ qvariant_cast<QString>(format.property(QTextFormat::ImageName)) };
+        QUrl image_url{qvariant_cast<QString>(format.property(QTextFormat::ImageName))};
         if (m_fetching_images.contains(image_url) || image_url.isEmpty())
             return;
 
-        auto meta = std::make_shared<ImageMetadata>();
+        auto meta           = std::make_shared<ImageMetadata>();
         meta->posInDocument = posInDocument;
-        meta->url = image_url;
+        meta->url           = image_url;
 
         auto widthVar = format.property(QTextFormat::ImageWidth);
         if (widthVar.isValid()) {
@@ -140,8 +140,8 @@ void VariableSizedImageObject::loadImage(QTextDocument* doc, std::shared_ptr<Ima
     job->addNetAction(Net::ApiDownload::makeCached(meta->url, entry));
 
     auto full_entry_path = entry->getFullPath();
-    auto source_url = meta->url;
-    auto loadImage = [this, doc, full_entry_path, source_url, meta](const QImage& image) {
+    auto source_url      = meta->url;
+    auto loadImage       = [this, doc, full_entry_path, source_url, meta](const QImage& image) {
         doc->addResource(QTextDocument::ImageResource, source_url, image);
 
         meta->image = image;

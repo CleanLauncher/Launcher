@@ -49,7 +49,7 @@ QString MCEditTool::getProgramPath()
     return path();
 #else
     const QString mceditPath = path();
-    QDir mceditDir(mceditPath);
+    QDir          mceditDir(mceditPath);
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
     if (mceditDir.exists("mcedit.sh")) {
         return mceditDir.absoluteFilePath("mcedit.sh");

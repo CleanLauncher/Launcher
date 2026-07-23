@@ -21,12 +21,13 @@
 #include "launch/LaunchTask.h"
 #include "settings/SettingsObject.h"
 
-class GenericProfiler : public BaseProfiler {
+class GenericProfiler : public BaseProfiler
+{
     Q_OBJECT
-   public:
+public:
     GenericProfiler(SettingsObject* settings, BaseInstance* instance, QObject* parent = 0);
 
-   protected:
+protected:
     void beginProfilingImpl(LaunchTask* process);
 };
 

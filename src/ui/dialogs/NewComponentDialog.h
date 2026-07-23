@@ -20,14 +20,16 @@
 #include <QString>
 #include <QStringList>
 
-namespace Ui {
+namespace Ui
+{
 class NewComponentDialog;
 }
 
-class NewComponentDialog : public QDialog {
+class NewComponentDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit NewComponentDialog(const QString& initialName = QString(), const QString& initialUid = QString(), QWidget* parent = 0);
     virtual ~NewComponentDialog();
     void setBlacklist(QStringList badUids);
@@ -35,12 +37,12 @@ class NewComponentDialog : public QDialog {
     QString name() const;
     QString uid() const;
 
-   private slots:
+private slots:
     void updateDialogState();
 
-   private:
+private:
     Ui::NewComponentDialog* ui;
 
-    QString originalPlaceholderText;
+    QString     originalPlaceholderText;
     QStringList uidBlacklist;
 };

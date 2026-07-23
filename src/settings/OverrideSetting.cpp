@@ -20,7 +20,7 @@ OverrideSetting::OverrideSetting(std::shared_ptr<Setting> other, std::shared_ptr
     Q_ASSERT(other);
     Q_ASSERT(gate);
     m_other = other;
-    m_gate = gate;
+    m_gate  = gate;
 }
 
 bool OverrideSetting::isOverriding() const

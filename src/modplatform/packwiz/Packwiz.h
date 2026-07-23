@@ -27,32 +27,35 @@
 
 class QDir;
 
-namespace Packwiz {
+namespace Packwiz
+{
 
-class V1 {
-   public:
-    struct Mod {
-        QString slug{};
-        QString name{};
-        QString filename{};
-        ModPlatform::Side side{ ModPlatform::Side::UniversalSide };
-        ModPlatform::ModLoaderTypes loaders;
-        QStringList mcVersions;
+class V1
+{
+public:
+    struct Mod
+    {
+        QString                         slug{};
+        QString                         name{};
+        QString                         filename{};
+        ModPlatform::Side               side{ModPlatform::Side::UniversalSide};
+        ModPlatform::ModLoaderTypes     loaders;
+        QStringList                     mcVersions;
         ModPlatform::IndexedVersionType releaseType;
 
         QString mode{};
-        QUrl url{};
+        QUrl    url{};
         QString hash_format{};
         QString hash{};
 
         ModPlatform::ResourceProvider provider{};
-        QVariant file_id{};
-        QVariant project_id{};
-        QString version_number{};
+        QVariant                      file_id{};
+        QVariant                      project_id{};
+        QString                       version_number{};
 
         QList<ModPlatform::Dependency> dependencies;
 
-       public:
+    public:
         auto isValid() const -> bool { return !slug.isEmpty() && !project_id.isNull(); }
 
         auto mod_id() -> QVariant& { return project_id; }

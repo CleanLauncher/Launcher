@@ -42,11 +42,17 @@
 
 class InstanceWindow;
 
-enum class LaunchDecision { Undecided, Continue, Abort };
+enum class LaunchDecision
+{
+    Undecided,
+    Continue,
+    Abort
+};
 
-class LaunchController : public Task {
+class LaunchController : public Task
+{
     Q_OBJECT
-   public:
+public:
     void executeTask() override;
 
     LaunchController();
@@ -72,32 +78,32 @@ class LaunchController : public Task {
 
     bool abort() override;
 
-   private:
-    void login();
-    void launchInstance();
-    void decideAccount();
+private:
+    void           login();
+    void           launchInstance();
+    void           decideAccount();
     LaunchDecision decideLaunchMode();
-    bool askPlayDemo() const;
-    QString askOfflineName(const QString& playerName, bool* ok = nullptr);
-    bool reauthenticateAccount(const MinecraftAccountPtr& account, const QString& reason);
+    bool           askPlayDemo() const;
+    QString        askOfflineName(const QString& playerName, bool* ok = nullptr);
+    bool           reauthenticateAccount(const MinecraftAccountPtr& account, const QString& reason);
 
-   private slots:
+private slots:
     void readyForLaunch();
 
     void onSucceeded();
     void onFailed(QString reason);
     void onProgressRequested(Task* task) const;
 
-   private:
-    LaunchMode m_wantedLaunchMode = LaunchMode::Normal;
-    LaunchMode m_actualLaunchMode = LaunchMode::Normal;
-    BaseProfilerFactory* m_profiler = nullptr;
-    QString m_offlineName;
-    BaseInstance* m_instance = nullptr;
-    QWidget* m_parentWidget = nullptr;
-    InstanceWindow* m_console = nullptr;
-    MinecraftAccountPtr m_accountToUse = nullptr;
-    AuthSessionPtr m_session = nullptr;
-    LaunchTask* m_launcher = nullptr;
+private:
+    LaunchMode           m_wantedLaunchMode = LaunchMode::Normal;
+    LaunchMode           m_actualLaunchMode = LaunchMode::Normal;
+    BaseProfilerFactory* m_profiler         = nullptr;
+    QString              m_offlineName;
+    BaseInstance*        m_instance     = nullptr;
+    QWidget*             m_parentWidget = nullptr;
+    InstanceWindow*      m_console      = nullptr;
+    MinecraftAccountPtr  m_accountToUse = nullptr;
+    AuthSessionPtr       m_session      = nullptr;
+    LaunchTask*          m_launcher     = nullptr;
     MinecraftTarget::Ptr m_targetToJoin = nullptr;
 };

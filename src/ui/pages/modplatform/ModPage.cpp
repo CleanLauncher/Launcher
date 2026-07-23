@@ -53,7 +53,8 @@
 
 #include "ui/dialogs/ResourceDownloadDialog.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 ModPage::ModPage(ModDownloadDialog* dialog, BaseInstance& instance) : ResourcePage(dialog, instance)
 {
@@ -86,7 +87,7 @@ void ModPage::filterMods()
 void ModPage::triggerSearch()
 {
     auto changed = m_filter_widget->changed();
-    m_filter = m_filter_widget->getFilter();
+    m_filter     = m_filter_widget->getFilter();
     m_ui->packView->selectionModel()->setCurrentIndex({}, QItemSelectionModel::SelectionFlag::ClearAndSelect);
     m_ui->packView->clearSelection();
     m_ui->packDescription->clear();
@@ -107,9 +108,9 @@ QMap<QString, QString> ModPage::urlHandlers() const
 }
 
 void ModPage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
-                                ModPlatform::IndexedVersion& version,
-                                ResourceFolderModel* baseModel,
-                                QString downloadReason)
+                                ModPlatform::IndexedVersion&  version,
+                                ResourceFolderModel*          baseModel,
+                                QString                       downloadReason)
 {
     bool isIndexed = !APPLICATION->settings()->get("ModMetadataDisabled").toBool();
     m_model->addPack(pack, version, baseModel, isIndexed, downloadReason);

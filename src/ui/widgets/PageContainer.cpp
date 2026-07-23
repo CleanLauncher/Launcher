@@ -58,16 +58,17 @@
 #include "Application.h"
 #include "DesktopServices.h"
 
-class PageEntryFilterModel : public QSortFilterProxyModel {
-   public:
+class PageEntryFilterModel : public QSortFilterProxyModel
+{
+public:
     explicit PageEntryFilterModel(QObject* parent = nullptr) : QSortFilterProxyModel(parent) {}
 
-   protected:
+protected:
     bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override
     {
         const QString pattern = filterRegularExpression().pattern();
-        auto* const model = static_cast<PageModel*>(sourceModel());
-        auto* const page = model->pages().at(sourceRow);
+        auto* const   model   = static_cast<PageModel*>(sourceModel());
+        auto* const   page    = model->pages().at(sourceRow);
         if (!page->shouldDisplay()) {
             return false;
         }
@@ -82,13 +83,13 @@ PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, 
     createUI();
     useSidebarStyle(true);
 
-    int counter = 0;
-    auto pages = pageProvider->getPages();
+    int  counter = 0;
+    auto pages   = pageProvider->getPages();
     for (auto* page : pages) {
         auto* widget = dynamic_cast<QWidget*>(page);
         widget->setParent(this);
         page->stackIndex = m_pageStack->addWidget(widget);
-        page->listIndex = counter;
+        page->listIndex  = counter;
         page->setParentContainer(this);
         counter++;
         page->updateExtraInfo = [this](const QString& id, const QString& info) {
@@ -115,7 +116,7 @@ PageContainer::PageContainer(BasePageProvider* pageProvider, QString defaultId, 
 
 bool PageContainer::selectPage(QString pageId)
 {
-    auto* page = m_model->findPageEntryById(pageId);
+    auto*       page = m_model->findPageEntryById(pageId);
     QModelIndex index;
     if (page) {
         index = m_proxyModel->mapFromSource(m_model->index(page->listIndex));
@@ -160,8 +161,8 @@ void PageContainer::refreshContainer()
 void PageContainer::createUI()
 {
     m_pageStack = new QStackedLayout;
-    m_pageList = new PageView;
-    m_header = new QLabel();
+    m_pageList  = new PageView;
+    m_header    = new QLabel();
 
     QFont headerLabelFont = m_header->font();
     headerLabelFont.setBold(true);
@@ -171,8 +172,8 @@ void PageContainer::createUI()
     }
     m_header->setFont(headerLabelFont);
 
-    auto* headerHLayout = new QHBoxLayout;
-    const int leftMargin = APPLICATION->style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
+    auto*     headerHLayout = new QHBoxLayout;
+    const int leftMargin    = APPLICATION->style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
     headerHLayout->addSpacerItem(new QSpacerItem(leftMargin, 0, QSizePolicy::Fixed, QSizePolicy::Ignored));
     headerHLayout->addWidget(m_header);
     headerHLayout->setContentsMargins(0, 6, 0, 0);

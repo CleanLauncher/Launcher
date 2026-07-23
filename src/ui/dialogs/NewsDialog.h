@@ -5,26 +5,28 @@
 
 #include "news/NewsEntry.h"
 
-namespace Ui {
+namespace Ui
+{
 class NewsDialog;
 }
 
-class NewsDialog : public QDialog {
+class NewsDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     NewsDialog(QList<NewsEntryPtr> entries, QWidget* parent = nullptr);
     ~NewsDialog();
 
-   public slots:
+public slots:
     void toggleArticleList();
 
-   private slots:
+private slots:
     void selectedArticleChanged(const QString& new_title);
 
-   private:
+private:
     Ui::NewsDialog* ui;
 
     QHash<QString, NewsEntryPtr> m_entries;
-    bool m_article_list_hidden = false;
+    bool                         m_article_list_hidden = false;
 };

@@ -74,7 +74,7 @@ void Task::setDetails(const QString& new_details)
 void Task::setProgress(qint64 current, qint64 total)
 {
     if ((m_progress != current) || (m_progressTotal != total)) {
-        m_progress = current;
+        m_progress      = current;
         m_progressTotal = total;
 
         emit progress(m_progress, m_progressTotal);
@@ -84,31 +84,31 @@ void Task::setProgress(qint64 current, qint64 total)
 void Task::start()
 {
     switch (m_state) {
-        case State::Inactive: {
-            if (m_show_debug)
-                qCDebug(taskLogC) << "Task" << describe() << "starting for the first time";
-            break;
-        }
-        case State::AbortedByUser: {
-            if (m_show_debug)
-                qCDebug(taskLogC) << "Task" << describe() << "restarting for after being aborted by user";
-            break;
-        }
-        case State::Failed: {
-            if (m_show_debug)
-                qCDebug(taskLogC) << "Task" << describe() << "restarting for after failing at first";
-            break;
-        }
-        case State::Succeeded: {
-            if (m_show_debug)
-                qCDebug(taskLogC) << "Task" << describe() << "restarting for after succeeding at first";
-            break;
-        }
-        case State::Running: {
-            if (ASSERT_NEVER(isRunning()) && m_show_debug)
-                qCWarning(taskLogC) << "The launcher tried to start task" << describe() << "while it was already running!";
-            return;
-        }
+    case State::Inactive: {
+        if (m_show_debug)
+            qCDebug(taskLogC) << "Task" << describe() << "starting for the first time";
+        break;
+    }
+    case State::AbortedByUser: {
+        if (m_show_debug)
+            qCDebug(taskLogC) << "Task" << describe() << "restarting for after being aborted by user";
+        break;
+    }
+    case State::Failed: {
+        if (m_show_debug)
+            qCDebug(taskLogC) << "Task" << describe() << "restarting for after failing at first";
+        break;
+    }
+    case State::Succeeded: {
+        if (m_show_debug)
+            qCDebug(taskLogC) << "Task" << describe() << "restarting for after succeeding at first";
+        break;
+    }
+    case State::Running: {
+        if (ASSERT_NEVER(isRunning()) && m_show_debug)
+            qCWarning(taskLogC) << "The launcher tried to start task" << describe() << "while it was already running!";
+        return;
+    }
     }
 
     m_state = State::Running;
@@ -122,7 +122,7 @@ void Task::emitFailed(QString reason)
         qCCritical(taskLogC) << "Task" << describe() << "failed while not running!!!!:" << reason;
         return;
     }
-    m_state = State::Failed;
+    m_state      = State::Failed;
     m_failReason = reason;
     qCCritical(taskLogC) << "Task" << describe() << "failed:" << reason;
     emit failed(reason);
@@ -135,7 +135,7 @@ void Task::emitAborted()
         qCCritical(taskLogC) << "Task" << describe() << "aborted while not running!!!!";
         return;
     }
-    m_state = State::AbortedByUser;
+    m_state      = State::AbortedByUser;
     m_failReason = tr("Aborted");
     if (m_show_debug)
         qCDebug(taskLogC) << "Task" << describe() << "aborted.";
@@ -163,7 +163,7 @@ void Task::propagateStepProgress(const TaskStepProgress& task_progress)
 
 QString Task::describe()
 {
-    QString outStr;
+    QString     outStr;
     QTextStream out(&outStr);
     out << metaObject()->className() << QChar('(');
     auto name = objectName();

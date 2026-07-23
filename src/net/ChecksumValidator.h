@@ -39,9 +39,11 @@
 
 #include <QCryptographicHash>
 
-namespace Net {
-class ChecksumValidator : public Validator {
-   public:
+namespace Net
+{
+class ChecksumValidator : public Validator
+{
+public:
     ChecksumValidator(QCryptographicHash::Algorithm algorithm, QString expectedHex)
         : Net::ChecksumValidator(algorithm, QByteArray::fromHex(expectedHex.toLatin1()))
     {}
@@ -49,7 +51,7 @@ class ChecksumValidator : public Validator {
         : m_checksum(algorithm), m_expected(expected) {};
     virtual ~ChecksumValidator() = default;
 
-   public:
+public:
     auto init(QNetworkRequest&) -> bool override
     {
         m_checksum.reset();
@@ -81,8 +83,8 @@ class ChecksumValidator : public Validator {
 
     void setExpected(QByteArray expected) { m_expected = expected; }
 
-   private:
+private:
     QCryptographicHash m_checksum;
-    QByteArray m_expected;
+    QByteArray         m_expected;
 };
 }  // namespace Net

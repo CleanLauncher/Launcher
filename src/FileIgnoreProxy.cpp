@@ -36,13 +36,13 @@
 
 #include "FileIgnoreProxy.h"
 
+#include "FileSystem.h"
+#include "SeparatorPrefixTree.h"
+#include "StringUtils.h"
 #include <QDebug>
 #include <QFileSystemModel>
 #include <QSortFilterProxyModel>
 #include <QStack>
-#include "FileSystem.h"
-#include "SeparatorPrefixTree.h"
-#include "StringUtils.h"
 
 FileIgnoreProxy::FileIgnoreProxy(QString root, QObject* parent) : QSortFilterProxyModel(parent), m_root(root) {}
 
@@ -54,7 +54,7 @@ bool FileIgnoreProxy::lessThan(const QModelIndex& left, const QModelIndex& right
     }
     bool asc = sortOrder() == Qt::AscendingOrder ? true : false;
 
-    QFileInfo leftFileInfo = fsm->fileInfo(left);
+    QFileInfo leftFileInfo  = fsm->fileInfo(left);
     QFileInfo rightFileInfo = fsm->fileInfo(right);
 
     if (!leftFileInfo.isDir() && rightFileInfo.isDir()) {
@@ -68,7 +68,7 @@ bool FileIgnoreProxy::lessThan(const QModelIndex& left, const QModelIndex& right
         return StringUtils::naturalCompare(leftFileInfo.fileName(), rightFileInfo.fileName(), Qt::CaseInsensitive) < 0;
     }
     if (sortColumn() == 1) {
-        auto leftSize = leftFileInfo.size();
+        auto leftSize  = leftFileInfo.size();
         auto rightSize = rightFileInfo.size();
         if ((leftSize == rightSize) || (leftFileInfo.isDir() && rightFileInfo.isDir())) {
             return StringUtils::naturalCompare(leftFileInfo.fileName(), rightFileInfo.fileName(), Qt::CaseInsensitive) < 0 ? asc : !asc;
@@ -83,8 +83,8 @@ Qt::ItemFlags FileIgnoreProxy::flags(const QModelIndex& index) const
     if (!index.isValid())
         return Qt::NoItemFlags;
 
-    auto sourceIndex = mapToSource(index);
-    Qt::ItemFlags flags = sourceIndex.flags();
+    auto          sourceIndex = mapToSource(index);
+    Qt::ItemFlags flags       = sourceIndex.flags();
     if (index.column() == 0) {
         flags |= Qt::ItemIsUserCheckable;
         if (sourceIndex.model()->hasChildren(sourceIndex)) {
@@ -100,9 +100,9 @@ QVariant FileIgnoreProxy::data(const QModelIndex& index, int role) const
     QModelIndex sourceIndex = mapToSource(index);
 
     if (index.column() == 0 && role == Qt::CheckStateRole) {
-        QFileSystemModel* fsm = qobject_cast<QFileSystemModel*>(sourceModel());
-        auto blockedPath = relPath(fsm->filePath(sourceIndex));
-        auto cover = m_blocked.cover(blockedPath);
+        QFileSystemModel* fsm         = qobject_cast<QFileSystemModel*>(sourceModel());
+        auto              blockedPath = relPath(fsm->filePath(sourceIndex));
+        auto              cover       = m_blocked.cover(blockedPath);
         if (!cover.isNull()) {
             return QVariant(Qt::Unchecked);
         } else if (m_blocked.exists(blockedPath)) {
@@ -140,8 +140,8 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
     }
 
     QModelIndex sourceIndex = mapToSource(index);
-    auto blockedPath = relPath(fsm->filePath(sourceIndex));
-    bool changed = false;
+    auto        blockedPath = relPath(fsm->filePath(sourceIndex));
+    bool        changed     = false;
     if (state == Qt::Unchecked) {
         auto& node = m_blocked.insert(blockedPath);
 
@@ -154,9 +154,9 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
 
             m_blocked.remove(cover);
 
-            QModelIndex rootIndex = fsm->index(FS::PathCombine(m_root, cover));
-            QModelIndex doing = rootIndex;
-            int row = 0;
+            QModelIndex         rootIndex = fsm->index(FS::PathCombine(m_root, cover));
+            QModelIndex         doing     = rootIndex;
+            int                 row       = 0;
             QStack<QModelIndex> todo;
             while (1) {
                 auto node = fsm->index(row, 0, doing);
@@ -165,7 +165,7 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
                         break;
                     } else {
                         doing = todo.pop();
-                        row = 0;
+                        row   = 0;
                         continue;
                     }
                 }
@@ -183,18 +183,18 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
         changed = true;
     }
     if (changed) {
-        emit dataChanged(index, index, { Qt::CheckStateRole });
+        emit dataChanged(index, index, {Qt::CheckStateRole});
 
         QModelIndex up = index.parent();
         while (1) {
             if (!up.isValid())
                 break;
-            emit dataChanged(up, up, { Qt::CheckStateRole });
+            emit dataChanged(up, up, {Qt::CheckStateRole});
             up = up.parent();
         }
 
-        QModelIndex doing = index;
-        int row = 0;
+        QModelIndex         doing = index;
+        int                 row   = 0;
         QStack<QModelIndex> todo;
         while (1) {
             auto node = this->index(row, 0, doing);
@@ -203,11 +203,11 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
                     break;
                 } else {
                     doing = todo.pop();
-                    row = 0;
+                    row   = 0;
                     continue;
                 }
             }
-            emit dataChanged(node, node, { Qt::CheckStateRole });
+            emit dataChanged(node, node, {Qt::CheckStateRole});
             todo.push(node);
             row++;
         }
@@ -217,13 +217,13 @@ bool FileIgnoreProxy::setFilterState(QModelIndex index, Qt::CheckState state)
 
 bool FileIgnoreProxy::shouldExpand(QModelIndex index)
 {
-    QModelIndex sourceIndex = mapToSource(index);
-    QFileSystemModel* fsm = qobject_cast<QFileSystemModel*>(sourceModel());
+    QModelIndex       sourceIndex = mapToSource(index);
+    QFileSystemModel* fsm         = qobject_cast<QFileSystemModel*>(sourceModel());
     if (!fsm) {
         return false;
     }
     auto blockedPath = relPath(fsm->filePath(sourceIndex));
-    auto found = m_blocked.find(blockedPath);
+    auto found       = m_blocked.find(blockedPath);
     if (found) {
         return !found->leaf();
     }
@@ -250,8 +250,8 @@ bool FileIgnoreProxy::filterAcceptsColumn(int source_column, const QModelIndex& 
 
 bool FileIgnoreProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    QFileSystemModel* fsm = qobject_cast<QFileSystemModel*>(sourceModel());
+    QModelIndex       index = sourceModel()->index(sourceRow, 0, sourceParent);
+    QFileSystemModel* fsm   = qobject_cast<QFileSystemModel*>(sourceModel());
 
     auto fileInfo = fsm->fileInfo(index);
     return !ignoreFile(fileInfo);
@@ -288,7 +288,7 @@ void FileIgnoreProxy::loadBlockedPathsFromFile(const QString& fileName)
         return;
     }
     auto ignoreData = ignoreFile.readAll();
-    auto string = QString::fromUtf8(ignoreData);
+    auto string     = QString::fromUtf8(ignoreData);
     setBlockedPaths(string.split('\n', Qt::SkipEmptyParts));
 }
 

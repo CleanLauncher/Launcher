@@ -1,10 +1,12 @@
 #include "ShaderPackFolderModel.h"
 #include "FileSystem.h"
 
-namespace {
-class ShaderPackIndexMigrateTask : public Task {
+namespace
+{
+class ShaderPackIndexMigrateTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     ShaderPackIndexMigrateTask(QDir resourceDir, QDir indexDir) : m_resourceDir(std::move(resourceDir)), m_indexDir(std::move(indexDir)) {}
 
     void executeTask() override
@@ -15,11 +17,11 @@ class ShaderPackIndexMigrateTask : public Task {
             return;
         }
 
-        QStringList pwFiles = m_indexDir.entryList({ "*.pw.toml" }, QDir::Files);
-        bool movedAll = true;
+        QStringList pwFiles  = m_indexDir.entryList({"*.pw.toml"}, QDir::Files);
+        bool        movedAll = true;
 
         for (const auto& file : pwFiles) {
-            QString src = m_indexDir.filePath(file);
+            QString src  = m_indexDir.filePath(file);
             QString dest = m_resourceDir.filePath(file);
 
             if (FS::move(src, dest)) {
@@ -42,7 +44,7 @@ class ShaderPackIndexMigrateTask : public Task {
         emitSucceeded();
     }
 
-   private:
+private:
     QDir m_resourceDir, m_indexDir;
 };
 }  // namespace

@@ -5,9 +5,10 @@
 
 class MinecraftInstance;
 
-class LegacyFMLLibrariesTask : public Task {
+class LegacyFMLLibrariesTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LegacyFMLLibrariesTask(MinecraftInstance* inst);
     virtual ~LegacyFMLLibrariesTask() = default;
 
@@ -15,18 +16,18 @@ class LegacyFMLLibrariesTask : public Task {
 
     bool canAbort() const override;
 
-   private slots:
+private slots:
     void fmllibsFinished();
     void fmllibsFailed(QString reason);
 
-   public slots:
+public slots:
     bool abort() override;
 
-   private:
+private:
     static QString baseUrl();
 
-   private:
+private:
     MinecraftInstance* m_inst;
-    NetJob::Ptr downloadJob;
-    QList<FMLlib> fmlLibsToProcess;
+    NetJob::Ptr        downloadJob;
+    QList<FMLlib>      fmlLibsToProcess;
 };

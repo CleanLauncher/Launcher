@@ -3,9 +3,10 @@
 #include "tasks/Task.h"
 class MinecraftInstance;
 
-class LibrariesTask : public Task {
+class LibrariesTask : public Task
+{
     Q_OBJECT
-   public:
+public:
     LibrariesTask(MinecraftInstance* inst);
     virtual ~LibrariesTask() = default;
 
@@ -13,13 +14,13 @@ class LibrariesTask : public Task {
 
     bool canAbort() const override;
 
-   private slots:
+private slots:
     void jarlibFailed(QString reason);
 
-   public slots:
+public slots:
     bool abort() override;
 
-   private:
+private:
     MinecraftInstance* m_inst;
-    NetJob::Ptr downloadJob;
+    NetJob::Ptr        downloadJob;
 };

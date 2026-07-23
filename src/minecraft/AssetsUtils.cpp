@@ -54,7 +54,8 @@
 #include "net/NetRequest.h"
 #include "update/AssetUpdateTask.h"
 
-namespace {
+namespace
+{
 QSet<QString> collectPathsFromDir(QString dirPath)
 {
     QFileInfo dirInfo(dirPath);
@@ -67,7 +68,7 @@ QSet<QString> collectPathsFromDir(QString dirPath)
 
     QDirIterator iter(dirPath, QDirIterator::Subdirectories);
     while (iter.hasNext()) {
-        QString value = iter.next();
+        QString   value = iter.next();
         QFileInfo info(value);
         if (info.isFile()) {
             out.insert(value);
@@ -78,7 +79,8 @@ QSet<QString> collectPathsFromDir(QString dirPath)
 }
 }  // namespace
 
-namespace AssetsUtils {
+namespace AssetsUtils
+{
 
 bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsIndex& index)
 {
@@ -94,7 +96,7 @@ bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsInd
     file.close();
 
     QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
+    QJsonDocument   jsonDoc = QJsonDocument::fromJson(jsonData, &parseError);
 
     if (parseError.error != QJsonParseError::NoError) {
         qCritical() << "Failed to parse assets index file:" << parseError.errorString() << "at offset "
@@ -119,17 +121,17 @@ bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsInd
         index.mapToResources = mapToResources.toBool(false);
     }
 
-    QJsonValue objects = root.value("objects");
-    QVariantMap map = objects.toVariant().toMap();
+    QJsonValue  objects = root.value("objects");
+    QVariantMap map     = objects.toVariant().toMap();
 
     for (QVariantMap::const_iterator iter = map.begin(); iter != map.end(); ++iter) {
-        QVariant variant = iter.value();
+        QVariant    variant        = iter.value();
         QVariantMap nested_objects = variant.toMap();
 
         AssetObject object;
 
         for (QVariantMap::const_iterator nested_iter = nested_objects.begin(); nested_iter != nested_objects.end(); ++nested_iter) {
-            QString key = nested_iter.key();
+            QString  key   = nested_iter.key();
             QVariant value = nested_iter.value();
 
             if (key == "hash") {
@@ -147,14 +149,14 @@ bool loadAssetsIndexJson(const QString& assetsId, const QString& path, AssetsInd
 
 QDir getAssetsDir(const QString& assetsId, const QString& resourcesFolder)
 {
-    QDir assetsDir = QDir("assets/");
-    QDir indexDir = QDir(FS::PathCombine(assetsDir.path(), "indexes"));
-    QDir objectDir = QDir(FS::PathCombine(assetsDir.path(), "objects"));
+    QDir assetsDir  = QDir("assets/");
+    QDir indexDir   = QDir(FS::PathCombine(assetsDir.path(), "indexes"));
+    QDir objectDir  = QDir(FS::PathCombine(assetsDir.path(), "objects"));
     QDir virtualDir = QDir(FS::PathCombine(assetsDir.path(), "virtual"));
 
     QString indexPath = FS::PathCombine(indexDir.path(), assetsId + ".json");
-    QFile indexFile(indexPath);
-    QDir virtualRoot(FS::PathCombine(virtualDir.path(), assetsId));
+    QFile   indexFile(indexPath);
+    QDir    virtualRoot(FS::PathCombine(virtualDir.path(), assetsId));
 
     if (!indexFile.exists()) {
         qCritical() << "No assets index file" << indexPath << "; can't determine assets path!";
@@ -178,14 +180,14 @@ QDir getAssetsDir(const QString& assetsId, const QString& resourcesFolder)
 
 bool reconstructAssets(QString assetsId, QString resourcesFolder)
 {
-    QDir assetsDir = QDir("assets/");
-    QDir indexDir = QDir(FS::PathCombine(assetsDir.path(), "indexes"));
-    QDir objectDir = QDir(FS::PathCombine(assetsDir.path(), "objects"));
+    QDir assetsDir  = QDir("assets/");
+    QDir indexDir   = QDir(FS::PathCombine(assetsDir.path(), "indexes"));
+    QDir objectDir  = QDir(FS::PathCombine(assetsDir.path(), "objects"));
     QDir virtualDir = QDir(FS::PathCombine(assetsDir.path(), "virtual"));
 
     QString indexPath = FS::PathCombine(indexDir.path(), assetsId + ".json");
-    QFile indexFile(indexPath);
-    QDir virtualRoot(FS::PathCombine(virtualDir.path(), assetsId));
+    QFile   indexFile(indexPath);
+    QDir    virtualRoot(FS::PathCombine(virtualDir.path(), assetsId));
 
     if (!indexFile.exists()) {
         qCritical() << "No assets index file" << indexPath << "; can't reconstruct assets!";
@@ -201,9 +203,9 @@ bool reconstructAssets(QString assetsId, QString resourcesFolder)
     }
 
     QString targetPath;
-    bool removeLeftovers = false;
+    bool    removeLeftovers = false;
     if (index.isVirtual) {
-        targetPath = virtualRoot.path();
+        targetPath      = virtualRoot.path();
         removeLeftovers = true;
         qDebug() << "Reconstructing virtual assets folder at" << targetPath;
     } else if (index.mapToResources) {
@@ -215,13 +217,13 @@ bool reconstructAssets(QString assetsId, QString resourcesFolder)
         auto presentFiles = collectPathsFromDir(targetPath);
         for (QString map : index.objects.keys()) {
             AssetObject asset_object = index.objects.value(map);
-            QString target_path = FS::PathCombine(targetPath, map);
-            QFile target(target_path);
+            QString     target_path  = FS::PathCombine(targetPath, map);
+            QFile       target(target_path);
 
             QString tlk = asset_object.hash.left(2);
 
             QString original_path = FS::PathCombine(objectDir.path(), tlk, asset_object.hash);
-            QFile original(original_path);
+            QFile   original(original_path);
             if (!original.exists())
                 continue;
 
@@ -229,7 +231,7 @@ bool reconstructAssets(QString assetsId, QString resourcesFolder)
 
             if (!target.exists()) {
                 QFileInfo info(target_path);
-                QDir target_dir = info.dir();
+                QDir      target_dir = info.dir();
 
                 qDebug() << target_dir.path();
                 FS::ensureFolderPathExists(target_dir.path());

@@ -36,16 +36,17 @@
 
 #include "MinimalTheme.h"
 
-class BrightTheme : public MinimalTheme {
-   public:
+class BrightTheme : public MinimalTheme
+{
+public:
     virtual ~BrightTheme() {}
 
     QString id() override;
     QString name() override;
     QString tooltip() override;
-    bool hasStyleSheet() override;
+    bool    hasStyleSheet() override;
 
     QPalette colorScheme() override;
-    double fadeAmount() override;
-    QColor fadeColor() override;
+    double   fadeAmount() override;
+    QColor   fadeColor() override;
 };

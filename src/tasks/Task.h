@@ -44,21 +44,28 @@
 
 Q_DECLARE_LOGGING_CATEGORY(taskLogC)
 
-enum class TaskStepState { Waiting, Running, Failed, Succeeded };
+enum class TaskStepState
+{
+    Waiting,
+    Running,
+    Failed,
+    Succeeded
+};
 
 Q_DECLARE_METATYPE(TaskStepState)
 
-struct TaskStepProgress {
-    QUuid uid;
+struct TaskStepProgress
+{
+    QUuid  uid;
     qint64 current = 0;
-    qint64 total = -1;
+    qint64 total   = -1;
 
     qint64 old_current = 0;
-    qint64 old_total = -1;
+    qint64 old_total   = -1;
 
-    QString status = "";
-    QString details = "";
-    TaskStepState state = TaskStepState::Waiting;
+    QString       status  = "";
+    QString       details = "";
+    TaskStepState state   = TaskStepState::Waiting;
 
     TaskStepProgress() { this->uid = QUuid::createUuid(); }
     TaskStepProgress(QUuid uid_) : uid(uid_) {}
@@ -67,11 +74,11 @@ struct TaskStepProgress {
     void update(qint64 new_current, qint64 new_total)
     {
         this->old_current = this->current;
-        this->old_total = this->total;
+        this->old_total   = this->total;
 
         this->current = new_current;
-        this->total = new_total;
-        this->state = TaskStepState::Running;
+        this->total   = new_total;
+        this->state   = TaskStepState::Running;
     }
 };
 
@@ -79,14 +86,22 @@ Q_DECLARE_METATYPE(TaskStepProgress)
 
 using TaskStepProgressList = QList<std::shared_ptr<TaskStepProgress>>;
 
-class Task : public QObject, public QRunnable {
+class Task : public QObject, public QRunnable
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<Task>;
 
-    enum class State { Inactive, Running, Succeeded, Failed, AbortedByUser };
+    enum class State
+    {
+        Inactive,
+        Running,
+        Succeeded,
+        Failed,
+        AbortedByUser
+    };
 
-   public:
+public:
     explicit Task(bool show_debug_log = true);
     ~Task() override;
 
@@ -107,21 +122,21 @@ class Task : public QObject, public QRunnable {
     QString getStatus() { return m_status; }
     QString getDetails() { return m_details; }
 
-    qint64 getProgress() { return m_progress; }
-    qint64 getTotalProgress() { return m_progressTotal; }
+    qint64       getProgress() { return m_progress; }
+    qint64       getTotalProgress() { return m_progressTotal; }
     virtual auto getStepProgress() const -> TaskStepProgressList { return {}; }
 
     QUuid getUid() { return m_uid; }
 
     void propagateFromOther(Task* other);
 
-   protected:
+protected:
     void logWarning(const QString& line);
 
-   private:
+private:
     QString describe();
 
-   signals:
+signals:
     void started();
     void progress(qint64 current, qint64 total);
 
@@ -140,7 +155,7 @@ class Task : public QObject, public QRunnable {
 
     void abortButtonTextChanged(QString text);
 
-   public slots:
+public slots:
 
     void run() override { start(); }
 
@@ -161,10 +176,10 @@ class Task : public QObject, public QRunnable {
 
     void setAbortButtonText(QString text) { emit abortButtonTextChanged(text); }
 
-   protected:
+protected:
     virtual void executeTask() = 0;
 
-   protected slots:
+protected slots:
 
     virtual void emitSucceeded();
 
@@ -174,23 +189,23 @@ class Task : public QObject, public QRunnable {
 
     virtual void propagateStepProgress(const TaskStepProgress& task_progress);
 
-   public slots:
+public slots:
     void setStatus(const QString& status);
     void setDetails(const QString& details);
     void setProgress(qint64 current, qint64 total);
 
-   protected:
-    State m_state = State::Inactive;
+protected:
+    State       m_state = State::Inactive;
     QStringList m_Warnings;
-    QString m_failReason = "";
-    QString m_status;
-    QString m_details;
-    int m_progress = 0;
-    int m_progressTotal = 100;
+    QString     m_failReason = "";
+    QString     m_status;
+    QString     m_details;
+    int         m_progress      = 0;
+    int         m_progressTotal = 100;
 
     bool m_show_debug = true;
 
-   private:
-    bool m_can_abort = false;
+private:
+    bool  m_can_abort = false;
     QUuid m_uid;
 };

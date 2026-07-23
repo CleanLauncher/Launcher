@@ -8,14 +8,19 @@
 
 #include "tasks/Task.h"
 
-namespace ModUtils {
+namespace ModUtils
+{
 
 ModDetails ReadFabricModInfo(QByteArray contents);
 ModDetails ReadQuiltModInfo(QByteArray contents);
 ModDetails ReadForgeInfo(QByteArray contents);
 ModDetails ReadLiteModInfo(QByteArray contents);
 
-enum class ProcessingLevel { Full, BasicInfoOnly };
+enum class ProcessingLevel
+{
+    Full,
+    BasicInfoOnly
+};
 
 bool process(Mod& mod, ProcessingLevel level = ProcessingLevel::Full);
 
@@ -29,10 +34,12 @@ bool processIconPNG(const Mod& mod, QByteArray&& raw_data, QPixmap* pixmap);
 bool loadIconFile(const Mod& mod, QPixmap* pixmap);
 }  // namespace ModUtils
 
-class LocalModParseTask : public Task {
+class LocalModParseTask : public Task
+{
     Q_OBJECT
-   public:
-    struct Result {
+public:
+    struct Result
+    {
         ModDetails details;
     };
     using ResultPtr = std::shared_ptr<Result>;
@@ -46,11 +53,11 @@ class LocalModParseTask : public Task {
 
     int token() const { return m_token; }
 
-   private:
-    int m_token;
+private:
+    int          m_token;
     ResourceType m_type;
-    QFileInfo m_modFile;
-    ResultPtr m_result;
+    QFileInfo    m_modFile;
+    ResultPtr    m_result;
 
     std::atomic<bool> m_aborted = false;
 };

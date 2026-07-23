@@ -23,19 +23,19 @@
 #include <QDebug>
 #include <QIODevice>
 
-namespace ModPlatform {
+namespace ModPlatform
+{
 
 ModLoaderType operator|(ModLoaderType lhs, ModLoaderType rhs)
 {
     return static_cast<ModLoaderType>(static_cast<std::uint16_t>(lhs) | static_cast<std::uint16_t>(rhs));
 }
 
-static const QMap<QString, IndexedVersionType> s_indexed_version_type_names = { { "release", IndexedVersionType::Release },
-                                                                                { "beta", IndexedVersionType::Beta },
-                                                                                { "alpha", IndexedVersionType::Alpha } };
+static const QMap<QString, IndexedVersionType> s_indexed_version_type_names = {
+    {"release", IndexedVersionType::Release}, {"beta", IndexedVersionType::Beta}, {"alpha", IndexedVersionType::Alpha}};
 
-static const QList<ModLoaderType> loaderList = { NeoForge, Forge, Cauldron,     LiteLoader, Quilt, Fabric,
-                                                 Babric,   BTA,   LegacyFabric, Ornithe,    Rift };
+static const QList<ModLoaderType> loaderList = {
+    NeoForge, Forge, Cauldron, LiteLoader, Quilt, Fabric, Babric, BTA, LegacyFabric, Ornithe, Rift};
 
 QList<ModLoaderType> modLoaderTypesToList(ModLoaderTypes flags)
 {
@@ -61,10 +61,10 @@ IndexedVersionType IndexedVersionType::fromString(const QString& type)
 const char* ProviderCapabilities::name(ResourceProvider p)
 {
     switch (p) {
-        case ResourceProvider::MODRINTH:
-            return "modrinth";
-        case ResourceProvider::FLAME:
-            return "curseforge";
+    case ResourceProvider::MODRINTH:
+        return "modrinth";
+    case ResourceProvider::FLAME:
+        return "curseforge";
     }
     return {};
 }
@@ -72,10 +72,10 @@ const char* ProviderCapabilities::name(ResourceProvider p)
 QString ProviderCapabilities::readableName(ResourceProvider p)
 {
     switch (p) {
-        case ResourceProvider::MODRINTH:
-            return "Modrinth";
-        case ResourceProvider::FLAME:
-            return "CurseForge";
+    case ResourceProvider::MODRINTH:
+        return "Modrinth";
+    case ResourceProvider::FLAME:
+        return "CurseForge";
     }
     return {};
 }
@@ -83,11 +83,11 @@ QString ProviderCapabilities::readableName(ResourceProvider p)
 QStringList ProviderCapabilities::hashType(ResourceProvider p)
 {
     switch (p) {
-        case ResourceProvider::MODRINTH:
-            return { "sha512", "sha1" };
-        case ResourceProvider::FLAME:
+    case ResourceProvider::MODRINTH:
+        return {"sha512", "sha1"};
+    case ResourceProvider::FLAME:
 
-            return { "sha1", "md5", "murmur2" };
+        return {"sha1", "md5", "murmur2"};
     }
     return {};
 }
@@ -101,32 +101,32 @@ QString getMetaURL(ResourceProvider provider, QVariant projectID)
 auto getModLoaderAsString(ModLoaderType type) -> const QString
 {
     switch (type) {
-        case NeoForge:
-            return "neoforge";
-        case Forge:
-            return "forge";
-        case Cauldron:
-            return "cauldron";
-        case LiteLoader:
-            return "liteloader";
-        case Fabric:
-            return "fabric";
-        case Quilt:
-            return "quilt";
-        case DataPack:
-            return "datapack";
-        case Babric:
-            return "babric";
-        case BTA:
-            return "bta-babric";
-        case LegacyFabric:
-            return "legacy-fabric";
-        case Ornithe:
-            return "ornithe";
-        case Rift:
-            return "rift";
-        default:
-            break;
+    case NeoForge:
+        return "neoforge";
+    case Forge:
+        return "forge";
+    case Cauldron:
+        return "cauldron";
+    case LiteLoader:
+        return "liteloader";
+    case Fabric:
+        return "fabric";
+    case Quilt:
+        return "quilt";
+    case DataPack:
+        return "datapack";
+    case Babric:
+        return "babric";
+    case BTA:
+        return "bta-babric";
+    case LegacyFabric:
+        return "legacy-fabric";
+    case Ornithe:
+        return "ornithe";
+    case Rift:
+        return "rift";
+    default:
+        break;
     }
     return "";
 }
@@ -161,14 +161,14 @@ auto getModLoaderFromString(QString type) -> ModLoaderType
 QString SideUtils::toString(Side side)
 {
     switch (side) {
-        case Side::ClientSide:
-            return "client";
-        case Side::ServerSide:
-            return "server";
-        case Side::UniversalSide:
-            return "both";
-        case Side::NoSide:
-            break;
+    case Side::ClientSide:
+        return "client";
+    case Side::ServerSide:
+        return "server";
+    case Side::UniversalSide:
+        return "both";
+    case Side::NoSide:
+        break;
     }
     return {};
 }
@@ -187,20 +187,20 @@ Side SideUtils::fromString(QString side)
 QString DependencyTypeUtils::toString(DependencyType type)
 {
     switch (type) {
-        case DependencyType::REQUIRED:
-            return "REQUIRED";
-        case DependencyType::OPTIONAL:
-            return "OPTIONAL";
-        case DependencyType::INCOMPATIBLE:
-            return "INCOMPATIBLE";
-        case DependencyType::EMBEDDED:
-            return "EMBEDDED";
-        case DependencyType::TOOL:
-            return "TOOL";
-        case DependencyType::INCLUDE:
-            return "INCLUDE";
-        case DependencyType::UNKNOWN:
-            return "UNKNOWN";
+    case DependencyType::REQUIRED:
+        return "REQUIRED";
+    case DependencyType::OPTIONAL:
+        return "OPTIONAL";
+    case DependencyType::INCOMPATIBLE:
+        return "INCOMPATIBLE";
+    case DependencyType::EMBEDDED:
+        return "EMBEDDED";
+    case DependencyType::TOOL:
+        return "TOOL";
+    case DependencyType::INCLUDE:
+        return "INCLUDE";
+    case DependencyType::UNKNOWN:
+        return "UNKNOWN";
     }
     return "UNKNOWN";
 }
@@ -208,13 +208,13 @@ QString DependencyTypeUtils::toString(DependencyType type)
 DependencyType DependencyTypeUtils::fromString(const QString& str)
 {
     static const QHash<QString, DependencyType> map = {
-        { "REQUIRED", DependencyType::REQUIRED },
-        { "OPTIONAL", DependencyType::OPTIONAL },
-        { "INCOMPATIBLE", DependencyType::INCOMPATIBLE },
-        { "EMBEDDED", DependencyType::EMBEDDED },
-        { "TOOL", DependencyType::TOOL },
-        { "INCLUDE", DependencyType::INCLUDE },
-        { "UNKNOWN", DependencyType::UNKNOWN },
+        {"REQUIRED", DependencyType::REQUIRED},
+        {"OPTIONAL", DependencyType::OPTIONAL},
+        {"INCOMPATIBLE", DependencyType::INCOMPATIBLE},
+        {"EMBEDDED", DependencyType::EMBEDDED},
+        {"TOOL", DependencyType::TOOL},
+        {"INCLUDE", DependencyType::INCLUDE},
+        {"UNKNOWN", DependencyType::UNKNOWN},
     };
 
     return map.value(str.toUpper(), DependencyType::UNKNOWN);

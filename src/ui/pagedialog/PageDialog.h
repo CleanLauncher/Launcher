@@ -15,24 +15,25 @@
 
 #pragma once
 
-#include <QDialog>
 #include "ui/pages/BasePageProvider.h"
+#include <QDialog>
 
 class PageContainer;
-class PageDialog : public QDialog {
+class PageDialog : public QDialog
+{
     Q_OBJECT
-   public:
+public:
     explicit PageDialog(BasePageProvider* pageProvider, QString defaultId = QString(), QWidget* parent = 0);
     virtual ~PageDialog() {}
 
-   signals:
+signals:
     void applied();
 
-   private:
+private:
     void accept() override;
     void closeEvent(QCloseEvent* event) override;
     bool handleClose();
 
-   private:
+private:
     PageContainer* m_container;
 };

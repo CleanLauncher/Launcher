@@ -64,9 +64,9 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
     ui->iconButton->setIcon(APPLICATION->icons()->getIcon(InstIconKey));
     ui->instNameTextBox->setPlaceholderText(instance->name());
 
-    auto mInst = dynamic_cast<MinecraftInstance*>(instance);
+    auto mInst           = dynamic_cast<MinecraftInstance*>(instance);
     m_QuickJoinSupported = mInst && mInst->traits().contains("feature:is_quick_play_singleplayer");
-    auto worldList = mInst->worldList();
+    auto worldList       = mInst->worldList();
     worldList->update();
     if (!m_QuickJoinSupported || worldList->empty()) {
         ui->worldTarget->hide();
@@ -77,7 +77,7 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
     }
 
     if (!DesktopServices::isFlatpak()) {
-        QString desktopDir = FS::getDesktopDir();
+        QString desktopDir     = FS::getDesktopDir();
         QString applicationDir = FS::getApplicationsDir();
 
         if (!desktopDir.isEmpty())
@@ -96,17 +96,17 @@ CreateShortcutDialog::CreateShortcutDialog(BaseInstance* instance, QWidget* pare
         }
     }
 
-    auto accounts = APPLICATION->accounts();
+    auto                accounts       = APPLICATION->accounts();
     MinecraftAccountPtr defaultAccount = accounts->defaultAccount();
     if (accounts->count() <= 0) {
         ui->overrideAccountCheckbox->setEnabled(false);
     } else {
         for (int i = 0; i < accounts->count(); i++) {
-            MinecraftAccountPtr account = accounts->at(i);
-            auto profileLabel = account->profileName();
+            MinecraftAccountPtr account      = accounts->at(i);
+            auto                profileLabel = account->profileName();
             if (account->isInUse())
                 profileLabel = tr("%1 (in use)").arg(profileLabel);
-            auto face = account->getFace();
+            auto  face = account->getFace();
             QIcon icon = face.isNull() ? QIcon::fromTheme("noaccount") : face;
             ui->accountSelectionBox->addItem(profileLabel, account->profileName());
             ui->accountSelectionBox->setItemIcon(i, icon);
@@ -188,26 +188,26 @@ void CreateShortcutDialog::stateChanged()
 
 void CreateShortcutDialog::createShortcut()
 {
-    QString targetString = tr("instance");
+    QString     targetString = tr("instance");
     QStringList extraArgs;
     if (ui->targetCheckbox->isChecked()) {
         if (ui->worldTarget->isChecked()) {
             targetString = tr("world");
-            extraArgs = { "--world", ui->worldSelectionBox->currentData().toString() };
+            extraArgs    = {"--world", ui->worldSelectionBox->currentData().toString()};
         } else if (ui->serverTarget->isChecked()) {
             targetString = tr("server");
-            extraArgs = { "--server", ui->serverAddressBox->text() };
+            extraArgs    = {"--server", ui->serverAddressBox->text()};
         }
     }
 
     auto target = ui->saveTargetSelectionBox->currentData().value<ShortcutTarget>();
-    auto name = ui->instNameTextBox->text();
+    auto name   = ui->instNameTextBox->text();
     if (name.isEmpty())
         name = ui->instNameTextBox->placeholderText();
     if (ui->overrideAccountCheckbox->isChecked())
-        extraArgs.append({ "--profile", ui->accountSelectionBox->currentData().toString() });
+        extraArgs.append({"--profile", ui->accountSelectionBox->currentData().toString()});
 
-    ShortcutUtils::Shortcut args{ m_instance, name, targetString, this, extraArgs, InstIconKey, target };
+    ShortcutUtils::Shortcut args{m_instance, name, targetString, this, extraArgs, InstIconKey, target};
     if (target == ShortcutTarget::Desktop)
         ShortcutUtils::createInstanceShortcutOnDesktop(args);
     else if (target == ShortcutTarget::Applications)

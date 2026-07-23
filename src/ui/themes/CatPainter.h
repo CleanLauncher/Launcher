@@ -23,17 +23,18 @@
 #include <QPixmap>
 #include <QString>
 
-class CatPainter : public QObject {
+class CatPainter : public QObject
+{
     Q_OBJECT
-   public:
+public:
     CatPainter(const QString& path, QObject* parent = nullptr);
     virtual ~CatPainter() = default;
     void paint(QPainter*, const QRect&);
 
-   signals:
+signals:
     void updateFrame();
 
-   private:
+private:
     QMovie* m_movie = nullptr;
     QPixmap m_image;
 };

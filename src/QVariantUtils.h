@@ -39,7 +39,8 @@
 #include <QList>
 #include <QVariant>
 
-namespace QVariantUtils {
+namespace QVariantUtils
+{
 
 template <typename T>
 inline QList<T> toList(QVariant src)

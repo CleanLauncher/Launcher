@@ -2,7 +2,8 @@
 
 #include "AccountData.h"
 
-namespace Parsers {
+namespace Parsers
+{
 bool getDateTime(QJsonValue value, QDateTime& out);
 bool getString(QJsonValue value, QString& out);
 bool getNumber(QJsonValue value, double& out);

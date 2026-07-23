@@ -38,16 +38,18 @@
 #include "Validator.h"
 #include "tasks/Task.h"
 
-namespace Net {
-class Sink {
-   public:
-    Sink() = default;
+namespace Net
+{
+class Sink
+{
+public:
+    Sink()          = default;
     virtual ~Sink() = default;
 
-   public:
+public:
     virtual auto init(QNetworkRequest& request) -> Task::State = 0;
-    virtual auto write(QByteArray& data) -> Task::State = 0;
-    virtual auto abort() -> Task::State = 0;
+    virtual auto write(QByteArray& data) -> Task::State        = 0;
+    virtual auto abort() -> Task::State                        = 0;
     virtual auto finalize(QNetworkReply& reply) -> Task::State = 0;
 
     virtual auto hasLocalData() -> bool = 0;
@@ -61,7 +63,7 @@ class Sink {
         }
     }
 
-   protected:
+protected:
     bool initAllValidators(QNetworkRequest& request)
     {
         for (auto& validator : validators) {
@@ -95,8 +97,8 @@ class Sink {
         return true;
     }
 
-   protected:
+protected:
     std::vector<std::shared_ptr<Validator>> validators;
-    QString m_fail_reason;
+    QString                                 m_fail_reason;
 };
 }  // namespace Net

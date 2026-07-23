@@ -88,7 +88,7 @@ QString Meta::Version::localFilename() const
 
 ::Version Meta::Version::toComparableVersion() const
 {
-    return { descriptor() };
+    return {descriptor()};
 }
 
 void Meta::Version::setType(const QString& type)
@@ -105,7 +105,7 @@ void Meta::Version::setTime(const qint64 time)
 
 void Meta::Version::setRequires(const Meta::RequireSet& reqs, const Meta::RequireSet& conflicts)
 {
-    m_requires = reqs;
+    m_requires  = reqs;
     m_conflicts = conflicts;
     emit requiresChanged();
 }

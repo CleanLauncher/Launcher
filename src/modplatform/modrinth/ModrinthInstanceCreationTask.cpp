@@ -68,8 +68,8 @@ bool ModrinthCreationTask::updateInstance()
     }
 
     auto versionName = inst->getManagedPackVersionName();
-    m_root_path = QFileInfo(inst->gameRoot()).fileName();
-    auto versionStr = !versionName.isEmpty() ? tr(" (version %1)").arg(versionName) : "";
+    m_root_path      = QFileInfo(inst->gameRoot()).fileName();
+    auto versionStr  = !versionName.isEmpty() ? tr(" (version %1)").arg(versionName) : "";
 
     if (shouldConfirmUpdate()) {
         auto shouldUpdate = askIfShouldUpdate(m_parent, versionStr);
@@ -86,7 +86,7 @@ bool ModrinthCreationTask::updateInstance()
 
     QString oldIndexFolder(FS::PathCombine(oldInstDir.absolutePath(), "mrpack"));
 
-    QString oldIndexPath(FS::PathCombine(oldIndexFolder, "modrinth.index.json"));
+    QString   oldIndexPath(FS::PathCombine(oldIndexFolder, "modrinth.index.json"));
     QFileInfo oldIndexFile(oldIndexPath);
     if (oldIndexFile.exists()) {
         std::vector<File> oldFiles;
@@ -103,7 +103,7 @@ bool ModrinthCreationTask::updateInstance()
 
                 if (oldFile.hash == file.hash) {
                     qDebug() << "Removed file at" << file.path << "from list of downloads";
-                    filesIterator = m_files.erase(filesIterator);
+                    filesIterator    = m_files.erase(filesIterator);
                     oldFilesIterator = oldFiles.erase(oldFilesIterator);
                     goto begin;
                 }
@@ -132,10 +132,12 @@ bool ModrinthCreationTask::updateInstance()
             scheduleToDelete(m_parent, oldMinecraftDir, entry);
         }
     } else {
-        auto* dialog = CustomMessageBox::selectable(m_parent, tr("No index file."),
+        auto* dialog = CustomMessageBox::selectable(m_parent,
+                                                    tr("No index file."),
                                                     tr("We couldn't find a suitable index file for the older version. This may cause some "
                                                        "of the files to be duplicated. Do you want to continue?"),
-                                                    QMessageBox::Warning, QMessageBox::Ok | QMessageBox::Cancel);
+                                                    QMessageBox::Warning,
+                                                    QMessageBox::Ok | QMessageBox::Cancel);
 
         if (dialog->exec() == QDialog::DialogCode::Rejected) {
             m_abort = true;
@@ -188,9 +190,9 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         }
     }
 
-    QString configPath = FS::PathCombine(m_stagingPath, "instance.cfg");
-    auto instanceSettings = std::make_unique<INISettingsObject>(configPath);
-    auto instance = std::make_unique<MinecraftInstance>(m_globalSettings, std::move(instanceSettings), m_stagingPath);
+    QString configPath       = FS::PathCombine(m_stagingPath, "instance.cfg");
+    auto    instanceSettings = std::make_unique<INISettingsObject>(configPath);
+    auto    instance         = std::make_unique<MinecraftInstance>(m_globalSettings, std::move(instanceSettings), m_stagingPath);
 
     auto* components = instance->getPackProfile();
     components->buildingFromScratch();
@@ -232,12 +234,12 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
     auto downloadMods = makeShared<NetJob>(tr("Mod Download Modrinth"), APPLICATION->network());
 
     auto rootModpackPath = FS::PathCombine(m_stagingPath, m_root_path);
-    auto rootModpackUrl = QUrl::fromLocalFile(rootModpackPath);
+    auto rootModpackUrl  = QUrl::fromLocalFile(rootModpackPath);
 
     QHash<QString, Resource*> resources;
     for (auto& file : m_files) {
         auto fileName = file.path;
-        fileName = FS::RemoveInvalidPathChars(fileName);
+        fileName      = FS::RemoveInvalidPathChars(fileName);
         auto filePath = FS::PathCombine(rootModpackPath, fileName);
         if (!rootModpackUrl.isParentOf(QUrl::fromLocalFile(filePath))) {
             setError(tr("One of the files has a path that leads to an arbitrary location (%1). This is a security risk and isn't allowed.")
@@ -245,7 +247,7 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
             return nullptr;
         }
         if (fileName.startsWith("mods/")) {
-            auto* mod = new Mod(filePath);
+            auto*      mod = new Mod(filePath);
             ModDetails d;
             d.mod_id = filePath;
             mod->setDetails(d);
@@ -258,20 +260,20 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
         qDebug() << "Will try to download" << file.downloads.front() << "to" << filePath;
 
         Net::ModrinthDownloadMeta meta{
-            .reason = m_instance.has_value() ? "update" : "modpack",
+            .reason      = m_instance.has_value() ? "update" : "modpack",
             .gameVersion = m_minecraft_version,
-            .loader = loader,
+            .loader      = loader,
         };
 
         QUrl downloadUrl = file.downloads.dequeue();
-        auto dl = Net::ApiDownload::makeFile(downloadUrl, filePath, Net::Download::Option::NoOptions, meta);
+        auto dl          = Net::ApiDownload::makeFile(downloadUrl, filePath, Net::Download::Option::NoOptions, meta);
         dl->addValidator(new Net::ChecksumValidator(file.hashAlgorithm, file.hash));
         downloadMods->addNetAction(dl);
         if (!file.downloads.empty()) {
             auto param = dl.toWeakRef();
             connect(dl.get(), &Task::failed, [&file, filePath, param, downloadMods, meta] {
                 QUrl fallbackUrl = file.downloads.dequeue();
-                auto ndl = Net::ApiDownload::makeFile(fallbackUrl, filePath, Net::Download::Option::NoOptions, meta);
+                auto ndl         = Net::ApiDownload::makeFile(fallbackUrl, filePath, Net::Download::Option::NoOptions, meta);
                 ndl->addValidator(new Net::ChecksumValidator(file.hashAlgorithm, file.hash));
                 downloadMods->addNetAction(ndl);
                 if (auto shared = param.lock()) {
@@ -309,8 +311,8 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
     }
 
     QEventLoop ensureMetaLoop;
-    QDir folder = FS::PathCombine(instance->modsRoot(), ".index");
-    auto ensureMetadataTask = makeShared<EnsureMetadataTask>(resources, folder, ModPlatform::ResourceProvider::MODRINTH);
+    QDir       folder             = FS::PathCombine(instance->modsRoot(), ".index");
+    auto       ensureMetadataTask = makeShared<EnsureMetadataTask>(resources, folder, ModPlatform::ResourceProvider::MODRINTH);
     connect(ensureMetadataTask.get(), &Task::succeeded, this, [&endedWell]() { endedWell = true; });
     connect(ensureMetadataTask.get(), &Task::finished, &ensureMetaLoop, &QEventLoop::quit);
     connect(ensureMetadataTask.get(), &Task::progress, [this](qint64 current, qint64 total) {
@@ -350,9 +352,9 @@ std::unique_ptr<MinecraftInstance> ModrinthCreationTask::createInstance()
 bool ModrinthCreationTask::parseManifest(const QString& indexPath, std::vector<File>& files, bool setInternalData, bool showOptionalDialog)
 {
     try {
-        auto doc = Json::requireDocument(indexPath);
-        auto obj = Json::requireObject(doc, "modrinth.index.json");
-        int formatVersion = Json::requireInteger(obj, "formatVersion", "modrinth.index.json");
+        auto doc           = Json::requireDocument(indexPath);
+        auto obj           = Json::requireObject(doc, "modrinth.index.json");
+        int  formatVersion = Json::requireInteger(obj, "formatVersion", "modrinth.index.json");
         if (formatVersion == 1) {
             auto game = Json::requireString(obj, "game", "modrinth.index.json");
             if (game != "minecraft") {
@@ -366,7 +368,7 @@ bool ModrinthCreationTask::parseManifest(const QString& indexPath, std::vector<F
                 m_managed_name = obj["name"].toString();
             }
 
-            auto jsonFiles = Json::requireIsArrayOf<QJsonObject>(obj, "files", "modrinth.index.json");
+            auto              jsonFiles = Json::requireIsArrayOf<QJsonObject>(obj, "files", "modrinth.index.json");
             std::vector<File> optionalFiles;
             for (const auto& modInfo : jsonFiles) {
                 File file;
@@ -385,7 +387,7 @@ bool ModrinthCreationTask::parseManifest(const QString& indexPath, std::vector<F
                 }
 
                 QJsonObject hashes = Json::requireObject(modInfo, "hashes");
-                file.hash = QByteArray::fromHex(Json::requireString(hashes, "sha512").toLatin1());
+                file.hash          = QByteArray::fromHex(Json::requireString(hashes, "sha512").toLatin1());
                 file.hashAlgorithm = QCryptographicHash::Sha512;
 
                 auto downloadArr = modInfo["downloads"].toArray();

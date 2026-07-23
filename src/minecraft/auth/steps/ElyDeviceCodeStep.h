@@ -20,9 +20,10 @@
 
 #include "MSADeviceCodeStep.h"
 
-class ElyDeviceCodeStep : public MSADeviceCodeStep {
+class ElyDeviceCodeStep : public MSADeviceCodeStep
+{
     Q_OBJECT
-   public:
+public:
     explicit ElyDeviceCodeStep(AccountData* data);
     virtual ~ElyDeviceCodeStep() noexcept = default;
 

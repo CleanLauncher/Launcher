@@ -28,7 +28,7 @@ QString Time::prettifyDuration(int64_t duration, bool noDays)
     int minutes = (int)(duration % 60);
     duration /= 60;
     int hours = (int)(noDays ? duration : (duration % 24));
-    int days = (int)(noDays ? 0 : (duration / 24));
+    int days  = (int)(noDays ? 0 : (duration / 24));
     if ((hours == 0) && (days == 0)) {
         return QObject::tr("%1min %2s").arg(minutes).arg(seconds);
     }
@@ -42,7 +42,7 @@ QString Time::humanReadableDuration(double duration, int precision)
 {
     using days = std::chrono::duration<int, std::ratio<86400>>;
 
-    QString outStr;
+    QString     outStr;
     QTextStream os(&outStr);
 
     bool neg = false;
@@ -53,7 +53,7 @@ QString Time::humanReadableDuration(double duration, int precision)
     }
 
     auto std_duration = std::chrono::duration<double>(duration);
-    auto d = std::chrono::duration_cast<days>(std_duration);
+    auto d            = std::chrono::duration_cast<days>(std_duration);
     std_duration -= d;
     auto h = std::chrono::duration_cast<std::chrono::hours>(std_duration);
     std_duration -= h;
@@ -63,10 +63,10 @@ QString Time::humanReadableDuration(double duration, int precision)
     std_duration -= s;
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(std_duration);
 
-    auto dc = d.count();
-    auto hc = h.count();
-    auto mc = m.count();
-    auto sc = s.count();
+    auto dc  = d.count();
+    auto hc  = h.count();
+    auto mc  = m.count();
+    auto sc  = s.count();
     auto msc = ms.count();
 
     if (neg) {

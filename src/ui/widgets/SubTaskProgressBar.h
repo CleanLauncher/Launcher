@@ -18,17 +18,19 @@
  */
 #pragma once
 
-#include <QWidget>
 #include "QObjectPtr.h"
+#include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class SubTaskProgressBar;
 }
 
-class SubTaskProgressBar : public QWidget {
+class SubTaskProgressBar : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     static unique_qobject_ptr<SubTaskProgressBar> create(QWidget* parent = nullptr);
 
     SubTaskProgressBar(QWidget* parent = nullptr);
@@ -39,6 +41,6 @@ class SubTaskProgressBar : public QWidget {
     void setStatus(QString status);
     void setDetails(QString details);
 
-   private:
+private:
     Ui::SubTaskProgressBar* ui;
 };

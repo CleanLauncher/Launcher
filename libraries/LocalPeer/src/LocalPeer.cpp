@@ -39,6 +39,7 @@
 ****************************************************************************/
 
 #include "LocalPeer.h"
+#include "LockedFile.h"
 #include <QCoreApplication>
 #include <QDataStream>
 #include <QDir>
@@ -46,11 +47,10 @@
 #include <QLocalSocket>
 #include <QRegularExpression>
 #include <QTime>
-#include "LockedFile.h"
 
 #if defined(Q_OS_WIN)
-#include <qt_windows.h>
 #include <QLibrary>
+#include <qt_windows.h>
 typedef BOOL(WINAPI* PProcessIdToSessionId)(DWORD, DWORD*);
 static PProcessIdToSessionId pProcessIdToSessionId = 0;
 #endif
@@ -71,13 +71,13 @@ ApplicationId ApplicationId::fromTraditionalApp()
 #if defined(Q_OS_WIN)
     protoId = protoId.toLower();
 #endif
-    auto prefix = protoId.section(QLatin1Char('/'), -1);
+    auto                            prefix = protoId.section(QLatin1Char('/'), -1);
     static const QRegularExpression s_removeChars("[^a-zA-Z]");
     prefix.remove(s_removeChars);
     prefix.truncate(6);
-    QByteArray idc = protoId.toUtf8();
-    quint16 idNum = qChecksum(idc);
-    auto socketName = QLatin1String("pl") + prefix + QLatin1Char('-') + QString::number(idNum, 16).left(12);
+    QByteArray idc        = protoId.toUtf8();
+    quint16    idNum      = qChecksum(idc);
+    auto       socketName = QLatin1String("pl") + prefix + QLatin1Char('-') + QString::number(idNum, 16).left(12);
 #if defined(Q_OS_WIN)
     if (!pProcessIdToSessionId) {
         QLibrary lib("kernel32");
@@ -97,7 +97,7 @@ ApplicationId ApplicationId::fromTraditionalApp()
 ApplicationId ApplicationId::fromPathAndVersion(const QString& dataPath, const QString& version)
 {
     QCryptographicHash shasum(QCryptographicHash::Algorithm::Sha1);
-    QString result = dataPath + QLatin1Char('-') + version;
+    QString            result = dataPath + QLatin1Char('-') + version;
     shasum.addData(result.toUtf8());
     return ApplicationId(QLatin1String("pl") + QString::fromLatin1(shasum.result().toHex()).left(12));
 }
@@ -156,10 +156,9 @@ bool LocalPeer::sendMessage(const QByteArray& message, int timeout)
         return false;
 
     QLocalSocket socket;
-    bool connOk = false;
-    int tries = 2;
+    bool         connOk = false;
+    int          tries  = 2;
     for (int i = 0; i < tries; i++) {
-
         socket.connectToServer(socketName);
         connOk = socket.waitForConnected(timeout / 2);
         if (!connOk && i < (tries - 1)) {
@@ -170,7 +169,7 @@ bool LocalPeer::sendMessage(const QByteArray& message, int timeout)
         return false;
     }
 
-    QByteArray uMsg(message);
+    QByteArray  uMsg(message);
     QDataStream ds(&socket);
 
     ds.writeBytes(uMsg.constData(), uMsg.size());
@@ -199,11 +198,11 @@ void LocalPeer::receiveConnection()
         socket->waitForReadyRead();
     }
     QDataStream ds(socket);
-    QByteArray uMsg;
-    quint32 remaining;
+    QByteArray  uMsg;
+    quint32     remaining;
     ds >> remaining;
     uMsg.resize(remaining);
-    int got = 0;
+    int   got     = 0;
     char* uMsgBuf = uMsg.data();
     do {
         got = ds.readRawData(uMsgBuf, remaining);
@@ -221,5 +220,4 @@ void LocalPeer::receiveConnection()
 
     delete socket;
     emit messageReceived(uMsg);
-
 }

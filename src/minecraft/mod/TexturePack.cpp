@@ -19,9 +19,9 @@
 
 #include "TexturePack.h"
 
+#include "MTPixmapCache.h"
 #include <QDebug>
 #include <QMap>
-#include "MTPixmapCache.h"
 
 #include "minecraft/mod/tasks/LocalTexturePackParseTask.h"
 
@@ -41,10 +41,9 @@ void TexturePack::setImage(QImage new_image) const
     if (m_pack_image_cache_key.key.isValid())
         PixmapCache::remove(m_pack_image_cache_key.key);
 
-    auto pixmap =
-        QPixmap::fromImage(new_image.scaled({ 64, 64 }, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
+    auto pixmap = QPixmap::fromImage(new_image.scaled({64, 64}, Qt::AspectRatioMode::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 
-    m_pack_image_cache_key.key = PixmapCache::insert(pixmap);
+    m_pack_image_cache_key.key           = PixmapCache::insert(pixmap);
     m_pack_image_cache_key.was_ever_used = true;
 }
 

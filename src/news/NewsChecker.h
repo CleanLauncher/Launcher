@@ -23,9 +23,10 @@
 
 #include "NewsEntry.h"
 
-class NewsChecker : public QObject {
+class NewsChecker : public QObject
+{
     Q_OBJECT
-   public:
+public:
     NewsChecker(QNetworkAccessManager* network, const QString& feedUrl);
 
     QString getLastLoadErrorMsg() const;
@@ -38,17 +39,17 @@ class NewsChecker : public QObject {
 
     void Q_SLOT reloadNews(const QString& newUrl = {});
 
-   signals:
+signals:
 
     void newsLoaded();
 
     void newsLoadingFailed(QString errorMsg);
 
-   protected slots:
+protected slots:
     void rssDownloadFinished();
     void rssDownloadFailed(QString reason);
 
-   protected:
+protected:
     QString m_feedUrl;
 
     QList<NewsEntryPtr> m_newsEntries;
@@ -63,7 +64,7 @@ class NewsChecker : public QObject {
 
     QNetworkAccessManager* m_network;
 
-   protected slots:
+protected slots:
 
     void succeed();
 

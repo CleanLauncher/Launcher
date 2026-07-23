@@ -4,9 +4,10 @@
 
 class JavaWizardWidget;
 
-class JavaWizardPage : public BaseWizardPage {
+class JavaWizardPage : public BaseWizardPage
+{
     Q_OBJECT
-   public:
+public:
     explicit JavaWizardPage(QWidget* parent = Q_NULLPTR);
 
     virtual ~JavaWizardPage() = default;
@@ -16,10 +17,10 @@ class JavaWizardPage : public BaseWizardPage {
     void initializePage() override;
     bool validatePage() override;
 
-   protected:
+protected:
     void setupUi();
     void retranslate() override;
 
-   private:
+private:
     JavaWizardWidget* m_java_widget = nullptr;
 };

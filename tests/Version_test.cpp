@@ -17,7 +17,8 @@
 
 #include <Version.h>
 
-class VersionTest : public QObject {
+class VersionTest : public QObject
+{
     Q_OBJECT
 
     QStringList m_flex_test_names = {};
@@ -78,7 +79,7 @@ class VersionTest : public QObject {
                                                << "1.20.1" << false << false;
     }
 
-   private slots:
+private slots:
     void test_versionCompare_data() { setupVersions(); }
 
     void test_versionCompare()
@@ -104,15 +105,15 @@ class VersionTest : public QObject {
 
         QDir test_vector_dir(QFINDTESTDATA("testdata/Version"));
 
-        QFile vector_file{ test_vector_dir.absoluteFilePath("test_vectors.txt") };
+        QFile vector_file{test_vector_dir.absoluteFilePath("test_vectors.txt")};
 
         if (!vector_file.open(QFile::OpenModeFlag::ReadOnly)) {
             qCritical() << "Failed to open file" << vector_file.fileName() << "for reading:" << vector_file.errorString();
             return;
         }
 
-        int test_number = 0;
-        const QString test_name_template{ "FlexVer test #%1 (%2)" };
+        int           test_number = 0;
+        const QString test_name_template{"FlexVer test #%1 (%2)"};
         for (auto line = vector_file.readLine(); !vector_file.atEnd(); line = vector_file.readLine()) {
             line = line.simplified();
             if (line.startsWith('#') || line.isEmpty())
@@ -122,8 +123,8 @@ class VersionTest : public QObject {
 
             auto split_line = line.split('<');
             if (split_line.size() == 2) {
-                QString first{ split_line.first().simplified() };
-                QString second{ split_line.last().simplified() };
+                QString first{split_line.first().simplified()};
+                QString second{split_line.last().simplified()};
 
                 auto new_test_name = test_name_template.arg(QString::number(test_number), "lessThan");
                 m_flex_test_names.append(new_test_name);
@@ -134,8 +135,8 @@ class VersionTest : public QObject {
 
             split_line = line.split('=');
             if (split_line.size() == 2) {
-                QString first{ split_line.first().simplified() };
-                QString second{ split_line.last().simplified() };
+                QString first{split_line.first().simplified()};
+                QString second{split_line.last().simplified()};
 
                 auto new_test_name = test_name_template.arg(QString::number(test_number), "equals");
                 m_flex_test_names.append(new_test_name);
@@ -146,8 +147,8 @@ class VersionTest : public QObject {
 
             split_line = line.split('>');
             if (split_line.size() == 2) {
-                QString first{ split_line.first().simplified() };
-                QString second{ split_line.last().simplified() };
+                QString first{split_line.first().simplified()};
+                QString second{split_line.last().simplified()};
 
                 auto new_test_name = test_name_template.arg(QString::number(test_number), "greaterThan");
                 m_flex_test_names.append(new_test_name);

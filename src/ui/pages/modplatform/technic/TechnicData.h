@@ -39,8 +39,10 @@
 #include <QMetaType>
 #include <QString>
 
-namespace Technic {
-struct Modpack {
+namespace Technic
+{
+struct Modpack
+{
     QString slug;
 
     QString name;
@@ -50,17 +52,17 @@ struct Modpack {
     bool broken = true;
 
     QString url;
-    bool isSolder = false;
+    bool    isSolder = false;
     QString minecraftVersion;
 
-    bool metadataLoaded = false;
+    bool    metadataLoaded = false;
     QString websiteUrl;
     QString author;
     QString description;
     QString currentVersion;
 
-    bool versionsLoaded = false;
-    QString recommended;
+    bool           versionsLoaded = false;
+    QString        recommended;
     QList<QString> versions;
 };
 }  // namespace Technic

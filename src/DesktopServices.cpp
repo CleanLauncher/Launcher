@@ -33,13 +33,14 @@
  *      limitations under the License.
  */
 #include "DesktopServices.h"
+#include "FileSystem.h"
 #include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
 #include <QProcess>
-#include "FileSystem.h"
 
-namespace DesktopServices {
+namespace DesktopServices
+{
 bool openPath(const QFileInfo& path, bool ensureFolderPathExists)
 {
     qDebug() << "Opening path" << path;

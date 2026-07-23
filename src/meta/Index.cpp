@@ -22,7 +22,8 @@
 #include "meta/BaseEntity.h"
 #include "tasks/SequentialTask.h"
 
-namespace Meta {
+namespace Meta
+{
 Index::Index(QObject* parent) : QAbstractListModel(parent) {}
 Index::Index(const QList<VersionList::Ptr>& lists, QObject* parent) : QAbstractListModel(parent), m_lists(lists)
 {
@@ -40,18 +41,18 @@ QVariant Index::data(const QModelIndex& index, int role) const
 
     VersionList::Ptr list = m_lists.at(index.row());
     switch (role) {
-        case Qt::DisplayRole:
-            if (index.column() == 0) {
-                return list->humanReadable();
-            } else {
-                break;
-            }
-        case UidRole:
-            return list->uid();
-        case NameRole:
-            return list->name();
-        case ListPtrRole:
-            return QVariant::fromValue(list);
+    case Qt::DisplayRole:
+        if (index.column() == 0) {
+            return list->humanReadable();
+        } else {
+            break;
+        }
+    case UidRole:
+        return list->uid();
+    case NameRole:
+        return list->name();
+    case ListPtrRole:
+        return QVariant::fromValue(list);
     }
     return QVariant();
 }
@@ -84,7 +85,7 @@ VersionList::Ptr Index::get(const QString& uid)
 {
     VersionList::Ptr out = m_uids.value(uid, nullptr);
     if (!out) {
-        out = std::make_shared<VersionList>(uid);
+        out         = std::make_shared<VersionList>(uid);
         m_uids[uid] = out;
         m_lists.append(out);
     }
@@ -131,7 +132,7 @@ void Index::merge(const std::shared_ptr<Index>& other)
 
 void Index::connectVersionList(const int row, const VersionList::Ptr& list)
 {
-    connect(list.get(), &VersionList::nameChanged, this, [this, row] { emit dataChanged(index(row), index(row), { Qt::DisplayRole }); });
+    connect(list.get(), &VersionList::nameChanged, this, [this, row] { emit dataChanged(index(row), index(row), {Qt::DisplayRole}); });
 }
 
 Task::Ptr Index::loadVersion(const QString& uid, const QString& version, Net::Mode mode, bool force)
@@ -154,7 +155,7 @@ Task::Ptr Index::loadVersion(const QString& uid, const QString& version, Net::Mo
 Version::Ptr Index::getLoadedVersion(const QString& uid, const QString& version)
 {
     QEventLoop ev;
-    auto task = loadVersion(uid, version);
+    auto       task = loadVersion(uid, version);
     connect(task.get(), &Task::finished, &ev, &QEventLoop::quit);
     task->start();
     ev.exec();

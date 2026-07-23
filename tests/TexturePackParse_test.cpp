@@ -25,16 +25,17 @@
 #include "minecraft/mod/TexturePack.h"
 #include "minecraft/mod/tasks/LocalTexturePackParseTask.h"
 
-class TexturePackParseTest : public QObject {
+class TexturePackParseTest : public QObject
+{
     Q_OBJECT
 
-   private slots:
+private slots:
     void test_parseZIP()
     {
         QString source = QFINDTESTDATA("testdata/TexturePackParse");
 
-        QString zip_rp = FS::PathCombine(source, "test_texture_pack_idk.zip");
-        TexturePack pack{ QFileInfo(zip_rp) };
+        QString     zip_rp = FS::PathCombine(source, "test_texture_pack_idk.zip");
+        TexturePack pack{QFileInfo(zip_rp)};
 
         bool valid = TexturePackUtils::processZIP(pack);
 
@@ -46,8 +47,8 @@ class TexturePackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/TexturePackParse");
 
-        QString folder_rp = FS::PathCombine(source, "test_texturefolder");
-        TexturePack pack{ QFileInfo(folder_rp) };
+        QString     folder_rp = FS::PathCombine(source, "test_texturefolder");
+        TexturePack pack{QFileInfo(folder_rp)};
 
         bool valid = TexturePackUtils::processFolder(pack, TexturePackUtils::ProcessingLevel::BasicInfoOnly);
 
@@ -59,8 +60,8 @@ class TexturePackParseTest : public QObject {
     {
         QString source = QFINDTESTDATA("testdata/TexturePackParse");
 
-        QString folder_rp = FS::PathCombine(source, "another_test_texturefolder");
-        TexturePack pack{ QFileInfo(folder_rp) };
+        QString     folder_rp = FS::PathCombine(source, "another_test_texturefolder");
+        TexturePack pack{QFileInfo(folder_rp)};
 
         bool valid = TexturePackUtils::process(pack, TexturePackUtils::ProcessingLevel::BasicInfoOnly);
 

@@ -26,7 +26,8 @@
 #include "net/Mode.h"
 #include "tasks/SequentialTask.h"
 
-namespace Meta {
+namespace Meta
+{
 VersionList::VersionList(const QString& uid, QObject* parent) : BaseVersionList(parent), m_uid(uid)
 {
     setObjectName("Version list: " + uid);
@@ -70,44 +71,44 @@ QVariant VersionList::data(const QModelIndex& index, int role) const
     Version::Ptr version = m_versions.at(index.row());
 
     switch (role) {
-        case VersionPointerRole:
-            return QVariant::fromValue(std::dynamic_pointer_cast<BaseVersion>(version));
-        case VersionRole:
-        case VersionIdRole:
-            return version->version();
-        case ParentVersionRole: {
-            auto& reqs = version->requiredSet();
-            auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Require& req) { return req.uid == "net.minecraft"; });
-            if (iter != reqs.end()) {
-                return (*iter).equalsVersion;
-            }
-            return QVariant();
+    case VersionPointerRole:
+        return QVariant::fromValue(std::dynamic_pointer_cast<BaseVersion>(version));
+    case VersionRole:
+    case VersionIdRole:
+        return version->version();
+    case ParentVersionRole: {
+        auto& reqs = version->requiredSet();
+        auto  iter = std::find_if(reqs.begin(), reqs.end(), [](const Require& req) { return req.uid == "net.minecraft"; });
+        if (iter != reqs.end()) {
+            return (*iter).equalsVersion;
         }
-        case TypeRole:
-            return version->type();
+        return QVariant();
+    }
+    case TypeRole:
+        return version->type();
 
-        case UidRole:
-            return version->uid();
-        case TimeRole:
-            return version->time();
-        case RequiresRole:
-            return QVariant::fromValue(version->requiredSet());
-        case SortRole:
-            return version->rawTime();
-        case VersionPtrRole:
-            return QVariant::fromValue(version);
-        case RecommendedRole:
-            return version->isRecommended() || m_externalRecommendsVersions.contains(version->version());
-        case JavaMajorRole: {
-            auto major = version->version();
-            if (major.startsWith("java")) {
-                major = "Java " + major.mid(4);
-            }
-            return major;
+    case UidRole:
+        return version->uid();
+    case TimeRole:
+        return version->time();
+    case RequiresRole:
+        return QVariant::fromValue(version->requiredSet());
+    case SortRole:
+        return version->rawTime();
+    case VersionPtrRole:
+        return QVariant::fromValue(version);
+    case RecommendedRole:
+        return version->isRecommended() || m_externalRecommendsVersions.contains(version->version());
+    case JavaMajorRole: {
+        auto major = version->version();
+        if (major.startsWith("java")) {
+            major = "Java " + major.mid(4);
         }
+        return major;
+    }
 
-        default:
-            return QVariant();
+    default:
+        return QVariant();
     }
 }
 
@@ -145,7 +146,7 @@ Version::Ptr VersionList::getVersion(const QString& version)
 {
     Version::Ptr out = m_lookup.value(version, nullptr);
     if (!out) {
-        out = std::make_shared<Version>(m_uid, version);
+        out               = std::make_shared<Version>(m_uid, version);
         m_lookup[version] = out;
         setupAddedVersion(m_versions.size(), out);
         m_versions.append(out);
@@ -155,8 +156,8 @@ Version::Ptr VersionList::getVersion(const QString& version)
 
 bool VersionList::hasVersion(QString version) const
 {
-    auto ver = std::find_if(m_versions.constBegin(), m_versions.constEnd(),
-                            [version](const Meta::Version::Ptr& a) { return a->version() == version; });
+    auto ver = std::find_if(
+        m_versions.constBegin(), m_versions.constEnd(), [version](const Meta::Version::Ptr& a) { return a->version() == version; });
     return (ver != m_versions.constEnd());
 }
 
@@ -170,8 +171,8 @@ void VersionList::setVersions(const QList<Version::Ptr>& versions)
 {
     beginResetModel();
     m_versions = versions;
-    std::sort(m_versions.begin(), m_versions.end(),
-              [](const Version::Ptr& a, const Version::Ptr& b) { return a->rawTime() > b->rawTime(); });
+    std::sort(
+        m_versions.begin(), m_versions.end(), [](const Version::Ptr& a, const Version::Ptr& b) { return a->rawTime() > b->rawTime(); });
     for (int i = 0; i < m_versions.size(); ++i) {
         m_lookup.insert(m_versions.at(i)->version(), m_versions.at(i));
         setupAddedVersion(i, m_versions.at(i));
@@ -256,11 +257,11 @@ void VersionList::setupAddedVersion(const int row, const Version::Ptr& version)
     disconnect(version.get(), &Version::timeChanged, this, nullptr);
     disconnect(version.get(), &Version::typeChanged, this, nullptr);
 
-    connect(version.get(), &Version::requiresChanged, this,
-            [this, row]() { emit dataChanged(index(row), index(row), QList<int>() << RequiresRole); });
-    connect(version.get(), &Version::timeChanged, this,
-            [this, row]() { emit dataChanged(index(row), index(row), { TimeRole, SortRole }); });
-    connect(version.get(), &Version::typeChanged, this, [this, row]() { emit dataChanged(index(row), index(row), { TypeRole }); });
+    connect(version.get(), &Version::requiresChanged, this, [this, row]() {
+        emit dataChanged(index(row), index(row), QList<int>() << RequiresRole);
+    });
+    connect(version.get(), &Version::timeChanged, this, [this, row]() { emit dataChanged(index(row), index(row), {TimeRole, SortRole}); });
+    connect(version.get(), &Version::typeChanged, this, [this, row]() { emit dataChanged(index(row), index(row), {TypeRole}); });
 }
 
 BaseVersion::Ptr VersionList::getRecommended() const
@@ -273,7 +274,7 @@ void VersionList::waitToLoad()
     if (isLoaded())
         return;
     QEventLoop ev;
-    auto task = getLoadTask();
+    auto       task = getLoadTask();
     connect(task.get(), &Task::finished, &ev, &QEventLoop::quit);
     task->start();
     ev.exec();
@@ -282,8 +283,8 @@ void VersionList::waitToLoad()
 Version::Ptr VersionList::getRecommendedForParent(const QString& uid, const QString& version)
 {
     auto foundExplicit = std::find_if(m_versions.begin(), m_versions.end(), [uid, version](Version::Ptr ver) -> bool {
-        auto& reqs = ver->requiredSet();
-        auto parentReq = std::find_if(reqs.begin(), reqs.end(), [uid, version](const Require& req) -> bool {
+        auto& reqs      = ver->requiredSet();
+        auto  parentReq = std::find_if(reqs.begin(), reqs.end(), [uid, version](const Require& req) -> bool {
             return req.uid == uid && req.equalsVersion == version;
         });
         return parentReq != reqs.end() && ver->isRecommended();
@@ -298,8 +299,8 @@ Version::Ptr VersionList::getLatestForParent(const QString& uid, const QString& 
 {
     Version::Ptr latestCompat = nullptr;
     for (auto ver : m_versions) {
-        auto& reqs = ver->requiredSet();
-        auto parentReq = std::find_if(reqs.begin(), reqs.end(), [uid, version](const Require& req) -> bool {
+        auto& reqs      = ver->requiredSet();
+        auto  parentReq = std::find_if(reqs.begin(), reqs.end(), [uid, version](const Require& req) -> bool {
             return req.uid == uid && req.equalsVersion == version;
         });
         if (parentReq != reqs.end()) {

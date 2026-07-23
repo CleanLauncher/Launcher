@@ -90,7 +90,7 @@ void InstanceView::setModel(QAbstractItemModel* model)
 
 void InstanceView::dataChanged([[maybe_unused]] const QModelIndex& topLeft,
                                [[maybe_unused]] const QModelIndex& bottomRight,
-                               [[maybe_unused]] const QList<int>& roles)
+                               [[maybe_unused]] const QList<int>&  roles)
 {
     scheduleDelayedItemsLayout();
 }
@@ -127,8 +127,9 @@ void InstanceView::currentChanged(const QModelIndex& current, const QModelIndex&
 #endif
 }
 
-class LocaleString : public QString {
-   public:
+class LocaleString : public QString
+{
+public:
     LocaleString(const char* s) : QString(s) {}
     LocaleString(const QString& s) : QString(s) {}
 };
@@ -243,7 +244,7 @@ QString InstanceView::groupNameAt(const QPoint& point)
     executeDelayedItemsLayout();
 
     VisualGroup::HitResults hitResult;
-    auto group = categoryAt(point + offset(), hitResult);
+    auto                    group = categoryAt(point + offset(), hitResult);
     if (group && (hitResult & (VisualGroup::HeaderHit | VisualGroup::BodyHit))) {
         return group->text;
     }
@@ -269,14 +270,14 @@ void InstanceView::mousePressEvent(QMouseEvent* event)
 {
     executeDelayedItemsLayout();
 
-    QPoint visualPos = event->pos();
+    QPoint visualPos   = event->pos();
     QPoint geometryPos = event->pos() + offset();
 
     QPersistentModelIndex index = indexAt(visualPos);
 
-    m_pressedIndex = index;
+    m_pressedIndex           = index;
     m_pressedAlreadySelected = selectionModel()->isSelected(m_pressedIndex);
-    m_pressedPosition = geometryPos;
+    m_pressedPosition        = geometryPos;
 
     if (event->button() == Qt::LeftButton) {
         VisualGroup::HitResults hitResult;
@@ -312,7 +313,7 @@ void InstanceView::mouseMoveEvent(QMouseEvent* event)
     executeDelayedItemsLayout();
 
     QPoint topLeft;
-    QPoint visualPos = event->pos();
+    QPoint visualPos   = event->pos();
     QPoint geometryPos = event->pos() + offset();
 
     if (state() == ExpandingState || state() == CollapsingState) {
@@ -357,9 +358,9 @@ void InstanceView::mouseReleaseEvent(QMouseEvent* event)
 {
     executeDelayedItemsLayout();
 
-    QPoint visualPos = event->pos();
-    QPoint geometryPos = event->pos() + offset();
-    QPersistentModelIndex index = indexAt(visualPos);
+    QPoint                visualPos   = event->pos();
+    QPoint                geometryPos = event->pos() + offset();
+    QPersistentModelIndex index       = indexAt(visualPos);
 
     VisualGroup::HitResults hitResult;
 
@@ -413,14 +414,19 @@ void InstanceView::mouseDoubleClickEvent(QMouseEvent* event)
 
     QModelIndex index = indexAt(event->pos());
     if (!index.isValid() || !(index.flags() & Qt::ItemIsEnabled) || (m_pressedIndex != index)) {
-        QMouseEvent me(QEvent::MouseButtonPress, event->position(), event->scenePosition(), event->globalPosition(), event->button(),
-                       event->buttons(), event->modifiers());
+        QMouseEvent me(QEvent::MouseButtonPress,
+                       event->position(),
+                       event->scenePosition(),
+                       event->globalPosition(),
+                       event->button(),
+                       event->buttons(),
+                       event->modifiers());
         mousePressEvent(&me);
         return;
     }
 
     QPersistentModelIndex persistent = index;
-    emit doubleClicked(persistent);
+    emit                  doubleClicked(persistent);
 
     QStyleOptionViewItem option;
     initViewItemOption(&option);
@@ -457,7 +463,7 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         foreground.setAlpha(190);
         painter.setFont(font);
         auto fontMetrics = painter.fontMetrics();
-        auto textRect = fontMetrics.boundingRect(innerBounds, Qt::AlignHCenter | Qt::TextWordWrap, emptyString);
+        auto textRect    = fontMetrics.boundingRect(innerBounds, Qt::AlignHCenter | Qt::TextWordWrap, emptyString);
         textRect.moveCenter(bounds.center());
 
         auto wrapRect = textRect;
@@ -485,7 +491,7 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
         int y = category->verticalPosition();
         y -= verticalOffset();
         QRect backup = option.rect;
-        int height = category->totalHeight();
+        int   height = category->totalHeight();
         option.rect.setTop(y);
         option.rect.setHeight(height);
         option.rect.setLeft(m_leftMargin);
@@ -500,7 +506,7 @@ void InstanceView::paintEvent([[maybe_unused]] QPaintEvent* event)
             continue;
         }
         Qt::ItemFlags flags = index.flags();
-        option.rect = visualRect(index);
+        option.rect         = visualRect(index);
         option.features |= QStyleOptionViewItem::WrapText;
         if (flags & Qt::ItemIsSelectable && selectionModel()->isSelected(index)) {
             option.state |= selectionModel()->isSelected(index) ? QStyle::State_Selected : QStyle::State_None;
@@ -548,7 +554,7 @@ void InstanceView::resizeEvent([[maybe_unused]] QResizeEvent* event)
     int newItemsPerRow = calculateItemsPerRow();
     if (newItemsPerRow != m_currentItemsPerRow) {
         m_currentCursorColumn = -1;
-        m_currentItemsPerRow = newItemsPerRow;
+        m_currentItemsPerRow  = newItemsPerRow;
         updateGeometries();
     } else {
         updateScrollbar();
@@ -600,15 +606,15 @@ void InstanceView::dropEvent(QDropEvent* event)
 
     if (event->source() == this) {
         if (event->possibleActions() & Qt::MoveAction) {
-            std::pair<VisualGroup*, VisualGroup::HitResults> dropPos = rowDropPos(event->position().toPoint());
-            const VisualGroup* group = dropPos.first;
-            auto hitResult = dropPos.second;
+            std::pair<VisualGroup*, VisualGroup::HitResults> dropPos   = rowDropPos(event->position().toPoint());
+            const VisualGroup*                               group     = dropPos.first;
+            auto                                             hitResult = dropPos.second;
 
             if (hitResult == VisualGroup::HitResult::NoHit) {
                 viewport()->update();
                 return;
             }
-            auto instanceId = QString::fromUtf8(mimedata->data("application/x-instanceid"));
+            auto instanceId   = QString::fromUtf8(mimedata->data("application/x-instanceid"));
             auto instanceList = APPLICATION->instances();
             instanceList->setInstanceGroup(instanceId, group->text);
             event->setDropAction(Qt::MoveAction);
@@ -643,9 +649,9 @@ void InstanceView::startDrag(Qt::DropActions supportedActions)
     if (!mimeData) {
         return;
     }
-    QRect rect;
+    QRect   rect;
     QPixmap pixmap = renderToPixmap(indexes, &rect);
-    QDrag* drag = new QDrag(this);
+    QDrag*  drag   = new QDrag(this);
     drag->setPixmap(pixmap);
     drag->setMimeData(mimeData);
     drag->setHotSpot(m_pressedPosition - rect.topLeft());
@@ -678,8 +684,8 @@ QRect InstanceView::geometryRect(const QModelIndex& index) const
     }
 
     const VisualGroup* cat = category(index);
-    QPair<int, int> pos = cat->positionOf(index);
-    int x = pos.first;
+    QPair<int, int>    pos = cat->positionOf(index);
+    int                x   = pos.first;
 
     QStyleOptionViewItem option;
     initViewItemOption(&option);
@@ -710,8 +716,8 @@ void InstanceView::setSelection(const QRect& rect, const QItemSelectionModel::Se
     executeDelayedItemsLayout();
 
     for (int i = 0; i < model()->rowCount(); ++i) {
-        QModelIndex index = model()->index(i, 0);
-        QRect itemRect = visualRect(index);
+        QModelIndex index    = model()->index(i, 0);
+        QRect       itemRect = visualRect(index);
         if (itemRect.intersects(rect)) {
             selectionModel()->select(index, commands);
             update(itemRect.translated(-offset()));
@@ -728,12 +734,12 @@ QPixmap InstanceView::renderToPixmap(const QModelIndexList& indices, QRect* r) c
     }
     QPixmap pixmap(r->size());
     pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
+    QPainter             painter(&pixmap);
     QStyleOptionViewItem option;
     initViewItemOption(&option);
     option.state |= QStyle::State_Selected;
     for (int j = 0; j < paintPairs.count(); ++j) {
-        option.rect = paintPairs.at(j).first.translated(-r->topLeft());
+        option.rect                = paintPairs.at(j).first.translated(-r->topLeft());
         const QModelIndex& current = paintPairs.at(j).second;
         itemDelegate()->paint(&painter, option, current);
     }
@@ -743,11 +749,11 @@ QPixmap InstanceView::renderToPixmap(const QModelIndexList& indices, QRect* r) c
 QList<std::pair<QRect, QModelIndex>> InstanceView::draggablePaintPairs(const QModelIndexList& indices, QRect* r) const
 {
     Q_ASSERT(r);
-    QRect& rect = *r;
+    QRect&                               rect = *r;
     QList<std::pair<QRect, QModelIndex>> ret;
     for (int i = 0; i < indices.count(); ++i) {
-        const QModelIndex& index = indices.at(i);
-        const QRect current = geometryRect(index);
+        const QModelIndex& index   = indices.at(i);
+        const QRect        current = geometryRect(index);
         ret += std::make_pair(current, index);
         rect |= current;
     }
@@ -762,7 +768,7 @@ bool InstanceView::isDragEventAccepted([[maybe_unused]] QDropEvent* event)
 std::pair<VisualGroup*, VisualGroup::HitResults> InstanceView::rowDropPos(const QPoint& pos)
 {
     VisualGroup::HitResults hitResult;
-    auto group = categoryAt(pos + offset(), hitResult);
+    auto                    group = categoryAt(pos + offset(), hitResult);
     return std::make_pair(group, hitResult);
 }
 
@@ -776,10 +782,10 @@ QRegion InstanceView::visualRegionForSelection(const QItemSelection& selection) 
     QRegion region;
     for (auto& range : selection) {
         int start_row = range.top();
-        int end_row = range.bottom();
+        int end_row   = range.bottom();
         for (int row = start_row; row <= end_row; ++row) {
             int start_column = range.left();
-            int end_column = range.right();
+            int end_column   = range.right();
             for (int column = start_column; column <= end_column; ++column) {
                 QModelIndex index = model()->index(row, column, rootIndex());
                 region += visualRect(index);
@@ -795,133 +801,133 @@ QModelIndex InstanceView::moveCursor(QAbstractItemView::CursorAction cursorActio
     if (!current.isValid()) {
         return current;
     }
-    auto cat = category(current);
-    int group_index = m_groups.indexOf(cat);
+    auto cat         = category(current);
+    int  group_index = m_groups.indexOf(cat);
     if (group_index < 0)
         return current;
 
-    QPair<int, int> pos = cat->positionOf(current);
-    int column = pos.first;
-    int row = pos.second;
+    QPair<int, int> pos    = cat->positionOf(current);
+    int             column = pos.first;
+    int             row    = pos.second;
     if (m_currentCursorColumn < 0) {
         m_currentCursorColumn = column;
     }
 
     switch (cursorAction) {
-        case MoveUp: {
-            if (row == 0) {
-                int prevGroupIndex = group_index - 1;
-                while (prevGroupIndex >= 0) {
-                    auto prevGroup = m_groups[prevGroupIndex];
-                    if (prevGroup->collapsed) {
-                        prevGroupIndex--;
-                        continue;
-                    }
-                    int newRow = prevGroup->numRows() - 1;
-                    int newRowSize = prevGroup->rows[newRow].size();
-                    int newColumn = m_currentCursorColumn;
-                    if (m_currentCursorColumn >= newRowSize) {
-                        newColumn = newRowSize - 1;
-                    }
-                    return prevGroup->rows[newRow][newColumn];
+    case MoveUp: {
+        if (row == 0) {
+            int prevGroupIndex = group_index - 1;
+            while (prevGroupIndex >= 0) {
+                auto prevGroup = m_groups[prevGroupIndex];
+                if (prevGroup->collapsed) {
+                    prevGroupIndex--;
+                    continue;
                 }
-            } else {
-                int newRow = row - 1;
-                int newRowSize = cat->rows[newRow].size();
-                int newColumn = m_currentCursorColumn;
+                int newRow     = prevGroup->numRows() - 1;
+                int newRowSize = prevGroup->rows[newRow].size();
+                int newColumn  = m_currentCursorColumn;
                 if (m_currentCursorColumn >= newRowSize) {
                     newColumn = newRowSize - 1;
                 }
-                return cat->rows[newRow][newColumn];
+                return prevGroup->rows[newRow][newColumn];
             }
-            return current;
+        } else {
+            int newRow     = row - 1;
+            int newRowSize = cat->rows[newRow].size();
+            int newColumn  = m_currentCursorColumn;
+            if (m_currentCursorColumn >= newRowSize) {
+                newColumn = newRowSize - 1;
+            }
+            return cat->rows[newRow][newColumn];
         }
-        case MoveDown: {
-            if (row == cat->rows.size() - 1) {
-                int nextGroupIndex = group_index + 1;
-                while (nextGroupIndex < m_groups.size()) {
-                    auto nextGroup = m_groups[nextGroupIndex];
-                    if (nextGroup->collapsed) {
-                        nextGroupIndex++;
-                        continue;
-                    }
-                    int newRowSize = nextGroup->rows[0].size();
-                    int newColumn = m_currentCursorColumn;
-                    if (m_currentCursorColumn >= newRowSize) {
-                        newColumn = newRowSize - 1;
-                    }
-                    return nextGroup->rows[0][newColumn];
+        return current;
+    }
+    case MoveDown: {
+        if (row == cat->rows.size() - 1) {
+            int nextGroupIndex = group_index + 1;
+            while (nextGroupIndex < m_groups.size()) {
+                auto nextGroup = m_groups[nextGroupIndex];
+                if (nextGroup->collapsed) {
+                    nextGroupIndex++;
+                    continue;
                 }
-            } else {
-                int newRow = row + 1;
-                int newRowSize = cat->rows[newRow].size();
-                int newColumn = m_currentCursorColumn;
+                int newRowSize = nextGroup->rows[0].size();
+                int newColumn  = m_currentCursorColumn;
                 if (m_currentCursorColumn >= newRowSize) {
                     newColumn = newRowSize - 1;
                 }
-                return cat->rows[newRow][newColumn];
+                return nextGroup->rows[0][newColumn];
             }
-            return current;
+        } else {
+            int newRow     = row + 1;
+            int newRowSize = cat->rows[newRow].size();
+            int newColumn  = m_currentCursorColumn;
+            if (m_currentCursorColumn >= newRowSize) {
+                newColumn = newRowSize - 1;
+            }
+            return cat->rows[newRow][newColumn];
         }
-        case MoveLeft: {
-            if (column > 0) {
-                m_currentCursorColumn = column - 1;
-                return cat->rows[row][column - 1];
-            } else if (row > 0) {
-                row -= 1;
-                int newRowSize = cat->rows[row].size();
-                m_currentCursorColumn = newRowSize - 1;
-                return cat->rows[row][m_currentCursorColumn];
-            } else {
-                int prevGroupIndex = group_index - 1;
-                while (prevGroupIndex >= 0) {
-                    auto prevGroup = m_groups[prevGroupIndex];
-                    if (prevGroup->collapsed) {
-                        prevGroupIndex--;
-                        continue;
-                    }
-                    int lastRow = prevGroup->numRows() - 1;
-                    int lastCol = prevGroup->rows[lastRow].size() - 1;
-                    m_currentCursorColumn = lastCol;
-                    return prevGroup->rows[lastRow][lastCol];
+        return current;
+    }
+    case MoveLeft: {
+        if (column > 0) {
+            m_currentCursorColumn = column - 1;
+            return cat->rows[row][column - 1];
+        } else if (row > 0) {
+            row -= 1;
+            int newRowSize        = cat->rows[row].size();
+            m_currentCursorColumn = newRowSize - 1;
+            return cat->rows[row][m_currentCursorColumn];
+        } else {
+            int prevGroupIndex = group_index - 1;
+            while (prevGroupIndex >= 0) {
+                auto prevGroup = m_groups[prevGroupIndex];
+                if (prevGroup->collapsed) {
+                    prevGroupIndex--;
+                    continue;
                 }
+                int lastRow           = prevGroup->numRows() - 1;
+                int lastCol           = prevGroup->rows[lastRow].size() - 1;
+                m_currentCursorColumn = lastCol;
+                return prevGroup->rows[lastRow][lastCol];
             }
-            return current;
         }
-        case MoveRight: {
-            if (column < cat->rows[row].size() - 1) {
-                m_currentCursorColumn = column + 1;
-                return cat->rows[row][column + 1];
-            } else if (row < cat->rows.size() - 1) {
-                row += 1;
-                m_currentCursorColumn = 0;
-                return cat->rows[row][m_currentCursorColumn];
-            } else {
-                int nextGroupIndex = group_index + 1;
-                while (nextGroupIndex < m_groups.size()) {
-                    auto nextGroup = m_groups[nextGroupIndex];
-                    if (nextGroup->collapsed) {
-                        nextGroupIndex++;
-                        continue;
-                    }
-                    m_currentCursorColumn = 0;
-                    return nextGroup->rows[0][0];
-                }
-            }
-            return current;
-        }
-        case MoveHome: {
+        return current;
+    }
+    case MoveRight: {
+        if (column < cat->rows[row].size() - 1) {
+            m_currentCursorColumn = column + 1;
+            return cat->rows[row][column + 1];
+        } else if (row < cat->rows.size() - 1) {
+            row += 1;
             m_currentCursorColumn = 0;
-            return cat->rows[row][0];
+            return cat->rows[row][m_currentCursorColumn];
+        } else {
+            int nextGroupIndex = group_index + 1;
+            while (nextGroupIndex < m_groups.size()) {
+                auto nextGroup = m_groups[nextGroupIndex];
+                if (nextGroup->collapsed) {
+                    nextGroupIndex++;
+                    continue;
+                }
+                m_currentCursorColumn = 0;
+                return nextGroup->rows[0][0];
+            }
         }
-        case MoveEnd: {
-            auto last = cat->rows[row].size() - 1;
-            m_currentCursorColumn = last;
-            return cat->rows[row][last];
-        }
-        default:
+        return current;
+    }
+    case MoveHome: {
+        m_currentCursorColumn = 0;
+        return cat->rows[row][0];
+    }
+    case MoveEnd: {
+        auto last             = cat->rows[row].size() - 1;
+        m_currentCursorColumn = last;
+        return cat->rows[row][last];
+    }
+    default:
 
-            break;
+        break;
     }
     return current;
 }
@@ -958,12 +964,12 @@ void InstanceView::scrollTo(const QModelIndex& index, ScrollHint hint)
 
 int InstanceView::verticalScrollToValue([[maybe_unused]] const QModelIndex& index, const QRect& rect, QListView::ScrollHint hint) const
 {
-    const QRect area = viewport()->rect();
-    const bool above = (hint == QListView::EnsureVisible && rect.top() < area.top());
-    const bool below = (hint == QListView::EnsureVisible && rect.bottom() > area.bottom());
+    const QRect area  = viewport()->rect();
+    const bool  above = (hint == QListView::EnsureVisible && rect.top() < area.top());
+    const bool  below = (hint == QListView::EnsureVisible && rect.bottom() > area.bottom());
 
-    int verticalValue = verticalScrollBar()->value();
-    QRect adjusted = rect.adjusted(-spacing(), -spacing(), spacing(), spacing());
+    int   verticalValue = verticalScrollBar()->value();
+    QRect adjusted      = rect.adjusted(-spacing(), -spacing(), spacing(), spacing());
     if (hint == QListView::PositionAtTop || above)
         verticalValue += adjusted.top();
     else if (hint == QListView::PositionAtBottom || below)

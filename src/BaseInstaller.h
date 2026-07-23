@@ -26,8 +26,9 @@ class QObject;
 class Task;
 class BaseVersion;
 
-class BaseInstaller {
-   public:
+class BaseInstaller
+{
+public:
     BaseInstaller();
     virtual ~BaseInstaller() {};
     bool isApplied(MinecraftInstance* on);
@@ -37,8 +38,8 @@ class BaseInstaller {
 
     virtual Task* createInstallTask(MinecraftInstance* instance, BaseVersion::Ptr version, QObject* parent) = 0;
 
-   protected:
+protected:
     virtual QString id() const = 0;
-    QString filename(const QString& root) const;
-    QDir patchesDir(const QString& root) const;
+    QString         filename(const QString& root) const;
+    QDir            patchesDir(const QString& root) const;
 };

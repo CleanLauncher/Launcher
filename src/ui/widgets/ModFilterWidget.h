@@ -50,21 +50,24 @@
 
 class MinecraftInstance;
 
-namespace Ui {
+namespace Ui
+{
 class ModFilterWidget;
 }
 
-class ModFilterWidget : public QTabWidget {
+class ModFilterWidget : public QTabWidget
+{
     Q_OBJECT
-   public:
-    struct Filter {
-        std::vector<Version> versions;
+public:
+    struct Filter
+    {
+        std::vector<Version>                         versions;
         std::vector<ModPlatform::IndexedVersionType> releases;
-        ModPlatform::ModLoaderTypes loaders;
-        ModPlatform::Side side;
-        bool hideInstalled;
-        QStringList categoryIds;
-        bool openSource;
+        ModPlatform::ModLoaderTypes                  loaders;
+        ModPlatform::Side                            side;
+        bool                                         hideInstalled;
+        QStringList                                  categoryIds;
+        bool                                         openSource;
 
         bool operator==(const Filter& other) const
         {
@@ -89,7 +92,7 @@ class ModFilterWidget : public QTabWidget {
                     (releases.empty() ||
 
                      std::find(releases.cbegin(), releases.cend(), v.version_type) != releases.cend()) &&
-                    checkMcVersions({ v.mcVersion }));
+                    checkMcVersions({v.mcVersion}));
         }
     };
 
@@ -99,19 +102,19 @@ class ModFilterWidget : public QTabWidget {
     auto getFilter() -> std::shared_ptr<Filter>;
     auto changed() const -> bool { return m_filter_changed; }
 
-   signals:
+signals:
     void filterChanged();
 
-   public slots:
+public slots:
     void setCategories(const QList<ModPlatform::Category>&);
 
-   private:
+private:
     ModFilterWidget(MinecraftInstance* instance, bool extendedSupport);
 
     void loadVersionList();
     void prepareBasicFilter();
 
-   private slots:
+private slots:
     void onVersionFilterChanged(int);
     void onVersionFilterTextChanged(const QString& version);
     void onLoadersFilterChanged();
@@ -122,15 +125,15 @@ class ModFilterWidget : public QTabWidget {
     void onReleaseFilterChanged();
     void onShowMoreClicked();
 
-   private:
+private:
     Ui::ModFilterWidget* ui;
 
-    MinecraftInstance* m_instance = nullptr;
+    MinecraftInstance*      m_instance = nullptr;
     std::shared_ptr<Filter> m_filter;
-    bool m_filter_changed = false;
+    bool                    m_filter_changed = false;
 
     Meta::VersionList::Ptr m_version_list;
-    VersionProxyModel* m_versions_proxy = nullptr;
+    VersionProxyModel*     m_versions_proxy = nullptr;
 
     QList<ModPlatform::Category> m_categories;
 };

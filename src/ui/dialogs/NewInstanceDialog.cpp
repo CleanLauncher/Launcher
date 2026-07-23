@@ -67,10 +67,10 @@
 #include "ui/pages/modplatform/technic/TechnicPage.h"
 #include "ui/widgets/PageContainer.h"
 
-NewInstanceDialog::NewInstanceDialog(const QString& initialGroup,
-                                     const QString& url,
+NewInstanceDialog::NewInstanceDialog(const QString&                initialGroup,
+                                     const QString&                url,
                                      const QMap<QString, QString>& extra_info,
-                                     QWidget* parent)
+                                     QWidget*                      parent)
     : QDialog(parent), ui(new Ui::NewInstanceDialog)
 {
     ui->setupUi(this);
@@ -134,7 +134,7 @@ NewInstanceDialog::NewInstanceDialog(const QString& initialGroup,
     if (APPLICATION->settings()->get("NewInstanceGeometry").isValid()) {
         restoreGeometry(QByteArray::fromBase64(APPLICATION->settings()->get("NewInstanceGeometry").toString().toUtf8()));
     } else {
-        auto screen = parent->screen();
+        auto screen   = parent->screen();
         auto geometry = screen->availableSize();
         resize(width(), qMin(geometry.height() - 50, 710));
     }
@@ -225,7 +225,7 @@ void NewInstanceDialog::setSuggestedPack(const QString& name, QString version, I
 
 void NewInstanceDialog::setSuggestedIconFromFile(const QString& path, const QString& name)
 {
-    importIcon = true;
+    importIcon     = true;
     importIconPath = path;
     importIconName = name;
 
@@ -237,7 +237,7 @@ void NewInstanceDialog::setSuggestedIcon(const QString& key)
     if (key == "default")
         return;
 
-    auto icon = APPLICATION->icons()->getIcon(key);
+    auto icon  = APPLICATION->icons()->getIcon(key);
     importIcon = false;
 
     ui->iconButton->setIcon(icon);
@@ -258,7 +258,7 @@ InstanceTask* NewInstanceDialog::extractTask()
 
 void NewInstanceDialog::updateDialogState()
 {
-    auto allowOK = creationTask && !instName().isEmpty();
+    auto allowOK  = creationTask && !instName().isEmpty();
     auto OkButton = m_buttons->button(QDialogButtonBox::Ok);
     if (OkButton->isEnabled() != allowOK) {
         OkButton->setEnabled(allowOK);
@@ -311,7 +311,7 @@ void NewInstanceDialog::importIconNow()
     if (importIcon) {
         APPLICATION->icons()->installIcon(importIconPath, importIconName);
         InstIconKey = importIconName.mid(0, importIconName.lastIndexOf('.'));
-        importIcon = false;
+        importIcon  = false;
     }
     APPLICATION->settings()->set("NewInstanceGeometry", QString::fromUtf8(saveGeometry().toBase64()));
 }

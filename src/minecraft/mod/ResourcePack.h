@@ -10,9 +10,10 @@
 
 class Version;
 
-class ResourcePack : public DataPack {
+class ResourcePack : public DataPack
+{
     Q_OBJECT
-   public:
+public:
     ResourcePack(QObject* parent = nullptr) : DataPack(parent) {}
     ResourcePack(QFileInfo file_info) : DataPack(file_info) {}
 

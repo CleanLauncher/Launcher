@@ -1,4 +1,9 @@
 ---
+Language: ObjC
+BasedOnStyle: LLVM
+IndentWidth: 4
+ColumnLimit: 140
+---
 Language: Cpp
 BasedOnStyle: LLVM
 IndentWidth: 4
@@ -43,7 +48,6 @@ BraceWrapping:
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
 BreakBeforeBinaryOperators: None
-BreakBeforeInitializers: false
 BreakStringLiterals: true
 CompactNamespaces: false
 ConstructorInitializerIndentWidth: 4

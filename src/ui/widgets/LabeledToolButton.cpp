@@ -69,12 +69,12 @@ QSize LabeledToolButton::sizeHint() const
 {
     ensurePolished();
 
-    int w = 0, h = 0;
+    int                    w = 0, h = 0;
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
     QSize sz = m_label->sizeHint();
-    w = sz.width();
-    h = sz.height();
+    w        = sz.width();
+    h        = sz.height();
 
     opt.rect.setSize(QSize(w, h));
 
@@ -95,16 +95,16 @@ void LabeledToolButton::resizeEvent(QResizeEvent* event)
 
 void LabeledToolButton::resetIcon()
 {
-    auto iconSz = m_icon.actualSize(QSize(160, 80));
-    float w = iconSz.width();
-    float h = iconSz.height();
-    float ar = w / h;
+    auto  iconSz = m_icon.actualSize(QSize(160, 80));
+    float w      = iconSz.width();
+    float h      = iconSz.height();
+    float ar     = w / h;
 
     int newW = 80 * ar;
     if (newW > 160)
         newW = 160;
     QSize newSz(newW, 80);
-    auto pixmap = m_icon.pixmap(newSz);
+    auto  pixmap = m_icon.pixmap(newSz);
     m_label->setPixmap(pixmap);
     m_label->setMinimumHeight(80);
     m_label->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);

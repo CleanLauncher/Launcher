@@ -20,7 +20,8 @@
 
 #include "FileSystem.h"
 
-namespace Java {
+namespace Java
+{
 SymlinkTask::SymlinkTask(QString final_path) : m_path(final_path) {}
 
 QString findBinPath(QString root, QString pattern)
@@ -44,7 +45,7 @@ QString findBinPath(QString root, QString pattern)
 void SymlinkTask::executeTask()
 {
     setStatus(tr("Checking for Java binary path"));
-    const auto binPath = FS::PathCombine("bin", "java");
+    const auto binPath    = FS::PathCombine("bin", "java");
     const auto wantedPath = FS::PathCombine(m_path, binPath);
     if (QFileInfo::exists(wantedPath)) {
         emitSucceeded();
@@ -53,7 +54,7 @@ void SymlinkTask::executeTask()
 
     setStatus(tr("Searching for Java binary path"));
     const auto contentsPartialPath = FS::PathCombine("Contents", "Home", binPath);
-    const auto relativePathToBin = findBinPath(m_path, contentsPartialPath);
+    const auto relativePathToBin   = findBinPath(m_path, contentsPartialPath);
     if (relativePathToBin.isEmpty()) {
         emitFailed(tr("Failed to find Java binary path"));
         return;
@@ -61,11 +62,11 @@ void SymlinkTask::executeTask()
     const auto folderToLink = relativePathToBin.chopped(binPath.length());
 
     setStatus(tr("Collecting folders to symlink"));
-    auto entries = QDir(folderToLink).entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries);
+    auto                entries = QDir(folderToLink).entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries);
     QList<FS::LinkPair> files;
     setProgress(0, entries.length());
     for (auto& entry : entries) {
-        files.append({ entry.absoluteFilePath(), FS::PathCombine(m_path, entry.fileName()) });
+        files.append({entry.absoluteFilePath(), FS::PathCombine(m_path, entry.fileName())});
     }
 
     setStatus(tr("Symlinking Java binary path"));

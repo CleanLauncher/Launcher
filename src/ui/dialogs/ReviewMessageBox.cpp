@@ -31,7 +31,7 @@ ReviewMessageBox::ReviewMessageBox(QWidget* parent, [[maybe_unused]] const QStri
             return;
         auto currentColumn = this->ui->modTreeWidget->currentColumn();
 
-        auto data = currentItem->data(currentColumn, Qt::UserRole);
+        auto    data = currentItem->data(currentColumn, Qt::UserRole);
         QString txt;
 
         if (data.isValid()) {
@@ -122,7 +122,7 @@ void ReviewMessageBox::retranslateUi(QString resources_name)
 void ReviewMessageBox::on_toggleDepsButton_clicked()
 {
     m_deps_checked = !m_deps_checked;
-    auto state = m_deps_checked ? Qt::Checked : Qt::Unchecked;
+    auto state     = m_deps_checked ? Qt::Checked : Qt::Unchecked;
     for (auto dep : m_deps)
         dep->setCheckState(0, state);
 };

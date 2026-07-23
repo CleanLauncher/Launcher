@@ -19,10 +19,11 @@
 #pragma once
 #include "MSAStep.h"
 
-class ElyStep : public MSAStep {
+class ElyStep : public MSAStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ElyStep(AccountData* data, bool silent = false);
     virtual ~ElyStep() noexcept = default;
 

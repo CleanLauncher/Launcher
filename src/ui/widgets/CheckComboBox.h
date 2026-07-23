@@ -21,44 +21,45 @@
 #include <QComboBox>
 #include <QLineEdit>
 
-class CheckComboBox : public QComboBox {
+class CheckComboBox : public QComboBox
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CheckComboBox(QWidget* parent = nullptr);
     virtual ~CheckComboBox() = default;
 
     void hidePopup() override;
 
     QString defaultText() const;
-    void setDefaultText(const QString& text);
+    void    setDefaultText(const QString& text);
 
     Qt::CheckState itemCheckState(int index) const;
-    void setItemCheckState(int index, Qt::CheckState state);
+    void           setItemCheckState(int index, Qt::CheckState state);
 
     QString separator() const;
-    void setSeparator(const QString& separator);
+    void    setSeparator(const QString& separator);
 
     QStringList checkedItems() const;
 
     void setSourceModel(QAbstractItemModel* model);
 
-   public slots:
+public slots:
     void setCheckedItems(const QStringList& items);
 
-   signals:
+signals:
     void checkedItemsChanged(const QStringList& items);
 
-   protected:
+protected:
     void paintEvent(QPaintEvent*) override;
 
-   private:
+private:
     void emitCheckedItemsChanged();
     bool eventFilter(QObject* receiver, QEvent* event) override;
     void toggleCheckState(int index);
 
-   private:
+private:
     QString m_default_text;
     QString m_separator;
-    bool m_containerMousePress = false;
+    bool    m_containerMousePress = false;
 };

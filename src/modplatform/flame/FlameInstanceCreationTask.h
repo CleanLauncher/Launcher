@@ -47,16 +47,17 @@
 
 #include "ui/dialogs/BlockedModsDialog.h"
 
-class FlameCreationTask final : public InstanceCreationTask {
+class FlameCreationTask final : public InstanceCreationTask
+{
     Q_OBJECT
 
-   public:
-    FlameCreationTask(const QString& staging_path,
+public:
+    FlameCreationTask(const QString&  staging_path,
                       SettingsObject* global_settings,
-                      QWidget* parent,
-                      QString id,
-                      QString version_id,
-                      QString original_instance_id = {})
+                      QWidget*        parent,
+                      QString         id,
+                      QString         version_id,
+                      QString         original_instance_id = {})
         : InstanceCreationTask(), m_parent(parent), m_managedId(std::move(id)), m_managedVersionId(std::move(version_id))
     {
         setStagingPath(staging_path);
@@ -67,24 +68,24 @@ class FlameCreationTask final : public InstanceCreationTask {
 
     bool abort() override;
 
-    bool updateInstance() override;
+    bool                               updateInstance() override;
     std::unique_ptr<MinecraftInstance> createInstance() override;
 
-   private slots:
-    void idResolverSucceeded(QEventLoop&);
-    void setupDownloadJob(QEventLoop&);
-    void copyBlockedMods(const QList<BlockedMod>& blocked_mods);
-    void validateOtherResources(QEventLoop& loop);
+private slots:
+    void    idResolverSucceeded(QEventLoop&);
+    void    setupDownloadJob(QEventLoop&);
+    void    copyBlockedMods(const QList<BlockedMod>& blocked_mods);
+    void    validateOtherResources(QEventLoop& loop);
     QString getVersionForLoader(QString uid, QString loaderType, QString version, QString mcVersion);
 
-   private:
+private:
     QWidget* m_parent = nullptr;
 
     shared_qobject_ptr<Flame::FileResolvingTask> m_modIdResolver;
-    Flame::Manifest m_pack;
+    Flame::Manifest                              m_pack;
 
-    Task::Ptr m_processUpdateFileInfoJob = nullptr;
-    NetJob::Ptr m_filesJob = nullptr;
+    Task::Ptr   m_processUpdateFileInfoJob = nullptr;
+    NetJob::Ptr m_filesJob                 = nullptr;
 
     QString m_managedId, m_managedVersionId;
 

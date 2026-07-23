@@ -2,9 +2,9 @@
 #include <QWidget>
 
 #include <BaseVersion.h>
+#include <QIcon>
 #include <QObjectPtr.h>
 #include <java/JavaChecker.h>
-#include <QIcon>
 
 class QCheckBox;
 class QLineEdit;
@@ -19,33 +19,47 @@ class QLabel;
 class QToolButton;
 class QSpacerItem;
 
-class JavaWizardWidget : public QWidget {
+class JavaWizardWidget : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     explicit JavaWizardWidget(QWidget* parent);
     virtual ~JavaWizardWidget();
 
-    enum class JavaStatus { NotSet, Pending, Good, DoesNotExist, DoesNotStart, ReturnedInvalidData } javaStatus = JavaStatus::NotSet;
+    enum class JavaStatus
+    {
+        NotSet,
+        Pending,
+        Good,
+        DoesNotExist,
+        DoesNotStart,
+        ReturnedInvalidData
+    } javaStatus = JavaStatus::NotSet;
 
-    enum class ValidationStatus { Bad, JavaBad, AllOK };
+    enum class ValidationStatus
+    {
+        Bad,
+        JavaBad,
+        AllOK
+    };
 
-    void refresh();
-    void initialize();
+    void             refresh();
+    void             initialize();
     ValidationStatus validate();
-    void retranslate();
+    void             retranslate();
 
-    bool permGenEnabled() const;
-    int permGenSize() const;
-    int minHeapSize() const;
-    int maxHeapSize() const;
+    bool    permGenEnabled() const;
+    int     permGenSize() const;
+    int     minHeapSize() const;
+    int     maxHeapSize() const;
     QString javaPath() const;
-    bool autoDetectJava() const;
-    bool autoDownloadJava() const;
+    bool    autoDetectJava() const;
+    bool    autoDownloadJava() const;
 
     void updateThresholds();
 
-   protected slots:
+protected slots:
     void onSpinBoxValueChanged(int);
     void memoryValueChanged();
     void javaPathEdited(const QString& path);
@@ -55,49 +69,49 @@ class JavaWizardWidget : public QWidget {
     void javaDownloadBtn_clicked();
     void checkFinished(const JavaChecker::Result& result);
 
-   protected:
+protected:
     void checkJavaPathOnEdit(const QString& path);
     void checkJavaPath(const QString& path);
     void setJavaStatus(JavaStatus status);
     void setupUi();
 
-   private:
-    VersionSelectWidget* m_versionWidget = nullptr;
-    QVBoxLayout* m_verticalLayout = nullptr;
-    QSpacerItem* m_verticalSpacer = nullptr;
+private:
+    VersionSelectWidget* m_versionWidget  = nullptr;
+    QVBoxLayout*         m_verticalLayout = nullptr;
+    QSpacerItem*         m_verticalSpacer = nullptr;
 
-    QLineEdit* m_javaPathTextBox = nullptr;
-    QPushButton* m_javaBrowseBtn = nullptr;
-    QToolButton* m_javaStatusBtn = nullptr;
+    QLineEdit*   m_javaPathTextBox  = nullptr;
+    QPushButton* m_javaBrowseBtn    = nullptr;
+    QToolButton* m_javaStatusBtn    = nullptr;
     QHBoxLayout* m_horizontalLayout = nullptr;
 
-    QGroupBox* m_memoryGroupBox = nullptr;
-    QGridLayout* m_gridLayout_2 = nullptr;
-    QSpinBox* m_maxMemSpinBox = nullptr;
-    QLabel* m_labelMinMem = nullptr;
-    QLabel* m_labelMaxMem = nullptr;
-    QLabel* m_labelMaxMemIcon = nullptr;
-    QSpinBox* m_minMemSpinBox = nullptr;
-    QLabel* m_labelPermGen = nullptr;
-    QSpinBox* m_permGenSpinBox = nullptr;
+    QGroupBox*   m_memoryGroupBox  = nullptr;
+    QGridLayout* m_gridLayout_2    = nullptr;
+    QSpinBox*    m_maxMemSpinBox   = nullptr;
+    QLabel*      m_labelMinMem     = nullptr;
+    QLabel*      m_labelMaxMem     = nullptr;
+    QLabel*      m_labelMaxMemIcon = nullptr;
+    QSpinBox*    m_minMemSpinBox   = nullptr;
+    QLabel*      m_labelPermGen    = nullptr;
+    QSpinBox*    m_permGenSpinBox  = nullptr;
 
     QHBoxLayout* m_horizontalBtnLayout = nullptr;
-    QPushButton* m_javaDownloadBtn = nullptr;
-    QIcon goodIcon;
-    QIcon yellowIcon;
-    QIcon badIcon;
+    QPushButton* m_javaDownloadBtn     = nullptr;
+    QIcon        goodIcon;
+    QIcon        yellowIcon;
+    QIcon        badIcon;
 
-    QGroupBox* m_autoJavaGroupBox = nullptr;
-    QVBoxLayout* m_veriticalJavaLayout = nullptr;
-    QCheckBox* m_autodetectJavaCheckBox = nullptr;
-    QCheckBox* m_autodownloadCheckBox = nullptr;
+    QGroupBox*   m_autoJavaGroupBox       = nullptr;
+    QVBoxLayout* m_veriticalJavaLayout    = nullptr;
+    QCheckBox*   m_autodetectJavaCheckBox = nullptr;
+    QCheckBox*   m_autodownloadCheckBox   = nullptr;
 
-    unsigned int observedMinMemory = 0;
-    unsigned int observedMaxMemory = 0;
-    unsigned int observedPermGenMemory = 0;
-    QString queuedCheck;
-    uint64_t m_availableMemory = 0ull;
+    unsigned int                    observedMinMemory     = 0;
+    unsigned int                    observedMaxMemory     = 0;
+    unsigned int                    observedPermGenMemory = 0;
+    QString                         queuedCheck;
+    uint64_t                        m_availableMemory = 0ull;
     shared_qobject_ptr<JavaChecker> m_checker;
-    JavaChecker::Result m_result;
-    QTimer* m_memoryTimer;
+    JavaChecker::Result             m_result;
+    QTimer*                         m_memoryTimer;
 };

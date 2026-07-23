@@ -56,9 +56,9 @@
 
 int getConsoleMaxLines(SettingsObject* settings)
 {
-    auto lineSetting = settings->getSetting("ConsoleMaxLines");
+    auto lineSetting  = settings->getSetting("ConsoleMaxLines");
     bool conversionOk = false;
-    int maxLines = lineSetting->get().toInt(&conversionOk);
+    int  maxLines     = lineSetting->get().toInt(&conversionOk);
     if (!conversionOk) {
         maxLines = lineSetting->defValue().toInt();
         qWarning() << "ConsoleMaxLines has nonsensical value, defaulting to" << maxLines;
@@ -73,9 +73,9 @@ bool shouldStopOnConsoleOverflow(SettingsObject* settings)
 
 BaseInstance::BaseInstance(SettingsObject* globalSettings, std::unique_ptr<SettingsObject> settings, const QString& rootDir) : QObject()
 {
-    m_settings = std::move(settings);
+    m_settings        = std::move(settings);
     m_global_settings = globalSettings;
-    m_rootDir = rootDir;
+    m_rootDir         = rootDir;
 
     m_settings->registerSetting("name", "Unnamed Instance");
     m_settings->registerSetting("iconKey", "default");
@@ -97,7 +97,7 @@ BaseInstance::BaseInstance(SettingsObject* globalSettings, std::unique_ptr<Setti
     if (!m_settings->getSetting("InstanceType"))
         m_settings->registerSetting("InstanceType", "");
 
-    auto commandSetting = m_settings->registerSetting({ "OverrideCommands", "OverrideLaunchCmd" }, false);
+    auto commandSetting = m_settings->registerSetting({"OverrideCommands", "OverrideLaunchCmd"}, false);
     m_settings->registerOverride(globalSettings->getSetting("PreLaunchCommand"), commandSetting);
     m_settings->registerOverride(globalSettings->getSetting("WrapperCommand"), commandSetting);
     m_settings->registerOverride(globalSettings->getSetting("PostExitCommand"), commandSetting);
@@ -169,11 +169,8 @@ QString BaseInstance::getManagedPackVersionName() const
     return m_settings->get("ManagedPackVersionName").toString();
 }
 
-void BaseInstance::setManagedPack(const QString& type,
-                                  const QString& id,
-                                  const QString& name,
-                                  const QString& versionId,
-                                  const QString& version)
+void BaseInstance::setManagedPack(
+    const QString& type, const QString& id, const QString& name, const QString& versionId, const QString& version)
 {
     m_settings->set("ManagedPack", true);
     m_settings->set("ManagedPackType", type);
@@ -220,7 +217,7 @@ void BaseInstance::addLinkedInstanceId(const QString& id)
 bool BaseInstance::removeLinkedInstanceId(const QString& id)
 {
     auto linkedInstances = getLinkedInstances();
-    int numRemoved = linkedInstances.removeAll(id);
+    int  numRemoved      = linkedInstances.removeAll(id);
     setLinkedInstances(linkedInstances);
     return numRemoved > 0;
 }
@@ -406,7 +403,7 @@ void BaseInstance::setShortcuts(const QList<ShortcutData>& shortcuts)
 {
     QJsonArray array;
     for (const auto& elem : shortcuts) {
-        array.append(QJsonObject{ { "name", elem.name }, { "filePath", elem.filePath }, { "target", static_cast<int>(elem.target) } });
+        array.append(QJsonObject{{"name", elem.name}, {"filePath", elem.filePath}, {"target", static_cast<int>(elem.target)}});
     }
 
     QJsonDocument document;
@@ -416,9 +413,9 @@ void BaseInstance::setShortcuts(const QList<ShortcutData>& shortcuts)
 
 QList<ShortcutData> BaseInstance::shortcuts() const
 {
-    auto data = m_settings->get("shortcuts").toString().toUtf8();
+    auto            data = m_settings->get("shortcuts").toString().toUtf8();
     QJsonParseError parseError;
-    auto document = QJsonDocument::fromJson(data, &parseError);
+    auto            document = QJsonDocument::fromJson(data, &parseError);
     if (parseError.error != QJsonParseError::NoError || !document.isArray())
         return {};
 
@@ -434,12 +431,12 @@ QList<ShortcutData> BaseInstance::shortcuts() const
             continue;
 
         QString shortcutName = dict["name"].toString();
-        QString filePath = dict["filePath"].toString();
+        QString filePath     = dict["filePath"].toString();
         if (!QDir(filePath).exists()) {
             qWarning() << "Shortcut" << shortcutName << "for instance" << name() << "have non-existent path" << filePath;
             continue;
         }
-        results.append({ shortcutName, filePath, static_cast<ShortcutTarget>(value) });
+        results.append({shortcutName, filePath, static_cast<ShortcutTarget>(value)});
     }
     return results;
 }

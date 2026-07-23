@@ -15,35 +15,37 @@
 
 #pragma once
 
-#include <QDialog>
 #include "BaseInstance.h"
 #include "BaseVersion.h"
 #include "InstanceCopyPrefs.h"
+#include <QDialog>
 
 class BaseInstance;
 
-namespace Ui {
+namespace Ui
+{
 class CopyInstanceDialog;
 }
 
-class CopyInstanceDialog : public QDialog {
+class CopyInstanceDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CopyInstanceDialog(BaseInstance* original, QWidget* parent = 0);
     ~CopyInstanceDialog();
 
     void updateDialogState();
 
-    QString instName() const;
-    QString instGroup() const;
-    QString iconKey() const;
+    QString                  instName() const;
+    QString                  instGroup() const;
+    QString                  iconKey() const;
     const InstanceCopyPrefs& getChosenOptions() const;
 
-   public slots:
+public slots:
     void help();
 
-   private slots:
+private slots:
     void on_iconButton_clicked();
     void on_instNameTextBox_textChanged(const QString& arg1);
 
@@ -62,16 +64,16 @@ class CopyInstanceDialog : public QDialog {
     void on_dontLinkSavesCheckbox_stateChanged(int state);
     void on_useCloneCheckbox_stateChanged(int state);
 
-   private:
+private:
     void checkAllCheckboxes(const bool& b);
     void updateSelectAllCheckbox();
     void updateUseCloneCheckbox();
     void updateLinkOptions();
 
     Ui::CopyInstanceDialog* ui;
-    QString InstIconKey;
-    BaseInstance* m_original;
-    InstanceCopyPrefs m_selectedOptions;
-    bool m_cloneSupported = false;
-    bool m_linkSupported = false;
+    QString                 InstIconKey;
+    BaseInstance*           m_original;
+    InstanceCopyPrefs       m_selectedOptions;
+    bool                    m_cloneSupported = false;
+    bool                    m_linkSupported  = false;
 };

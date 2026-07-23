@@ -6,7 +6,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-namespace Parsers {
+namespace Parsers
+{
 
 bool getDateTime(QJsonValue value, QDateTime& out)
 {
@@ -58,7 +59,7 @@ bool parseXTokenResponse(QByteArray& data, Token& output, QString name)
     qDebug() << "Parsing" << name << ":";
     qCDebug(authCredentials()) << data;
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &jsonError);
     if (jsonError.error) {
         qWarning() << "Failed to parse response from user.auth.xboxlive.com as JSON:" << jsonError.errorString();
         return false;
@@ -120,7 +121,7 @@ bool parseMinecraftProfile(QByteArray& data, MinecraftProfile& output)
     qCDebug(authCredentials()) << data;
 
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &jsonError);
     if (jsonError.error) {
         qWarning() << "Failed to parse response from user.auth.xboxlive.com as JSON:" << jsonError.errorString();
         return false;
@@ -189,11 +190,12 @@ bool parseMinecraftProfile(QByteArray& data, MinecraftProfile& output)
         output.capes[capeOut.id] = capeOut;
     }
     output.currentCape = currentCape;
-    output.validity = Validity::Certain;
+    output.validity    = Validity::Certain;
     return true;
 }
 
-namespace {
+namespace
+{
 
 static const QString SKIN_URL_STEVE =
     "https://textures.minecraft.net/texture/1a4af718455d4aab528e7a61f86fa25e6a369d1768dcb13f7df319a713eb810b";
@@ -208,7 +210,7 @@ bool isDefaultModelSteve(QString uuid)
         return true;
     }
 
-    qulonglong most = uuid.left(16).toULongLong(nullptr, 16);
+    qulonglong most  = uuid.left(16).toULongLong(nullptr, 16);
     qulonglong least = uuid.right(16).toULongLong(nullptr, 16);
     qulonglong xored = most ^ least;
     return ((static_cast<quint32>(xored >> 32)) ^ static_cast<quint32>(xored)) % 2 == 0;
@@ -221,7 +223,7 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
     qCDebug(authCredentials()) << data;
 
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &jsonError);
     if (jsonError.error) {
         qWarning() << "Failed to parse response as JSON:" << jsonError.errorString();
         return false;
@@ -238,7 +240,7 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
         return false;
     }
 
-    auto propsArray = obj.value("properties").toArray();
+    auto       propsArray = obj.value("properties").toArray();
     QByteArray texturePayload;
     for (auto p : propsArray) {
         auto pObj = p.toObject();
@@ -268,7 +270,7 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
         return false;
     }
 
-    obj = Json::requireObject(doc, "session texture payload");
+    obj           = Json::requireObject(doc, "session texture payload");
     auto textures = obj.value("textures");
     if (!textures.isObject()) {
         qWarning() << "No textures array in response";
@@ -277,9 +279,9 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
 
     Skin skinOut;
 
-    bool steve = isDefaultModelSteve(output.id);
+    bool steve      = isDefaultModelSteve(output.id);
     skinOut.variant = steve ? "CLASSIC" : "SLIM";
-    skinOut.url = steve ? SKIN_URL_STEVE : SKIN_URL_ALEX;
+    skinOut.url     = steve ? SKIN_URL_STEVE : SKIN_URL_ALEX;
 
     skinOut.id = "00000000-0000-0000-0000-000000000000";
     Cape capeOut;
@@ -315,7 +317,7 @@ bool parseMinecraftProfileMojang(QByteArray& data, MinecraftProfile& output)
 
     output.skin = skinOut;
     if (capeOut.alias == "cape") {
-        output.capes = QMap<QString, Cape>({ { capeOut.alias, capeOut } });
+        output.capes       = QMap<QString, Cape>({{capeOut.alias, capeOut}});
         output.currentCape = capeOut.alias;
     }
 
@@ -329,19 +331,19 @@ bool parseMinecraftEntitlements(QByteArray& data, MinecraftEntitlement& output)
     qCDebug(authCredentials()) << data;
 
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &jsonError);
     if (jsonError.error) {
         qWarning() << "Failed to parse response from user.auth.xboxlive.com as JSON:" << jsonError.errorString();
         return false;
     }
 
-    auto obj = doc.object();
+    auto obj                = doc.object();
     output.canPlayMinecraft = false;
-    output.ownsMinecraft = false;
+    output.ownsMinecraft    = false;
 
     auto itemsArray = obj.value("items").toArray();
     for (auto item : itemsArray) {
-        auto itemObj = item.toObject();
+        auto    itemObj = item.toObject();
         QString name;
         if (!getString(itemObj.value("name"), name)) {
             continue;
@@ -363,14 +365,14 @@ bool parseRolloutResponse(QByteArray& data, bool& result)
     qCDebug(authCredentials()) << data;
 
     QJsonParseError jsonError;
-    QJsonDocument doc = QJsonDocument::fromJson(data, &jsonError);
+    QJsonDocument   doc = QJsonDocument::fromJson(data, &jsonError);
     if (jsonError.error) {
         qWarning() << "Failed to parse response from https://api.minecraftservices.com/rollout/v1/msamigration as JSON: "
                    << jsonError.errorString();
         return false;
     }
 
-    auto obj = doc.object();
+    auto    obj = doc.object();
     QString feature;
     if (!getString(obj.value("feature"), feature)) {
         qWarning() << "Rollout feature is not a string";
@@ -398,15 +400,15 @@ bool parseMojangResponse(QByteArray& data, Token& output)
         return false;
     }
 
-    auto obj = doc.object();
+    auto   obj        = doc.object();
     double expires_in = 0;
     if (!getNumber(obj.value("expires_in"), expires_in)) {
         qWarning() << "expires_in is not a valid number";
         return false;
     }
-    auto currentTime = QDateTime::currentDateTimeUtc();
+    auto currentTime    = QDateTime::currentDateTimeUtc();
     output.issueInstant = currentTime;
-    output.notAfter = currentTime.addSecs(expires_in);
+    output.notAfter     = currentTime.addSecs(expires_in);
 
     QString username;
     if (!getString(obj.value("username"), username)) {

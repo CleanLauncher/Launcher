@@ -41,10 +41,10 @@
 #include "modplatform/ModIndex.h"
 #include "ui_ResourcePage.h"
 
-#include <StringUtils.h>
 #include <QDesktopServices>
 #include <QKeyEvent>
 #include <QMessageBox>
+#include <StringUtils.h>
 #include <algorithm>
 #include <utility>
 
@@ -55,7 +55,8 @@
 #include "ui/pages/modplatform/ResourceModel.h"
 #include "ui/widgets/ProjectItem.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 ResourcePage::ResourcePage(ResourceDownloadDialog* parent, BaseInstance& baseInstance)
     : QWidget(parent), m_baseInstance(baseInstance), m_ui(new Ui::ResourcePage), m_parentDialog(parent), m_fetchProgress(this, false)
@@ -392,9 +393,9 @@ void ResourcePage::removeResourceFromDialog(const QString& packName)
 }
 
 void ResourcePage::addResourceToPage(ModPlatform::IndexedPack::Ptr pack,
-                                     ModPlatform::IndexedVersion& ver,
-                                     ResourceFolderModel* baseModel,
-                                     QString downloadReason)
+                                     ModPlatform::IndexedVersion&  ver,
+                                     ResourceFolderModel*          baseModel,
+                                     QString                       downloadReason)
 {
     bool isIndexed = !APPLICATION->settings()->get("ModMetadataDisabled").toBool();
     m_model->addPack(std::move(pack), ver, baseModel, isIndexed, std::move(downloadReason));
@@ -440,7 +441,7 @@ void ResourcePage::onResourceSelected()
 void ResourcePage::onResourceToggle(const QModelIndex& index)
 {
     const bool isSelected = index == m_ui->packView->currentIndex();
-    auto pack = m_model->data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
+    auto       pack       = m_model->data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
 
     if (pack->versionsLoaded) {
         if (pack->isAnyVersionSelected()) {
@@ -452,9 +453,11 @@ void ResourcePage::onResourceToggle(const QModelIndex& index)
 
             if (version == pack->versions.end()) {
                 auto* errorMessage = new QMessageBox(
-                    QMessageBox::Warning, tr("No versions available"),
+                    QMessageBox::Warning,
+                    tr("No versions available"),
                     tr("No versions for '%1' are available.\nThe author likely blocked third-party launchers.").arg(pack->name),
-                    QMessageBox::Ok, this);
+                    QMessageBox::Ok,
+                    this);
 
                 errorMessage->open();
             } else {
@@ -485,9 +488,9 @@ void ResourcePage::openUrl(const QUrl& url)
         return;
     }
 
-    const QString address = url.host() + url.path();
+    const QString           address = url.host() + url.path();
     QRegularExpressionMatch match;
-    QString page;
+    QString                 page;
 
     auto handlers = urlHandlers();
     for (auto it = handlers.constKeyValueBegin(); it != handlers.constKeyValueEnd(); it++) {
@@ -507,13 +510,13 @@ void ResourcePage::openUrl(const QUrl& url)
             auto* newPage = m_parentDialog->selectedPage();
 
             QLineEdit* searchEdit = newPage->m_ui->searchEdit;
-            auto* model = newPage->m_model;
-            QListView* view = newPage->m_ui->packView;
+            auto*      model      = newPage->m_model;
+            QListView* view       = newPage->m_ui->packView;
 
             auto jump = [url, slug, model, view] {
                 for (int row = 0; row < model->rowCount({}); row++) {
                     const QModelIndex index = model->index(row);
-                    const auto pack = model->data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
+                    const auto        pack  = model->data(index, Qt::UserRole).value<ModPlatform::IndexedPack::Ptr>();
 
                     if (pack->slug == slug) {
                         view->setCurrentIndex(index);
@@ -571,8 +574,9 @@ void ResourcePage::openProject(const QVariant& projectID)
     connect(cancelBtn, &QPushButton::clicked, m_parentDialog, &ResourceDownloadDialog::reject);
     m_ui->gridLayout_4->addWidget(buttonBox, 1, 2);
 
-    connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this,
-            [this, okBtn](int index) { okBtn->setEnabled(m_ui->versionSelectionBox->itemData(index).toInt() >= 0); });
+    connect(m_ui->versionSelectionBox, &QComboBox::currentIndexChanged, this, [this, okBtn](int index) {
+        okBtn->setEnabled(m_ui->versionSelectionBox->itemData(index).toInt() >= 0);
+    });
 
     auto jump = [this] {
         if (m_model->rowCount({}) > 0) {

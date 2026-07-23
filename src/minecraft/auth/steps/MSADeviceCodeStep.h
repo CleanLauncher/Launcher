@@ -41,9 +41,10 @@
 #include "net/NetJob.h"
 #include "net/Upload.h"
 
-class MSADeviceCodeStep : public AuthStep {
+class MSADeviceCodeStep : public AuthStep
+{
     Q_OBJECT
-   public:
+public:
     explicit MSADeviceCodeStep(AccountData* data);
     virtual ~MSADeviceCodeStep() noexcept = default;
 
@@ -51,32 +52,32 @@ class MSADeviceCodeStep : public AuthStep {
 
     QString describe() override;
 
-   public slots:
+public slots:
     void abort() override;
 
-   signals:
+signals:
     void authorizeWithBrowser(QString url, QString code, int expiresIn);
 
-   protected:
+protected:
     QString m_clientId;
-    QString m_scopes = "XboxLive.SignIn XboxLive.offline_access";
-    QUrl m_deviceCodeUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode");
-    QUrl m_tokenUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/token");
+    QString m_scopes        = "XboxLive.SignIn XboxLive.offline_access";
+    QUrl    m_deviceCodeUrl = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/devicecode");
+    QUrl    m_tokenUrl      = QUrl("https://login.microsoftonline.com/consumers/oauth2/v2.0/token");
 
-   private slots:
+private slots:
     void deviceAuthorizationFinished(QByteArray* response);
     void startPoolTimer();
     void authenticateUser();
     void authenticationFinished(QByteArray* response);
 
-   private:
+private:
     QString m_device_code;
-    bool m_is_aborted = false;
-    int interval = 5;
+    bool    m_is_aborted = false;
+    int     interval     = 5;
 
     QTimer m_pool_timer;
     QTimer m_expiration_timer;
 
     Net::Upload::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr      m_task;
 };

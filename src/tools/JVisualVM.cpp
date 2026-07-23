@@ -7,16 +7,17 @@
 #include "launch/LaunchTask.h"
 #include "settings/SettingsObject.h"
 
-class JVisualVM : public BaseProfiler {
+class JVisualVM : public BaseProfiler
+{
     Q_OBJECT
-   public:
+public:
     JVisualVM(SettingsObject* settings, BaseInstance* instance, QObject* parent = 0);
 
-   private slots:
+private slots:
     void profilerStarted();
     void profilerFinished(int exit, QProcess::ExitStatus status);
 
-   protected:
+protected:
     void beginProfilingImpl(LaunchTask* process);
 };
 
@@ -40,9 +41,9 @@ void JVisualVM::profilerFinished([[maybe_unused]] int exit, QProcess::ExitStatus
 
 void JVisualVM::beginProfilingImpl(LaunchTask* process)
 {
-    QProcess* profiler = new QProcess(this);
-    QStringList profilerArgs = { "--openpid", QString::number(process->pid()) };
-    auto programPath = globalSettings->get("JVisualVMPath").toString();
+    QProcess*   profiler     = new QProcess(this);
+    QStringList profilerArgs = {"--openpid", QString::number(process->pid())};
+    auto        programPath  = globalSettings->get("JVisualVMPath").toString();
 
     profiler->setArguments(profilerArgs);
     profiler->setProgram(programPath);

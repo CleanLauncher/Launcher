@@ -21,9 +21,11 @@
 #include "ui/dialogs/skins/draw/BoxGeometry.h"
 
 #include <QOpenGLTexture>
-namespace opengl {
-class Scene : protected QOpenGLFunctions {
-   public:
+namespace opengl
+{
+class Scene : protected QOpenGLFunctions
+{
+public:
     Scene(const QImage& skin, bool slim, const QImage& cape);
     virtual ~Scene();
 
@@ -34,19 +36,19 @@ class Scene : protected QOpenGLFunctions {
     void setCapeVisible(bool visible);
     void setElytraVisible(bool elytraVisible);
 
-   private:
+private:
     QList<BoxGeometry*> m_staticComponents;
     QList<BoxGeometry*> m_normalArms;
     QList<BoxGeometry*> m_slimArms;
     QList<BoxGeometry*> m_staticComponentsOverlay;
     QList<BoxGeometry*> m_normalArmsOverlay;
     QList<BoxGeometry*> m_slimArmsOverlay;
-    BoxGeometry* m_cape = nullptr;
+    BoxGeometry*        m_cape = nullptr;
     QList<BoxGeometry*> m_elytra;
-    QOpenGLTexture* m_skinTexture = nullptr;
-    QOpenGLTexture* m_capeTexture = nullptr;
-    bool m_slim = false;
-    bool m_capeVisible = false;
-    bool m_elytraVisible = false;
+    QOpenGLTexture*     m_skinTexture   = nullptr;
+    QOpenGLTexture*     m_capeTexture   = nullptr;
+    bool                m_slim          = false;
+    bool                m_capeVisible   = false;
+    bool                m_elytraVisible = false;
 };
 }  // namespace opengl

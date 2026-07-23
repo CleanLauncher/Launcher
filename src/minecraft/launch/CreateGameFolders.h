@@ -19,9 +19,10 @@
 #include <launch/LaunchStep.h>
 #include <minecraft/auth/AuthSession.h>
 
-class CreateGameFolders : public LaunchStep {
+class CreateGameFolders : public LaunchStep
+{
     Q_OBJECT
-   public:
+public:
     explicit CreateGameFolders(LaunchTask* parent);
     virtual ~CreateGameFolders() {};
 

@@ -69,7 +69,7 @@ void AutoInstallJava::executeTask()
     }
     auto packProfile = m_instance->getPackProfile();
     if (!APPLICATION->settings()->get("AutomaticJavaDownload").toBool()) {
-        auto javas = APPLICATION->javalist();
+        auto javas     = APPLICATION->javalist();
         m_current_task = javas->getLoadTask();
         connect(m_current_task.get(), &Task::finished, this, [this, javas, packProfile] {
             for (auto i = 0; i < javas->count(); i++) {
@@ -116,7 +116,7 @@ void AutoInstallJava::executeTask()
         return;
     }
     auto versionList = APPLICATION->metadataIndex()->get("net.minecraft.java");
-    m_current_task = versionList->getLoadTask();
+    m_current_task   = versionList->getLoadTask();
     connect(m_current_task.get(), &Task::succeeded, this, &AutoInstallJava::tryNextMajorJava);
     connect(m_current_task.get(), &Task::failed, this, &AutoInstallJava::emitFailed);
     connect(m_current_task.get(), &Task::progress, this, &AutoInstallJava::setProgress);
@@ -142,11 +142,11 @@ void AutoInstallJava::setJavaPath(QString path)
 void AutoInstallJava::setJavaPathFromPartial()
 {
     auto packProfile = m_instance->getPackProfile();
-    auto javaName = packProfile->getProfile()->getCompatibleJavaName();
+    auto javaName    = packProfile->getProfile()->getCompatibleJavaName();
     QDir javaDir(APPLICATION->javaPath());
 
     auto relativeBinary = FS::PathCombine(javaName, "bin", JavaUtils::javaExecutable);
-    auto finalPath = javaDir.absoluteFilePath(relativeBinary);
+    auto finalPath      = javaDir.absoluteFilePath(relativeBinary);
     if (QFileInfo::exists(finalPath)) {
         setJavaPath(finalPath);
     } else {
@@ -166,16 +166,16 @@ void AutoInstallJava::downloadJava(Meta::Version::Ptr version, QString javaName)
             auto final_path = javaDir.absoluteFilePath(java->m_name);
             auto deletePath = [final_path] { FS::deletePath(final_path); };
             switch (java->downloadType) {
-                case Java::DownloadType::Manifest:
-                    m_current_task = makeShared<Java::ManifestDownloadTask>(java->url, final_path, java->checksumType, java->checksumHash);
-                    break;
-                case Java::DownloadType::Archive:
-                    m_current_task = makeShared<Java::ArchiveDownloadTask>(java->url, final_path, java->checksumType, java->checksumHash);
-                    break;
-                case Java::DownloadType::Unknown:
-                    deletePath();
-                    emitFailed(tr("Could not determine Java download type!"));
-                    return;
+            case Java::DownloadType::Manifest:
+                m_current_task = makeShared<Java::ManifestDownloadTask>(java->url, final_path, java->checksumType, java->checksumHash);
+                break;
+            case Java::DownloadType::Archive:
+                m_current_task = makeShared<Java::ArchiveDownloadTask>(java->url, final_path, java->checksumType, java->checksumHash);
+                break;
+            case Java::DownloadType::Unknown:
+                deletePath();
+                emitFailed(tr("Could not determine Java download type!"));
+                return;
             }
 #if defined(Q_OS_MACOS)
             auto seq = makeShared<SequentialTask>(tr("Install Java"));
@@ -205,9 +205,9 @@ void AutoInstallJava::tryNextMajorJava()
 {
     if (!isRunning())
         return;
-    auto versionList = APPLICATION->metadataIndex()->get("net.minecraft.java");
-    auto packProfile = m_instance->getPackProfile();
-    auto wantedJavaName = packProfile->getProfile()->getCompatibleJavaName();
+    auto versionList       = APPLICATION->metadataIndex()->get("net.minecraft.java");
+    auto packProfile       = m_instance->getPackProfile();
+    auto wantedJavaName    = packProfile->getProfile()->getCompatibleJavaName();
     auto majorJavaVersions = packProfile->getProfile()->getCompatibleJavaMajors();
     if (m_majorJavaVersionIndex >= majorJavaVersions.length()) {
         emit logLine(
@@ -226,8 +226,8 @@ void AutoInstallJava::tryNextMajorJava()
         downloadJava(javaMajor, wantedJavaName);
     } else {
         m_current_task = APPLICATION->metadataIndex()->loadVersion("net.minecraft.java", javaMajor->version(), Net::Mode::Online);
-        connect(m_current_task.get(), &Task::succeeded, this,
-                [this, javaMajor, wantedJavaName] { downloadJava(javaMajor, wantedJavaName); });
+        connect(
+            m_current_task.get(), &Task::succeeded, this, [this, javaMajor, wantedJavaName] { downloadJava(javaMajor, wantedJavaName); });
         connect(m_current_task.get(), &Task::failed, this, &AutoInstallJava::tryNextMajorJava);
         connect(m_current_task.get(), &Task::progress, this, &AutoInstallJava::setProgress);
         connect(m_current_task.get(), &Task::stepProgress, this, &AutoInstallJava::propagateStepProgress);

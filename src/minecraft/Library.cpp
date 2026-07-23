@@ -43,11 +43,11 @@
 #include <net/ChecksumValidator.h>
 
 void Library::getApplicableFiles(const RuntimeContext& runtimeContext,
-                                 QStringList& jar,
-                                 QStringList& native,
-                                 QStringList& native32,
-                                 QStringList& native64,
-                                 const QString& overridePath) const
+                                 QStringList&          jar,
+                                 QStringList&          native,
+                                 QStringList&          native32,
+                                 QStringList&          native64,
+                                 const QString&        overridePath) const
 {
     bool local = isLocal();
 
@@ -79,18 +79,18 @@ void Library::getApplicableFiles(const RuntimeContext& runtimeContext,
 }
 
 QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeContext,
-                                                  class HttpMetaCache* cache,
-                                                  QStringList& failedLocalFiles,
-                                                  const QString& overridePath) const
+                                                  class HttpMetaCache*  cache,
+                                                  QStringList&          failedLocalFiles,
+                                                  const QString&        overridePath) const
 {
     QList<Net::NetRequest::Ptr> out;
-    bool stale = isAlwaysStale();
-    bool local = isLocal();
+    bool                        stale = isAlwaysStale();
+    bool                        local = isLocal();
 
     auto check_local_file = [overridePath, &failedLocalFiles](QString storage) {
         QFileInfo fileinfo(storage);
-        QString fileName = fileinfo.fileName();
-        auto fullPath = FS::PathCombine(overridePath, fileName);
+        QString   fileName = fileinfo.fileName();
+        auto      fullPath = FS::PathCombine(overridePath, fileName);
         QFileInfo localFileInfo(fullPath);
         if (!localFileInfo.exists()) {
             failedLocalFiles.append(localFileInfo.filePath());
@@ -186,10 +186,10 @@ QList<Net::NetRequest::Ptr> Library::getDownloads(const RuntimeContext& runtimeC
         }();
         if (raw_storage.contains("${arch}")) {
             QString cooked_storage = raw_storage;
-            QString cooked_dl = raw_dl;
+            QString cooked_dl      = raw_dl;
             add_download(cooked_storage.replace("${arch}", "32"), cooked_dl.replace("${arch}", "32"), QString());
             cooked_storage = raw_storage;
-            cooked_dl = raw_dl;
+            cooked_dl      = raw_dl;
             add_download(cooked_storage.replace("${arch}", "64"), cooked_dl.replace("${arch}", "64"), QString());
         } else {
             add_download(raw_storage, raw_dl, QString());
@@ -269,8 +269,8 @@ QString Library::filename(const RuntimeContext& runtimeContext) const
         return m_name.getFileName();
     }
 
-    GradleSpecifier nativeSpec = m_name;
-    QString nativeClassifier = getCompatibleNative(runtimeContext);
+    GradleSpecifier nativeSpec       = m_name;
+    QString         nativeClassifier = getCompatibleNative(runtimeContext);
     if (!nativeClassifier.isNull()) {
         nativeSpec.setClassifier(nativeClassifier);
     } else {
@@ -292,8 +292,8 @@ QString Library::storageSuffix(const RuntimeContext& runtimeContext) const
         return m_name.toPath(m_filename);
     }
 
-    GradleSpecifier nativeSpec = m_name;
-    QString nativeClassifier = getCompatibleNative(runtimeContext);
+    GradleSpecifier nativeSpec       = m_name;
+    QString         nativeClassifier = getCompatibleNative(runtimeContext);
     if (!nativeClassifier.isNull()) {
         nativeSpec.setClassifier(nativeClassifier);
     } else {

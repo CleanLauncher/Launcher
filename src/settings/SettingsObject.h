@@ -30,19 +30,21 @@
 class Setting;
 class SettingsObject;
 
-class SettingsObject : public QObject {
+class SettingsObject : public QObject
+{
     Q_OBJECT
-   public:
-    class Lock {
-       public:
+public:
+    class Lock
+    {
+    public:
         Lock(SettingsObject* locked) : m_locked(locked) { m_locked->suspendSave(); }
         ~Lock() { m_locked->resumeSave(); }
 
-       private:
+    private:
         SettingsObject* m_locked;
     };
 
-   public:
+public:
     explicit SettingsObject(QObject* parent = 0);
     virtual ~SettingsObject();
 
@@ -76,33 +78,33 @@ class SettingsObject : public QObject {
     virtual bool reload();
 
     virtual void suspendSave() = 0;
-    virtual void resumeSave() = 0;
-   signals:
+    virtual void resumeSave()  = 0;
+signals:
 
     void SettingChanged(const Setting& setting, QVariant value);
 
     void settingReset(const Setting& setting);
 
-   protected slots:
+protected slots:
 
     virtual void changeSetting(const Setting& setting, QVariant value) = 0;
 
     virtual void resetSetting(const Setting& setting) = 0;
 
-   protected:
+protected:
     void connectSignals(const Setting& setting);
 
     virtual QVariant retrieveValue(const Setting& setting) = 0;
 
     friend class Setting;
 
-   private:
+private:
     QMap<QString, std::shared_ptr<Setting>> m_settings;
 #ifdef Q_OS_MACOS
     SecurityBookmarkFileAccess m_sandboxedFileAccess;
 #endif
 
-   protected:
+protected:
     bool m_suspendSave = false;
-    bool m_doSave = false;
+    bool m_doSave      = false;
 };

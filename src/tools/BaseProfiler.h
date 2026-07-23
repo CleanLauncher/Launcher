@@ -8,27 +8,29 @@ class SettingsObject;
 class LaunchTask;
 class QProcess;
 
-class BaseProfiler : public BaseExternalTool {
+class BaseProfiler : public BaseExternalTool
+{
     Q_OBJECT
-   public:
+public:
     explicit BaseProfiler(SettingsObject* settings, BaseInstance* instance, QObject* parent = 0);
 
-   public slots:
+public slots:
     void beginProfiling(LaunchTask* process);
     void abortProfiling();
 
-   protected:
+protected:
     QProcess* m_profilerProcess;
 
     virtual void beginProfilingImpl(LaunchTask* process) = 0;
     virtual void abortProfilingImpl();
 
-   signals:
+signals:
     void readyToLaunch(const QString& message);
     void abortLaunch(const QString& message);
 };
 
-class BaseProfilerFactory : public BaseExternalToolFactory {
-   public:
+class BaseProfilerFactory : public BaseExternalToolFactory
+{
+public:
     virtual BaseProfiler* createProfiler(BaseInstance* instance, QObject* parent = 0);
 };

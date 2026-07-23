@@ -4,10 +4,11 @@
 #include "minecraft/mod/ShaderPack.h"
 #include "minecraft/mod/tasks/LocalShaderPackParseTask.h"
 
-class ShaderPackFolderModel : public ResourceFolderModel {
+class ShaderPackFolderModel : public ResourceFolderModel
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ShaderPackFolderModel(const QDir& dir, BaseInstance* instance, bool is_indexed, bool create_dir, QObject* parent = nullptr)
         : ResourceFolderModel(dir, instance, is_indexed, create_dir, parent)
     {}
@@ -25,11 +26,11 @@ class ShaderPackFolderModel : public ResourceFolderModel {
 
     Task* createPreUpdateTask() override;
 
-    virtual bool startWatching() override { return ResourceFolderModel::startWatching({ m_dir.absolutePath() }); }
-    virtual bool stopWatching() override { return ResourceFolderModel::stopWatching({ m_dir.absolutePath() }); }
+    virtual bool startWatching() override { return ResourceFolderModel::startWatching({m_dir.absolutePath()}); }
+    virtual bool stopWatching() override { return ResourceFolderModel::stopWatching({m_dir.absolutePath()}); }
 
     RESOURCE_HELPERS(ShaderPack);
 
-   private:
+private:
     QMutex m_migrateLock;
 };

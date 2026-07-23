@@ -12,29 +12,30 @@
 #include <QDebug>
 #include <utility>
 
-class ModrinthAPI : public ResourceAPI {
-   public:
+class ModrinthAPI : public ResourceAPI
+{
+public:
     std::pair<Task::Ptr, QByteArray*> currentVersion(const QString& hash, const QString& hash_format) const;
 
     std::pair<Task::Ptr, QByteArray*> currentVersions(const QStringList& hashes, QString hash_format) const;
 
-    std::pair<Task::Ptr, QByteArray*> latestVersion(const QString& hash,
-                                                    const QString& hash_format,
-                                                    std::optional<std::vector<Version>> mcVersions,
+    std::pair<Task::Ptr, QByteArray*> latestVersion(const QString&                             hash,
+                                                    const QString&                             hash_format,
+                                                    std::optional<std::vector<Version>>        mcVersions,
                                                     std::optional<ModPlatform::ModLoaderTypes> loaders) const;
 
-    std::pair<Task::Ptr, QByteArray*> latestVersions(const QStringList& hashes,
-                                                     const QString& hash_format,
-                                                     std::optional<std::vector<Version>> mcVersions,
+    std::pair<Task::Ptr, QByteArray*> latestVersions(const QStringList&                         hashes,
+                                                     const QString&                             hash_format,
+                                                     std::optional<std::vector<Version>>        mcVersions,
                                                      std::optional<ModPlatform::ModLoaderTypes> loaders) const;
 
     std::pair<Task::Ptr, QByteArray*> getProjects(QStringList addonIds) const override;
 
     static std::pair<Task::Ptr, QByteArray*> getModCategories();
-    static QList<ModPlatform::Category> loadCategories(const QByteArray& response, const QString& projectType);
-    static QList<ModPlatform::Category> loadModCategories(const QByteArray& response);
+    static QList<ModPlatform::Category>      loadCategories(const QByteArray& response, const QString& projectType);
+    static QList<ModPlatform::Category>      loadModCategories(const QByteArray& response);
 
-   public:
+public:
     auto getSortingMethods() const -> QList<ResourceAPI::SortingMethod> override;
 
     static auto getAuthorURL(const QString& name) -> QString { return "https://modrinth.com/user/" + name; };
@@ -42,9 +43,17 @@ class ModrinthAPI : public ResourceAPI {
     static auto getModLoaderStrings(const ModPlatform::ModLoaderTypes types) -> QStringList
     {
         QStringList l;
-        for (auto loader : { ModPlatform::NeoForge, ModPlatform::Forge, ModPlatform::Fabric, ModPlatform::Quilt, ModPlatform::LiteLoader,
-                             ModPlatform::DataPack, ModPlatform::Babric, ModPlatform::BTA, ModPlatform::LegacyFabric, ModPlatform::Ornithe,
-                             ModPlatform::Rift }) {
+        for (auto loader : {ModPlatform::NeoForge,
+                            ModPlatform::Forge,
+                            ModPlatform::Fabric,
+                            ModPlatform::Quilt,
+                            ModPlatform::LiteLoader,
+                            ModPlatform::DataPack,
+                            ModPlatform::Babric,
+                            ModPlatform::BTA,
+                            ModPlatform::LegacyFabric,
+                            ModPlatform::Ornithe,
+                            ModPlatform::Rift}) {
             if ((types & loader) != 0U) {
                 l << getModLoaderAsString(loader);
             }
@@ -73,23 +82,23 @@ class ModrinthAPI : public ResourceAPI {
     static QString getSideFilters(ModPlatform::Side side)
     {
         switch (side) {
-            case ModPlatform::Side::ClientSide:
-                return { R"("client_side:required","client_side:optional"],["server_side:optional","server_side:unsupported")" };
-            case ModPlatform::Side::ServerSide:
-                return { R"("server_side:required","server_side:optional"],["client_side:optional","client_side:unsupported")" };
-            case ModPlatform::Side::UniversalSide:
-                return { R"("client_side:required"],["server_side:required")" };
-            case ModPlatform::Side::NoSide:
+        case ModPlatform::Side::ClientSide:
+            return {R"("client_side:required","client_side:optional"],["server_side:optional","server_side:unsupported")"};
+        case ModPlatform::Side::ServerSide:
+            return {R"("server_side:required","server_side:optional"],["client_side:optional","client_side:unsupported")"};
+        case ModPlatform::Side::UniversalSide:
+            return {R"("client_side:required"],["server_side:required")"};
+        case ModPlatform::Side::NoSide:
 
-            default:
-                return {};
+        default:
+            return {};
         }
     }
 
     static QString mapMCVersionFromModrinth(QString v)
     {
         static const QString s_preString = " Pre-Release ";
-        bool pre = false;
+        bool                 pre         = false;
         if (v.contains("-pre")) {
             pre = true;
             v.replace("-pre", s_preString);
@@ -101,23 +110,23 @@ class ModrinthAPI : public ResourceAPI {
         return v;
     }
 
-   private:
+private:
     static QString resourceTypeParameter(ModPlatform::ResourceType type)
     {
         switch (type) {
-            case ModPlatform::ResourceType::Mod:
-                return "mod";
-            case ModPlatform::ResourceType::ResourcePack:
-                return "resourcepack";
-            case ModPlatform::ResourceType::ShaderPack:
-                return "shader";
-            case ModPlatform::ResourceType::DataPack:
-                return "datapack";
-            case ModPlatform::ResourceType::Modpack:
-                return "modpack";
-            default:
-                qWarning() << "Invalid resource type for Modrinth API!";
-                break;
+        case ModPlatform::ResourceType::Mod:
+            return "mod";
+        case ModPlatform::ResourceType::ResourcePack:
+            return "resourcepack";
+        case ModPlatform::ResourceType::ShaderPack:
+            return "shader";
+        case ModPlatform::ResourceType::DataPack:
+            return "datapack";
+        case ModPlatform::ResourceType::Modpack:
+            return "modpack";
+        default:
+            qWarning() << "Invalid resource type for Modrinth API!";
+            break;
         }
 
         return "";
@@ -151,7 +160,7 @@ class ModrinthAPI : public ResourceAPI {
         return QString("[%1]").arg(facets_list.join(','));
     }
 
-   public:
+public:
     auto getSearchURL(const SearchArgs& args) const -> std::optional<QString> override
     {
         if (args.loaders.has_value() && args.loaders.value() != 0) {
@@ -231,7 +240,7 @@ class ModrinthAPI : public ResourceAPI {
     };
 
     QJsonArray documentToArray(QJsonDocument& obj) const override { return obj.object().value("hits").toArray(); }
-    void loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { Modrinth::loadIndexedPack(m, obj); }
+    void       loadIndexedPack(ModPlatform::IndexedPack& m, QJsonObject& obj) const override { Modrinth::loadIndexedPack(m, obj); }
     ModPlatform::IndexedVersion loadIndexedPackVersion(QJsonObject& obj, ModPlatform::ResourceType) const override
     {
         return Modrinth::loadIndexedPackVersion(obj);

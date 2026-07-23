@@ -15,25 +15,27 @@
 
 #pragma once
 
-#include <QDialog>
 #include "BaseInstance.h"
+#include <QDialog>
 
 class BaseInstance;
 
-namespace Ui {
+namespace Ui
+{
 class CreateShortcutDialog;
 }
 
-class CreateShortcutDialog : public QDialog {
+class CreateShortcutDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit CreateShortcutDialog(BaseInstance* instance, QWidget* parent = nullptr);
     ~CreateShortcutDialog();
 
     void createShortcut();
 
-   private slots:
+private slots:
 
     void on_iconButton_clicked();
 
@@ -45,11 +47,11 @@ class CreateShortcutDialog : public QDialog {
     void on_worldSelectionBox_currentIndexChanged(int index);
     void on_serverAddressBox_textChanged(const QString& text);
 
-   private:
+private:
     Ui::CreateShortcutDialog* ui;
-    QString InstIconKey;
-    BaseInstance* m_instance;
-    bool m_QuickJoinSupported = false;
+    QString                   InstIconKey;
+    BaseInstance*             m_instance;
+    bool                      m_QuickJoinSupported = false;
 
     void stateChanged();
 };

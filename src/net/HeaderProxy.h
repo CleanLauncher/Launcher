@@ -22,22 +22,25 @@
 #include <QDebug>
 #include <QNetworkRequest>
 
-namespace Net {
+namespace Net
+{
 
-struct HeaderPair {
+struct HeaderPair
+{
     QByteArray headerName;
     QByteArray headerValue;
 };
 
-class HeaderProxy {
-   public:
+class HeaderProxy
+{
+public:
     HeaderProxy() {}
     virtual ~HeaderProxy() {}
 
-   public:
+public:
     virtual QList<HeaderPair> headers(const QNetworkRequest& request) const = 0;
 
-   public:
+public:
     void writeHeaders(QNetworkRequest& request)
     {
         for (auto header : headers(request)) {

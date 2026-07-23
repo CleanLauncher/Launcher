@@ -7,22 +7,25 @@
 #include "ui/pages/modplatform/ResourcePackModel.h"
 #include "ui/pages/modplatform/ResourcePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class ResourcePackDownloadDialog;
 
-class ResourcePackResourcePage : public ResourcePage {
+class ResourcePackResourcePage : public ResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     template <typename T>
     static T* create(ResourcePackDownloadDialog* dialog, BaseInstance& instance)
     {
-        auto page = new T(dialog, instance);
+        auto page  = new T(dialog, instance);
         auto model = static_cast<ResourcePackResourceModel*>(page->getModel());
 
         connect(model, &ResourceModel::versionListUpdated, page, &ResourcePage::versionListUpdated);
@@ -42,10 +45,10 @@ class ResourcePackResourcePage : public ResourcePage {
 
     inline auto helpPage() const -> QString override { return "resourcepack-platform"; }
 
-   protected:
+protected:
     ResourcePackResourcePage(ResourceDownloadDialog* dialog, BaseInstance& instance);
 
-   protected slots:
+protected slots:
     void triggerSearch() override;
 };
 

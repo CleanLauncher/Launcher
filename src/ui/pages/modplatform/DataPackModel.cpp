@@ -7,7 +7,8 @@
 
 #include <QMessageBox>
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 DataPackResourceModel::DataPackResourceModel(const BaseInstance& base_inst, ResourceAPI* api, QString debugName, QString metaEntryBase)
     : ResourceModel(api), m_base_instance(base_inst), m_debugName(debugName + " (Model)"), m_metaEntryBase(metaEntryBase)
@@ -16,19 +17,19 @@ DataPackResourceModel::DataPackResourceModel(const BaseInstance& base_inst, Reso
 ResourceAPI::SearchArgs DataPackResourceModel::createSearchArguments()
 {
     auto sort = getCurrentSortingMethodByIndex();
-    return { ModPlatform::ResourceType::DataPack, m_next_search_offset, m_search_term, sort, ModPlatform::ModLoaderType::DataPack };
+    return {ModPlatform::ResourceType::DataPack, m_next_search_offset, m_search_term, sort, ModPlatform::ModLoaderType::DataPack};
 }
 
 ResourceAPI::VersionSearchArgs DataPackResourceModel::createVersionsArguments(const QModelIndex& entry)
 {
     auto pack = m_packs[entry.row()];
-    return { pack, {}, ModPlatform::ModLoaderType::DataPack };
+    return {pack, {}, ModPlatform::ModLoaderType::DataPack};
 }
 
 ResourceAPI::ProjectInfoArgs DataPackResourceModel::createInfoArguments(const QModelIndex& entry)
 {
     auto pack = m_packs[entry.row()];
-    return { pack };
+    return {pack};
 }
 
 void DataPackResourceModel::searchWithTerm(const QString& term, unsigned int sort)

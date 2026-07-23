@@ -34,7 +34,8 @@
 #include "net/ApiDownload.h"
 #include "net/ChecksumValidator.h"
 
-namespace {
+namespace
+{
 Net::ModrinthDownloadMeta createModrinthMeta(BaseInstance* instance, QString reason)
 {
     auto* mcInstance = dynamic_cast<MinecraftInstance*>(instance);
@@ -50,18 +51,18 @@ Net::ModrinthDownloadMeta createModrinthMeta(BaseInstance* instance, QString rea
     auto loaders = profile->getModLoadersList();
 
     return {
-        .reason = std::move(reason),
+        .reason      = std::move(reason),
         .gameVersion = profile->getComponentVersion("net.minecraft"),
-        .loader = !loaders.isEmpty() ? ModPlatform::getModLoaderAsString(loaders.first()) : "",
+        .loader      = !loaders.isEmpty() ? ModPlatform::getModLoaderAsString(loaders.first()) : "",
     };
 }
 }  // namespace
 
 ResourceDownloadTask::ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
-                                           ModPlatform::IndexedVersion version,
-                                           ResourceFolderModel* packs,
-                                           bool isIndexed,
-                                           QString downloadReason)
+                                           ModPlatform::IndexedVersion   version,
+                                           ResourceFolderModel*          packs,
+                                           bool                          isIndexed,
+                                           QString                       downloadReason)
     : m_pack(std::move(pack)), m_pack_version(std::move(version)), m_pack_model(packs)
 {
     if (isIndexed) {
@@ -74,28 +75,29 @@ ResourceDownloadTask::ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
     m_filesNetJob.reset(new NetJob(tr("Resource download"), APPLICATION->network()));
     m_filesNetJob->setStatus(tr("Downloading resource:\n%1").arg(m_pack_version.downloadUrl));
 
-    auto action = Net::ApiDownload::makeFile(m_pack_version.downloadUrl, m_pack_model->dir().absoluteFilePath(getFilename()),
+    auto action = Net::ApiDownload::makeFile(m_pack_version.downloadUrl,
+                                             m_pack_model->dir().absoluteFilePath(getFilename()),
                                              Net::Download::Option::NoOptions,
                                              createModrinthMeta(m_pack_model->instance(), std::move(downloadReason)));
     if (!m_pack_version.hash_type.isEmpty() && !m_pack_version.hash.isEmpty()) {
         switch (Hashing::algorithmFromString(m_pack_version.hash_type)) {
-            case Hashing::Algorithm::Md4:
-                action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Md4, m_pack_version.hash));
-                break;
-            case Hashing::Algorithm::Md5:
-                action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Md5, m_pack_version.hash));
-                break;
-            case Hashing::Algorithm::Sha1:
-                action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha1, m_pack_version.hash));
-                break;
-            case Hashing::Algorithm::Sha256:
-                action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha256, m_pack_version.hash));
-                break;
-            case Hashing::Algorithm::Sha512:
-                action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha512, m_pack_version.hash));
-                break;
-            default:
-                break;
+        case Hashing::Algorithm::Md4:
+            action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Md4, m_pack_version.hash));
+            break;
+        case Hashing::Algorithm::Md5:
+            action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Md5, m_pack_version.hash));
+            break;
+        case Hashing::Algorithm::Sha1:
+            action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha1, m_pack_version.hash));
+            break;
+        case Hashing::Algorithm::Sha256:
+            action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha256, m_pack_version.hash));
+            break;
+        case Hashing::Algorithm::Sha512:
+            action->addValidator(new Net::ChecksumValidator(QCryptographicHash::Algorithm::Sha512, m_pack_version.hash));
+            break;
+        default:
+            break;
         }
     }
     m_filesNetJob->addNetAction(action);
@@ -110,7 +112,7 @@ ResourceDownloadTask::ResourceDownloadTask(ModPlatform::IndexedPack::Ptr pack,
 void ResourceDownloadTask::downloadSucceeded()
 {
     m_filesNetJob.reset();
-    auto oldName = std::get<0>(to_delete);
+    auto oldName     = std::get<0>(to_delete);
     auto oldFilename = std::get<1>(to_delete);
 
     if (oldName.isEmpty() || oldFilename == m_pack_version.fileName) {
@@ -146,5 +148,5 @@ void ResourceDownloadTask::downloadProgressChanged(qint64 current, qint64 total)
 
 void ResourceDownloadTask::hasOldResource(const QString& name, const QString& filename)
 {
-    to_delete = { name, filename };
+    to_delete = {name, filename};
 }

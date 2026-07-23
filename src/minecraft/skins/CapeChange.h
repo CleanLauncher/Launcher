@@ -20,18 +20,19 @@
 
 #include "net/NetRequest.h"
 
-class CapeChange : public Net::NetRequest {
+class CapeChange : public Net::NetRequest
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<CapeChange>;
     CapeChange(QString capeId);
     virtual ~CapeChange() = default;
 
     static CapeChange::Ptr make(QString token, QString capeId);
 
-   protected:
+protected:
     virtual QNetworkReply* getReply(QNetworkRequest&) override;
 
-   private:
+private:
     QString m_capeId;
 };

@@ -5,10 +5,11 @@
 #include "net/NetJob.h"
 #include "net/Upload.h"
 
-class XboxUserStep : public AuthStep {
+class XboxUserStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit XboxUserStep(AccountData* data);
     virtual ~XboxUserStep() noexcept = default;
 
@@ -16,10 +17,10 @@ class XboxUserStep : public AuthStep {
 
     QString describe() override;
 
-   private slots:
+private slots:
     void onRequestDone(QByteArray* response);
 
-   private:
+private:
     Net::Upload::Ptr m_request;
-    NetJob::Ptr m_task;
+    NetJob::Ptr      m_task;
 };

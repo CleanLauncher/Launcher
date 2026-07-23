@@ -141,11 +141,14 @@ void ShaderPackPage::updateShaderPacks()
     }
     if (m_instance != nullptr && m_instance->isRunning()) {
         auto response =
-            CustomMessageBox::selectable(this, tr("Confirm Update"),
+            CustomMessageBox::selectable(this,
+                                         tr("Confirm Update"),
                                          tr("Updating shader packs while the game is running may pack duplication and game crashes.\n"
                                             "The old files may not be deleted as they are in use.\n"
                                             "Are you sure you want to do this?"),
-                                         QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                         QMessageBox::Warning,
+                                         QMessageBox::Yes | QMessageBox::No,
+                                         QMessageBox::No)
                 ->exec();
 
         if (response != QMessageBox::Yes) {
@@ -155,7 +158,7 @@ void ShaderPackPage::updateShaderPacks()
     auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
 
     auto modsList = m_model->selectedResources(selection);
-    bool useAll = modsList.empty();
+    bool useAll   = modsList.empty();
     if (useAll) {
         modsList = m_model->allResources();
     }
@@ -168,7 +171,7 @@ void ShaderPackPage::updateShaderPacks()
         return;
     }
     if (updateDialog.noUpdates()) {
-        QString message{ tr("'%1' is up-to-date! :)").arg(modsList.front()->name()) };
+        QString message{tr("'%1' is up-to-date! :)").arg(modsList.front()->name())};
         if (modsList.size() > 1) {
             if (useAll) {
                 message = tr("All shader packs are up-to-date! :)");
@@ -212,17 +215,20 @@ void ShaderPackPage::updateShaderPacks()
 
 void ShaderPackPage::deleteShaderPackMetadata()
 {
-    auto selection = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
+    auto selection      = m_filterModel->mapSelectionToSource(ui->treeView->selectionModel()->selection()).indexes();
     auto selectionCount = m_model->selectedShaderPacks(selection).length();
     if (selectionCount == 0) {
         return;
     }
     if (selectionCount > 1) {
-        auto response = CustomMessageBox::selectable(this, tr("Confirm Removal"),
+        auto response = CustomMessageBox::selectable(this,
+                                                     tr("Confirm Removal"),
                                                      tr("You are about to remove the metadata for %1 shader packs.\n"
                                                         "Are you sure?")
                                                          .arg(selectionCount),
-                                                     QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                     QMessageBox::Warning,
+                                                     QMessageBox::Yes | QMessageBox::No,
+                                                     QMessageBox::No)
                             ->exec();
 
         if (response != QMessageBox::Yes) {

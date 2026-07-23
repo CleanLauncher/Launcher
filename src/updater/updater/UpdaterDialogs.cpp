@@ -24,10 +24,10 @@
 
 #include "ui_SelectReleaseDialog.h"
 
-#include <QPushButton>
-#include <QTextBrowser>
 #include "Markdown.h"
 #include "StringUtils.h"
+#include <QPushButton>
+#include <QTextBrowser>
 
 SelectReleaseDialog::SelectReleaseDialog(const Version& current_version, const QList<GitHubRelease>& releases, QWidget* parent)
     : QDialog(parent), m_releases(releases), m_currentVersion(current_version), ui(new Ui::SelectReleaseDialog)
@@ -42,7 +42,7 @@ SelectReleaseDialog::SelectReleaseDialog(const Version& current_version, const Q
 
     ui->versionsTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->versionsTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    ui->versionsTree->setHeaderLabels({ tr("Version"), tr("Published Date") });
+    ui->versionsTree->setHeaderLabels({tr("Version"), tr("Published Date")});
     ui->versionsTree->header()->setStretchLastSection(false);
 
     ui->eplainLabel->setText(tr("Select a version to install.\n"
@@ -86,7 +86,7 @@ void SelectReleaseDialog::appendRelease(const GitHubRelease& release)
 
 GitHubRelease SelectReleaseDialog::getRelease(QTreeWidgetItem* item)
 {
-    int id = item->data(0, Qt::UserRole).toInt();
+    int           id = item->data(0, Qt::UserRole).toInt();
     GitHubRelease release;
     for (auto rls : m_releases) {
         if (rls.id == id)
@@ -98,8 +98,8 @@ GitHubRelease SelectReleaseDialog::getRelease(QTreeWidgetItem* item)
 void SelectReleaseDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem*)
 {
     GitHubRelease release = getRelease(current);
-    QString body = markdownToHTML(release.body.toUtf8());
-    m_selectedRelease = release;
+    QString       body    = markdownToHTML(release.body.toUtf8());
+    m_selectedRelease     = release;
 
     ui->changelogTextBrowser->setHtml(StringUtils::htmlListPatch(body));
 }
@@ -117,7 +117,7 @@ SelectReleaseAssetDialog::SelectReleaseAssetDialog(const QList<GitHubReleaseAsse
 
     ui->versionsTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->versionsTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    ui->versionsTree->setHeaderLabels({ tr("Version"), tr("Published Date") });
+    ui->versionsTree->setHeaderLabels({tr("Version"), tr("Published Date")});
     ui->versionsTree->header()->setStretchLastSection(false);
 
     ui->eplainLabel->setText(tr("Select a version to install."));
@@ -157,7 +157,7 @@ void SelectReleaseAssetDialog::appendAsset(const GitHubReleaseAsset& asset)
 
 GitHubReleaseAsset SelectReleaseAssetDialog::getAsset(QTreeWidgetItem* item)
 {
-    int id = item->data(0, Qt::UserRole).toInt();
+    int                id = item->data(0, Qt::UserRole).toInt();
     GitHubReleaseAsset selected_asset;
     for (auto asset : m_assets) {
         if (asset.id == id)
@@ -169,5 +169,5 @@ GitHubReleaseAsset SelectReleaseAssetDialog::getAsset(QTreeWidgetItem* item)
 void SelectReleaseAssetDialog::selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem*)
 {
     GitHubReleaseAsset asset = getAsset(current);
-    m_selectedAsset = asset;
+    m_selectedAsset          = asset;
 }

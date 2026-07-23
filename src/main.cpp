@@ -50,22 +50,22 @@ int main(int argc, char* argv[])
 
     Application app(argc, argv);
     switch (app.status()) {
-        case Application::StartingUp:
-        case Application::Initialized: {
-            Q_INIT_RESOURCE(multimc);
-            Q_INIT_RESOURCE(backgrounds);
-            Q_INIT_RESOURCE(documents);
-            Q_INIT_RESOURCE(launcher);
-            Q_INIT_RESOURCE(breeze_dark);
-            Q_INIT_RESOURCE(breeze_light);
-            Q_INIT_RESOURCE(shaders);
-            return app.exec();
-        }
-        case Application::Failed:
-            return 1;
-        case Application::Succeeded:
-            return 0;
-        default:
-            return -1;
+    case Application::StartingUp:
+    case Application::Initialized: {
+        Q_INIT_RESOURCE(multimc);
+        Q_INIT_RESOURCE(backgrounds);
+        Q_INIT_RESOURCE(documents);
+        Q_INIT_RESOURCE(launcher);
+        Q_INIT_RESOURCE(breeze_dark);
+        Q_INIT_RESOURCE(breeze_light);
+        Q_INIT_RESOURCE(shaders);
+        return app.exec();
+    }
+    case Application::Failed:
+        return 1;
+    case Application::Succeeded:
+        return 0;
+    default:
+        return -1;
     }
 }

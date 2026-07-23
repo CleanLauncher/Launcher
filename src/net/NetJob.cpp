@@ -36,9 +36,9 @@
  */
 
 #include "NetJob.h"
-#include <QNetworkReply>
 #include "net/NetRequest.h"
 #include "tasks/ConcurrentTask.h"
+#include <QNetworkReply>
 #if defined(LAUNCHER_APPLICATION)
 #include "Application.h"
 #include "settings/SettingsObject.h"

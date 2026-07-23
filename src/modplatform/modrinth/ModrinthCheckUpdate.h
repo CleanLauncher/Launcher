@@ -2,28 +2,29 @@
 
 #include "modplatform/CheckUpdateTask.h"
 
-class ModrinthCheckUpdate : public CheckUpdateTask {
+class ModrinthCheckUpdate : public CheckUpdateTask
+{
     Q_OBJECT
 
-   public:
-    ModrinthCheckUpdate(QList<Resource*>& resources,
-                        std::vector<Version>& mcVersions,
+public:
+    ModrinthCheckUpdate(QList<Resource*>&                 resources,
+                        std::vector<Version>&             mcVersions,
                         QList<ModPlatform::ModLoaderType> loadersList,
-                        ResourceFolderModel* resourceModel);
+                        ResourceFolderModel*              resourceModel);
 
-   public slots:
+public slots:
     bool abort() override;
 
-   protected slots:
+protected slots:
     void executeTask() override;
     void getUpdateModsForLoader(std::optional<ModPlatform::ModLoaderTypes> loader = {}, bool forceModLoaderCheck = false);
     void checkVersionsResponse(QByteArray* response, std::optional<ModPlatform::ModLoaderTypes> loader);
     void checkNextLoader();
 
-   private:
-    Task::Ptr m_job = nullptr;
+private:
+    Task::Ptr                 m_job = nullptr;
     QHash<QString, Resource*> m_mappings;
-    QString m_hashType;
-    int m_loaderIdx = 0;
-    qsizetype m_initialSize = 0;
+    QString                   m_hashType;
+    int                       m_loaderIdx   = 0;
+    qsizetype                 m_initialSize = 0;
 };

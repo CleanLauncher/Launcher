@@ -37,15 +37,16 @@
 
 #include "ConcurrentTask.h"
 
-class SequentialTask : public ConcurrentTask {
+class SequentialTask : public ConcurrentTask
+{
     Q_OBJECT
-   public:
+public:
     explicit SequentialTask(QString task_name = "");
     ~SequentialTask() override = default;
 
-   protected slots:
+protected slots:
     virtual void subTaskFailed(Task::Ptr, const QString& msg) override;
 
-   protected:
+protected:
     void updateState() override;
 };

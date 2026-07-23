@@ -38,15 +38,16 @@
 
 #include "ui/dialogs/UpdateAvailableDialog.h"
 
-class ExternalUpdater::Private {
-   public:
-    QDir appDir;
-    QDir dataDir;
-    QTimer updateTimer;
-    bool allowBeta{};
-    bool autoCheck{};
-    double updateInterval{};
-    QDateTime lastCheck;
+class ExternalUpdater::Private
+{
+public:
+    QDir                       appDir;
+    QDir                       dataDir;
+    QTimer                     updateTimer;
+    bool                       allowBeta{};
+    bool                       autoCheck{};
+    double                     updateInterval{};
+    QDateTime                  lastCheck;
     std::unique_ptr<QSettings> settings;
 
     QWidget* parent{};
@@ -54,13 +55,13 @@ class ExternalUpdater::Private {
 
 ExternalUpdater::ExternalUpdater(QWidget* parent, const QString& appDir, const QString& dataDir) : priv(new ExternalUpdater::Private())
 {
-    priv->appDir = QDir(appDir);
-    priv->dataDir = QDir(dataDir);
+    priv->appDir      = QDir(appDir);
+    priv->dataDir     = QDir(dataDir);
     auto settingsFile = priv->dataDir.absoluteFilePath("launcher_update.cfg");
-    priv->settings = std::make_unique<QSettings>(settingsFile, QSettings::Format::IniFormat);
-    priv->allowBeta = priv->settings->value("allow_beta", false).toBool();
-    priv->autoCheck = priv->settings->value("auto_check", true).toBool();
-    bool intervalOk = false;
+    priv->settings    = std::make_unique<QSettings>(settingsFile, QSettings::Format::IniFormat);
+    priv->allowBeta   = priv->settings->value("allow_beta", false).toBool();
+    priv->autoCheck   = priv->settings->value("auto_check", true).toBool();
+    bool intervalOk   = false;
 
     priv->updateInterval = priv->settings->value("update_interval", 86400).toInt(&intervalOk);
     if (!intervalOk) {
@@ -105,7 +106,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
     QCoreApplication::processEvents();
 
     QProcess proc;
-    auto exeName = QStringLiteral("%1_updater").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
+    auto     exeName = QStringLiteral("%1_updater").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
 #ifdef Q_OS_WIN32
     exeName.append(".exe");
 
@@ -116,7 +117,7 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
     exeName = QString("bin/%1").arg(exeName);
 #endif
 
-    QStringList args = { "--check-only", "--dir", priv->dataDir.absolutePath(), "--debug" };
+    QStringList args = {"--check-only", "--dir", priv->dataDir.absolutePath(), "--debug"};
     if (priv->allowBeta) {
         args.append("--pre-release");
     }
@@ -126,9 +127,11 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
         auto err = proc.error();
         qDebug() << "Failed to start updater after 5 seconds."
                  << "reason:" << err << proc.errorString();
-        auto msgBox =
-            QMessageBox(QMessageBox::Information, tr("Update Check Failed"),
-                        tr("Failed to start after 5 seconds\nReason: %1.").arg(proc.errorString()), QMessageBox::Ok, priv->parent);
+        auto msgBox = QMessageBox(QMessageBox::Information,
+                                  tr("Update Check Failed"),
+                                  tr("Failed to start after 5 seconds\nReason: %1.").arg(proc.errorString()),
+                                  QMessageBox::Ok,
+                                  priv->parent);
         msgBox.setMinimumWidth(460);
         msgBox.adjustSize();
         msgBox.exec();
@@ -142,13 +145,15 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
 
     if (auto resultFinished = proc.waitForFinished(60000); !resultFinished) {
         proc.kill();
-        auto err = proc.error();
+        auto err    = proc.error();
         auto output = proc.readAll();
         qDebug() << "Updater failed to close after 60 seconds."
                  << "reason:" << err << proc.errorString();
-        auto msgBox =
-            QMessageBox(QMessageBox::Information, tr("Update Check Failed"),
-                        tr("Updater failed to close 60 seconds\nReason: %1.").arg(proc.errorString()), QMessageBox::Ok, priv->parent);
+        auto msgBox = QMessageBox(QMessageBox::Information,
+                                  tr("Update Check Failed"),
+                                  tr("Updater failed to close 60 seconds\nReason: %1.").arg(proc.errorString()),
+                                  QMessageBox::Ok,
+                                  priv->parent);
         msgBox.setDetailedText(output);
         msgBox.setMinimumWidth(460);
         msgBox.adjustSize();
@@ -163,61 +168,69 @@ void ExternalUpdater::checkForUpdates(bool triggeredByUser) const
     auto exitCode = proc.exitCode();
 
     auto stdOutput = proc.readAllStandardOutput();
-    auto stdError = proc.readAllStandardError();
+    auto stdError  = proc.readAllStandardError();
 
     progress.cancel();
     QCoreApplication::processEvents();
 
     switch (exitCode) {
-        case 0:
+    case 0:
 
-            if (triggeredByUser) {
-                qDebug() << "No update available";
-                auto msgBox = QMessageBox(QMessageBox::Information, tr("No Update Available"), tr("You are running the latest version."),
-                                          QMessageBox::Ok, priv->parent);
-                msgBox.setMinimumWidth(460);
-                msgBox.adjustSize();
-                msgBox.exec();
-            }
-            break;
-        case 1:
-
-        {
-            qDebug() << "Updater subprocess error" << qPrintable(stdError);
-            auto msgBox = QMessageBox(QMessageBox::Warning, tr("Update Check Error"), tr("There was an error running the update check."),
-                                      QMessageBox::Ok, priv->parent);
-            msgBox.setDetailedText(QString(stdError));
-            msgBox.setMinimumWidth(460);
-            msgBox.adjustSize();
-            msgBox.exec();
-        } break;
-        case 100:
-
-        {
-            auto [firstLine, remainder1] = StringUtils::splitFirst(stdOutput, '\n');
-            auto [secondLine, remainder2] = StringUtils::splitFirst(remainder1, '\n');
-            auto [thirdLine, releaseNotes] = StringUtils::splitFirst(remainder2, '\n');
-            auto versionName = StringUtils::splitFirst(firstLine, ": ").second.trimmed();
-            auto versionTag = StringUtils::splitFirst(secondLine, ": ").second.trimmed();
-            auto releaseTimestamp = QDateTime::fromString(StringUtils::splitFirst(thirdLine, ": ").second.trimmed(), Qt::ISODate);
-            qDebug() << "Update available:" << versionName << versionTag << releaseTimestamp;
-            qDebug() << "Update release notes:" << releaseNotes;
-
-            offerUpdate(versionName, versionTag, releaseNotes, triggeredByUser);
-        } break;
-        default:
-
-        {
-            qDebug() << "Updater exited with unknown code" << exitCode;
-            auto msgBox = QMessageBox(QMessageBox::Information, tr("Unknown Update Error"),
-                                      tr("The updater exited with an unknown condition.\nExit Code: %1").arg(QString::number(exitCode)),
-                                      QMessageBox::Ok, priv->parent);
-            auto detailTxt = tr("StdOut: %1\nStdErr: %2").arg(QString(stdOutput)).arg(QString(stdError));
-            msgBox.setDetailedText(detailTxt);
+        if (triggeredByUser) {
+            qDebug() << "No update available";
+            auto msgBox = QMessageBox(QMessageBox::Information,
+                                      tr("No Update Available"),
+                                      tr("You are running the latest version."),
+                                      QMessageBox::Ok,
+                                      priv->parent);
             msgBox.setMinimumWidth(460);
             msgBox.adjustSize();
             msgBox.exec();
         }
+        break;
+    case 1:
+
+    {
+        qDebug() << "Updater subprocess error" << qPrintable(stdError);
+        auto msgBox = QMessageBox(QMessageBox::Warning,
+                                  tr("Update Check Error"),
+                                  tr("There was an error running the update check."),
+                                  QMessageBox::Ok,
+                                  priv->parent);
+        msgBox.setDetailedText(QString(stdError));
+        msgBox.setMinimumWidth(460);
+        msgBox.adjustSize();
+        msgBox.exec();
+    } break;
+    case 100:
+
+    {
+        auto [firstLine, remainder1]   = StringUtils::splitFirst(stdOutput, '\n');
+        auto [secondLine, remainder2]  = StringUtils::splitFirst(remainder1, '\n');
+        auto [thirdLine, releaseNotes] = StringUtils::splitFirst(remainder2, '\n');
+        auto versionName               = StringUtils::splitFirst(firstLine, ": ").second.trimmed();
+        auto versionTag                = StringUtils::splitFirst(secondLine, ": ").second.trimmed();
+        auto releaseTimestamp          = QDateTime::fromString(StringUtils::splitFirst(thirdLine, ": ").second.trimmed(), Qt::ISODate);
+        qDebug() << "Update available:" << versionName << versionTag << releaseTimestamp;
+        qDebug() << "Update release notes:" << releaseNotes;
+
+        offerUpdate(versionName, versionTag, releaseNotes, triggeredByUser);
+    } break;
+    default:
+
+    {
+        qDebug() << "Updater exited with unknown code" << exitCode;
+        auto msgBox    = QMessageBox(QMessageBox::Information,
+                                  tr("Unknown Update Error"),
+                                  tr("The updater exited with an unknown condition.\nExit Code: %1").arg(QString::number(exitCode)),
+                                  QMessageBox::Ok,
+                                  priv->parent);
+        auto detailTxt = tr("StdOut: %1\nStdErr: %2").arg(QString(stdOutput)).arg(QString(stdError));
+        msgBox.setDetailedText(detailTxt);
+        msgBox.setMinimumWidth(460);
+        msgBox.adjustSize();
+        msgBox.exec();
+    }
     }
     priv->lastCheck = QDateTime::currentDateTime();
     priv->settings->setValue("last_check", priv->lastCheck.toString(Qt::ISODate));
@@ -271,9 +284,9 @@ void ExternalUpdater::resetAutoCheckTimer() const
         qint64 timeoutMs = 0;
 
         if (priv->lastCheck.isValid()) {
-            const qint64 diff = priv->lastCheck.secsTo(now);
+            const qint64 diff     = priv->lastCheck.secsTo(now);
             const qint64 secsLeft = std::max<qint64>(priv->updateInterval - diff, 0);
-            timeoutMs = secsLeft * 1000;
+            timeoutMs             = secsLeft * 1000;
         }
 
         timeoutMs = std::min(timeoutMs, static_cast<qint64>(INT_MAX));
@@ -306,7 +319,7 @@ void ExternalUpdater::autoCheckTimerFired() const
 void ExternalUpdater::offerUpdate(const QString& versionName,
                                   const QString& versionTag,
                                   const QString& releaseNotes,
-                                  const bool triggeredByUser) const
+                                  const bool     triggeredByUser) const
 {
     priv->settings->beginGroup("skip");
     auto shouldSkip = !triggeredByUser && priv->settings->value(versionTag, false).toBool();
@@ -314,8 +327,11 @@ void ExternalUpdater::offerUpdate(const QString& versionName,
 
     if (shouldSkip) {
         if (triggeredByUser) {
-            auto msgBox = QMessageBox(QMessageBox::Information, tr("No Update Available"), tr("There are no new updates available."),
-                                      QMessageBox::Ok, priv->parent);
+            auto msgBox = QMessageBox(QMessageBox::Information,
+                                      tr("No Update Available"),
+                                      tr("There are no new updates available."),
+                                      QMessageBox::Ok,
+                                      priv->parent);
             msgBox.setMinimumWidth(460);
             msgBox.adjustSize();
             msgBox.exec();
@@ -344,7 +360,7 @@ void ExternalUpdater::offerUpdate(const QString& versionName,
 void ExternalUpdater::performUpdate(const QString& versionTag) const
 {
     QProcess proc;
-    auto exeName = QStringLiteral("%1_updater").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
+    auto     exeName = QStringLiteral("%1_updater").arg(BuildConfig.LAUNCHER_APP_BINARY_NAME);
 #ifdef Q_OS_WIN32
     exeName.append(".exe");
 
@@ -355,7 +371,7 @@ void ExternalUpdater::performUpdate(const QString& versionTag) const
     exeName = QString("bin/%1").arg(exeName);
 #endif
 
-    QStringList args = { "--dir", priv->dataDir.absolutePath(), "--install-version", versionTag };
+    QStringList args = {"--dir", priv->dataDir.absolutePath(), "--install-version", versionTag};
     if (priv->allowBeta) {
         args.append("--pre-release");
     }

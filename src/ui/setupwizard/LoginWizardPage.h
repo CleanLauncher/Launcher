@@ -1,24 +1,26 @@
 #pragma once
-#include <QWidget>
 #include "BaseWizardPage.h"
+#include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class LoginWizardPage;
 }
 
-class LoginWizardPage : public BaseWizardPage {
+class LoginWizardPage : public BaseWizardPage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit LoginWizardPage(QWidget* parent = nullptr);
     ~LoginWizardPage();
 
     void initializePage() override;
     bool validatePage() override;
     void retranslate() override;
-   private slots:
+private slots:
     void on_pushButton_clicked();
 
-   private:
+private:
     Ui::LoginWizardPage* ui;
 };

@@ -19,8 +19,8 @@
 
 #include "LogParser.h"
 
-#include <QRegularExpression>
 #include "MessageLevel.h"
+#include <QRegularExpression>
 
 using namespace Qt::Literals::StringLiterals;
 
@@ -48,7 +48,7 @@ std::optional<LogParser::LogEntry> LogParser::parseAttributes()
     auto attributes = m_parser.attributes();
 
     for (const auto& attr : attributes) {
-        auto name = attr.name();
+        auto name  = attr.name();
         auto value = attr.value();
         if (name == "logger"_L1) {
             entry.logger = value.trimmed().toString();
@@ -60,7 +60,7 @@ std::optional<LogParser::LogEntry> LogParser::parseAttributes()
             entry.timestamp = QDateTime::fromSecsSinceEpoch(value.trimmed().toLongLong());
         } else if (name == "level"_L1) {
             entry.levelText = value.trimmed().toString();
-            entry.level = MessageLevel::fromName(entry.levelText);
+            entry.level     = MessageLevel::fromName(entry.levelText);
         } else if (name == "thread"_L1) {
             entry.thread = value.trimmed().toString();
         }
@@ -107,7 +107,7 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
     if (m_buffer.trimmed().isEmpty()) {
         auto text = QString(m_buffer);
         m_buffer.clear();
-        return LogParser::PlainText{ text };
+        return LogParser::PlainText{text};
     }
 
     bool isCompleteLog4j = false;
@@ -116,23 +116,23 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
     m_parser.addData(m_buffer);
     if (m_parser.readNextStartElement()) {
         if (m_parser.qualifiedName().compare("log4j:Event"_L1, Qt::CaseInsensitive) == 0) {
-            int depth = 1;
-            bool eod = false;
+            int  depth = 1;
+            bool eod   = false;
             while (depth > 0 && !eod) {
                 auto tok = m_parser.readNext();
                 switch (tok) {
-                    case QXmlStreamReader::TokenType::StartElement: {
-                        depth += 1;
-                    } break;
-                    case QXmlStreamReader::TokenType::EndElement: {
-                        depth -= 1;
-                    } break;
-                    case QXmlStreamReader::TokenType::EndDocument: {
-                        eod = true;
+                case QXmlStreamReader::TokenType::StartElement: {
+                    depth += 1;
+                } break;
+                case QXmlStreamReader::TokenType::EndElement: {
+                    depth -= 1;
+                } break;
+                case QXmlStreamReader::TokenType::EndDocument: {
+                    eod = true;
 
-                    } break;
-                    default: {
-                    }
+                } break;
+                default: {
+                }
                 }
                 if (m_parser.hasError()) {
                     break;
@@ -148,25 +148,25 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
     } else {
         if (isPotentialLog4JStart(m_buffer)) {
             m_partialData = QString(m_buffer);
-            return LogParser::Partial{ QString(m_buffer) };
+            return LogParser::Partial{QString(m_buffer)};
         }
 
-        int start = 0;
+        int  start   = 0;
         auto bufView = QStringView(m_buffer);
         while (start < bufView.length()) {
             if (qsizetype pos = bufView.right(bufView.length() - start).indexOf('<'); pos != -1) {
                 auto slicestart = start + pos;
-                auto slice = bufView.right(bufView.length() - slicestart);
+                auto slice      = bufView.right(bufView.length() - slicestart);
                 if (isPotentialLog4JStart(slice)) {
                     if (slicestart > 0) {
                         auto text = m_buffer.left(slicestart);
-                        m_buffer = m_buffer.right(m_buffer.length() - slicestart);
+                        m_buffer  = m_buffer.right(m_buffer.length() - slicestart);
                         if (!text.trimmed().isEmpty()) {
-                            return LogParser::PlainText{ text };
+                            return LogParser::PlainText{text};
                         }
                     }
                     m_partialData = QString(m_buffer);
-                    return LogParser::Partial{ QString(m_buffer) };
+                    return LogParser::Partial{QString(m_buffer)};
                 }
                 start = slicestart + 1;
             } else {
@@ -176,14 +176,14 @@ std::optional<LogParser::ParsedItem> LogParser::parseNext()
 
         auto text = QString(m_buffer);
         m_buffer.clear();
-        return LogParser::PlainText{ text };
+        return LogParser::PlainText{text};
     }
 }
 
 QList<LogParser::ParsedItem> LogParser::parseAvailable()
 {
     QList<LogParser::ParsedItem> items;
-    bool doNext = true;
+    bool                         doNext = true;
     while (doNext) {
         auto item_ = parseNext();
         if (m_error.has_value()) {
@@ -219,34 +219,39 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
         auto entry = entry_.value();
 
         bool foundMessage = false;
-        int depth = 1;
+        int  depth        = 1;
 
-        enum parseOp { noOp, entryReady, parseError };
+        enum parseOp
+        {
+            noOp,
+            entryReady,
+            parseError
+        };
 
         auto foundStart = [&]() -> parseOp {
             depth += 1;
             if (m_parser.qualifiedName().compare("log4j:Message"_L1, Qt::CaseInsensitive) == 0) {
                 QString message;
-                bool messageComplete = false;
+                bool    messageComplete = false;
 
                 while (!messageComplete) {
                     auto tok = m_parser.readNext();
 
                     switch (tok) {
-                        case QXmlStreamReader::TokenType::Characters: {
-                            message.append(m_parser.text());
-                        } break;
-                        case QXmlStreamReader::TokenType::EndElement: {
-                            if (m_parser.qualifiedName().compare("log4j:Message"_L1, Qt::CaseInsensitive) == 0) {
-                                messageComplete = true;
-                            }
-                        } break;
-                        case QXmlStreamReader::TokenType::EndDocument: {
-                            return parseError;
-
-                        } break;
-                        default: {
+                    case QXmlStreamReader::TokenType::Characters: {
+                        message.append(m_parser.text());
+                    } break;
+                    case QXmlStreamReader::TokenType::EndElement: {
+                        if (m_parser.qualifiedName().compare("log4j:Message"_L1, Qt::CaseInsensitive) == 0) {
+                            messageComplete = true;
                         }
+                    } break;
+                    case QXmlStreamReader::TokenType::EndDocument: {
+                        return parseError;
+
+                    } break;
+                    default: {
+                    }
                     }
 
                     if (m_parser.hasError()) {
@@ -255,7 +260,7 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
                 }
 
                 entry.message = message;
-                foundMessage = true;
+                foundMessage  = true;
                 depth -= 1;
             }
             return noOp;
@@ -280,31 +285,31 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
         };
 
         while (!m_parser.atEnd()) {
-            auto tok = m_parser.readNext();
-            parseOp op = noOp;
+            auto    tok = m_parser.readNext();
+            parseOp op  = noOp;
             switch (tok) {
-                case QXmlStreamReader::TokenType::StartElement: {
-                    op = foundStart();
-                } break;
-                case QXmlStreamReader::TokenType::EndElement: {
-                    op = foundEnd();
-                } break;
-                case QXmlStreamReader::TokenType::EndDocument: {
-                    return {};
-                } break;
-                default: {
-                }
+            case QXmlStreamReader::TokenType::StartElement: {
+                op = foundStart();
+            } break;
+            case QXmlStreamReader::TokenType::EndElement: {
+                op = foundEnd();
+            } break;
+            case QXmlStreamReader::TokenType::EndDocument: {
+                return {};
+            } break;
+            default: {
+            }
             }
 
             switch (op) {
-                case parseError:
-                    return {};
+            case parseError:
+                return {};
 
-                case entryReady:
-                    return entry;
-                case noOp:
-                default: {
-                }
+            case entryReady:
+                return entry;
+            case noOp:
+            default: {
+            }
             }
 
             if (m_parser.hasError()) {
@@ -319,10 +324,10 @@ std::optional<LogParser::ParsedItem> LogParser::parseLog4J()
 MessageLevel LogParser::guessLevel(const QString& line, MessageLevel previous)
 {
     static const QRegularExpression LINE_WITH_LEVEL("^\\[(?<timestamp>[0-9:]+)\\] \\[[^/]+/(?<level>[^\\]]+)\\]");
-    auto match = LINE_WITH_LEVEL.match(line);
+    auto                            match = LINE_WITH_LEVEL.match(line);
     if (match.hasMatch()) {
         QString timestamp = match.captured("timestamp");
-        QString levelStr = match.captured("level");
+        QString levelStr  = match.captured("level");
 
         return MessageLevel::fromName(levelStr);
     } else {

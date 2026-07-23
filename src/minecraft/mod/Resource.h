@@ -45,7 +45,8 @@
 
 class BaseInstance;
 
-enum class ResourceType : std::uint8_t {
+enum class ResourceType : std::uint8_t
+{
     UNKNOWN,
 
     ZIPFILE,
@@ -60,7 +61,8 @@ enum class ResourceType : std::uint8_t {
 
 QDebug operator<<(QDebug debug, ResourceType type);
 
-enum class ResourceStatus : std::uint8_t {
+enum class ResourceStatus : std::uint8_t
+{
     Installed,
 
     NotInstalled,
@@ -73,7 +75,8 @@ enum class ResourceStatus : std::uint8_t {
 
 QDebug operator<<(QDebug debug, ResourceStatus status);
 
-enum class SortType : std::uint8_t {
+enum class SortType : std::uint8_t
+{
     Name,
     Date,
     Version,
@@ -90,12 +93,18 @@ enum class SortType : std::uint8_t {
     Filename,
 };
 
-enum class EnableAction : std::uint8_t { ENABLE, DISABLE, TOGGLE };
+enum class EnableAction : std::uint8_t
+{
+    ENABLE,
+    DISABLE,
+    TOGGLE
+};
 
-class Resource : public QObject {
+class Resource : public QObject
+{
     Q_OBJECT
     Q_DISABLE_COPY(Resource)
-   public:
+public:
     using Ptr = shared_qobject_ptr<Resource>;
 
     Resource(QObject* parent = nullptr);
@@ -107,22 +116,22 @@ class Resource : public QObject {
     void setFile(QFileInfo fileInfo);
     void parseFile();
 
-    auto fileinfo() const -> QFileInfo { return m_file_info; }
-    auto dateTimeChanged() const -> QDateTime { return m_changed_date_time; }
-    auto internalId() const -> QString { return m_internal_id; }
-    auto type() const -> ResourceType { return m_type; }
-    bool enabled() const { return m_enabled; }
-    auto getOriginalFileName() const -> QString;
+    auto    fileinfo() const -> QFileInfo { return m_file_info; }
+    auto    dateTimeChanged() const -> QDateTime { return m_changed_date_time; }
+    auto    internalId() const -> QString { return m_internal_id; }
+    auto    type() const -> ResourceType { return m_type; }
+    bool    enabled() const { return m_enabled; }
+    auto    getOriginalFileName() const -> QString;
     QString sizeStr() const { return m_size_str; }
-    qint64 sizeInfo() const { return m_size_info; }
+    qint64  sizeInfo() const { return m_size_info; }
 
     virtual auto name() const -> QString;
     virtual bool valid() const { return m_type != ResourceType::UNKNOWN; }
 
-    auto status() const -> ResourceStatus { return m_status; };
-    auto metadata() -> std::shared_ptr<Metadata::ModStruct> { return m_metadata; }
-    auto metadata() const -> std::shared_ptr<const Metadata::ModStruct> { return m_metadata; }
-    auto provider() const -> QString;
+    auto         status() const -> ResourceStatus { return m_status; };
+    auto         metadata() -> std::shared_ptr<Metadata::ModStruct> { return m_metadata; }
+    auto         metadata() const -> std::shared_ptr<const Metadata::ModStruct> { return m_metadata; }
+    auto         provider() const -> QString;
     virtual auto homepage() const -> QString;
 
     void setStatus(ResourceStatus status) { m_status = status; }
@@ -130,8 +139,8 @@ class Resource : public QObject {
     void setMetadata(const Metadata::ModStruct& metadata) { setMetadata(std::make_shared<Metadata::ModStruct>(metadata)); }
 
     QStringList issues() const;
-    void updateIssues(const BaseInstance* inst);
-    bool hasIssues() const { return !m_issues.empty(); }
+    void        updateIssues(const BaseInstance* inst);
+    bool        hasIssues() const { return !m_issues.empty(); }
 
     virtual int compare(const Resource& other, SortType type = SortType::Name) const;
 
@@ -146,7 +155,7 @@ class Resource : public QObject {
 
     void setResolving(bool resolving, int resolutionTicket)
     {
-        m_is_resolving = resolving;
+        m_is_resolving      = resolving;
         m_resolution_ticket = resolutionTicket;
     }
 
@@ -160,7 +169,7 @@ class Resource : public QObject {
 
     bool isMoreThanOneHardLink() const;
 
-   protected:
+protected:
     QFileInfo m_file_info;
 
     QDateTime m_changed_date_time;
@@ -179,9 +188,9 @@ class Resource : public QObject {
 
     QList<const char*> m_issues;
 
-    bool m_is_resolving = false;
-    bool m_is_resolved = false;
-    int m_resolution_ticket = 0;
+    bool    m_is_resolving      = false;
+    bool    m_is_resolved       = false;
+    int     m_resolution_ticket = 0;
     QString m_size_str;
-    qint64 m_size_info;
+    qint64  m_size_info;
 };

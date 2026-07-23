@@ -25,7 +25,7 @@ Task::Ptr ResourceAPI::searchProjects(SearchArgs&& args, Callback<QList<ModPlatf
 
     QObject::connect(netJob.get(), &NetJob::succeeded, [this, response, callbacks] {
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(*response, &parse_error);
+        QJsonDocument   doc = QJsonDocument::fromJson(*response, &parse_error);
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response from" << debugName() << "at" << parse_error.offset
                        << "reason:" << parse_error.errorString();
@@ -37,7 +37,7 @@ Task::Ptr ResourceAPI::searchProjects(SearchArgs&& args, Callback<QList<ModPlatf
         }
 
         QList<ModPlatform::IndexedPack::Ptr> newList;
-        auto packs = documentToArray(doc);
+        auto                                 packs = documentToArray(doc);
 
         for (auto packRaw : packs) {
             auto packObj = packRaw.toObject();
@@ -87,7 +87,7 @@ Task::Ptr ResourceAPI::getProjectVersions(VersionSearchArgs&& args, Callback<QVe
 
     QObject::connect(netJob.get(), &NetJob::succeeded, [this, response, callbacks, args] {
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(*response, &parse_error);
+        QJsonDocument   doc = QJsonDocument::fromJson(*response, &parse_error);
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response for getting versions at" << parse_error.offset
                        << "reason:" << parse_error.errorString();
@@ -146,9 +146,9 @@ Task::Ptr ResourceAPI::getProjectInfo(ProjectInfoArgs&& args, Callback<ModPlatfo
     auto [job, response] = getProject(args.pack->addonId.toString(), askRetry);
 
     QObject::connect(job.get(), &NetJob::succeeded, [this, response, callbacks, args] {
-        auto pack = args.pack;
+        auto            pack = args.pack;
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(*response, &parse_error);
+        QJsonDocument   doc = QJsonDocument::fromJson(*response, &parse_error);
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response for mod info at" << parse_error.offset
                        << "reason:" << parse_error.errorString();
@@ -195,13 +195,13 @@ Task::Ptr ResourceAPI::getDependencyVersion(DependencySearchArgs&& args, Callbac
 
     auto versions_url = versions_url_optional.value();
 
-    auto netJob = makeShared<NetJob>(QString("%1::Dependency").arg(args.dependency.addonId.toString()), APPLICATION->network());
+    auto netJob             = makeShared<NetJob>(QString("%1::Dependency").arg(args.dependency.addonId.toString()), APPLICATION->network());
     auto [action, response] = Net::ApiDownload::makeByteArray(versions_url);
     netJob->addNetAction(action);
 
     QObject::connect(netJob.get(), &NetJob::succeeded, [this, response, callbacks, args] {
         QJsonParseError parse_error{};
-        QJsonDocument doc = QJsonDocument::fromJson(*response, &parse_error);
+        QJsonDocument   doc = QJsonDocument::fromJson(*response, &parse_error);
         if (parse_error.error != QJsonParseError::NoError) {
             qWarning() << "Error while parsing JSON response for getting dependency version at" << parse_error.offset
                        << "reason:" << parse_error.errorString();
@@ -263,7 +263,7 @@ QString ResourceAPI::getGameVersionsString(std::vector<Version> mcVersions) cons
 QString ResourceAPI::mapMCVersionToModrinth(Version v) const
 {
     static const QString preString = " Pre-Release ";
-    auto verStr = v.toString();
+    auto                 verStr    = v.toString();
 
     if (verStr.contains(preString)) {
         verStr.replace(preString, "-pre");
@@ -276,7 +276,7 @@ std::pair<Task::Ptr, QByteArray*> ResourceAPI::getProject(QString addonId, bool 
 {
     auto project_url_optional = getInfoURL(addonId);
     if (!project_url_optional.has_value())
-        return { nullptr, nullptr };
+        return {nullptr, nullptr};
 
     auto project_url = project_url_optional.value();
 
@@ -286,5 +286,5 @@ std::pair<Task::Ptr, QByteArray*> ResourceAPI::getProject(QString addonId, bool 
     auto [action, response] = Net::ApiDownload::makeByteArray(QUrl(project_url));
     netJob->addNetAction(action);
 
-    return { netJob, response };
+    return {netJob, response};
 }

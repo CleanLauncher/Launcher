@@ -149,7 +149,7 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
         qDebug() << "Loading modrinth modpack information";
         ResourceAPI::Callback<ModPlatform::IndexedPack::Ptr> callbacks;
 
-        auto id = m_current->addonId;
+        auto id           = m_current->addonId;
         callbacks.on_fail = [this](QString reason, int) {
             CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
         };
@@ -167,7 +167,7 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
             suggestCurrent();
             updateUI();
         };
-        if (auto netJob = m_api.getProjectInfo({ m_current }, std::move(callbacks)); netJob) {
+        if (auto netJob = m_api.getProjectInfo({m_current}, std::move(callbacks)); netJob) {
             m_job = netJob;
             m_job->start();
         }
@@ -187,9 +187,9 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
                 return;
             }
 
-            m_current->versions = doc;
+            m_current->versions       = doc;
             m_current->versionsLoaded = true;
-            auto pred = [this](const ModPlatform::IndexedVersion& v) {
+            auto pred                 = [this](const ModPlatform::IndexedVersion& v) {
                 if (auto filter = m_filterWidget->getFilter())
                     return !filter->checkModpackFilters(v);
                 return false;
@@ -219,7 +219,7 @@ void ModrinthPage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelI
             CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
         };
 
-        auto netJob = m_api.getProjectVersions({ m_current, {}, {}, ModPlatform::ResourceType::Modpack }, std::move(callbacks));
+        auto netJob = m_api.getProjectVersions({m_current, {}, {}, ModPlatform::ResourceType::Modpack}, std::move(callbacks));
 
         m_job2 = netJob;
         m_job2->start();
@@ -320,8 +320,9 @@ void ModrinthPage::suggestCurrent()
 
             m_dialog->setSuggestedPack(m_current->name, ver.version, new InstanceImportTask(ver.downloadUrl, this, std::move(extra_info)));
             QString editedLogoName = "modrinth_" + m_current->logoName;
-            m_model->getLogo(m_current->logoName, m_current->logoUrl,
-                             [this, editedLogoName](QString logo) { m_dialog->setSuggestedIconFromFile(logo, editedLogoName); });
+            m_model->getLogo(m_current->logoName, m_current->logoUrl, [this, editedLogoName](QString logo) {
+                m_dialog->setSuggestedIconFromFile(logo, editedLogoName);
+            });
 
             break;
         }
@@ -373,7 +374,7 @@ void ModrinthPage::createFilterWidget()
 
     connect(m_filterWidget.get(), &ModFilterWidget::filterChanged, this, &ModrinthPage::triggerSearch);
     auto [categoriesTask, response] = ModrinthAPI::getModCategories();
-    m_categoriesTask = categoriesTask;
+    m_categoriesTask                = categoriesTask;
     connect(m_categoriesTask.get(), &Task::succeeded, [this, response]() {
         auto categories = ModrinthAPI::loadCategories(*response, "modpack");
         m_filterWidget->setCategories(categories);

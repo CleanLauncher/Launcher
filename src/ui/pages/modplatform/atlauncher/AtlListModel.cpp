@@ -23,7 +23,8 @@
 #include "net/ApiDownload.h"
 #include "ui/widgets/ProjectItem.h"
 
-namespace Atl {
+namespace Atl
+{
 
 ListModel::ListModel(QObject* parent) : QAbstractListModel(parent) {}
 
@@ -48,43 +49,43 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
 
     ATLauncher::IndexedPack pack = modpacks.at(pos);
     switch (role) {
-        case Qt::ToolTipRole: {
-            if (pack.description.length() > 100) {
-                QString edit = pack.description.left(97);
-                edit = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
-                return edit;
-            }
-            return pack.description;
+    case Qt::ToolTipRole: {
+        if (pack.description.length() > 100) {
+            QString edit = pack.description.left(97);
+            edit         = edit.left(edit.lastIndexOf("<br>")).left(edit.lastIndexOf(" ")).append("...");
+            return edit;
         }
-        case Qt::DecorationRole: {
-            if (m_logoMap.contains(pack.safeName)) {
-                return (m_logoMap.value(pack.safeName));
-            }
-            auto icon = QIcon::fromTheme("atlauncher-placeholder");
-
-            auto url = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "launcher/images/%1").arg(pack.safeName);
-            ((ListModel*)this)->requestLogo(pack.safeName, url);
-
-            return icon;
+        return pack.description;
+    }
+    case Qt::DecorationRole: {
+        if (m_logoMap.contains(pack.safeName)) {
+            return (m_logoMap.value(pack.safeName));
         }
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
-        }
-        case Qt::DisplayRole:
-            return pack.name;
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
+        auto icon = QIcon::fromTheme("atlauncher-placeholder");
 
-        case UserDataTypes::TITLE:
-            return pack.name;
-        case UserDataTypes::DESCRIPTION:
-            return pack.description;
-        case UserDataTypes::INSTALLED:
-            return false;
-        default:
-            break;
+        auto url = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "launcher/images/%1").arg(pack.safeName);
+        ((ListModel*)this)->requestLogo(pack.safeName, url);
+
+        return icon;
+    }
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
+    case Qt::DisplayRole:
+        return pack.name;
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
+
+    case UserDataTypes::TITLE:
+        return pack.name;
+    case UserDataTypes::DESCRIPTION:
+        return pack.description;
+    case UserDataTypes::INSTALLED:
+        return false;
+    default:
+        break;
     }
 
     return {};
@@ -96,8 +97,8 @@ void ListModel::request()
     modpacks.clear();
     endResetModel();
 
-    auto netJob = makeShared<NetJob>("Atl::Request", APPLICATION->network());
-    auto url = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "launcher/json/packsnew.json");
+    auto netJob             = makeShared<NetJob>("Atl::Request", APPLICATION->network());
+    auto url                = QString(BuildConfig.ATL_DOWNLOAD_SERVER_URL + "launcher/json/packsnew.json");
     auto [action, response] = Net::ApiDownload::makeByteArray(QUrl(url));
     netJob->addNetAction(action);
     jobPtr = netJob;
@@ -113,7 +114,7 @@ void ListModel::requestFinished(QByteArray* responsePtr)
     jobPtr.reset();
 
     QJsonParseError parse_error;
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from ATL at" << parse_error.offset << "reason:" << parse_error.errorString();
         qWarning() << response;
@@ -180,7 +181,7 @@ void ListModel::logoLoaded(QString logo, QIcon out)
 
     for (int i = 0; i < modpacks.size(); i++) {
         if (modpacks[i].safeName == logo) {
-            emit dataChanged(createIndex(i, 0), createIndex(i, 0), { Qt::DecorationRole });
+            emit dataChanged(createIndex(i, 0), createIndex(i, 0), {Qt::DecorationRole});
         }
     }
 }
@@ -192,7 +193,7 @@ void ListModel::requestLogo(QString file, QString url)
     }
 
     MetaEntryPtr entry = APPLICATION->metacache()->resolveEntry("ATLauncherPacks", QString("logos/%1").arg(file));
-    auto job = new NetJob(QString("ATLauncher Icon Download %1").arg(file), APPLICATION->network());
+    auto         job   = new NetJob(QString("ATLauncher Icon Download %1").arg(file), APPLICATION->network());
     job->setAskRetry(false);
     job->addNetAction(Net::ApiDownload::makeCached(QUrl(url), entry));
 

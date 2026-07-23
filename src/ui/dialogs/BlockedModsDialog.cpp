@@ -105,7 +105,7 @@ void BlockedModsDialog::dropEvent(QDropEvent* e)
         addHashTask(filePath);
 
         QFileInfo file = QFileInfo(filePath);
-        QString path = file.dir().absolutePath();
+        QString   path = file.dir().absolutePath();
         qDebug() << "[Blocked Mods Dialog] Adding watch path:" << path;
         m_watcher.addPath(path);
     }
@@ -130,9 +130,10 @@ void BlockedModsDialog::openAll(bool missingOnly)
 
 void BlockedModsDialog::addDownloadFolder()
 {
-    QString dir =
-        QFileDialog::getExistingDirectory(this, tr("Select directory where you downloaded the mods"),
-                                          QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), QFileDialog::ShowDirsOnly);
+    QString dir = QFileDialog::getExistingDirectory(this,
+                                                    tr("Select directory where you downloaded the mods"),
+                                                    QStandardPaths::writableLocation(QStandardPaths::DownloadLocation),
+                                                    QFileDialog::ShowDirsOnly);
     qDebug() << "[Blocked Mods Dialog] Adding watch path:" << dir;
     m_watcher.addPath(dir);
     scanPath(dir, true);
@@ -183,9 +184,9 @@ void BlockedModsDialog::directoryChanged(QString path)
 
 void BlockedModsDialog::setupWatch()
 {
-    const QString downloadsFolder = APPLICATION->settings()->get("DownloadsDir").toString();
-    const QString modsFolder = APPLICATION->settings()->get("CentralModsDir").toString();
-    const bool downloadsFolderWatchRecursive = APPLICATION->settings()->get("DownloadsDirWatchRecursive").toBool();
+    const QString downloadsFolder               = APPLICATION->settings()->get("DownloadsDir").toString();
+    const QString modsFolder                    = APPLICATION->settings()->get("CentralModsDir").toString();
+    const bool    downloadsFolderWatchRecursive = APPLICATION->settings()->get("DownloadsDirWatchRecursive").toBool();
     watchPath(downloadsFolder, downloadsFolderWatchRecursive);
     watchPath(modsFolder, true);
 }
@@ -225,7 +226,7 @@ void BlockedModsDialog::scanPaths()
 
 void BlockedModsDialog::scanPath(QString path, bool start_task)
 {
-    QDir scan_dir(path);
+    QDir         scan_dir(path);
     QDirIterator scan_it(path, QDir::Filter::Files | QDir::Filter::Hidden, QDirIterator::NoIteratorFlags);
     while (scan_it.hasNext()) {
         QString file = scan_it.next();
@@ -267,13 +268,13 @@ void BlockedModsDialog::checkMatchHash(QString hash, QString path)
     qDebug() << "[Blocked Mods Dialog] Checking for match on hash:" << hash << "| From path:" << path;
 
     auto downloadDir = QFileInfo(APPLICATION->settings()->get("DownloadsDir").toString()).absoluteFilePath();
-    auto moveFiles = APPLICATION->settings()->get("MoveModsFromDownloadsDir").toBool();
+    auto moveFiles   = APPLICATION->settings()->get("MoveModsFromDownloadsDir").toBool();
     for (auto& mod : m_mods) {
         if (mod.matched) {
             continue;
         }
         if (mod.hash.compare(hash, Qt::CaseInsensitive) == 0) {
-            mod.matched = true;
+            mod.matched   = true;
             mod.localPath = path;
             if (moveFiles) {
                 mod.move = QFileInfo(path).absoluteFilePath().startsWith(downloadDir);
@@ -293,36 +294,36 @@ void BlockedModsDialog::checkMatchHash(QString hash, QString path)
 
 bool BlockedModsDialog::checkValidPath(QString path)
 {
-    const QFileInfo file = QFileInfo(path);
-    const QString filename = file.fileName();
+    const QFileInfo file     = QFileInfo(path);
+    const QString   filename = file.fileName();
 
     auto compare = [](QString fsFilename, QString metadataFilename) {
         return metadataFilename.compare(fsFilename, Qt::CaseInsensitive) == 0;
     };
 
     auto laxCompare = [](QString fsfilename, QString metadataFilename) {
-        QList<QChar> allowedSeperators = { '-', '+', '.', '_' };
+        QList<QChar> allowedSeperators = {'-', '+', '.', '_'};
 
-        auto fsName = fsfilename.toLower();
+        auto fsName   = fsfilename.toLower();
         auto metaName = metadataFilename.toLower();
 
         for (auto sep : allowedSeperators) {
-            fsName = fsName.replace(sep, ' ');
+            fsName   = fsName.replace(sep, ' ');
             metaName = metaName.replace(sep, ' ');
         }
 
-        fsName = fsName.simplified();
+        fsName   = fsName.simplified();
         metaName = metaName.simplified();
 
         return fsName.compare(metaName) == 0;
     };
 
     auto downloadDir = QFileInfo(APPLICATION->settings()->get("DownloadsDir").toString()).absoluteFilePath();
-    auto moveFiles = APPLICATION->settings()->get("MoveModsFromDownloadsDir").toBool();
+    auto moveFiles   = APPLICATION->settings()->get("MoveModsFromDownloadsDir").toBool();
     for (auto& mod : m_mods) {
         if (compare(filename, mod.name)) {
             if (!mod.matched && mod.hash.isEmpty()) {
-                mod.matched = true;
+                mod.matched   = true;
                 mod.localPath = path;
                 if (moveFiles) {
                     mod.move = QFileInfo(path).absoluteFilePath().startsWith(downloadDir);
@@ -356,8 +357,8 @@ void BlockedModsDialog::validateMatchedMods()
                 qDebug() << "[Blocked Mods Dialog] File" << mod.localPath << "for mod" << mod.name
                          << "has vanshed! marking as not matched.";
                 mod.localPath = "";
-                mod.matched = false;
-                changed = true;
+                mod.matched   = false;
+                changed       = true;
             }
         }
     }

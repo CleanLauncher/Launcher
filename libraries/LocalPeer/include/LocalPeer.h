@@ -46,9 +46,9 @@
 class QLocalServer;
 class LockedFile;
 
-class ApplicationId {
-   public:
-
+class ApplicationId
+{
+public:
     static ApplicationId fromTraditionalApp();
 
     static ApplicationId fromPathAndVersion(const QString& dataPath, const QString& version);
@@ -59,32 +59,33 @@ class ApplicationId {
 
     QString toString() { return m_id; }
 
-   private:
+private:
     ApplicationId(const QString& value) { m_id = value; }
 
-   private:
+private:
     QString m_id;
 };
 
-class LocalPeer : public QObject {
+class LocalPeer : public QObject
+{
     Q_OBJECT
 
-   public:
+public:
     LocalPeer(QObject* parent, const ApplicationId& appId);
     ~LocalPeer();
-    bool isClient();
-    bool sendMessage(const QByteArray& message, int timeout);
+    bool          isClient();
+    bool          sendMessage(const QByteArray& message, int timeout);
     ApplicationId applicationId() const;
 
-   Q_SIGNALS:
+Q_SIGNALS:
     void messageReceived(const QByteArray& message);
 
-   protected Q_SLOTS:
+protected Q_SLOTS:
     void receiveConnection();
 
-   protected:
-    ApplicationId id;
-    QString socketName;
+protected:
+    ApplicationId                 id;
+    QString                       socketName;
     std::unique_ptr<QLocalServer> server;
-    std::unique_ptr<LockedFile> lockFile;
+    std::unique_ptr<LockedFile>   lockFile;
 };

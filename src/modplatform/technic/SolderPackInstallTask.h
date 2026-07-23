@@ -41,23 +41,25 @@
 
 #include <QUrl>
 
-namespace Technic {
-class SolderPackInstallTask : public InstanceTask {
+namespace Technic
+{
+class SolderPackInstallTask : public InstanceTask
+{
     Q_OBJECT
-   public:
+public:
     explicit SolderPackInstallTask(QNetworkAccessManager* network,
-                                   const QUrl& solderUrl,
-                                   const QString& pack,
-                                   const QString& version,
-                                   const QString& minecraftVersion);
+                                   const QUrl&            solderUrl,
+                                   const QString&         pack,
+                                   const QString&         version,
+                                   const QString&         minecraftVersion);
 
     bool canAbort() const override { return true; }
     bool abort() override;
 
-   protected:
+protected:
     virtual void executeTask() override;
 
-   private slots:
+private slots:
     void fileListSucceeded(QByteArray* response);
     void downloadSucceeded();
     void downloadFailed(QString reason);
@@ -66,19 +68,19 @@ class SolderPackInstallTask : public InstanceTask {
     void extractFinished();
     void extractAborted();
 
-   private:
+private:
     bool m_abortable = false;
 
     QNetworkAccessManager* m_network;
 
-    NetJob::Ptr m_filesNetJob;
-    QUrl m_solderUrl;
-    QString m_pack;
-    QString m_version;
-    QString m_minecraftVersion;
-    QTemporaryDir m_outputDir;
-    int m_modCount;
-    QFuture<bool> m_extractFuture;
+    NetJob::Ptr          m_filesNetJob;
+    QUrl                 m_solderUrl;
+    QString              m_pack;
+    QString              m_version;
+    QString              m_minecraftVersion;
+    QTemporaryDir        m_outputDir;
+    int                  m_modCount;
+    QFuture<bool>        m_extractFuture;
     QFutureWatcher<bool> m_extractFutureWatcher;
 };
 }  // namespace Technic

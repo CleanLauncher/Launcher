@@ -54,9 +54,9 @@
 #include "java/JavaInstallList.h"
 #include "java/JavaUtils.h"
 
-#include <FileSystem.h>
 #include "Application.h"
 #include "settings/SettingsObject.h"
+#include <FileSystem.h>
 
 JavaPage::JavaPage(QWidget* parent) : QWidget(parent), ui(new Ui::JavaPage)
 {
@@ -99,7 +99,7 @@ void JavaPage::on_downloadJavaButton_clicked()
 void JavaPage::on_removeJavaButton_clicked()
 {
     auto version = ui->managedJavaList->selectedVersion();
-    auto dcast = std::dynamic_pointer_cast<JavaInstall>(version);
+    auto dcast   = std::dynamic_pointer_cast<JavaInstall>(version);
     if (!dcast) {
         return;
     }
@@ -108,11 +108,14 @@ void JavaPage::on_removeJavaButton_clicked()
     auto entries = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
     for (auto& entry : entries) {
         if (dcast->path.startsWith(entry.canonicalFilePath())) {
-            auto response = CustomMessageBox::selectable(this, tr("Confirm Deletion"),
+            auto response = CustomMessageBox::selectable(this,
+                                                         tr("Confirm Deletion"),
                                                          tr("You are about to remove  the Java installation named \"%1\".\n"
                                                             "Are you sure?")
                                                              .arg(entry.fileName()),
-                                                         QMessageBox::Warning, QMessageBox::Yes | QMessageBox::No, QMessageBox::No)
+                                                         QMessageBox::Warning,
+                                                         QMessageBox::Yes | QMessageBox::No,
+                                                         QMessageBox::No)
                                 ->exec();
 
             if (response == QMessageBox::Yes) {

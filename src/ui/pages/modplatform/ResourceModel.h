@@ -19,18 +19,21 @@
 class NetJob;
 class ResourceAPI;
 
-namespace ModPlatform {
+namespace ModPlatform
+{
 struct IndexedPack;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
-class ResourceModel : public QAbstractListModel {
+class ResourceModel : public QAbstractListModel
+{
     Q_OBJECT
 
     Q_PROPERTY(QString search_term MEMBER m_search_term WRITE setSearchTerm)
 
-   public:
+public:
     using DownloadTaskPtr = shared_qobject_ptr<ResourceDownloadTask>;
 
     ResourceModel(ResourceAPI* api);
@@ -43,12 +46,12 @@ class ResourceModel : public QAbstractListModel {
     virtual auto debugName() const -> QString;
     virtual auto metaEntryBase() const -> QString = 0;
 
-    int rowCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : static_cast<int>(m_packs.size()); }
-    int columnCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : 1; }
+    int  rowCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : static_cast<int>(m_packs.size()); }
+    int  columnCount(const QModelIndex& parent) const override { return parent.isValid() ? 0 : 1; }
     auto flags(const QModelIndex& index) const -> Qt::ItemFlags override { return QAbstractListModel::flags(index); }
 
-    bool hasActiveSearchJob() const { return m_current_search_job && m_current_search_job->isRunning(); }
-    bool hasActiveInfoJob() const { return m_current_info_job.isRunning(); }
+    bool      hasActiveSearchJob() const { return m_current_search_job && m_current_search_job->isRunning(); }
+    bool      hasActiveInfoJob() const { return m_current_info_job.isRunning(); }
     Task::Ptr activeSearchJob() { return hasActiveSearchJob() ? m_current_search_job : nullptr; }
 
     auto getSortingMethods() const { return m_api->getSortingMethods(); }
@@ -64,7 +67,7 @@ class ResourceModel : public QAbstractListModel {
     virtual bool checkFilters(ModPlatform::IndexedPack::Ptr) { return true; }
     virtual bool checkVersionFilters(const ModPlatform::IndexedVersion&);
 
-   public slots:
+public slots:
     void fetchMore(const QModelIndex& parent) override;
     bool canFetchMore(const QModelIndex& parent) const override
     {
@@ -87,15 +90,15 @@ class ResourceModel : public QAbstractListModel {
 
     std::optional<QIcon> getIcon(QModelIndex&, const QUrl&);
 
-    void addPack(ModPlatform::IndexedPack::Ptr pack,
-                 ModPlatform::IndexedVersion& version,
-                 ResourceFolderModel* packs,
-                 bool isIndexed = false,
-                 QString downloadReason = "standalone");
-    void removePack(const QString& rem);
+    void                   addPack(ModPlatform::IndexedPack::Ptr pack,
+                                   ModPlatform::IndexedVersion&  version,
+                                   ResourceFolderModel*          packs,
+                                   bool                          isIndexed      = false,
+                                   QString                       downloadReason = "standalone");
+    void                   removePack(const QString& rem);
     QList<DownloadTaskPtr> selectedPacks() { return m_selected; }
 
-   protected:
+protected:
     void clearData();
 
     void runSearchJob(Task::Ptr);
@@ -105,10 +108,16 @@ class ResourceModel : public QAbstractListModel {
 
     virtual bool isPackInstalled(ModPlatform::IndexedPack::Ptr) const { return false; }
 
-   protected:
-    enum class SearchState { None, CanFetchMore, ResetRequested, Finished } m_search_state = SearchState::None;
-    int m_next_search_offset = 0;
-    QString m_search_term;
+protected:
+    enum class SearchState
+    {
+        None,
+        CanFetchMore,
+        ResetRequested,
+        Finished
+    } m_search_state                  = SearchState::None;
+    int          m_next_search_offset = 0;
+    QString      m_search_term;
     unsigned int m_current_sort_index = 0;
 
     std::unique_ptr<ResourceAPI> m_api;
@@ -118,15 +127,15 @@ class ResourceModel : public QAbstractListModel {
     ConcurrentTask m_current_info_job;
 
     shared_qobject_ptr<NetJob> m_current_icon_job;
-    QSet<QUrl> m_currently_running_icon_actions;
-    QSet<QUrl> m_failed_icon_actions;
+    QSet<QUrl>                 m_currently_running_icon_actions;
+    QSet<QUrl>                 m_failed_icon_actions;
 
     QList<ModPlatform::IndexedPack::Ptr> m_packs;
-    QList<DownloadTaskPtr> m_selected;
+    QList<DownloadTaskPtr>               m_selected;
 
     static QHash<ResourceModel*, bool> s_running_models;
 
-   private:
+private:
     void searchRequestSucceeded(QList<ModPlatform::IndexedPack::Ptr>&);
     void searchRequestForOneSucceeded(ModPlatform::IndexedPack::Ptr);
     void searchRequestFailed(QString reason, int network_error_code);
@@ -136,7 +145,7 @@ class ResourceModel : public QAbstractListModel {
 
     void infoRequestSucceeded(ModPlatform::IndexedPack::Ptr, const QModelIndex&);
 
-   signals:
+signals:
     void versionListUpdated(const QModelIndex& index);
     void projectInfoUpdated(const QModelIndex& index);
 };

@@ -34,8 +34,8 @@
  */
 
 #include "ProgressDialog.h"
-#include <QPoint>
 #include "ui_ProgressDialog.h"
+#include <QPoint>
 
 #include <QDebug>
 #include <QKeyEvent>
@@ -52,11 +52,11 @@ std::tuple<int, int> map_int_zero_max(T current, T range_max, T range_min)
 {
     int int_max = std::numeric_limits<int>::max();
 
-    auto type_range = range_max - range_min;
-    double percentage = static_cast<double>(current - range_min) / static_cast<double>(type_range);
-    int mapped_current = percentage * int_max;
+    auto   type_range     = range_max - range_min;
+    double percentage     = static_cast<double>(current - range_min) / static_cast<double>(type_range);
+    int    mapped_current = percentage * int_max;
 
-    return { mapped_current, int_max };
+    return {mapped_current, int_max};
 }
 
 ProgressDialog::ProgressDialog(QWidget* parent) : QDialog(parent), ui(new Ui::ProgressDialog)
@@ -98,15 +98,15 @@ ProgressDialog::~ProgressDialog()
 
 void ProgressDialog::updateSize(bool recenterParent)
 {
-    QSize lastSize = this->size();
-    QPoint lastPos = this->pos();
-    int minHeight = ui->globalStatusDetailsLabel->minimumSize().height() + (ui->verticalLayout->spacing() * 2);
+    QSize  lastSize  = this->size();
+    QPoint lastPos   = this->pos();
+    int    minHeight = ui->globalStatusDetailsLabel->minimumSize().height() + (ui->verticalLayout->spacing() * 2);
     minHeight += ui->globalProgressBar->minimumSize().height() + ui->verticalLayout->spacing();
     if (!ui->taskProgressScrollArea->isHidden())
         minHeight += ui->taskProgressScrollArea->minimumSizeHint().height() + ui->verticalLayout->spacing();
     if (ui->skipButton->isVisible())
         minHeight += ui->skipButton->height() + ui->verticalLayout->spacing();
-    minHeight = std::max(minHeight, 60);
+    minHeight     = std::max(minHeight, 60);
     QSize minSize = QSize(480, minHeight);
 
     setMinimumSize(minSize);
@@ -122,8 +122,8 @@ void ProgressDialog::updateSize(bool recenterParent)
     } else if (lastSize != newSize) {
         // center on old position after resize
         QSize sizeDiff = lastSize - newSize;  // last size was smaller, the results should be negative
-        auto newX = std::max(0, lastPos.x() + (sizeDiff.width() / 2));
-        auto newY = std::max(0, lastPos.y() + (sizeDiff.height() / 2));
+        auto  newX     = std::max(0, lastPos.x() + (sizeDiff.width() / 2));
+        auto  newY     = std::max(0, lastPos.y() + (sizeDiff.height() / 2));
         this->move(newX, newY);
     }
 }

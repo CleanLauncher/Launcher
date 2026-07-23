@@ -4,12 +4,14 @@
 #include <QSet>
 #include <QString>
 
-struct FMLlib {
+struct FMLlib
+{
     QString filename;
     QString checksum;
 };
 
-struct VersionFilterData {
+struct VersionFilterData
+{
     VersionFilterData();
 
     QMap<QString, QList<FMLlib>> fmlLibsMapping;

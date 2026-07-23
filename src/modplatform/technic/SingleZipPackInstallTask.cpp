@@ -27,7 +27,7 @@
 
 Technic::SingleZipPackInstallTask::SingleZipPackInstallTask(const QUrl& sourceUrl, const QString& minecraftVersion)
 {
-    m_sourceUrl = sourceUrl;
+    m_sourceUrl        = sourceUrl;
     m_minecraftVersion = minecraftVersion;
 }
 
@@ -43,13 +43,13 @@ void Technic::SingleZipPackInstallTask::executeTask()
 {
     setStatus(tr("Downloading modpack:\n%1").arg(m_sourceUrl.toString()));
 
-    const QString path = m_sourceUrl.host() + '/' + m_sourceUrl.path();
-    auto entry = APPLICATION->metacache()->resolveEntry("general", path);
+    const QString path  = m_sourceUrl.host() + '/' + m_sourceUrl.path();
+    auto          entry = APPLICATION->metacache()->resolveEntry("general", path);
     entry->setStale(true);
     m_filesNetJob.reset(new NetJob(tr("Modpack download"), APPLICATION->network()));
     m_filesNetJob->addNetAction(Net::ApiDownload::makeCached(m_sourceUrl, entry));
     m_archivePath = entry->getFullPath();
-    auto job = m_filesNetJob.get();
+    auto job      = m_filesNetJob.get();
     connect(job, &NetJob::succeeded, this, &Technic::SingleZipPackInstallTask::downloadSucceeded);
     connect(job, &NetJob::progress, this, &Technic::SingleZipPackInstallTask::downloadProgressChanged);
     connect(job, &NetJob::stepProgress, this, &Technic::SingleZipPackInstallTask::propagateStepProgress);
@@ -99,10 +99,10 @@ void Technic::SingleZipPackInstallTask::extractFinished()
     qDebug() << "Fixing permissions for extracted pack files...";
     QDirIterator it(extractDir, QDirIterator::Subdirectories);
     while (it.hasNext()) {
-        auto filepath = it.next();
+        auto      filepath = it.next();
         QFileInfo file(filepath);
-        auto permissions = QFile::permissions(filepath);
-        auto origPermissions = permissions;
+        auto      permissions     = QFile::permissions(filepath);
+        auto      origPermissions = permissions;
         if (file.isDir()) {
             permissions |= QFileDevice::Permission::ReadUser | QFileDevice::Permission::WriteUser | QFileDevice::Permission::ExeUser;
         } else {

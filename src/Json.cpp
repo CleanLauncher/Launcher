@@ -37,10 +37,11 @@
 
 #include <QFile>
 
-#include <math.h>
 #include "FileSystem.h"
+#include <math.h>
 
-namespace Json {
+namespace Json
+{
 void write(const QJsonDocument& doc, const QString& filename)
 {
     FS::write(filename, doc.toJson());
@@ -74,7 +75,7 @@ QJsonDocument requireDocument(const QByteArray& data, const QString& what)
         throw JsonException(what + ": Invalid JSON. Binary JSON unsupported");
     } else {
         QJsonParseError error;
-        QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+        QJsonDocument   doc = QJsonDocument::fromJson(data, &error);
         if (error.error != QJsonParseError::NoError) {
             throw JsonException(what + ": Error parsing JSON: " + error.errorString());
         }
@@ -104,9 +105,9 @@ QJsonDocument parseUntilGarbage(const QByteArray& json, QJsonParseError* error, 
 {
     auto doc = QJsonDocument::fromJson(json, error);
     if (error->error == QJsonParseError::GarbageAtEnd) {
-        qsizetype offset = error->offset;
+        qsizetype  offset    = error->offset;
         QByteArray validJson = json.left(offset);
-        doc = QJsonDocument::fromJson(validJson, error);
+        doc                  = QJsonDocument::fromJson(validJson, error);
 
         if (garbage)
             *garbage = json.right(json.size() - offset);
@@ -224,7 +225,7 @@ int requireIsType<int>(const QJsonValue& value, const QString& what)
 template <>
 QDateTime requireIsType<QDateTime>(const QJsonValue& value, const QString& what)
 {
-    const QString string = requireIsType<QString>(value, what);
+    const QString   string   = requireIsType<QString>(value, what);
     const QDateTime datetime = QDateTime::fromString(string, Qt::ISODate);
     if (!datetime.isValid()) {
         throw JsonException(what + " is not a ISO formatted date/time value");
@@ -258,7 +259,7 @@ template <>
 QUuid requireIsType<QUuid>(const QJsonValue& value, const QString& what)
 {
     const QString string = requireIsType<QString>(value, what);
-    const QUuid uuid = QUuid(string);
+    const QUuid   uuid   = QUuid(string);
     if (uuid.toString() != string)
 
     {
@@ -297,7 +298,7 @@ QJsonValue requireIsType<QJsonValue>(const QJsonValue& value, const QString& wha
 QStringList toStringList(const QString& jsonString)
 {
     QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
+    QJsonDocument   doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
 
     if (parseError.error != QJsonParseError::NoError || !doc.isArray())
         return {};
@@ -322,7 +323,7 @@ QString fromStringList(const QStringList& list)
 QVariantMap toMap(const QString& jsonString)
 {
     QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
+    QJsonDocument   doc = QJsonDocument::fromJson(jsonString.toUtf8(), &parseError);
 
     if (parseError.error != QJsonParseError::NoError || !doc.isObject())
         return {};
@@ -333,7 +334,7 @@ QVariantMap toMap(const QString& jsonString)
 
 QString fromMap(const QVariantMap& map)
 {
-    QJsonObject obj = QJsonObject::fromVariantMap(map);
+    QJsonObject   obj = QJsonObject::fromVariantMap(map);
     QJsonDocument doc(obj);
     return QString::fromUtf8(doc.toJson(QJsonDocument::Compact));
 }

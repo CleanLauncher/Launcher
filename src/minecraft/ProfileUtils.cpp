@@ -34,16 +34,17 @@
  */
 
 #include "ProfileUtils.h"
-#include <QDebug>
 #include "Json.h"
 #include "minecraft/OneSixVersionFormat.h"
 #include "minecraft/VersionFilterData.h"
+#include <QDebug>
 
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSaveFile>
 
-namespace ProfileUtils {
+namespace ProfileUtils
+{
 
 static const int currentOrderFileVersion = 1;
 
@@ -61,7 +62,7 @@ bool readOverrideOrders(QString path, PatchOrder& order)
     }
 
     QJsonParseError error;
-    QJsonDocument doc = QJsonDocument::fromJson(orderFile.readAll(), &error);
+    QJsonDocument   doc = QJsonDocument::fromJson(orderFile.readAll(), &error);
     if (error.error != QJsonParseError::NoError) {
         qCritical() << "Couldn't parse" << orderFile.fileName() << ":" << error.errorString();
         qWarning() << "Ignoring overridden order";
@@ -114,11 +115,11 @@ VersionFilePtr parseJsonFile(const QFileInfo& fileInfo, const bool requireOrder)
         return createErrorVersionFile(fileInfo.completeBaseName(), fileInfo.absoluteFilePath(), errorStr);
     }
     QJsonParseError error;
-    auto data = file.readAll();
-    QJsonDocument doc = QJsonDocument::fromJson(data, &error);
+    auto            data = file.readAll();
+    QJsonDocument   doc  = QJsonDocument::fromJson(data, &error);
     file.close();
     if (error.error != QJsonParseError::NoError) {
-        int line = 1;
+        int line   = 1;
         int column = 0;
         for (int i = 0; i < error.offset; i++) {
             if (data[i] == '\n') {
@@ -139,7 +140,7 @@ VersionFilePtr parseJsonFile(const QFileInfo& fileInfo, const bool requireOrder)
 
 bool saveJsonFile(const QJsonDocument& doc, const QString& filename)
 {
-    auto data = doc.toJson();
+    auto      data = doc.toJson();
     QSaveFile jsonFile(filename);
     if (!jsonFile.open(QIODevice::WriteOnly)) {
         qWarning() << "Couldn't open" << filename << "for writing:" << jsonFile.errorString();

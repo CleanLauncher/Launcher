@@ -19,16 +19,17 @@
  *  under LicenseRef-PublicDomain.
  */
 #include "ArchiveReader.h"
-#include <archive.h>
-#include <archive_entry.h>
 #include <QDir>
 #include <QFileInfo>
 #include <QUrl>
+#include <archive.h>
+#include <archive_entry.h>
 #include <functional>
 #include <memory>
 #include <optional>
 
-namespace MMCZip {
+namespace MMCZip
+{
 QStringList ArchiveReader::getFiles()
 {
     return m_fileNames;
@@ -61,10 +62,10 @@ QString ArchiveReader::File::filename()
 
 QByteArray ArchiveReader::File::readAll(int* outStatus)
 {
-    QByteArray data;
-    const void* buff = nullptr;
-    size_t size = 0;
-    la_int64_t offset = 0;
+    QByteArray  data;
+    const void* buff   = nullptr;
+    size_t      size   = 0;
+    la_int64_t  offset = 0;
 
     int status = 0;
     while ((status = archive_read_data_block(m_archive.get(), &buff, &size, &offset)) == ARCHIVE_OK) {
@@ -81,9 +82,9 @@ QByteArray ArchiveReader::File::readAll(int* outStatus)
 
 QDateTime ArchiveReader::File::dateTime()
 {
-    auto mtime = archive_entry_mtime(m_entry);
+    auto mtime      = archive_entry_mtime(m_entry);
     auto mtime_nsec = archive_entry_mtime_nsec(m_entry);
-    auto dt = QDateTime::fromSecsSinceEpoch(mtime);
+    auto dt         = QDateTime::fromSecsSinceEpoch(mtime);
     return dt.addMSecs(mtime_nsec / 1e6);
 }
 
@@ -94,7 +95,7 @@ int ArchiveReader::File::readNextHeader()
 
 auto ArchiveReader::goToFile(const QString& filename) -> std::unique_ptr<File>
 {
-    auto f = std::make_unique<File>();
+    auto  f = std::make_unique<File>();
     auto* a = f->m_archive.get();
     archive_read_support_format_all(a);
     archive_read_support_filter_all(a);
@@ -117,10 +118,10 @@ auto ArchiveReader::goToFile(const QString& filename) -> std::unique_ptr<File>
 
 static int copy_data(struct archive* ar, struct archive* aw, bool notBlock = false)
 {
-    int r = 0;
-    const void* buff = nullptr;
-    size_t size = 0;
-    la_int64_t offset = 0;
+    int         r      = 0;
+    const void* buff   = nullptr;
+    size_t      size   = 0;
+    la_int64_t  offset = 0;
 
     for (;;) {
         r = archive_read_data_block(ar, &buff, &size, &offset);
@@ -145,9 +146,9 @@ static int copy_data(struct archive* ar, struct archive* aw, bool notBlock = fal
 
 static bool willEscapeRoot(const QDir& root, archive_entry* entry)
 {
-    auto entryPath = decodeLibArchivePath(entry, archive_entry_pathname_utf8, archive_entry_pathname);
+    auto entryPath  = decodeLibArchivePath(entry, archive_entry_pathname_utf8, archive_entry_pathname);
     auto linkTarget = decodeLibArchivePath(entry, archive_entry_symlink_utf8, archive_entry_symlink);
-    auto hardLink = decodeLibArchivePath(entry, archive_entry_hardlink_utf8, archive_entry_hardlink);
+    auto hardLink   = decodeLibArchivePath(entry, archive_entry_hardlink_utf8, archive_entry_hardlink);
 
     if (entryPath.isEmpty() || (linkTarget.isEmpty() && hardLink.isEmpty())) {
         return false;
@@ -159,7 +160,7 @@ static bool willEscapeRoot(const QDir& root, archive_entry* entry)
     }
 
     QString linkFullPath = root.filePath(entryPath);
-    auto rootDir = QUrl::fromLocalFile(root.absolutePath());
+    auto    rootDir      = QUrl::fromLocalFile(root.absolutePath());
 
     if (!rootDir.isParentOf(QUrl::fromLocalFile(linkFullPath))) {
         return true;
@@ -179,11 +180,11 @@ bool ArchiveReader::File::writeFile(archive* out, const QString& targetFileName,
 
 bool ArchiveReader::File::writeFile(archive* out, const QString& targetFileName, std::optional<QDir> root, bool notBlock)
 {
-    auto* entry = m_entry;
+    auto*                                                         entry = m_entry;
     std::unique_ptr<archive_entry, decltype(&archive_entry_free)> entryClone(nullptr, &archive_entry_free);
     if (!targetFileName.isEmpty()) {
         entryClone.reset(archive_entry_clone(m_entry));
-        entry = entryClone.get();
+        entry         = entryClone.get();
         auto nameUtf8 = targetFileName.toUtf8();
         archive_entry_set_pathname_utf8(entry, nameUtf8.constData());
     }
@@ -213,7 +214,7 @@ bool ArchiveReader::File::writeFile(archive* out, const QString& targetFileName,
 
 bool ArchiveReader::parse(const std::function<bool(File*, bool&)>& doStuff)
 {
-    auto f = std::make_unique<File>();
+    auto  f = std::make_unique<File>();
     auto* a = f->m_archive.get();
     archive_read_support_format_all(a);
     archive_read_support_filter_all(a);

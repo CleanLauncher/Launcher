@@ -48,9 +48,11 @@
 #include "ui/pages/modplatform/ShaderPackPage.h"
 #include "ui/pages/modplatform/TexturePackPage.h"
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
-namespace Flame {
+namespace Flame
+{
 static inline QString displayName()
 {
     return "CurseForge";
@@ -73,10 +75,11 @@ static inline QString metaEntryBase()
 }
 }  // namespace Flame
 
-class FlameModPage : public ModPage {
+class FlameModPage : public ModPage
+{
     Q_OBJECT
 
-   public:
+public:
     static FlameModPage* create(ModDownloadDialog* dialog, BaseInstance& instance)
     {
         return ModPage::create<FlameModPage>(dialog, instance);
@@ -95,20 +98,21 @@ class FlameModPage : public ModPage {
 
     inline auto helpPage() const -> QString override { return "Mod-platform"; }
 
-    void openUrl(const QUrl& url) override;
+    void                             openUrl(const QUrl& url) override;
     std::unique_ptr<ModFilterWidget> createFilterWidget() override;
 
-   protected:
+protected:
     virtual void prepareProviderCategories() override;
 
-   private:
+private:
     Task::Ptr m_categoriesTask;
 };
 
-class FlameResourcePackPage : public ResourcePackResourcePage {
+class FlameResourcePackPage : public ResourcePackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static FlameResourcePackPage* create(ResourcePackDownloadDialog* dialog, BaseInstance& instance)
     {
         return ResourcePackResourcePage::create<FlameResourcePackPage>(dialog, instance);
@@ -130,10 +134,11 @@ class FlameResourcePackPage : public ResourcePackResourcePage {
     void openUrl(const QUrl& url) override;
 };
 
-class FlameTexturePackPage : public TexturePackResourcePage {
+class FlameTexturePackPage : public TexturePackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static FlameTexturePackPage* create(TexturePackDownloadDialog* dialog, BaseInstance& instance)
     {
         return TexturePackResourcePage::create<FlameTexturePackPage>(dialog, instance);
@@ -155,10 +160,11 @@ class FlameTexturePackPage : public TexturePackResourcePage {
     void openUrl(const QUrl& url) override;
 };
 
-class FlameShaderPackPage : public ShaderPackResourcePage {
+class FlameShaderPackPage : public ShaderPackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static FlameShaderPackPage* create(ShaderPackDownloadDialog* dialog, BaseInstance& instance)
     {
         return ShaderPackResourcePage::create<FlameShaderPackPage>(dialog, instance);
@@ -180,10 +186,11 @@ class FlameShaderPackPage : public ShaderPackResourcePage {
     void openUrl(const QUrl& url) override;
 };
 
-class FlameDataPackPage : public DataPackResourcePage {
+class FlameDataPackPage : public DataPackResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     static FlameDataPackPage* create(DataPackDownloadDialog* dialog, BaseInstance& instance)
     {
         return DataPackResourcePage::create<FlameDataPackPage>(dialog, instance);

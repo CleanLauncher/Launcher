@@ -20,10 +20,11 @@
 
 #include "minecraft/auth/AuthStep.h"
 
-class ElyYggdrasilTokenStep : public AuthStep {
+class ElyYggdrasilTokenStep : public AuthStep
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ElyYggdrasilTokenStep(AccountData* data);
     virtual ~ElyYggdrasilTokenStep() noexcept = default;
 

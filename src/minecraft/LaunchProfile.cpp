@@ -340,11 +340,11 @@ const QString LaunchProfile::getCompatibleJavaName() const
 }
 
 void LaunchProfile::getLibraryFiles(const RuntimeContext& runtimeContext,
-                                    QStringList& jars,
-                                    QStringList& nativeJars,
-                                    const QString& overridePath,
-                                    const QString& tempPath,
-                                    bool addJarMods) const
+                                    QStringList&          jars,
+                                    QStringList&          nativeJars,
+                                    const QString&        overridePath,
+                                    const QString&        tempPath,
+                                    bool                  addJarMods) const
 {
     QStringList native32, native64;
     jars.clear();

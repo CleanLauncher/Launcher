@@ -12,7 +12,8 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-class LinkTask : public Task {
+class LinkTask : public Task
+{
     Q_OBJECT
 
     friend class FileSystemTest;
@@ -37,7 +38,7 @@ class LinkTask : public Task {
 
     void setMaxDepth(int depth) { m_lnk->setMaxDepth(depth); }
 
-   private:
+private:
     void executeTask() override
     {
         if (!(*m_lnk)()) {
@@ -73,14 +74,15 @@ class LinkTask : public Task {
     bool m_linkRecursive = true;
 };
 
-class FileSystemTest : public QObject {
+class FileSystemTest : public QObject
+{
     Q_OBJECT
 
-    const QString bothSlash = "/foo/";
+    const QString bothSlash     = "/foo/";
     const QString trailingSlash = "foo/";
-    const QString leadingSlash = "/foo";
+    const QString leadingSlash  = "/foo";
 
-   private slots:
+private slots:
     void test_pathCombine()
     {
         QCOMPARE(QString("/foo/foo"), FS::PathCombine(bothSlash, bothSlash));
@@ -148,7 +150,7 @@ class FileSystemTest : public QObject {
     void test_copy()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -177,7 +179,7 @@ class FileSystemTest : public QObject {
     void test_copy_with_blacklist()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -186,7 +188,7 @@ class FileSystemTest : public QObject {
             qDebug() << tempDir.path();
             qDebug() << target_dir.path();
             FS::copy c(folder, target_dir.path());
-            auto re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
+            auto     re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
             c.matcher(re);
             c();
 
@@ -208,7 +210,7 @@ class FileSystemTest : public QObject {
     void test_copy_with_whitelist()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -217,7 +219,7 @@ class FileSystemTest : public QObject {
             qDebug() << tempDir.path();
             qDebug() << target_dir.path();
             FS::copy c(folder, target_dir.path());
-            auto re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
+            auto     re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
             c.matcher(re);
             c.whitelist(true);
             c();
@@ -240,7 +242,7 @@ class FileSystemTest : public QObject {
     void test_copy_with_dot_hidden()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -301,7 +303,7 @@ class FileSystemTest : public QObject {
     void test_link()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -312,8 +314,9 @@ class FileSystemTest : public QObject {
 
             LinkTask lnk_tsk(folder, target_dir.path());
             lnk_tsk.linkRecursively(false);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -344,7 +347,7 @@ class FileSystemTest : public QObject {
     void test_hard_link()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir("./tmp");
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -390,7 +393,7 @@ class FileSystemTest : public QObject {
     void test_link_with_blacklist()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -400,11 +403,12 @@ class FileSystemTest : public QObject {
             qDebug() << target_dir.path();
 
             LinkTask lnk_tsk(folder, target_dir.path());
-            auto re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
+            auto     re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
             lnk_tsk.matcher(re);
             lnk_tsk.linkRecursively(true);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -434,7 +438,7 @@ class FileSystemTest : public QObject {
     void test_link_with_whitelist()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -444,12 +448,13 @@ class FileSystemTest : public QObject {
             qDebug() << target_dir.path();
 
             LinkTask lnk_tsk(folder, target_dir.path());
-            auto re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
+            auto     re = Filters::regexp(QRegularExpression("[.]?mcmeta"));
             lnk_tsk.matcher(re);
             lnk_tsk.linkRecursively(true);
             lnk_tsk.whitelist(true);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -479,7 +484,7 @@ class FileSystemTest : public QObject {
     void test_link_with_dot_hidden()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -490,8 +495,9 @@ class FileSystemTest : public QObject {
 
             LinkTask lnk_tsk(folder, target_dir.path());
             lnk_tsk.linkRecursively(true);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -536,8 +542,9 @@ class FileSystemTest : public QObject {
             qDebug() << target_dir.path();
 
             LinkTask lnk_tsk(file, target_dir.filePath("pack.mcmeta"));
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -559,7 +566,7 @@ class FileSystemTest : public QObject {
     void test_link_with_max_depth()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -571,8 +578,9 @@ class FileSystemTest : public QObject {
             LinkTask lnk_tsk(folder, target_dir.path());
             lnk_tsk.linkRecursively(true);
             lnk_tsk.setMaxDepth(0);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");
@@ -607,7 +615,7 @@ class FileSystemTest : public QObject {
     void test_link_with_no_max_depth()
     {
         QString folder = QFINDTESTDATA("testdata/FileSystem/test_folder");
-        auto f = [&folder]() {
+        auto    f      = [&folder]() {
             QTemporaryDir tempDir;
             tempDir.setAutoRemove(true);
             qDebug() << "From:" << folder << "To:" << tempDir.path();
@@ -619,8 +627,9 @@ class FileSystemTest : public QObject {
             LinkTask lnk_tsk(folder, target_dir.path());
             lnk_tsk.linkRecursively(true);
             lnk_tsk.setMaxDepth(-1);
-            connect(&lnk_tsk, &Task::finished,
-                    [&lnk_tsk] { QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been."); });
+            connect(&lnk_tsk, &Task::finished, [&lnk_tsk] {
+                QVERIFY2(lnk_tsk.wasSuccessful(), "Task finished but was not successful when it should have been.");
+            });
             lnk_tsk.start();
 
             QVERIFY2(QTest::qWaitFor([&lnk_tsk]() { return lnk_tsk.isFinished(); }, 100000), "Task didn't finish as it should.");

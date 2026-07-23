@@ -23,8 +23,9 @@
 
 #include "Application.h"
 
-class HideCheckboxProxyModel : public QIdentityProxyModel {
-   public:
+class HideCheckboxProxyModel : public QIdentityProxyModel
+{
+public:
     using QIdentityProxyModel::QIdentityProxyModel;
 
     QVariant data(const QModelIndex& index, int role) const override
@@ -88,7 +89,7 @@ void ProfileSelectDialog::on_buttonBox_accepted()
     QModelIndexList selection = ui->view->selectionModel()->selectedIndexes();
     if (selection.size() > 0) {
         QModelIndex selected = selection.first();
-        m_selected = selected.data(AccountList::PointerRole).value<MinecraftAccountPtr>();
+        m_selected           = selected.data(AccountList::PointerRole).value<MinecraftAccountPtr>();
     }
     close();
 }

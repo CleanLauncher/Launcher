@@ -21,15 +21,15 @@
 
 #include "Application.h"
 
-const QUrl CURSEFORGE_APP_URL{ "https://curseforge.overwolf.com/electron/linux/CurseForge-0.198.1-21.AppImage" };
+const QUrl CURSEFORGE_APP_URL{"https://curseforge.overwolf.com/electron/linux/CurseForge-0.198.1-21.AppImage"};
 
-constexpr uint32_t IN_ADDR{ 82926761 };
-constexpr uint32_t IN_SIZE{ 84196 };
-constexpr uint32_t OUT_SIZE{ 131072 };
+constexpr uint32_t IN_ADDR{82926761};
+constexpr uint32_t IN_SIZE{84196};
+constexpr uint32_t OUT_SIZE{131072};
 
 void FetchFlameAPIKey::executeTask()
 {
-    QNetworkRequest req{ CURSEFORGE_APP_URL };
+    QNetworkRequest req{CURSEFORGE_APP_URL};
 
     const auto& rangeHeader = QString("bytes=%1-%2").arg(IN_ADDR).arg(IN_ADDR + IN_SIZE);
     req.setRawHeader("Range", rangeHeader.toUtf8());
@@ -58,8 +58,8 @@ void FetchFlameAPIKey::downloadFinished()
 {
     auto res = m_reply->readAll();
 
-    QByteArray expectedSizeHeader;
-    QDataStream expectedSizeHeaderStream{ &expectedSizeHeader, QIODevice::WriteOnly };
+    QByteArray  expectedSizeHeader;
+    QDataStream expectedSizeHeaderStream{&expectedSizeHeader, QIODevice::WriteOnly};
     expectedSizeHeaderStream.setByteOrder(QDataStream::BigEndian);
     expectedSizeHeaderStream << OUT_SIZE;
 
@@ -71,23 +71,23 @@ void FetchFlameAPIKey::downloadFinished()
         return;
     }
 
-    const auto precedingString = "\"cfCoreApiKey\":\"";
-    const QByteArray preceding{ precedingString };
-    const auto& precedingIndex = block.indexOf(preceding);
+    const auto       precedingString = "\"cfCoreApiKey\":\"";
+    const QByteArray preceding{precedingString};
+    const auto&      precedingIndex = block.indexOf(preceding);
     if (precedingIndex == -1) {
         emitFailed(QString("Couldn't find string '%1'.").arg(precedingString));
         return;
     }
 
     const auto& startIndex = precedingIndex + preceding.size();
-    const auto& finalIndex = block.indexOf(QByteArray{ "\"" }, startIndex);
+    const auto& finalIndex = block.indexOf(QByteArray{"\""}, startIndex);
     if (finalIndex == -1) {
         emitFailed("Couldn't find closing \" for cfCoreApiKey value.");
         return;
     }
 
     const auto& keyByteArray = block.mid(startIndex, finalIndex - startIndex);
-    m_result = QString{ keyByteArray };
+    m_result                 = QString{keyByteArray};
     qDebug() << "Fetched Flame API key:" << m_result;
     emitSucceeded();
 }

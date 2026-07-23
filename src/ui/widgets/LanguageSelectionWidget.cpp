@@ -1,15 +1,15 @@
 #include "LanguageSelectionWidget.h"
 
-#include <QCheckBox>
-#include <QHeaderView>
-#include <QLabel>
-#include <QTreeView>
-#include <QVBoxLayout>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "settings/Setting.h"
 #include "settings/SettingsObject.h"
 #include "translations/TranslationsModel.h"
+#include <QCheckBox>
+#include <QHeaderView>
+#include <QLabel>
+#include <QTreeView>
+#include <QVBoxLayout>
 
 LanguageSelectionWidget::LanguageSelectionWidget(QWidget* parent) : QWidget(parent)
 {
@@ -35,12 +35,13 @@ LanguageSelectionWidget::LanguageSelectionWidget(QWidget* parent) : QWidget(pare
     formatCheckbox = new QCheckBox(this);
     formatCheckbox->setObjectName(QStringLiteral("formatCheckbox"));
     formatCheckbox->setCheckState(APPLICATION->settings()->get("UseSystemLocale").toBool() ? Qt::Checked : Qt::Unchecked);
-    connect(formatCheckbox, &QCheckBox::stateChanged,
-            [this]() { APPLICATION->translations()->setUseSystemLocale(formatCheckbox->isChecked()); });
+    connect(formatCheckbox, &QCheckBox::stateChanged, [this]() {
+        APPLICATION->translations()->setUseSystemLocale(formatCheckbox->isChecked());
+    });
     verticalLayout->addWidget(formatCheckbox);
 
     auto translations = APPLICATION->translations();
-    auto index = translations->selectedIndex();
+    auto index        = translations->selectedIndex();
     languageView->setModel(translations);
     languageView->setCurrentIndex(index);
     languageView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -71,8 +72,8 @@ void LanguageSelectionWidget::languageRowChanged(const QModelIndex& current, con
     if (current == previous) {
         return;
     }
-    auto translations = APPLICATION->translations();
-    QString key = translations->data(current, Qt::UserRole).toString();
+    auto    translations = APPLICATION->translations();
+    QString key          = translations->data(current, Qt::UserRole).toString();
     translations->selectLanguage(key);
     translations->updateLanguage(key);
 }
@@ -80,6 +81,6 @@ void LanguageSelectionWidget::languageRowChanged(const QModelIndex& current, con
 void LanguageSelectionWidget::languageSettingChanged(const Setting&, const QVariant&)
 {
     auto translations = APPLICATION->translations();
-    auto index = translations->selectedIndex();
+    auto index        = translations->selectedIndex();
     languageView->setCurrentIndex(index);
 }

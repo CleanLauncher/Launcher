@@ -28,48 +28,51 @@
 #include "GitHubRelease.h"
 #include "Version.h"
 
-namespace Ui {
+namespace Ui
+{
 class SelectReleaseDialog;
 }
 
-class SelectReleaseDialog : public QDialog {
+class SelectReleaseDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit SelectReleaseDialog(const Version& cur_version, const QList<GitHubRelease>& releases, QWidget* parent = 0);
     ~SelectReleaseDialog();
 
-    void loadReleases();
-    void appendRelease(const GitHubRelease& release);
+    void          loadReleases();
+    void          appendRelease(const GitHubRelease& release);
     GitHubRelease selectedRelease() { return m_selectedRelease; }
-   private slots:
+private slots:
     GitHubRelease getRelease(QTreeWidgetItem* item);
-    void selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    void          selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
-   protected:
+protected:
     QList<GitHubRelease> m_releases;
-    GitHubRelease m_selectedRelease;
-    Version m_currentVersion;
+    GitHubRelease        m_selectedRelease;
+    Version              m_currentVersion;
 
     Ui::SelectReleaseDialog* ui;
 };
 
-class SelectReleaseAssetDialog : public QDialog {
+class SelectReleaseAssetDialog : public QDialog
+{
     Q_OBJECT
-   public:
+public:
     explicit SelectReleaseAssetDialog(const QList<GitHubReleaseAsset>& assets, QWidget* parent = 0);
     ~SelectReleaseAssetDialog();
 
-    void loadAssets();
-    void appendAsset(const GitHubReleaseAsset& asset);
+    void               loadAssets();
+    void               appendAsset(const GitHubReleaseAsset& asset);
     GitHubReleaseAsset selectedAsset() { return m_selectedAsset; }
-   private slots:
+private slots:
     GitHubReleaseAsset getAsset(QTreeWidgetItem* item);
-    void selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
+    void               selectionChanged(QTreeWidgetItem* current, QTreeWidgetItem* previous);
 
-   protected:
+protected:
     QList<GitHubReleaseAsset> m_assets;
-    GitHubReleaseAsset m_selectedAsset;
+    GitHubReleaseAsset        m_selectedAsset;
 
     Ui::SelectReleaseDialog* ui;
 };

@@ -18,32 +18,35 @@
 
 #include <QAbstractListModel>
 
-#include <QIcon>
-#include <memory>
 #include "modplatform/ftb/FTBPackManifest.h"
 #include "net/NetJob.h"
+#include <QIcon>
+#include <memory>
 
-namespace Ftb {
+namespace Ftb
+{
 
-struct Logo {
-    QString fullpath;
+struct Logo
+{
+    QString     fullpath;
     NetJob::Ptr downloadJob;
-    QIcon result;
-    bool failed = false;
+    QIcon       result;
+    bool        failed = false;
 };
 
-using LogoMap = QMap<QString, Logo>;
+using LogoMap      = QMap<QString, Logo>;
 using LogoCallback = std::function<void(QString)>;
 
-class ListModel : public QAbstractListModel {
+class ListModel : public QAbstractListModel
+{
     Q_OBJECT
 
-   public:
+public:
     ListModel(QObject* parent);
     virtual ~ListModel();
 
-    int rowCount(const QModelIndex& parent) const override;
-    int columnCount(const QModelIndex& parent) const override;
+    int      rowCount(const QModelIndex& parent) const override;
+    int      columnCount(const QModelIndex& parent) const override;
     QVariant data(const QModelIndex& index, int role) const override;
 
     void request();
@@ -54,7 +57,7 @@ class ListModel : public QAbstractListModel {
     [[nodiscard]] bool isMakingRequest() const { return m_jobPtr.get(); }
     [[nodiscard]] bool wasAborted() const { return m_aborted; }
 
-   private slots:
+private slots:
     void requestFinished(QByteArray* responsePtr);
     void requestFailed(QString reason);
 
@@ -65,18 +68,18 @@ class ListModel : public QAbstractListModel {
     void logoFailed(QString logo);
     void logoLoaded(QString logo);
 
-   private:
+private:
     void requestLogo(QString file, QString url);
 
-   private:
+private:
     bool m_aborted = false;
 
     QList<FTB::Modpack> m_modpacks;
-    LogoMap m_logoMap;
+    LogoMap             m_logoMap;
 
     NetJob::Ptr m_jobPtr;
-    int m_currentPack;
-    QList<int> m_remainingPacks;
+    int         m_currentPack;
+    QList<int>  m_remainingPacks;
 };
 
 }  // namespace Ftb

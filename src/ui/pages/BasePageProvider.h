@@ -15,19 +15,21 @@
 
 #pragma once
 
-#include <functional>
 #include "ui/pages/BasePage.h"
+#include <functional>
 
-class BasePageProvider {
-   public:
-    virtual QList<BasePage*> getPages() = 0;
-    virtual QString dialogTitle() = 0;
+class BasePageProvider
+{
+public:
+    virtual QList<BasePage*> getPages()    = 0;
+    virtual QString          dialogTitle() = 0;
 };
 
-class GenericPageProvider : public BasePageProvider {
+class GenericPageProvider : public BasePageProvider
+{
     using PageCreator = std::function<BasePage*()>;
 
-   public:
+public:
     explicit GenericPageProvider(const QString& dialogTitle) : m_dialogTitle(dialogTitle) {}
     virtual ~GenericPageProvider() {}
 
@@ -50,7 +52,7 @@ class GenericPageProvider : public BasePageProvider {
         addPageCreator([]() { return new PageClass(); });
     }
 
-   private:
+private:
     QList<PageCreator> m_creators;
-    QString m_dialogTitle;
+    QString            m_dialogTitle;
 };

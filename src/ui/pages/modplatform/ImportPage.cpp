@@ -54,8 +54,9 @@
 #include "InstanceImportTask.h"
 #include "net/NetJob.h"
 
-class UrlValidator : public QValidator {
-   public:
+class UrlValidator : public QValidator
+{
+public:
     using QValidator::QValidator;
 
     State validate(QString& in, [[maybe_unused]] int& pos) const
@@ -105,7 +106,7 @@ void ImportPage::updateState()
     }
     if (ui->modpackEdit->hasAcceptableInput()) {
         QString input = ui->modpackEdit->text().trimmed();
-        auto url = QUrl::fromUserInput(input);
+        auto    url   = QUrl::fromUserInput(input);
         if (url.isLocalFile()) {
             QFileInfo fi(input);
 
@@ -126,16 +127,17 @@ void ImportPage::updateState()
                 return;
             }
             auto addonId = query.allQueryItemValues("addonId")[0];
-            auto fileId = query.allQueryItemValues("fileId")[0];
+            auto fileId  = query.allQueryItemValues("fileId")[0];
 
-            auto api = FlameAPI();
+            auto api          = FlameAPI();
             auto [job, array] = api.getFile(addonId, fileId);
 
-            connect(job.get(), &NetJob::failed, this,
-                    [this](QString reason) { CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show(); });
+            connect(job.get(), &NetJob::failed, this, [this](QString reason) {
+                CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->show();
+            });
             connect(job.get(), &NetJob::succeeded, this, [this, array, addonId, fileId] {
                 qDebug() << "Returned CFURL Json:\n" << array->toStdString().c_str();
-                auto doc = Json::requireDocument(*array);
+                auto doc  = Json::requireDocument(*array);
                 auto data = doc.object()["data"].toObject();
 
                 auto fileName = data["fileName"].toString();
@@ -143,7 +145,8 @@ void ImportPage::updateState()
                     auto dl_url = QUrl(data["downloadUrl"].toString(""));
                     if (!dl_url.isValid()) {
                         CustomMessageBox::selectable(
-                            this, tr("Error"),
+                            this,
+                            tr("Error"),
                             tr("The modpack %1 is blocked for third-parties! Please download it manually.").arg(fileName),
                             QMessageBox::Critical)
                             ->show();
@@ -151,7 +154,7 @@ void ImportPage::updateState()
                     }
 
                     QFileInfo dl_file(dl_url.fileName());
-                    QString pack_name = data["displayName"].toString(dl_file.completeBaseName());
+                    QString   pack_name = data["displayName"].toString(dl_file.completeBaseName());
 
                     QMap<QString, QString> extra_info;
                     extra_info.insert("pack_id", addonId);
@@ -176,7 +179,7 @@ void ImportPage::updateState()
             }
 
             QFileInfo fi(url.fileName());
-            auto extra_info = QMap(m_extra_info);
+            auto      extra_info = QMap(m_extra_info);
             dialog->setSuggestedPack(fi.completeBaseName(), new InstanceImportTask(url, this, std::move(extra_info)));
             dialog->setSuggestedIcon("default");
         }
@@ -199,8 +202,8 @@ void ImportPage::setExtraInfo(const QMap<QString, QString>& extra_info)
 
 void ImportPage::on_modpackBtn_clicked()
 {
-    const QMimeType zip = QMimeDatabase().mimeTypeForName("application/zip");
-    auto filter = tr("Supported files") + QString(" (%1 *.mrpack)").arg(zip.globPatterns().join(" "));
+    const QMimeType zip    = QMimeDatabase().mimeTypeForName("application/zip");
+    auto            filter = tr("Supported files") + QString(" (%1 *.mrpack)").arg(zip.globPatterns().join(" "));
     filter += ";;" + zip.filterString();
 
     filter += ";;" + tr("Modrinth pack") + " (*.mrpack)";

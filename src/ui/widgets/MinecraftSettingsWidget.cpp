@@ -39,7 +39,6 @@
 #include "modplatform/ModIndex.h"
 #include "ui_MinecraftSettingsWidget.h"
 
-#include <QFileDialog>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "Json.h"
@@ -47,6 +46,7 @@
 #include "minecraft/WorldList.h"
 #include "minecraft/auth/AccountList.h"
 #include "settings/Setting.h"
+#include <QFileDialog>
 
 MinecraftSettingsWidget::MinecraftSettingsWidget(MinecraftInstance* instance, QWidget* parent)
     : QWidget(parent), m_instance(std::move(instance)), m_ui(new Ui::MinecraftSettingsWidget)
@@ -117,16 +117,25 @@ MinecraftSettingsWidget::MinecraftSettingsWidget(MinecraftInstance* instance, QW
                 m_instance->settings()->reset("ModDownloadLoaders");
         });
 
-        for (auto c : { m_ui->neoForge, m_ui->forge, m_ui->fabric, m_ui->quilt, m_ui->liteLoader, m_ui->babric, m_ui->btaBabric,
-                        m_ui->legacyFabric, m_ui->ornithe, m_ui->rift }) {
+        for (auto c : {m_ui->neoForge,
+                       m_ui->forge,
+                       m_ui->fabric,
+                       m_ui->quilt,
+                       m_ui->liteLoader,
+                       m_ui->babric,
+                       m_ui->btaBabric,
+                       m_ui->legacyFabric,
+                       m_ui->ornithe,
+                       m_ui->rift}) {
             connect(c, &QCheckBox::stateChanged, this, &MinecraftSettingsWidget::saveSelectedLoaders);
         }
     }
 
     m_ui->maximizedWarning->hide();
 
-    connect(m_ui->maximizedCheckBox, &QCheckBox::toggled, this,
-            [this](const bool value) { m_ui->maximizedWarning->setVisible(value && (m_instance == nullptr || !m_instance->isLegacy())); });
+    connect(m_ui->maximizedCheckBox, &QCheckBox::toggled, this, [this](const bool value) {
+        m_ui->maximizedWarning->setVisible(value && (m_instance == nullptr || !m_instance->isLegacy()));
+    });
 
 #if !defined(Q_OS_LINUX)
     m_ui->perfomanceGroupBox->hide();
@@ -187,11 +196,14 @@ void MinecraftSettingsWidget::loadSettings()
     if (m_javaSettings != nullptr)
         m_javaSettings->loadSettings();
 
-    m_ui->customCommands->initialize(m_instance != nullptr, m_instance == nullptr || settings->get("OverrideCommands").toBool(),
-                                     settings->get("PreLaunchCommand").toString(), settings->get("WrapperCommand").toString(),
+    m_ui->customCommands->initialize(m_instance != nullptr,
+                                     m_instance == nullptr || settings->get("OverrideCommands").toBool(),
+                                     settings->get("PreLaunchCommand").toString(),
+                                     settings->get("WrapperCommand").toString(),
                                      settings->get("PostExitCommand").toString());
 
-    m_ui->environmentVariables->initialize(m_instance != nullptr, m_instance == nullptr || settings->get("OverrideEnv").toBool(),
+    m_ui->environmentVariables->initialize(m_instance != nullptr,
+                                           m_instance == nullptr || settings->get("OverrideEnv").toBool(),
                                            Json::toMap(settings->get("Env").toString()));
 
     m_ui->legacySettingsGroupBox->setChecked(m_instance == nullptr || settings->get("OverrideLegacySettings").toBool());
@@ -246,15 +258,23 @@ void MinecraftSettingsWidget::loadSettings()
         m_ui->instanceAccountGroupBox->setChecked(settings->get("UseAccountForInstance").toBool());
         updateAccountsMenu(*settings);
 
-        auto blockSignalsCheckBoxes = { m_ui->neoForge, m_ui->forge,     m_ui->fabric,       m_ui->quilt,   m_ui->liteLoader,
-                                        m_ui->babric,   m_ui->btaBabric, m_ui->legacyFabric, m_ui->ornithe, m_ui->rift };
+        auto blockSignalsCheckBoxes = {m_ui->neoForge,
+                                       m_ui->forge,
+                                       m_ui->fabric,
+                                       m_ui->quilt,
+                                       m_ui->liteLoader,
+                                       m_ui->babric,
+                                       m_ui->btaBabric,
+                                       m_ui->legacyFabric,
+                                       m_ui->ornithe,
+                                       m_ui->rift};
         m_ui->loaderGroup->blockSignals(true);
         for (auto c : blockSignalsCheckBoxes) {
             c->blockSignals(true);
         }
 
-        const bool overrideLoaders = settings->get("OverrideModDownloadLoaders").toBool();
-        const QStringList loaders = Json::toStringList(settings->get("ModDownloadLoaders").toString());
+        const bool        overrideLoaders = settings->get("OverrideModDownloadLoaders").toBool();
+        const QStringList loaders         = Json::toStringList(settings->get("ModDownloadLoaders").toString());
 
         m_ui->loaderGroup->setChecked(overrideLoaders);
 
@@ -500,8 +520,8 @@ void MinecraftSettingsWidget::openGlobalSettings()
 void MinecraftSettingsWidget::updateAccountsMenu(SettingsObject& settings)
 {
     m_ui->instanceAccountSelector->clear();
-    auto accounts = APPLICATION->accounts();
-    int accountIndex = accounts->findAccountByProfileId(settings.get("InstanceAccountId").toString());
+    auto accounts     = APPLICATION->accounts();
+    int  accountIndex = accounts->findAccountByProfileId(settings.get("InstanceAccountId").toString());
 
     for (int i = 0; i < accounts->count(); i++) {
         MinecraftAccountPtr account = accounts->at(i);
@@ -566,7 +586,7 @@ void MinecraftSettingsWidget::selectDataPacksFolder()
         return;
 
     const QUrl instanceRootUrl = QUrl::fromLocalFile(m_instance->instanceRoot());
-    const QUrl pathUrl = QUrl::fromLocalFile(path);
+    const QUrl pathUrl         = QUrl::fromLocalFile(path);
 
     if (instanceRootUrl.isParentOf(pathUrl))
         path = QDir(m_instance->gameRoot()).relativeFilePath(path);

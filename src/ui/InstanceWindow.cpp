@@ -53,7 +53,7 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
 {
     setAttribute(Qt::WA_DeleteOnClose);
 
-    auto icon = APPLICATION->icons()->getIcon(m_instance->iconKey());
+    auto    icon        = APPLICATION->icons()->getIcon(m_instance->iconKey());
     QString windowTitle = tr("Console window for ") + m_instance->name();
 
     {
@@ -63,7 +63,7 @@ InstanceWindow::InstanceWindow(BaseInstance* instance, QWidget* parent) : QMainW
 
     {
         auto provider = std::make_shared<InstancePageProvider>(m_instance);
-        m_container = new PageContainer(provider.get(), "console", this);
+        m_container   = new PageContainer(provider.get(), "console", this);
         m_container->setParentContainer(this);
         setCentralWidget(m_container);
         setContentsMargins(0, 0, 0, 0);

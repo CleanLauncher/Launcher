@@ -43,20 +43,22 @@
 
 #include "minecraft/auth/AccountList.h"
 
-namespace Ui {
+namespace Ui
+{
 class AccountListPage;
 }
 
 class AuthenticateTask;
 
-class AccountListPage : public QMainWindow, public BasePage {
+class AccountListPage : public QMainWindow, public BasePage
+{
     Q_OBJECT
-   public:
+public:
     explicit AccountListPage(QWidget* parent = 0);
     ~AccountListPage();
 
     QString displayName() const override { return tr("Accounts"); }
-    QIcon icon() const override
+    QIcon   icon() const override
     {
         auto icon = QIcon::fromTheme("accounts");
         if (icon.isNull()) {
@@ -66,9 +68,9 @@ class AccountListPage : public QMainWindow, public BasePage {
     }
     QString id() const override { return "accounts"; }
     QString helpPage() const override { return "getting-started/adding-an-account"; }
-    void retranslate() override;
+    void    retranslate() override;
 
-   public slots:
+public slots:
     void on_actionAddMicrosoft_triggered();
     void on_actionAddEly_triggered();
     void on_actionAddOffline_triggered();
@@ -84,12 +86,12 @@ class AccountListPage : public QMainWindow, public BasePage {
 
     void updateButtonStates();
 
-   protected slots:
+protected slots:
     void ShowContextMenu(const QPoint& pos);
 
-   private:
-    void changeEvent(QEvent* event) override;
-    QMenu* createPopupMenu() override;
-    AccountList* m_accounts;
+private:
+    void                 changeEvent(QEvent* event) override;
+    QMenu*               createPopupMenu() override;
+    AccountList*         m_accounts;
     Ui::AccountListPage* ui;
 };

@@ -158,7 +158,7 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
     if (!m_current->versionsLoaded || m_filterWidget->changed()) {
         qDebug() << "Loading flame modpack versions";
 
-        ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion> > callbacks{};
+        ResourceAPI::Callback<QVector<ModPlatform::IndexedVersion>> callbacks{};
 
         auto addonId = m_current->addonId;
 
@@ -167,9 +167,9 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
                 return;
             }
 
-            m_current->versions = doc;
+            m_current->versions       = doc;
             m_current->versionsLoaded = true;
-            auto pred = [this](const ModPlatform::IndexedVersion& v) {
+            auto pred                 = [this](const ModPlatform::IndexedVersion& v) {
                 if (auto filter = m_filterWidget->getFilter())
                     return !filter->checkModpackFilters(v);
                 return false;
@@ -202,7 +202,7 @@ void FlamePage::onSelectionChanged(QModelIndex curr, [[maybe_unused]] QModelInde
             CustomMessageBox::selectable(this, tr("Error"), reason, QMessageBox::Critical)->exec();
         };
 
-        auto netJob = api.getProjectVersions({ m_current, {}, {}, ModPlatform::ResourceType::Modpack }, std::move(callbacks));
+        auto netJob = api.getProjectVersions({m_current, {}, {}, ModPlatform::ResourceType::Modpack}, std::move(callbacks));
 
         m_job = netJob;
         netJob->start();
@@ -240,8 +240,9 @@ void FlamePage::suggestCurrent()
 
     m_dialog->setSuggestedPack(m_current->name, new InstanceImportTask(version.downloadUrl, this, std::move(extra_info)));
     QString editedLogoName = "curseforge_" + m_current->logoName;
-    m_listModel->getLogo(m_current->logoName, m_current->logoUrl,
-                         [this, editedLogoName](QString logo) { m_dialog->setSuggestedIconFromFile(logo, editedLogoName); });
+    m_listModel->getLogo(m_current->logoName, m_current->logoUrl, [this, editedLogoName](QString logo) {
+        m_dialog->setSuggestedIconFromFile(logo, editedLogoName);
+    });
 }
 
 void FlamePage::onVersionSelectionChanged(int index)
@@ -328,7 +329,7 @@ void FlamePage::createFilterWidget()
 
     connect(m_filterWidget.get(), &ModFilterWidget::filterChanged, this, &FlamePage::triggerSearch);
     auto [task, response] = FlameAPI::getCategories(ModPlatform::ResourceType::Modpack);
-    m_categoriesTask = task;
+    m_categoriesTask      = task;
     connect(m_categoriesTask.get(), &Task::succeeded, [this, response]() {
         auto categories = FlameAPI::loadModCategories(*response);
         m_filterWidget->setCategories(categories);

@@ -1,15 +1,16 @@
 #pragma once
 
+#include "MessageLevel.h"
 #include <QAbstractListModel>
 #include <QString>
-#include "MessageLevel.h"
 
-class LogModel : public QAbstractListModel {
+class LogModel : public QAbstractListModel
+{
     Q_OBJECT
-   public:
+public:
     explicit LogModel(QObject* parent = 0);
 
-    int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    int      rowCount(const QModelIndex& parent = QModelIndex()) const;
     QVariant data(const QModelIndex& index, int role) const;
 
     void append(MessageLevel, QString line);
@@ -20,7 +21,7 @@ class LogModel : public QAbstractListModel {
 
     QString toPlainText();
 
-    int getMaxLines();
+    int  getMaxLines();
     void setMaxLines(int maxLines);
     void setStopOnOverflow(bool stop);
     void setOverflowMessage(const QString& overflowMessage);
@@ -33,27 +34,31 @@ class LogModel : public QAbstractListModel {
 
     MessageLevel previousLevel();
 
-    enum Roles { LevelRole = Qt::UserRole };
-
-   private:
-    struct entry {
-        MessageLevel level = MessageLevel::Unknown;
-        QString line;
+    enum Roles
+    {
+        LevelRole = Qt::UserRole
     };
 
-   private:
+private:
+    struct entry
+    {
+        MessageLevel level = MessageLevel::Unknown;
+        QString      line;
+    };
+
+private:
     QList<entry> m_content;
-    int m_maxLines = 1000;
+    int          m_maxLines = 1000;
 
     int m_firstLine = 0;
 
-    int m_numLines = 0;
-    bool m_stopOnOverflow = false;
+    int     m_numLines        = 0;
+    bool    m_stopOnOverflow  = false;
     QString m_overflowMessage = "OVERFLOW";
-    bool m_suspended = false;
-    bool m_lineWrap = true;
-    bool m_colorLines = true;
+    bool    m_suspended       = false;
+    bool    m_lineWrap        = true;
+    bool    m_colorLines      = true;
 
-   private:
+private:
     Q_DISABLE_COPY(LogModel)
 };

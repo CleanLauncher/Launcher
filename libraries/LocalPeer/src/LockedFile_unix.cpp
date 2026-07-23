@@ -63,11 +63,11 @@ bool LockedFile::lock(LockMode mode, bool block)
 
     struct flock fl;
     fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-    fl.l_type = (mode == ReadLock) ? F_RDLCK : F_WRLCK;
-    int cmd = block ? F_SETLKW : F_SETLK;
-    int ret = fcntl(handle(), cmd, &fl);
+    fl.l_start  = 0;
+    fl.l_len    = 0;
+    fl.l_type   = (mode == ReadLock) ? F_RDLCK : F_WRLCK;
+    int cmd     = block ? F_SETLKW : F_SETLK;
+    int ret     = fcntl(handle(), cmd, &fl);
 
     if (ret == -1) {
         if (errno != EINTR && errno != EAGAIN)
@@ -91,10 +91,10 @@ bool LockedFile::unlock()
 
     struct flock fl;
     fl.l_whence = SEEK_SET;
-    fl.l_start = 0;
-    fl.l_len = 0;
-    fl.l_type = F_UNLCK;
-    int ret = fcntl(handle(), F_SETLKW, &fl);
+    fl.l_start  = 0;
+    fl.l_len    = 0;
+    fl.l_type   = F_UNLCK;
+    int ret     = fcntl(handle(), F_SETLKW, &fl);
 
     if (ret == -1) {
         qWarning("QtLockedFile::lock(): fcntl: %s", strerror(errno));

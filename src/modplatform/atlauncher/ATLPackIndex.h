@@ -22,21 +22,24 @@
 #include <QMetaType>
 #include <QString>
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
-struct IndexedVersion {
+struct IndexedVersion
+{
     QString version;
     QString minecraft;
 };
 
-struct IndexedPack {
-    int id;
-    int position;
-    QString name;
-    PackType type;
+struct IndexedPack
+{
+    int                   id;
+    int                   position;
+    QString               name;
+    PackType              type;
     QList<IndexedVersion> versions;
-    bool system;
-    QString description;
+    bool                  system;
+    QString               description;
 
     QString safeName;
 };

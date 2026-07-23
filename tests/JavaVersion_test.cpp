@@ -2,9 +2,10 @@
 
 #include <java/JavaVersion.h>
 
-class JavaVersionTest : public QObject {
+class JavaVersionTest : public QObject
+{
     Q_OBJECT
-   private slots:
+private slots:
     void test_Parse_data()
     {
         QTest::addColumn<QString>("string");

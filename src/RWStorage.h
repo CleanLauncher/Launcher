@@ -5,8 +5,9 @@
 #include <QWriteLocker>
 
 template <typename K, typename V>
-class RWStorage {
-   public:
+class RWStorage
+{
+public:
     void add(K key, V value)
     {
         QWriteLocker l(&lock);
@@ -56,8 +57,8 @@ class RWStorage {
         stale_entries.clear();
     }
 
-   private:
+private:
     QReadWriteLock lock;
-    QMap<K, V> cache;
-    QSet<K> stale_entries;
+    QMap<K, V>     cache;
+    QSet<K>        stale_entries;
 };

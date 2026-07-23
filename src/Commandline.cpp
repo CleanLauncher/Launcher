@@ -37,14 +37,15 @@
 
 #include "Commandline.h"
 
-namespace Commandline {
+namespace Commandline
+{
 
 QStringList splitArgs(QString args)
 {
     QStringList argv;
-    QString current;
-    bool escape = false;
-    QChar inquotes;
+    QString     current;
+    bool        escape = false;
+    QChar       inquotes;
     for (int i = 0; i < args.length(); i++) {
         QChar cchar = args.at(i);
 

@@ -4,7 +4,8 @@
 
 #include "Library.h"
 
-struct Agent {
+struct Agent
+{
     LibraryPtr library;
 
     QString argument;

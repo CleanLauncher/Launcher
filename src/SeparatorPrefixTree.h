@@ -4,8 +4,9 @@
 #include <QStringList>
 
 template <char Tseparator>
-class SeparatorPrefixTree {
-   public:
+class SeparatorPrefixTree
+{
+public:
     SeparatorPrefixTree(QStringList paths) { insert(paths); }
 
     SeparatorPrefixTree(bool contained = false) { m_contained = contained; }
@@ -52,7 +53,7 @@ class SeparatorPrefixTree {
             return (*found).covers(QString());
         } else {
             auto prefix = path.left(sepIndex);
-            auto found = children.find(prefix);
+            auto found  = children.find(prefix);
             if (found == children.end()) {
                 return false;
             }
@@ -80,7 +81,7 @@ class SeparatorPrefixTree {
             return path + Tseparator + nested;
         } else {
             auto prefix = path.left(sepIndex);
-            auto found = children.find(prefix);
+            auto found  = children.find(prefix);
             if (found == children.end()) {
                 return QString();
             }
@@ -105,7 +106,7 @@ class SeparatorPrefixTree {
             return true;
         } else {
             auto prefix = path.left(sepIndex);
-            auto found = children.find(prefix);
+            auto found  = children.find(prefix);
             if (found == children.end()) {
                 return false;
             }
@@ -124,7 +125,7 @@ class SeparatorPrefixTree {
             return &(*found);
         } else {
             auto prefix = path.left(sepIndex);
-            auto found = children.find(prefix);
+            auto found  = children.find(prefix);
             if (found == children.end()) {
                 return nullptr;
             }
@@ -159,8 +160,13 @@ class SeparatorPrefixTree {
         return collected;
     }
 
-   private:
-    enum Removal { Failed, Succeeded, HasChildren };
+private:
+    enum Removal
+    {
+        Failed,
+        Succeeded,
+        HasChildren
+    };
     Removal removeInternal(QString path = QString())
     {
         if (path.isEmpty()) {
@@ -176,42 +182,42 @@ class SeparatorPrefixTree {
         }
         Removal remStatus = Failed;
         QString childToRemove;
-        auto sepIndex = path.indexOf(Tseparator);
+        auto    sepIndex = path.indexOf(Tseparator);
         if (sepIndex == -1) {
             childToRemove = path;
-            auto found = children.find(childToRemove);
+            auto found    = children.find(childToRemove);
             if (found == children.end()) {
                 return Failed;
             }
             remStatus = (*found).removeInternal();
         } else {
             childToRemove = path.left(sepIndex);
-            auto found = children.find(childToRemove);
+            auto found    = children.find(childToRemove);
             if (found == children.end()) {
                 return Failed;
             }
             remStatus = (*found).removeInternal(path.mid(sepIndex + 1));
         }
         switch (remStatus) {
-            case Failed:
-            case HasChildren: {
-                return remStatus;
+        case Failed:
+        case HasChildren: {
+            return remStatus;
+        }
+        case Succeeded: {
+            children.remove(childToRemove);
+            if (m_contained) {
+                return HasChildren;
             }
-            case Succeeded: {
-                children.remove(childToRemove);
-                if (m_contained) {
-                    return HasChildren;
-                }
-                if (children.size()) {
-                    return HasChildren;
-                }
-                return Succeeded;
+            if (children.size()) {
+                return HasChildren;
             }
+            return Succeeded;
+        }
         }
         return Failed;
     }
 
-   private:
+private:
     QMap<QString, SeparatorPrefixTree<Tseparator>> children;
-    bool m_contained = false;
+    bool                                           m_contained = false;
 };

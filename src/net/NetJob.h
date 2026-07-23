@@ -38,17 +38,18 @@
 
 #include <QtNetwork>
 
-#include <QObject>
 #include "net/NetRequest.h"
 #include "tasks/ConcurrentTask.h"
+#include <QObject>
 
 #include "net/Download.h"
 #include "net/HttpMetaCache.h"
 
-class NetJob : public ConcurrentTask {
+class NetJob : public ConcurrentTask
+{
     Q_OBJECT
 
-   public:
+public:
     using Ptr = shared_qobject_ptr<NetJob>;
 
     explicit NetJob(QString job_name, QNetworkAccessManager* network, int max_concurrent = -1);
@@ -63,22 +64,22 @@ class NetJob : public ConcurrentTask {
     auto getFailedFiles() -> QList<QString>;
     void setAskRetry(bool askRetry);
 
-   public slots:
+public slots:
 
     bool abort() override;
     void emitFailed(QString reason) override;
 
-   protected slots:
+protected slots:
     void executeNextSubTask() override;
 
-   protected:
+protected:
     void updateState() override;
     bool isOnline();
 
-   private:
+private:
     QNetworkAccessManager* m_network;
 
-    int m_try = 1;
-    bool m_ask_retry = true;
-    int m_manual_try = 0;
+    int  m_try        = 1;
+    bool m_ask_retry  = true;
+    int  m_manual_try = 0;
 };

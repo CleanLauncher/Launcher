@@ -35,13 +35,13 @@
 
 #include "ApplicationMessage.h"
 
+#include "Json.h"
 #include <QJsonDocument>
 #include <QJsonObject>
-#include "Json.h"
 
 void ApplicationMessage::parse(const QByteArray& input)
 {
-    auto doc = Json::requireDocument(input, "ApplicationMessage");
+    auto doc  = Json::requireDocument(input, "ApplicationMessage");
     auto root = Json::requireObject(doc, "ApplicationMessage");
 
     command = root.value("command").toString();

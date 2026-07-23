@@ -36,14 +36,15 @@
 
 #pragma once
 
+#include "SeparatorPrefixTree.h"
 #include <QFileInfo>
 #include <QSortFilterProxyModel>
-#include "SeparatorPrefixTree.h"
 
-class FileIgnoreProxy : public QSortFilterProxyModel {
+class FileIgnoreProxy : public QSortFilterProxyModel
+{
     Q_OBJECT
 
-   public:
+public:
     FileIgnoreProxy(QString root, QObject* parent);
 
     bool lessThan(const QModelIndex& left, const QModelIndex& right) const;
@@ -51,7 +52,7 @@ class FileIgnoreProxy : public QSortFilterProxyModel {
     virtual Qt::ItemFlags flags(const QModelIndex& index) const;
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const;
-    virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
+    virtual bool     setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 
     QString relPath(const QString& path) const;
 
@@ -62,7 +63,7 @@ class FileIgnoreProxy : public QSortFilterProxyModel {
     void setBlockedPaths(QStringList paths);
 
     inline const SeparatorPrefixTree<'/'>& blockedPaths() const { return m_blocked; }
-    inline SeparatorPrefixTree<'/'>& blockedPaths() { return m_blocked; }
+    inline SeparatorPrefixTree<'/'>&       blockedPaths() { return m_blocked; }
 
     inline QStringList& ignoreFilesWithName() { return m_ignoreFiles; }
     inline QStringList& ignoreFilesWithSuffix() { return m_ignoreFilesSuffixes; }
@@ -75,16 +76,16 @@ class FileIgnoreProxy : public QSortFilterProxyModel {
 
     void saveBlockedPathsToFile(const QString& fileName);
 
-   protected:
+protected:
     bool filterAcceptsColumn(int source_column, const QModelIndex& source_parent) const;
     bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
 
     bool ignoreFile(QFileInfo file) const;
 
-   private:
-    const QString m_root;
+private:
+    const QString            m_root;
     SeparatorPrefixTree<'/'> m_blocked;
-    QStringList m_ignoreFiles;
-    QStringList m_ignoreFilesSuffixes;
+    QStringList              m_ignoreFiles;
+    QStringList              m_ignoreFilesSuffixes;
     SeparatorPrefixTree<'/'> m_ignoreFilePaths;
 };

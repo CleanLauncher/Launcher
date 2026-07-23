@@ -107,9 +107,9 @@ void InfoFrame::updateWithMod(const Mod& m)
         setDescription(renderColorCodes(m.description()));
     }
 
-    setImage(m.icon({ 64, 64 }));
+    setImage(m.icon({64, 64}));
 
-    auto licenses = m.licenses();
+    auto    licenses    = m.licenses();
     QString licenseText = "";
     if (!licenses.empty()) {
         for (auto l : licenses) {
@@ -147,7 +147,7 @@ void InfoFrame::updateWithMod(const Mod& m)
 void InfoFrame::updateWithResource(const Resource& resource)
 {
     const QString homepage = resource.homepage();
-    auto name = renderColorCodes(resource.name());
+    auto          name     = renderColorCodes(resource.name());
 
     if (!homepage.isEmpty())
         setName("<a href=\"" + homepage + "\">" + name + "</a>");
@@ -159,14 +159,26 @@ void InfoFrame::updateWithResource(const Resource& resource)
 
 QString InfoFrame::renderColorCodes(QString input)
 {
-    const QMap<QChar, QString> color_codes_map = { { '0', "#000000" }, { '1', "#0000AA" }, { '2', "#00AA00" }, { '3', "#00AAAA" },
-                                                   { '4', "#AA0000" }, { '5', "#AA00AA" }, { '6', "#FFAA00" }, { '7', "#AAAAAA" },
-                                                   { '8', "#555555" }, { '9', "#5555FF" }, { 'a', "#55FF55" }, { 'b', "#55FFFF" },
-                                                   { 'c', "#FF5555" }, { 'd', "#FF55FF" }, { 'e', "#FFFF55" }, { 'f', "#FFFFFF" } };
+    const QMap<QChar, QString> color_codes_map = {{'0', "#000000"},
+                                                  {'1', "#0000AA"},
+                                                  {'2', "#00AA00"},
+                                                  {'3', "#00AAAA"},
+                                                  {'4', "#AA0000"},
+                                                  {'5', "#AA00AA"},
+                                                  {'6', "#FFAA00"},
+                                                  {'7', "#AAAAAA"},
+                                                  {'8', "#555555"},
+                                                  {'9', "#5555FF"},
+                                                  {'a', "#55FF55"},
+                                                  {'b', "#55FFFF"},
+                                                  {'c', "#FF5555"},
+                                                  {'d', "#FF55FF"},
+                                                  {'e', "#FFFF55"},
+                                                  {'f', "#FFFFFF"}};
 
-    const QMap<QChar, QString> formatting_codes_map = { { 'l', "b" }, { 'm', "s" }, { 'n', "u" }, { 'o', "i" } };
+    const QMap<QChar, QString> formatting_codes_map = {{'l', "b"}, {'m', "s"}, {'n', "u"}, {'o', "i"}};
 
-    QString html("<html>");
+    QString        html("<html>");
     QList<QString> tags{};
 
     auto it = input.constBegin();
@@ -175,7 +187,7 @@ QString InfoFrame::renderColorCodes(QString input)
             const auto& code = *(++it);
 
             const auto color_entry = color_codes_map.constFind(code);
-            const auto tag_entry = formatting_codes_map.constFind(code);
+            const auto tag_entry   = formatting_codes_map.constFind(code);
 
             if (color_entry != color_codes_map.constEnd()) {
                 html += QString("<span style=\"color: %1;\">").arg(color_entry.value());
@@ -215,14 +227,14 @@ void InfoFrame::updateWithResourcePack(ResourcePack& resource_pack)
 
     setName(name);
     setDescription(renderColorCodes(resource_pack.description()));
-    setImage(resource_pack.image({ 64, 64 }));
+    setImage(resource_pack.image({64, 64}));
 }
 
 void InfoFrame::updateWithDataPack(DataPack& data_pack)
 {
     setName(renderColorCodes(data_pack.name()));
     setDescription(renderColorCodes(data_pack.description()));
-    setImage(data_pack.image({ 64, 64 }));
+    setImage(data_pack.image({64, 64}));
 }
 
 void InfoFrame::updateWithTexturePack(TexturePack& texture_pack)
@@ -236,7 +248,7 @@ void InfoFrame::updateWithTexturePack(TexturePack& texture_pack)
 
     setName(name);
     setDescription(renderColorCodes(texture_pack.description()));
-    setImage(texture_pack.image({ 64, 64 }));
+    setImage(texture_pack.image({64, 64}));
 }
 
 void InfoFrame::clear()
@@ -282,8 +294,8 @@ void InfoFrame::setDescription(QString text)
     }
     ui->descriptionLabel->setToolTip("");
     QString intermediatetext = text.trimmed();
-    bool prev(false);
-    QChar rem('\n');
+    bool    prev(false);
+    QChar   rem('\n');
     QString finaltext;
     finaltext.reserve(intermediatetext.size());
     for (const QChar& c : intermediatetext) {
@@ -296,7 +308,7 @@ void InfoFrame::setDescription(QString text)
     QString labeltext;
     labeltext.reserve(300);
 
-    const int maxCharacterElide = 290;
+    const int     maxCharacterElide = 290;
     QTextDocument doc;
     doc.setHtml(text);
 
@@ -334,8 +346,8 @@ void InfoFrame::setLicense(QString text)
     }
     ui->licenseLabel->setToolTip("");
     QString intermediatetext = text.trimmed();
-    bool prev(false);
-    QChar rem('\n');
+    bool    prev(false);
+    QChar   rem('\n');
     QString finaltext;
     finaltext.reserve(intermediatetext.size());
     for (const QChar& c : intermediatetext) {

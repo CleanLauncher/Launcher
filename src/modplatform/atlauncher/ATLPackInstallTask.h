@@ -36,8 +36,8 @@
 
 #pragma once
 
-#include <meta/VersionList.h>
 #include "ATLPackManifest.h"
+#include <meta/VersionList.h>
 
 #include "InstanceTask.h"
 #include "meta/Version.h"
@@ -48,16 +48,19 @@
 #include <cstdint>
 #include <optional>
 
-namespace ATLauncher {
+namespace ATLauncher
+{
 
-enum class InstallMode : std::uint8_t {
+enum class InstallMode : std::uint8_t
+{
     Install,
     Reinstall,
     Update,
 };
 
-class UserInteractionSupport {
-   public:
+class UserInteractionSupport
+{
+public:
     virtual std::optional<QList<QString>> chooseOptionalMods(const PackVersion& version, QList<ATLauncher::VersionMod> mods) = 0;
 
     virtual QString chooseVersion(Meta::VersionList::Ptr vlist, QString minecraftVersion) = 0;
@@ -67,23 +70,24 @@ class UserInteractionSupport {
     virtual ~UserInteractionSupport() = default;
 };
 
-class PackInstallTask : public InstanceTask {
+class PackInstallTask : public InstanceTask
+{
     Q_OBJECT
 
-   public:
+public:
     explicit PackInstallTask(UserInteractionSupport* support,
-                             QString packName,
-                             QString version,
-                             InstallMode installMode = InstallMode::Install);
+                             QString                 packName,
+                             QString                 version,
+                             InstallMode             installMode = InstallMode::Install);
     ~PackInstallTask() override { delete m_support; }
 
     bool canAbort() const override { return true; }
     bool abort() override;
 
-   protected:
+protected:
     void executeTask() override;
 
-   private slots:
+private slots:
     void onDownloadSucceeded(QByteArray* responsePtr);
     void onDownloadFailed(QString reason);
     void onDownloadAborted();
@@ -91,9 +95,9 @@ class PackInstallTask : public InstanceTask {
     void onModsDownloaded();
     void onModsExtracted();
 
-   private:
-    QString getDirForModType(ModType type, const QString& raw);
-    QString getVersionForLoader(const QString& uid);
+private:
+    QString        getDirForModType(ModType type, const QString& raw);
+    QString        getVersionForLoader(const QString& uid);
     static QString detectLibrary(const VersionLibrary& library);
 
     bool createLibrariesComponent(const QString& instanceRoot, PackProfile* profile);
@@ -105,10 +109,10 @@ class PackInstallTask : public InstanceTask {
     void downloadMods();
     bool extractMods(const QMap<QString, VersionMod>& toExtract,
                      const QMap<QString, VersionMod>& toDecomp,
-                     const QMap<QString, QString>& toCopy);
+                     const QMap<QString, QString>&    toCopy);
     void install();
 
-   private:
+private:
     UserInteractionSupport* m_support;
 
     bool abortable = false;
@@ -116,24 +120,24 @@ class PackInstallTask : public InstanceTask {
     NetJob::Ptr jobPtr;
 
     InstallMode m_install_mode;
-    QString m_pack_name;
-    QString m_pack_safe_name;
-    QString m_version_name;
+    QString     m_pack_name;
+    QString     m_pack_safe_name;
+    QString     m_version_name;
     PackVersion m_version;
 
     QMap<QString, VersionMod> modsToExtract;
     QMap<QString, VersionMod> modsToDecomp;
-    QMap<QString, QString> modsToCopy;
+    QMap<QString, QString>    modsToCopy;
 
-    QString archivePath;
-    QStringList jarmods;
-    Meta::Version::Ptr minecraftVersion;
+    QString                           archivePath;
+    QStringList                       jarmods;
+    Meta::Version::Ptr                minecraftVersion;
     QMap<QString, Meta::Version::Ptr> componentsToInstall;
 
-    QFuture<std::optional<QStringList>> m_extractFuture;
+    QFuture<std::optional<QStringList>>        m_extractFuture;
     QFutureWatcher<std::optional<QStringList>> m_extractFutureWatcher;
 
-    QFuture<bool> m_modExtractFuture;
+    QFuture<bool>        m_modExtractFuture;
     QFutureWatcher<bool> m_modExtractFutureWatcher;
 };
 

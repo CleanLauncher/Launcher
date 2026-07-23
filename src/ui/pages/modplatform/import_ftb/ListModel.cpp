@@ -17,11 +17,6 @@
  */
 
 #include "ListModel.h"
-#include <QDir>
-#include <QDirIterator>
-#include <QFileInfo>
-#include <QIcon>
-#include <QProcessEnvironment>
 #include "Application.h"
 #include "Exception.h"
 #include "FileSystem.h"
@@ -30,8 +25,14 @@
 #include "modplatform/import_ftb/PackHelpers.h"
 #include "settings/SettingsObject.h"
 #include "ui/widgets/ProjectItem.h"
+#include <QDir>
+#include <QDirIterator>
+#include <QFileInfo>
+#include <QIcon>
+#include <QProcessEnvironment>
 
-namespace FTBImportAPP {
+namespace FTBImportAPP
+{
 
 QString getFTBRoot()
 {
@@ -80,8 +81,8 @@ void ListModel::update()
             return;
         if (auto instancesInfo = QFileInfo(path); !instancesInfo.exists() || !instancesInfo.isDir())
             return;
-        QDirIterator directoryIterator(path, QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable | QDir::Hidden,
-                                       QDirIterator::FollowSymlinks);
+        QDirIterator directoryIterator(
+            path, QDir::Dirs | QDir::NoDotAndDotDot | QDir::Readable | QDir::Hidden, QDirIterator::FollowSymlinks);
         while (directoryIterator.hasNext()) {
             auto currentPath = directoryIterator.next();
             if (!wasPathAdded(currentPath)) {
@@ -107,28 +108,28 @@ QVariant ListModel::data(const QModelIndex& index, int role) const
 
     auto pack = m_modpacks.at(pos);
     switch (role) {
-        case Qt::ToolTipRole:
-            return tr("Minecraft %1").arg(pack.mcVersion);
-        case Qt::DecorationRole:
-            return pack.icon;
-        case Qt::UserRole: {
-            QVariant v;
-            v.setValue(pack);
-            return v;
-        }
-        case Qt::DisplayRole:
-            return pack.name;
-        case Qt::SizeHintRole:
-            return QSize(0, 58);
+    case Qt::ToolTipRole:
+        return tr("Minecraft %1").arg(pack.mcVersion);
+    case Qt::DecorationRole:
+        return pack.icon;
+    case Qt::UserRole: {
+        QVariant v;
+        v.setValue(pack);
+        return v;
+    }
+    case Qt::DisplayRole:
+        return pack.name;
+    case Qt::SizeHintRole:
+        return QSize(0, 58);
 
-        case UserDataTypes::TITLE:
-            return pack.name;
-        case UserDataTypes::DESCRIPTION:
-            return tr("Minecraft %1").arg(pack.mcVersion);
-        case UserDataTypes::INSTALLED:
-            return false;
-        default:
-            break;
+    case UserDataTypes::TITLE:
+        return pack.name;
+    case UserDataTypes::DESCRIPTION:
+        return tr("Minecraft %1").arg(pack.mcVersion);
+    case UserDataTypes::INSTALLED:
+        return false;
+    default:
+        break;
     }
 
     return {};
@@ -145,7 +146,7 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
 {
     QVariant leftRaw = sourceModel()->data(left, Qt::UserRole);
     Q_ASSERT(leftRaw.canConvert<Modpack>());
-    auto leftPack = leftRaw.value<Modpack>();
+    auto     leftPack = leftRaw.value<Modpack>();
     QVariant rightRaw = sourceModel()->data(right, Qt::UserRole);
     Q_ASSERT(rightRaw.canConvert<Modpack>());
     auto rightPack = rightRaw.value<Modpack>();
@@ -169,7 +170,7 @@ bool FilterModel::filterAcceptsRow([[maybe_unused]] int sourceRow, [[maybe_unuse
         return true;
     }
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    QVariant raw = sourceModel()->data(index, Qt::UserRole);
+    QVariant    raw   = sourceModel()->data(index, Qt::UserRole);
     Q_ASSERT(raw.canConvert<Modpack>());
     auto pack = raw.value<Modpack>();
     return pack.name.contains(m_searchTerm, Qt::CaseInsensitive);

@@ -28,20 +28,22 @@
 #include "minecraft/skins/SkinModel.h"
 #include "ui/dialogs/skins/draw/SkinOpenGLWindow.h"
 
-namespace Ui {
+namespace Ui
+{
 class SkinManageDialog;
 }
-class SkinManageDialog : public QDialog, public SkinProvider {
+class SkinManageDialog : public QDialog, public SkinProvider
+{
     Q_OBJECT
-   public:
+public:
     explicit SkinManageDialog(QWidget* parent, MinecraftAccountPtr acct);
     virtual ~SkinManageDialog();
     void resizeEvent(QResizeEvent* event) override;
 
-    virtual SkinModel* getSelectedSkin() override;
+    virtual SkinModel*             getSelectedSkin() override;
     virtual QHash<QString, QImage> capes() override;
 
-   public slots:
+public slots:
     void selectionChanged(QItemSelection, QItemSelection);
     void activated(QModelIndex);
     void delayed_scroll(QModelIndex);
@@ -58,16 +60,16 @@ class SkinManageDialog : public QDialog, public SkinProvider {
     void on_action_Rename_Skin_triggered(bool checked);
     void on_action_Delete_Skin_triggered(bool checked);
 
-   private:
+private:
     void setupCapes();
 
-   private:
-    MinecraftAccountPtr m_acct;
-    Ui::SkinManageDialog* m_ui;
-    SkinList m_list;
-    QString m_selectedSkinKey;
+private:
+    MinecraftAccountPtr    m_acct;
+    Ui::SkinManageDialog*  m_ui;
+    SkinList               m_list;
+    QString                m_selectedSkinKey;
     QHash<QString, QImage> m_capes;
-    QHash<QString, int> m_capesIdx;
-    SkinOpenGLWindow* m_skinPreview = nullptr;
-    QLabel* m_skinPreviewLabel = nullptr;
+    QHash<QString, int>    m_capesIdx;
+    SkinOpenGLWindow*      m_skinPreview      = nullptr;
+    QLabel*                m_skinPreviewLabel = nullptr;
 };

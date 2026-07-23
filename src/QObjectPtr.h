@@ -10,8 +10,9 @@ template <typename T>
 using unique_qobject_ptr = QScopedPointer<T, QScopedPointerDeleteLater>;
 
 template <typename T>
-class shared_qobject_ptr : public QSharedPointer<T> {
-   public:
+class shared_qobject_ptr : public QSharedPointer<T>
+{
+public:
     constexpr explicit shared_qobject_ptr() : QSharedPointer<T>() {}
     constexpr explicit shared_qobject_ptr(T* ptr) : QSharedPointer<T>(ptr, &QObject::deleteLater) {}
     constexpr shared_qobject_ptr(std::nullptr_t null_ptr) : QSharedPointer<T>(null_ptr, &QObject::deleteLater) {}

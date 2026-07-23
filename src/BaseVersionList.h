@@ -23,10 +23,12 @@
 #include "QObjectPtr.h"
 #include "tasks/Task.h"
 
-class BaseVersionList : public QAbstractListModel {
+class BaseVersionList : public QAbstractListModel
+{
     Q_OBJECT
-   public:
-    enum ModelRoles {
+public:
+    enum ModelRoles
+    {
         VersionPointerRole = Qt::UserRole,
         VersionRole,
         VersionIdRole,
@@ -53,9 +55,9 @@ class BaseVersionList : public QAbstractListModel {
 
     virtual int count() const = 0;
 
-    QVariant data(const QModelIndex& index, int role) const override;
-    int rowCount(const QModelIndex& parent) const override;
-    int columnCount(const QModelIndex& parent) const override;
+    QVariant               data(const QModelIndex& index, int role) const override;
+    int                    rowCount(const QModelIndex& parent) const override;
+    int                    columnCount(const QModelIndex& parent) const override;
     QHash<int, QByteArray> roleNames() const override;
 
     virtual RoleList providesRoles() const;
@@ -66,7 +68,7 @@ class BaseVersionList : public QAbstractListModel {
 
     virtual void sortVersions() = 0;
 
-   protected slots:
+protected slots:
 
     virtual void updateListData(QList<BaseVersion::Ptr> versions) = 0;
 };

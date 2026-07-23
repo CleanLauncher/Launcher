@@ -21,14 +21,17 @@
 
 #include "minecraft/auth/AccountList.h"
 
-namespace Ui {
+namespace Ui
+{
 class ProfileSelectDialog;
 }
 
-class ProfileSelectDialog : public QDialog {
+class ProfileSelectDialog : public QDialog
+{
     Q_OBJECT
-   public:
-    enum Flags {
+public:
+    enum Flags
+    {
         NoFlags = 0,
 
         GlobalDefaultCheckbox,
@@ -45,16 +48,16 @@ class ProfileSelectDialog : public QDialog {
 
     bool useAsInstDefaullt() const;
 
-   public slots:
+public slots:
     void on_buttonBox_accepted();
 
     void on_buttonBox_rejected();
 
-   protected:
+protected:
     AccountList* m_accounts;
 
     MinecraftAccountPtr m_selected;
 
-   private:
+private:
     Ui::ProfileSelectDialog* ui;
 };

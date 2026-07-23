@@ -27,11 +27,17 @@
 
 class Version;
 
-enum class WorldSaveFormat { SINGLE, MULTI, INVALID };
+enum class WorldSaveFormat
+{
+    SINGLE,
+    MULTI,
+    INVALID
+};
 
-class WorldSave : public Resource {
+class WorldSave : public Resource
+{
     Q_OBJECT
-   public:
+public:
     using Ptr = shared_qobject_ptr<Resource>;
 
     WorldSave(QObject* parent = nullptr) : Resource(parent) {}
@@ -47,7 +53,7 @@ class WorldSave : public Resource {
 
     bool valid() const override;
 
-   protected:
+protected:
     mutable QMutex m_data_lock;
 
     WorldSaveFormat m_save_format = WorldSaveFormat::INVALID;

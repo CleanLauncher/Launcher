@@ -25,23 +25,25 @@
 class QTextCharFormat;
 class SettingsObject;
 
-namespace Ui {
+namespace Ui
+{
 class AppearanceWidget;
 }
 
-class AppearanceWidget : public QWidget {
+class AppearanceWidget : public QWidget
+{
     Q_OBJECT
 
-   public:
+public:
     explicit AppearanceWidget(bool simple, QWidget* parent = 0);
     virtual ~AppearanceWidget();
 
-   public:
+public:
     void applySettings();
     void loadSettings();
     void retranslateUi();
 
-   private:
+private:
     void applyIconTheme(int index);
     void applyWidgetTheme(int index);
     void loadThemeSettings();
@@ -49,6 +51,6 @@ class AppearanceWidget : public QWidget {
     void updateConsolePreview();
 
     Ui::AppearanceWidget* m_ui;
-    QTextCharFormat m_defaultFormat;
-    bool m_themesOnly;
+    QTextCharFormat       m_defaultFormat;
+    bool                  m_themesOnly;
 };

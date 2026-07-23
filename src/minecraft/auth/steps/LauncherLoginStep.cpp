@@ -20,7 +20,7 @@ QString LauncherLoginStep::describe()
 void LauncherLoginStep::perform()
 {
     QUrl url("https://api.minecraftservices.com/launcher/login");
-    auto uhs = m_data->mojangservicesToken.extra["uhs"].toString();
+    auto uhs    = m_data->mojangservicesToken.extra["uhs"].toString();
     auto xToken = m_data->mojangservicesToken.token;
 
     QString mc_auth_template = R"XXX(
@@ -29,15 +29,15 @@ void LauncherLoginStep::perform()
     "platform": "PC_LAUNCHER"
 }
 )XXX";
-    auto requestBody = mc_auth_template.arg(uhs, xToken);
+    auto    requestBody      = mc_auth_template.arg(uhs, xToken);
 
     auto headers = QList<Net::HeaderPair>{
-        { "Content-Type", "application/json" },
-        { "Accept", "application/json" },
+        {"Content-Type", "application/json"},
+        {"Accept", "application/json"},
     };
 
     auto [request, response] = Net::Upload::makeByteArray(url, requestBody.toUtf8());
-    m_request = request;
+    m_request                = request;
     m_request->addHeaderProxy(std::make_unique<Net::RawHeaderProxy>(headers));
     m_request->enableAutoRetry(true);
 

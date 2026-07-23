@@ -47,21 +47,23 @@
 
 #include <QWidget>
 
-namespace FTB {
+namespace FTB
+{
 
-class PackInstallTask final : public InstanceTask {
+class PackInstallTask final : public InstanceTask
+{
     Q_OBJECT
 
-   public:
+public:
     explicit PackInstallTask(Modpack pack, QString version, QWidget* parent = nullptr);
     ~PackInstallTask() override = default;
 
     bool abort() override;
 
-   protected:
+protected:
     void executeTask() override;
 
-   private slots:
+private slots:
     void onManifestDownloadSucceeded(QByteArray* responsePtr);
     void onResolveModsSucceeded();
     void onCreateInstanceSucceeded();
@@ -72,14 +74,14 @@ class PackInstallTask final : public InstanceTask {
     void onCreateInstanceFailed(QString reason);
     void onModDownloadFailed(QString reason);
 
-   private:
+private:
     void resolveMods();
     void createInstance();
     void downloadPack();
     void copyBlockedMods();
 
-   private:
-    NetJob::Ptr m_net_job = nullptr;
+private:
+    NetJob::Ptr                                  m_net_job           = nullptr;
     shared_qobject_ptr<Flame::FileResolvingTask> m_modIdResolverTask = nullptr;
 
     QList<int> m_fileIds;
@@ -89,7 +91,7 @@ class PackInstallTask final : public InstanceTask {
     Version m_version;
 
     QMap<QString, QString> m_filesToCopy;
-    QList<BlockedMod> m_blockedMods;
+    QList<BlockedMod>      m_blockedMods;
 
     QWidget* m_parent;
 };

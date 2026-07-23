@@ -45,19 +45,20 @@
 
 #include "minecraft/mod/TexturePackFolderModel.h"
 
-class TexturePackPage : public ExternalResourcesPage {
+class TexturePackPage : public ExternalResourcesPage
+{
     Q_OBJECT
-   public:
+public:
     explicit TexturePackPage(MinecraftInstance* instance, TexturePackFolderModel* model, QWidget* parent = nullptr);
 
     QString displayName() const override { return tr("Texture packs"); }
-    QIcon icon() const override { return QIcon::fromTheme("resourcepacks"); }
+    QIcon   icon() const override { return QIcon::fromTheme("resourcepacks"); }
     QString id() const override { return "texturepacks"; }
     QString helpPage() const override { return "Texture-packs"; }
 
     virtual bool shouldDisplay() const override { return m_instance->traits().contains("texturepacks"); }
 
-   public slots:
+public slots:
     void updateFrame(const QModelIndex& current, const QModelIndex& previous) override;
     void downloadTexturePacks();
     void downloadDialogFinished(int result);
@@ -65,7 +66,7 @@ class TexturePackPage : public ExternalResourcesPage {
     void deleteTexturePackMetadata();
     void changeTexturePackVersion();
 
-   private:
-    TexturePackFolderModel* m_model;
+private:
+    TexturePackFolderModel*                               m_model;
     QPointer<ResourceDownload::TexturePackDownloadDialog> m_downloadDialog;
 };

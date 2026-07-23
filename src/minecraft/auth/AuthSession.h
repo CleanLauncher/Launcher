@@ -7,7 +7,8 @@
 
 class MinecraftAccount;
 
-struct AuthSession {
+struct AuthSession
+{
     bool MakeOffline(QString offline_playername);
     void MakeDemo(QString name, QString uuid);
 

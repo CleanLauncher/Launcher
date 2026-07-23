@@ -45,8 +45,8 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 
-#include <QSettings>
 #include "Json.h"
+#include <QSettings>
 
 INIFile::INIFile() {}
 
@@ -54,7 +54,7 @@ bool INIFile::saveFile(QString fileName)
 {
     if (!contains("ConfigVersion"))
         insert("ConfigVersion", "1.3");
-    QSettings _settings_obj{ fileName, QSettings::Format::IniFormat };
+    QSettings _settings_obj{fileName, QSettings::Format::IniFormat};
     _settings_obj.setFallbacksEnabled(false);
     _settings_obj.clear();
 
@@ -78,7 +78,7 @@ bool INIFile::saveFile(QString fileName)
 QString unescape(QString orig)
 {
     QString out;
-    QChar prev = QChar::Null;
+    QChar   prev = QChar::Null;
     for (auto c : orig) {
         if (prev == '\\') {
             if (c == 'n')
@@ -126,8 +126,8 @@ bool parseOldFileFormat(QIODevice& device, QSettings::SettingsMap& map)
     for (int i = 0; i < lines.count(); i++) {
         QString& lineRaw = lines[i];
 
-        int commentIndex = 0;
-        QString line = lineRaw;
+        int     commentIndex = 0;
+        QString line         = lineRaw;
 
         while ((commentIndex = line.indexOf('#', commentIndex + 1)) != -1) {
             if (commentIndex > 0 && line.at(commentIndex - 1) == '\\') {
@@ -139,7 +139,7 @@ bool parseOldFileFormat(QIODevice& device, QSettings::SettingsMap& map)
         int eqPos = line.indexOf('=');
         if (eqPos == -1)
             continue;
-        QString key = line.left(eqPos).trimmed();
+        QString key      = line.left(eqPos).trimmed();
         QString valueStr = line.right(line.length() - eqPos - 1).trimmed();
 
         valueStr = unquote(unescape(valueStr));
@@ -153,10 +153,16 @@ bool parseOldFileFormat(QIODevice& device, QSettings::SettingsMap& map)
 
 QVariant migrateQByteArrayToBase64(QString key, QVariant value)
 {
-    static const QStringList otherByteArrays = { "MainWindowState",       "MainWindowGeometry", "ConsoleWindowState",
-                                                 "ConsoleWindowGeometry", "PagedGeometry",      "NewInstanceGeometry",
-                                                 "ModDownloadGeometry",   "RPDownloadGeometry", "TPDownloadGeometry",
-                                                 "ShaderDownloadGeometry" };
+    static const QStringList otherByteArrays = {"MainWindowState",
+                                                "MainWindowGeometry",
+                                                "ConsoleWindowState",
+                                                "ConsoleWindowGeometry",
+                                                "PagedGeometry",
+                                                "NewInstanceGeometry",
+                                                "ModDownloadGeometry",
+                                                "RPDownloadGeometry",
+                                                "TPDownloadGeometry",
+                                                "ShaderDownloadGeometry"};
     if (key.startsWith("WideBarVisibility_") || (key.startsWith("UI/") && key.endsWith("_Page/Columns"))) {
         return QString::fromUtf8(value.toByteArray().toBase64());
     }
@@ -174,7 +180,7 @@ QVariant migrateQByteArrayToBase64(QString key, QVariant value)
 
 bool INIFile::loadFile(QString fileName)
 {
-    QSettings _settings_obj{ fileName, QSettings::Format::IniFormat };
+    QSettings _settings_obj{fileName, QSettings::Format::IniFormat};
     _settings_obj.setFallbacksEnabled(false);
 
     if (auto status = _settings_obj.status(); status != QSettings::Status::NoError) {

@@ -6,21 +6,22 @@
 void fib(int& prev, int& cur)
 {
     auto ret = prev + cur;
-    prev = cur;
-    cur = ret;
+    prev     = cur;
+    cur      = ret;
 }
 
-class GZipTest : public QObject {
+class GZipTest : public QObject
+{
     Q_OBJECT
-   private slots:
+private slots:
 
     void test_Through()
     {
-        static const int size = 10 * 1024 * 1024;
-        QByteArray random;
-        QByteArray compressed;
-        QByteArray decompressed;
-        std::default_random_engine eng((std::random_device())());
+        static const int                        size = 10 * 1024 * 1024;
+        QByteArray                              random;
+        QByteArray                              compressed;
+        QByteArray                              decompressed;
+        std::default_random_engine              eng((std::random_device())());
         std::uniform_int_distribution<uint16_t> idis(0, std::numeric_limits<uint8_t>::max());
 
         for (int i = 0; i < size; i++) {
@@ -28,7 +29,7 @@ class GZipTest : public QObject {
         }
 
         int prev = 1;
-        int cur = 1;
+        int cur  = 1;
 
         do {
             QByteArray copy = random;

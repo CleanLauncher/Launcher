@@ -1,15 +1,17 @@
 #pragma once
-#include <QWidget>
 #include "BaseWizardPage.h"
+#include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class AutoJavaWizardPage;
 }
 
-class AutoJavaWizardPage : public BaseWizardPage {
+class AutoJavaWizardPage : public BaseWizardPage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit AutoJavaWizardPage(QWidget* parent = nullptr);
     ~AutoJavaWizardPage();
 
@@ -17,6 +19,6 @@ class AutoJavaWizardPage : public BaseWizardPage {
     bool validatePage() override;
     void retranslate() override;
 
-   private:
+private:
     Ui::AutoJavaWizardPage* ui;
 };

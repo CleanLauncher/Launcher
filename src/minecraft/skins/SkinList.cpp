@@ -73,9 +73,9 @@ bool SkinList::update()
     auto manifestInfo = QFileInfo(m_dir.absoluteFilePath("index.json"));
     if (manifestInfo.exists()) {
         try {
-            auto doc = Json::requireDocument(manifestInfo.absoluteFilePath(), "SkinList JSON file");
-            const auto root = doc.object();
-            auto skins = root["skins"].toArray();
+            auto       doc   = Json::requireDocument(manifestInfo.absoluteFilePath(), "SkinList JSON file");
+            const auto root  = doc.object();
+            auto       skins = root["skins"].toArray();
             for (auto jSkin : skins) {
                 SkinModel s(m_dir, jSkin.toObject());
                 if (s.isValid()) {
@@ -87,10 +87,10 @@ bool SkinList::update()
         }
     }
 
-    bool needsSave = false;
-    const auto& skin = m_acct->accountData()->minecraftProfile.skin;
+    bool        needsSave = false;
+    const auto& skin      = m_acct->accountData()->minecraftProfile.skin;
     if (!skin.url.isEmpty() && !skin.data.isEmpty()) {
-        QPixmap skinTexture;
+        QPixmap    skinTexture;
         SkinModel* nskin = nullptr;
         for (auto i = 0; i < newSkins.size(); i++) {
             if (newSkins[i].getURL() == skin.url) {
@@ -139,8 +139,9 @@ bool SkinList::update()
             }
         }
     }
-    std::sort(newSkins.begin(), newSkins.end(),
-              [](const SkinModel& a, const SkinModel& b) { return a.getPath().localeAwareCompare(b.getPath()) < 0; });
+    std::sort(newSkins.begin(), newSkins.end(), [](const SkinModel& a, const SkinModel& b) {
+        return a.getPath().localeAwareCompare(b.getPath()) < 0;
+    });
     beginResetModel();
     m_skinList.swap(newSkins);
     endResetModel();
@@ -183,7 +184,7 @@ void SkinList::fileChanged(const QString& path)
 
 QStringList SkinList::mimeTypes() const
 {
-    return { "text/uri-list" };
+    return {"text/uri-list"};
 }
 
 Qt::DropActions SkinList::supportedDropActions() const
@@ -191,10 +192,10 @@ Qt::DropActions SkinList::supportedDropActions() const
     return Qt::CopyAction;
 }
 
-bool SkinList::dropMimeData(const QMimeData* data,
-                            Qt::DropAction action,
-                            [[maybe_unused]] int row,
-                            [[maybe_unused]] int column,
+bool SkinList::dropMimeData(const QMimeData*                    data,
+                            Qt::DropAction                      action,
+                            [[maybe_unused]] int                row,
+                            [[maybe_unused]] int                column,
                             [[maybe_unused]] const QModelIndex& parent)
 {
     if (action == Qt::IgnoreAction)
@@ -204,7 +205,7 @@ bool SkinList::dropMimeData(const QMimeData* data,
         return false;
 
     if (data->hasUrls()) {
-        auto urls = data->urls();
+        auto        urls = data->urls();
         QStringList skinFiles;
         for (auto url : urls) {
             if (!url.isLocalFile())
@@ -237,21 +238,21 @@ QVariant SkinList::data(const QModelIndex& index, int role) const
         return QVariant();
     auto skin = m_skinList[row];
     switch (role) {
-        case Qt::DecorationRole: {
-            auto preview = skin.getPreview();
-            if (preview.isNull()) {
-                preview = skin.getTexture();
-            }
-            return preview;
+    case Qt::DecorationRole: {
+        auto preview = skin.getPreview();
+        if (preview.isNull()) {
+            preview = skin.getTexture();
         }
-        case Qt::DisplayRole:
-            return skin.name();
-        case Qt::UserRole:
-            return skin.name();
-        case Qt::EditRole:
-            return skin.name();
-        default:
-            return QVariant();
+        return preview;
+    }
+    case Qt::DisplayRole:
+        return skin.name();
+    case Qt::UserRole:
+        return skin.name();
+    case Qt::EditRole:
+        return skin.name();
+    default:
+        return QVariant();
     }
 }
 
@@ -273,15 +274,15 @@ QString getUniqueFile(const QString& root, const QString& file)
         return result;
     }
 
-    QString baseName = QFileInfo(file).completeBaseName();
+    QString baseName  = QFileInfo(file).completeBaseName();
     QString extension = QFileInfo(file).suffix();
-    int tries = 0;
+    int     tries     = 0;
     while (QFileInfo::exists(result)) {
         if (++tries > 256)
             return {};
 
         QString key = QString("%1%2.%3").arg(baseName).arg(tries).arg(extension);
-        result = FS::PathCombine(root, key);
+        result      = FS::PathCombine(root, key);
     }
 
     return result;
@@ -354,7 +355,7 @@ bool SkinList::deleteSkin(const QString& key, bool trash)
 void SkinList::save()
 {
     QJsonObject doc;
-    QJsonArray arr;
+    QJsonArray  arr;
     for (auto s : m_skinList) {
         arr << s.toJSON();
     }
@@ -386,8 +387,8 @@ bool SkinList::setData(const QModelIndex& idx, const QVariant& value, int role)
     int row = idx.row();
     if (row < 0 || row >= m_skinList.size())
         return false;
-    auto& skin = m_skinList[row];
-    auto newName = value.toString();
+    auto& skin    = m_skinList[row];
+    auto  newName = value.toString();
     if (skin.name() != newName) {
         if (!skin.rename(newName))
             return false;

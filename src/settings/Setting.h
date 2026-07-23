@@ -22,9 +22,10 @@
 
 class SettingsObject;
 
-class Setting : public QObject {
+class Setting : public QObject
+{
     Q_OBJECT
-   public:
+public:
     explicit Setting(QStringList synonyms, QVariant defVal = QVariant());
 
     virtual QString id() const { return m_synonyms.first(); }
@@ -35,21 +36,21 @@ class Setting : public QObject {
 
     virtual QVariant defValue() const;
 
-   signals:
+signals:
 
     void SettingChanged(const Setting& setting, QVariant value);
 
     void settingReset(const Setting& setting);
 
-   public slots:
+public slots:
 
     virtual void set(QVariant value);
 
     virtual void reset();
 
-   protected:
+protected:
     friend class SettingsObject;
     SettingsObject* m_storage;
-    QStringList m_synonyms;
-    QVariant m_defVal;
+    QStringList     m_synonyms;
+    QVariant        m_defVal;
 };

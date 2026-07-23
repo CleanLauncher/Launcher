@@ -20,8 +20,9 @@
 
 #include "ui/pages/BasePage.h"
 
-class ModpackProviderBasePage : public BasePage {
-   public:
+class ModpackProviderBasePage : public BasePage
+{
+public:
     virtual void setSearchTerm(QString) = 0;
 
     virtual QString getSerachTerm() const = 0;

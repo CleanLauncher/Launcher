@@ -27,49 +27,52 @@
 
 struct archive;
 struct archive_entry;
-namespace MMCZip {
-class ArchiveReader {
-   public:
+namespace MMCZip
+{
+class ArchiveReader
+{
+public:
     using ArchivePtr = std::unique_ptr<struct archive, int (*)(struct archive*)>;
     explicit ArchiveReader(QString fileName) : m_archivePath(std::move(fileName)) {}
     virtual ~ArchiveReader() = default;
 
     QStringList getFiles();
-    QString getZipName();
-    bool collectFiles(bool onlyFiles = true);
-    bool exists(const QString& filePath) const;
+    QString     getZipName();
+    bool        collectFiles(bool onlyFiles = true);
+    bool        exists(const QString& filePath) const;
 
-    class File {
-       public:
+    class File
+    {
+    public:
         File();
         virtual ~File() = default;
 
-        QString filename();
-        bool isFile();
-        QDateTime dateTime();
+        QString     filename();
+        bool        isFile();
+        QDateTime   dateTime();
         const char* error();
 
         QByteArray readAll(int* outStatus = nullptr);
-        bool skip();
-        bool writeFile(archive* out, const QString& targetFileName = "", bool notBlock = false);
-        bool writeFile(archive* out, const QString& targetFileName, std::optional<QDir> root, bool notBlock = false);
+        bool       skip();
+        bool       writeFile(archive* out, const QString& targetFileName = "", bool notBlock = false);
+        bool       writeFile(archive* out, const QString& targetFileName, std::optional<QDir> root, bool notBlock = false);
 
-       private:
+    private:
         int readNextHeader();
 
-       private:
+    private:
         friend ArchiveReader;
-        ArchivePtr m_archive;
+        ArchivePtr     m_archive;
         archive_entry* m_entry;
     };
 
     std::unique_ptr<File> goToFile(const QString& filename);
-    bool parse(const std::function<bool(File*)>&);
-    bool parse(const std::function<bool(File*, bool&)>&);
+    bool                  parse(const std::function<bool(File*)>&);
+    bool                  parse(const std::function<bool(File*, bool&)>&);
 
-   private:
+private:
     QString m_archivePath;
-    size_t m_blockSize = 10240;
+    size_t  m_blockSize = 10240;
 
     QStringList m_fileNames;
 };

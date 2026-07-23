@@ -14,10 +14,10 @@
  */
 
 #include "settings/SettingsObject.h"
-#include <QDebug>
 #include "PassthroughSetting.h"
 #include "settings/OverrideSetting.h"
 #include "settings/Setting.h"
+#include <QDebug>
 
 #include <QDir>
 #include <QVariant>
@@ -40,7 +40,7 @@ std::shared_ptr<Setting> SettingsObject::registerOverride(std::shared_ptr<Settin
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
         return nullptr;
     }
-    auto override = std::make_shared<OverrideSetting>(original, gate);
+    auto override       = std::make_shared<OverrideSetting>(original, gate);
     override->m_storage = this;
     connectSignals(*override);
     m_settings.insert(override->id(), override);
@@ -53,7 +53,7 @@ std::shared_ptr<Setting> SettingsObject::registerPassthrough(std::shared_ptr<Set
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(original->id());
         return nullptr;
     }
-    auto passthrough = std::make_shared<PassthroughSetting>(original, gate);
+    auto passthrough       = std::make_shared<PassthroughSetting>(original, gate);
     passthrough->m_storage = this;
     connectSignals(*passthrough);
     m_settings.insert(passthrough->id(), passthrough);
@@ -68,7 +68,7 @@ std::shared_ptr<Setting> SettingsObject::registerSetting(QStringList synonyms, Q
         qCritical() << QString("Failed to register setting %1. ID already exists.").arg(synonyms.first());
         return nullptr;
     }
-    auto setting = std::make_shared<Setting>(synonyms, defVal);
+    auto setting       = std::make_shared<Setting>(synonyms, defVal);
     setting->m_storage = this;
     connectSignals(*setting);
     m_settings.insert(setting->id(), setting);
@@ -90,7 +90,7 @@ QVariant SettingsObject::get(const QString& id)
 #ifdef Q_OS_MACOS
 
     if (id.endsWith("Dir")) {
-        return { getPathFromBookmark(id) };
+        return {getPathFromBookmark(id)};
     }
 #endif
 
@@ -130,7 +130,7 @@ QString SettingsObject::getPathFromBookmark(const QString& id)
         return setting->get().toString();
     }
 
-    auto bookmarkId = id + "Bookmark";
+    auto bookmarkId      = id + "Bookmark";
     auto bookmarkSetting = getSetting(bookmarkId);
     if (!bookmarkSetting) {
         qCritical() << QString("Error changing setting %1. Bookmark setting doesn't exist.").arg(id);
@@ -173,8 +173,8 @@ bool SettingsObject::setPathWithBookmark(const QString& id, const QString& path)
         qCritical() << QString("Error changing setting %1. Path doesn't exist.").arg(id);
         return false;
     }
-    QString absolutePath = dir.absolutePath();
-    QString bookmarkId = id + "Bookmark";
+    QString                  absolutePath    = dir.absolutePath();
+    QString                  bookmarkId      = id + "Bookmark";
     std::shared_ptr<Setting> bookmarkSetting = getSetting(bookmarkId);
 
     if (path == setting->defValue().toString() || absolutePath.startsWith(QDir::current().absolutePath())) {

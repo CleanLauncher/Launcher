@@ -18,9 +18,6 @@
 
 #include "InstallLoaderDialog.h"
 
-#include <QDialogButtonBox>
-#include <QPushButton>
-#include <QVBoxLayout>
 #include "Application.h"
 #include "BuildConfig.h"
 #include "DesktopServices.h"
@@ -29,10 +26,14 @@
 #include "minecraft/PackProfile.h"
 #include "ui/widgets/PageContainer.h"
 #include "ui/widgets/VersionSelectWidget.h"
+#include <QDialogButtonBox>
+#include <QPushButton>
+#include <QVBoxLayout>
 
-class InstallLoaderPage : public VersionSelectWidget, public BasePage {
+class InstallLoaderPage : public VersionSelectWidget, public BasePage
+{
     Q_OBJECT
-   public:
+public:
     InstallLoaderPage(const QString& id, const QString& iconName, const QString& name, const Version& oldestVersion, PackProfile* profile)
         : VersionSelectWidget(nullptr), uid(id), iconName(iconName), name(name)
     {
@@ -49,7 +50,7 @@ class InstallLoaderPage : public VersionSelectWidget, public BasePage {
 
     QString id() const override { return uid; }
     QString displayName() const override { return name; }
-    QIcon icon() const override { return QIcon::fromTheme(iconName); }
+    QIcon   icon() const override { return QIcon::fromTheme(iconName); }
 
     void openedImpl() override
     {
@@ -70,11 +71,11 @@ class InstallLoaderPage : public VersionSelectWidget, public BasePage {
         connect(view(), &QAbstractItemView::doubleClicked, dialog, &QDialog::accept);
     }
 
-   private:
+private:
     const QString uid;
     const QString iconName;
     const QString name;
-    bool loaded = false;
+    bool          loaded = false;
 };
 
 static InstallLoaderPage* pageCast(BasePage* page)
@@ -144,8 +145,7 @@ QList<BasePage*> InstallLoaderDialog::getPages()
 
         new InstallLoaderPage("org.quiltmc.quilt-loader", "quiltmc", tr("Quilt"), Version("1.14"), profile),
 
-        new InstallLoaderPage("com.mumfrey.liteloader", "liteloader", tr("LiteLoader"), {}, profile)
-    };
+        new InstallLoaderPage("com.mumfrey.liteloader", "liteloader", tr("LiteLoader"), {}, profile)};
 }
 
 QString InstallLoaderDialog::dialogTitle()

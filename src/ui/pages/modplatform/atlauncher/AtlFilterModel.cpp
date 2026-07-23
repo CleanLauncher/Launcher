@@ -23,7 +23,8 @@
 
 #include "StringUtils.h"
 
-namespace Atl {
+namespace Atl
+{
 
 FilterModel::FilterModel(QObject* parent) : QSortFilterProxyModel(parent)
 {
@@ -68,7 +69,7 @@ bool FilterModel::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParen
         return true;
     }
     QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    QVariant raw = sourceModel()->data(index, Qt::UserRole);
+    QVariant    raw   = sourceModel()->data(index, Qt::UserRole);
     Q_ASSERT(raw.canConvert<ATLauncher::IndexedPack>());
     auto pack = raw.value<ATLauncher::IndexedPack>();
 
@@ -81,7 +82,7 @@ bool FilterModel::lessThan(const QModelIndex& left, const QModelIndex& right) co
 {
     QVariant leftRaw = sourceModel()->data(left, Qt::UserRole);
     Q_ASSERT(leftRaw.canConvert<ATLauncher::IndexedPack>());
-    auto leftPack = leftRaw.value<ATLauncher::IndexedPack>();
+    auto     leftPack = leftRaw.value<ATLauncher::IndexedPack>();
     QVariant rightRaw = sourceModel()->data(right, Qt::UserRole);
     Q_ASSERT(rightRaw.canConvert<ATLauncher::IndexedPack>());
     auto rightPack = rightRaw.value<ATLauncher::IndexedPack>();

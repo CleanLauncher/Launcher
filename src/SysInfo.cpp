@@ -46,7 +46,7 @@
 
 bool rosettaDetect()
 {
-    int ret = 0;
+    int    ret  = 0;
     size_t size = sizeof(ret);
     if (sysctlbyname("sysctl.proc_translated", &ret, &size, nullptr, 0) == -1) {
         return false;
@@ -55,7 +55,8 @@ bool rosettaDetect()
 }
 #endif
 
-namespace SysInfo {
+namespace SysInfo
+{
 QString currentSystem()
 {
 #if defined(Q_OS_LINUX)
@@ -92,7 +93,7 @@ int defaultMaxJvmMem()
 
 QString getSupportedJavaArchitecture()
 {
-    auto sys = currentSystem();
+    auto sys  = currentSystem();
     auto arch = useQTForArch();
     if (sys == "windows") {
         if (arch == "x86_64")

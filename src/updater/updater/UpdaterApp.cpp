@@ -58,7 +58,7 @@ namespace fs = std::filesystem;
 
 void appDebugOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
-    static std::mutex loggerMutex;
+    static std::mutex                 loggerMutex;
     const std::lock_guard<std::mutex> lock(loggerMutex);
 
     QString out = qFormatLogMessage(type, context, msg);
@@ -84,20 +84,20 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     parser.setApplicationDescription(QObject::tr("An auto-updater for Launcher"));
 
     parser.addOptions(
-        { { { "d", "dir" }, tr("Use a custom path as application root (use '.' for current directory)."), tr("directory") },
-          { { "V", "launcher-version" },
-            tr("Use this version as the installed launcher version. (provided because stdout can not be reliably captured on windows)"),
-            tr("installed launcher version") },
-          { { "I", "install-version" }, "Install a specific version.", tr("version name") },
-          { { "U", "update-url" }, tr("Update from the specified repo."), tr("github repo url") },
-          { { "c", "check-only" },
-            tr("Only check if an update is needed. Exit status 100 if true, 0 if false (or non 0 if there was an error).") },
-          { { "p", "pre-release" }, tr("Allow updating to pre-release releases") },
-          { { "F", "force" }, tr("Force an update, even if one is not needed.") },
-          { { "l", "list" }, tr("List available releases.") },
-          { "debug", tr("Log debug to console.") },
-          { { "S", "select-ui" }, tr("Select the version to install with a GUI.") },
-          { { "D", "allow-downgrade" }, tr("Allow the updater to downgrade to previous versions.") } });
+        {{{"d", "dir"}, tr("Use a custom path as application root (use '.' for current directory)."), tr("directory")},
+         {{"V", "launcher-version"},
+          tr("Use this version as the installed launcher version. (provided because stdout can not be reliably captured on windows)"),
+          tr("installed launcher version")},
+         {{"I", "install-version"}, "Install a specific version.", tr("version name")},
+         {{"U", "update-url"}, tr("Update from the specified repo."), tr("github repo url")},
+         {{"c", "check-only"},
+          tr("Only check if an update is needed. Exit status 100 if true, 0 if false (or non 0 if there was an error).")},
+         {{"p", "pre-release"}, tr("Allow updating to pre-release releases")},
+         {{"F", "force"}, tr("Force an update, even if one is not needed.")},
+         {{"l", "list"}, tr("List available releases.")},
+         {"debug", tr("Log debug to console.")},
+         {{"S", "select-ui"}, tr("Select the version to install with a GUI.")},
+         {{"D", "allow-downgrade"}, tr("Allow the updater to downgrade to previous versions.")}});
 
     parser.addHelpOption();
     parser.addVersionOption();
@@ -106,7 +106,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     logToConsole = parser.isSet("debug");
 
     QString origCwdPath = QDir::currentPath();
-    QString binPath = applicationDirPath();
+    QString binPath     = applicationDirPath();
 
     {
 #if defined(Q_OS_LINUX) || defined(Q_OS_FREEBSD) || defined(Q_OS_OPENBSD)
@@ -154,12 +154,12 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
 #ifndef Q_OS_MACOS
         if (auto portableUserData = FS::PathCombine(m_rootPath, "UserData"); QDir(portableUserData).exists()) {
-            m_dataPath = portableUserData;
-            adjustedBy = "Portable user data path";
+            m_dataPath   = portableUserData;
+            adjustedBy   = "Portable user data path";
             m_isPortable = true;
         } else if (QFile::exists(FS::PathCombine(m_rootPath, "portable.txt"))) {
-            m_dataPath = m_rootPath;
-            adjustedBy = "Portable data path";
+            m_dataPath   = m_rootPath;
+            adjustedBy   = "Portable data path";
             m_isPortable = true;
         }
 #endif
@@ -170,7 +170,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     {
         FS::ensureFolderPathExists(FS::PathCombine(m_dataPath, "logs"));
         static const QString baseLogFile = BuildConfig.LAUNCHER_NAME + "Updater" + (m_checkOnly ? "-CheckOnly" : "") + "-%0.log";
-        static const QString logBase = FS::PathCombine(m_dataPath, "logs", baseLogFile);
+        static const QString logBase     = FS::PathCombine(m_dataPath, "logs", baseLogFile);
 
         if (FS::ensureFolderPathExists("logs")) {
             FS::move(logBase.arg(1), logBase.arg(2));
@@ -192,19 +192,18 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
         }
         qInstallMessageHandler(appDebugOutput);
 
-        qSetMessagePattern(
-            "%{time process}"
-            " "
-            "%{if-debug}D%{endif}"
-            "%{if-info}I%{endif}"
-            "%{if-warning}W%{endif}"
-            "%{if-critical}C%{endif}"
-            "%{if-fatal}F%{endif}"
-            " "
-            "|"
-            " "
-            "%{if-category}[%{category}]: %{endif}"
-            "%{message}");
+        qSetMessagePattern("%{time process}"
+                           " "
+                           "%{if-debug}D%{endif}"
+                           "%{if-info}I%{endif}"
+                           "%{if-warning}W%{endif}"
+                           "%{if-critical}C%{endif}"
+                           "%{if-fatal}F%{endif}"
+                           " "
+                           "|"
+                           " "
+                           "%{if-category}[%{category}]: %{endif}"
+                           "%{message}");
 
         bool foundLoggingRules = false;
 
@@ -282,7 +281,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 #endif
 
     if (binPath.startsWith("/tmp/.mount_")) {
-        m_isAppimage = true;
+        m_isAppimage   = true;
         m_appimagePath = QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE"));
         if (m_appimagePath.isEmpty()) {
             showFatalErrorMessage(tr("Unsupported Installation"),
@@ -309,28 +308,28 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
 
     m_repoUrl = QUrl::fromUserInput(update_url);
 
-    m_checkOnly = parser.isSet("check-only");
-    m_forceUpdate = parser.isSet("force");
-    m_printOnly = parser.isSet("list");
+    m_checkOnly       = parser.isSet("check-only");
+    m_forceUpdate     = parser.isSet("force");
+    m_printOnly       = parser.isSet("list");
     auto user_version = parser.value("install-version");
     if (!user_version.isEmpty()) {
         m_userSelectedVersion = Version(user_version);
     }
-    m_selectUI = parser.isSet("select-ui");
+    m_selectUI       = parser.isSet("select-ui");
     m_allowDowngrade = parser.isSet("allow-downgrade");
 
     auto version = parser.value("launcher-version");
     if (!version.isEmpty()) {
         if (version.contains('-')) {
-            auto index = version.indexOf('-');
+            auto index       = version.indexOf('-');
             m_versionChannel = version.mid(index + 1);
-            version = version.left(index);
+            version          = version.left(index);
         } else {
             m_versionChannel = "stable";
         }
         auto version_parts = version.split('.');
-        m_versionMajor = version_parts.takeFirst().toInt();
-        m_versionMinor = version_parts.takeFirst().toInt();
+        m_versionMajor     = version_parts.takeFirst().toInt();
+        m_versionMinor     = version_parts.takeFirst().toInt();
         if (!version_parts.isEmpty())
             m_versionPatch = version_parts.takeFirst().toInt();
         else
@@ -340,7 +339,7 @@ UpdaterApp::UpdaterApp(int& argc, char** argv) : QApplication(argc, argv)
     m_allowPreRelease = parser.isSet("pre-release");
 
     auto marker_file_path = QDir(m_rootPath).absoluteFilePath(".launcher_updater_unpack.marker");
-    auto marker_file = QFileInfo(marker_file_path);
+    auto marker_file      = QFileInfo(marker_file_path);
     if (marker_file.exists()) {
         auto target_dir = QString(FS::read(marker_file_path)).trimmed();
         if (target_dir.isEmpty()) {
@@ -378,7 +377,7 @@ void UpdaterApp::abort(const QString& reason)
 
 void UpdaterApp::showFatalErrorMessage(const QString& title, const QString& content)
 {
-    m_status = Failed;
+    m_status    = Failed;
     auto msgBox = new QMessageBox();
     msgBox->setWindowTitle(title);
     msgBox->setText(content);
@@ -404,12 +403,12 @@ void UpdaterApp::run()
     }
 
     if (!loadVersionFromExe(m_executable)) {
-        m_version = BuildConfig.printableVersionString();
-        m_versionMajor = BuildConfig.VERSION_MAJOR;
-        m_versionMinor = BuildConfig.VERSION_MINOR;
-        m_versionPatch = BuildConfig.VERSION_PATCH;
+        m_version        = BuildConfig.printableVersionString();
+        m_versionMajor   = BuildConfig.VERSION_MAJOR;
+        m_versionMinor   = BuildConfig.VERSION_MINOR;
+        m_versionPatch   = BuildConfig.VERSION_PATCH;
         m_versionChannel = BuildConfig.VERSION_CHANNEL;
-        m_gitCommit = BuildConfig.GIT_COMMIT;
+        m_gitCommit      = BuildConfig.GIT_COMMIT;
     }
     m_status = Succeeded;
 
@@ -440,8 +439,9 @@ void UpdaterApp::run()
     }
 
     if (m_isFlatpak) {
-        showFatalErrorMessage(tr("Updating flatpack not supported"), tr("Actions outside of checking if an update is available are not "
-                                                                        "supported when running the flatpak version of Launcher."));
+        showFatalErrorMessage(tr("Updating flatpack not supported"),
+                              tr("Actions outside of checking if an update is available are not "
+                                 "supported when running the flatpak version of Launcher."));
         return;
     }
     if (m_isAppimage) {
@@ -457,7 +457,7 @@ void UpdaterApp::run()
             bool found = false;
             for (auto rls : m_releases) {
                 if (rls.version == m_userSelectedVersion) {
-                    found = true;
+                    found          = true;
                     update_release = rls;
                     break;
                 }
@@ -489,7 +489,7 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
     logUpdate("Waiting 2 seconds for resources to free");
     this->thread()->sleep(2);
 
-    auto manifest_path = FS::PathCombine(m_rootPath, "manifest.txt");
+    auto      manifest_path = FS::PathCombine(m_rootPath, "manifest.txt");
     QFileInfo manifest(manifest_path);
 
     auto app_dir = QDir(m_rootPath);
@@ -499,12 +499,11 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
             auto contents = QString::fromUtf8(FS::read(manifest.absoluteFilePath()));
-            auto files = contents.split('\n');
+            auto files    = contents.split('\n');
             for (auto file : files) {
                 file_list.append(file.trimmed());
             }
-        } catch (FS::FileSystemException&) {
-        }
+        } catch (FS::FileSystemException&) {}
     }
 
     if (file_list.isEmpty()) {
@@ -528,7 +527,7 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
     logUpdate(tr("Installing from %1").arg(m_rootPath));
 
     auto copy = [this, app_dir, target](QString to_install_file) {
-        auto rel_path = app_dir.relativeFilePath(to_install_file);
+        auto rel_path     = app_dir.relativeFilePath(to_install_file);
         auto install_path = FS::PathCombine(target.absolutePath(), rel_path);
         logUpdate(tr("Installing %1 from %2").arg(install_path).arg(to_install_file));
         FS::ensureFilePathExists(install_path);
@@ -542,7 +541,7 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
 
     int i = 0;
     for (auto glob : file_list) {
-        QDirIterator iter(m_rootPath, QStringList({ glob }), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+        QDirIterator iter(m_rootPath, QStringList({glob}), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
         progress.setValue(i);
         QCoreApplication::processEvents();
         if (!iter.hasNext() && !glob.isEmpty()) {
@@ -574,7 +573,7 @@ void UpdaterApp::moveAndFinishUpdate(QDir target)
     FS::deletePath(update_lock_path);
 
     QProcess proc;
-    auto app_exe_name = BuildConfig.LAUNCHER_APP_BINARY_NAME;
+    auto     app_exe_name = BuildConfig.LAUNCHER_APP_BINARY_NAME;
 #if defined Q_OS_WIN32
     app_exe_name.append(".exe");
 
@@ -632,7 +631,7 @@ GitHubRelease UpdaterApp::selectRelease()
         return {};
 
     SelectReleaseDialog dlg(Version(m_version), releases);
-    auto result = dlg.exec();
+    auto                result = dlg.exec();
 
     if (result == QDialog::Rejected) {
         return {};
@@ -662,11 +661,11 @@ QList<GitHubReleaseAsset> UpdaterApp::validReleaseArtifacts(const GitHubRelease&
             qDebug() << "Rejecting" << asset.name << "because it is not an AppImage";
             continue;
         }
-        auto asset_name = asset.name.toLower();
+        auto asset_name                  = asset.name.toLower();
         auto [platform, platform_qt_ver] = StringUtils::splitFirst(BuildConfig.BUILD_ARTIFACT.toLower(), "-qt");
-        auto system_is_arm = QSysInfo::buildCpuArchitecture().contains("arm64");
-        auto asset_is_arm = asset_name.contains("arm64");
-        auto asset_is_archive = asset_name.endsWith(".zip") || asset_name.endsWith(".tar.gz");
+        auto system_is_arm               = QSysInfo::buildCpuArchitecture().contains("arm64");
+        auto asset_is_arm                = asset_name.contains("arm64");
+        auto asset_is_archive            = asset_name.endsWith(".zip") || asset_name.endsWith(".tar.gz");
 
         bool for_platform = !platform.isEmpty() && asset_name.contains(platform);
         if (!for_platform) {
@@ -687,7 +686,7 @@ QList<GitHubReleaseAsset> UpdaterApp::validReleaseArtifacts(const GitHubRelease&
         }
 
         static const QRegularExpression s_qtPattern("-qt(\\d+)");
-        auto qt_match = s_qtPattern.match(asset_name);
+        auto                            qt_match = s_qtPattern.match(asset_name);
         if (for_platform && qt_match.hasMatch()) {
             if (platform_qt_ver.isEmpty() || platform_qt_ver.toInt() != qt_match.captured(1).toInt()) {
                 qDebug() << "Rejecting" << asset.name << "because it is not for the correct qt version" << platform_qt_ver.toInt() << "vs"
@@ -707,7 +706,7 @@ QList<GitHubReleaseAsset> UpdaterApp::validReleaseArtifacts(const GitHubRelease&
 GitHubReleaseAsset UpdaterApp::selectAsset(const QList<GitHubReleaseAsset>& assets)
 {
     SelectReleaseAssetDialog dlg(assets);
-    auto result = dlg.exec();
+    auto                     result = dlg.exec();
 
     if (result == QDialog::Rejected) {
         return {};
@@ -753,8 +752,8 @@ void UpdaterApp::performUpdate(const GitHubRelease& release)
 
 QFileInfo UpdaterApp::downloadAsset(const GitHubReleaseAsset& asset)
 {
-    auto temp_dir = QDir::tempPath();
-    auto file_url = QUrl(asset.browser_download_url);
+    auto temp_dir      = QDir::tempPath();
+    auto file_url      = QUrl(asset.browser_download_url);
     auto out_file_path = FS::PathCombine(temp_dir, file_url.fileName());
 
     qDebug() << "downloading" << file_url << "to" << out_file_path;
@@ -773,11 +772,11 @@ QFileInfo UpdaterApp::downloadAsset(const GitHubReleaseAsset& asset)
 
 bool UpdaterApp::callAppImageUpdate()
 {
-    auto appimage_path = QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE"));
-    QProcess proc = QProcess();
+    auto     appimage_path = QProcessEnvironment::systemEnvironment().value(QStringLiteral("APPIMAGE"));
+    QProcess proc          = QProcess();
     qDebug() << "Calling: AppImageUpdate" << appimage_path;
     proc.setProgram(FS::PathCombine(m_rootPath, "bin", "AppImageUpdate.AppImage"));
-    proc.setArguments({ appimage_path });
+    proc.setArguments({appimage_path});
     auto result = proc.startDetached();
     if (!result)
         qDebug() << "Failed to start AppImageUpdate reason:" << proc.errorString();
@@ -798,15 +797,15 @@ void UpdaterApp::logUpdate(const QString& msg)
 std::tuple<QDateTime, QString, QString, QString, QString> read_lock_File(const QString& path)
 {
     auto contents = QString(FS::read(path));
-    auto lines = contents.split('\n');
+    auto lines    = contents.split('\n');
 
     QDateTime timestamp;
-    QString from, to, target, data_path;
+    QString   from, to, target, data_path;
     for (auto line : lines) {
         auto index = line.indexOf("=");
         if (index < 0)
             continue;
-        auto left = line.left(index);
+        auto left  = line.left(index);
         auto right = line.mid(index + 1);
         if (left.toLower() == "timestamp") {
             timestamp = QDateTime::fromString(right, Qt::ISODate);
@@ -826,13 +825,14 @@ std::tuple<QDateTime, QString, QString, QString, QString> read_lock_File(const Q
 bool write_lock_file(const QString& path, QDateTime timestamp, QString from, QString to, QString target, QString data_path)
 {
     try {
-        FS::write(path, QStringLiteral("TIMESTAMP=%1\nFROM=%2\nTO=%3\nTARGET=%4\nDATA_PATH=%5\n")
-                            .arg(timestamp.toString(Qt::ISODate))
-                            .arg(from)
-                            .arg(to)
-                            .arg(target)
-                            .arg(data_path)
-                            .toUtf8());
+        FS::write(path,
+                  QStringLiteral("TIMESTAMP=%1\nFROM=%2\nTO=%3\nTARGET=%4\nDATA_PATH=%5\n")
+                      .arg(timestamp.toString(Qt::ISODate))
+                      .arg(from)
+                      .arg(to)
+                      .arg(target)
+                      .arg(data_path)
+                      .toUtf8());
     } catch (FS::FileSystemException& err) {
         qWarning() << "Error writing lockfile:" << err.what() << "\n" << err.cause();
         return false;
@@ -843,11 +843,11 @@ bool write_lock_file(const QString& path, QDateTime timestamp, QString from, QSt
 void UpdaterApp::performInstall(QFileInfo file)
 {
     qDebug() << "starting install";
-    auto update_lock_path = FS::PathCombine(m_dataPath, ".launcher_update.lock");
+    auto      update_lock_path = FS::PathCombine(m_dataPath, ".launcher_update.lock");
     QFileInfo update_lock(update_lock_path);
     if (update_lock.exists()) {
         auto [timestamp, from, to, target, data_path] = read_lock_File(update_lock_path);
-        auto msg = tr("Update already in progress\n");
+        auto msg                                      = tr("Update already in progress\n");
         auto infoMsg =
             tr("This installation has a update lock file present at: %1\n"
                "\n"
@@ -874,12 +874,12 @@ void UpdaterApp::performInstall(QFileInfo file)
         msgBox.setMinimumWidth(460);
         msgBox.adjustSize();
         switch (msgBox.exec()) {
-            case QMessageBox::AcceptRole:
-                break;
-            case QMessageBox::RejectRole:
-                [[fallthrough]];
-            default:
-                return showFatalErrorMessage(tr("Update Aborted"), tr("The update attempt was aborted"));
+        case QMessageBox::AcceptRole:
+            break;
+        case QMessageBox::RejectRole:
+            [[fallthrough]];
+        default:
+            return showFatalErrorMessage(tr("Update Aborted"), tr("The update attempt was aborted"));
         }
     }
     clearUpdateLog();
@@ -931,7 +931,7 @@ void UpdaterApp::unpackAndInstall(QFileInfo archive)
 
         auto new_updater_path = loc.value().absoluteFilePath(exe_name);
         logUpdate(tr("Starting new updater at '%1'").arg(new_updater_path));
-        if (!proc.startDetached(new_updater_path, { "-d", m_dataPath }, loc.value().absolutePath())) {
+        if (!proc.startDetached(new_updater_path, {"-d", m_dataPath}, loc.value().absolutePath())) {
             logUpdate(tr("Failed to launch '%1' %2").arg(new_updater_path).arg(proc.errorString()));
             return exit(10);
         }
@@ -942,7 +942,7 @@ void UpdaterApp::unpackAndInstall(QFileInfo archive)
 
 void UpdaterApp::backupAppDir()
 {
-    auto manifest_path = FS::PathCombine(m_rootPath, "manifest.txt");
+    auto      manifest_path = FS::PathCombine(m_rootPath, "manifest.txt");
     QFileInfo manifest(manifest_path);
 
     QStringList file_list;
@@ -950,17 +950,16 @@ void UpdaterApp::backupAppDir()
         logUpdate(tr("Reading manifest from %1").arg(manifest.absoluteFilePath()));
         try {
             auto contents = QString::fromUtf8(FS::read(manifest.absoluteFilePath()));
-            auto files = contents.split('\n');
+            auto files    = contents.split('\n');
             for (auto file : files) {
                 file_list.append(file.trimmed());
             }
-        } catch (FS::FileSystemException&) {
-        }
+        } catch (FS::FileSystemException&) {}
     }
 
     if (file_list.isEmpty()) {
         if (BuildConfig.BUILD_ARTIFACT.toLower().contains("linux")) {
-            file_list.append({ "ElyLauncher", "bin", "share", "lib" });
+            file_list.append({"ElyLauncher", "bin", "share", "lib"});
         } else {
             file_list.append({
                 "jars",
@@ -981,8 +980,8 @@ void UpdaterApp::backupAppDir()
     }
     logUpdate(tr("Backing up:\n  %1").arg(file_list.join(",\n  ")));
     static const QRegularExpression s_replaceRegex("[" + QRegularExpression::escape("\\/:*?\"<>|") + "]");
-    auto app_dir = QDir(m_rootPath);
-    auto backup_dir = FS::PathCombine(
+    auto                            app_dir    = QDir(m_rootPath);
+    auto                            backup_dir = FS::PathCombine(
         app_dir.absolutePath(), QStringLiteral("backup_") + QString(m_version).replace(s_replaceRegex, QString("_")) + "-" + m_gitCommit);
     FS::ensureFolderPathExists(backup_dir);
     auto backup_marker_path = FS::PathCombine(m_dataPath, ".launcher_update_backup_path.txt");
@@ -1013,7 +1012,7 @@ void UpdaterApp::backupAppDir()
 
     int i = 0;
     for (auto glob : file_list) {
-        QDirIterator iter(app_dir.absolutePath(), QStringList({ glob }), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+        QDirIterator iter(app_dir.absolutePath(), QStringList({glob}), QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
         progress.setValue(i);
         QCoreApplication::processEvents();
         if (!iter.hasNext() && !glob.isEmpty()) {
@@ -1057,7 +1056,7 @@ bool UpdaterApp::loadVersionFromExe(const QString& exe_path)
     QProcess proc = QProcess();
     proc.setProcessChannelMode(QProcess::MergedChannels);
     proc.setReadChannel(QProcess::StandardOutput);
-    proc.start(exe_path, { "--version" });
+    proc.start(exe_path, {"--version"});
     if (!proc.waitForStarted(5000)) {
         showFatalErrorMessage(tr("Failed to Check Version"), tr("Failed to launch child process to read version."));
         return false;
@@ -1067,7 +1066,7 @@ bool UpdaterApp::loadVersionFromExe(const QString& exe_path)
         showFatalErrorMessage(tr("Failed to Check Version"), tr("Child launcher process failed."));
         return false;
     }
-    auto out = proc.readAllStandardOutput();
+    auto out   = proc.readAllStandardOutput();
     auto lines = out.split('\n');
     lines.removeAll("");
     if (lines.length() < 2)
@@ -1075,19 +1074,19 @@ bool UpdaterApp::loadVersionFromExe(const QString& exe_path)
     else if (lines.length() > 2) {
         auto line1 = lines.takeLast();
         auto line2 = lines.takeLast();
-        lines = { line2, line1 };
+        lines      = {line2, line1};
     }
-    auto first = lines.takeFirst();
+    auto first       = lines.takeFirst();
     auto first_parts = first.split(' ');
     if (first_parts.length() < 2)
         return false;
     m_binaryName = first_parts.takeFirst();
     auto version = first_parts.takeFirst().trimmed();
-    m_version = version;
+    m_version    = version;
     if (version.contains('-')) {
-        auto index = version.indexOf('-');
+        auto index       = version.indexOf('-');
         m_versionChannel = version.mid(index + 1);
-        version = version.left(index);
+        version          = version.left(index);
     } else {
         m_versionChannel = "stable";
     }
@@ -1114,8 +1113,8 @@ void UpdaterApp::loadReleaseList()
     path_parts.removeFirst();
 
     auto repo_owner = path_parts.takeFirst();
-    auto repo_name = path_parts.takeFirst();
-    auto api_url = QString("https://api.github.com/repos/%1/%2/releases").arg(repo_owner, repo_name);
+    auto repo_name  = path_parts.takeFirst();
+    auto api_url    = QString("https://api.github.com/repos/%1/%2/releases").arg(repo_owner, repo_name);
 
     qDebug() << "Fetching release list from" << api_url;
 
@@ -1124,16 +1123,16 @@ void UpdaterApp::loadReleaseList()
 
 void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
 {
-    int per_page = 30;
-    auto page_url = QString("%1?per_page=%2&page=%3").arg(api_url).arg(QString::number(per_page)).arg(QString::number(page));
+    int  per_page             = 30;
+    auto page_url             = QString("%1?per_page=%2&page=%3").arg(api_url).arg(QString::number(per_page)).arg(QString::number(page));
     auto [download, response] = Net::Download::makeByteArray(page_url);
     download->setNetwork(m_network.get());
     m_current_url = page_url;
 
     auto github_api_headers = std::make_unique<Net::RawHeaderProxy>();
     github_api_headers->addHeaders({
-        { "Accept", "application/vnd.github+json" },
-        { "X-GitHub-Api-Version", "2022-11-28" },
+        {"Accept", "application/vnd.github+json"},
+        {"X-GitHub-Api-Version", "2022-11-28"},
     });
     download->addHeaderProxy(std::move(github_api_headers));
 
@@ -1148,8 +1147,9 @@ void UpdaterApp::downloadReleasePage(const QString& api_url, int page)
     connect(download.get(), &Net::Download::failed, this, &UpdaterApp::downloadError);
 
     m_current_task.reset(download);
-    connect(download.get(), &Net::Download::finished, this,
-            [this]() { qDebug() << "Download" << m_current_task->getUid().toString() << "finished"; });
+    connect(download.get(), &Net::Download::finished, this, [this]() {
+        qDebug() << "Download" << m_current_task->getUid().toString() << "finished";
+    });
 
     QCoreApplication::processEvents();
 
@@ -1163,34 +1163,34 @@ int UpdaterApp::parseReleasePage(const QByteArray* response)
         return 0;
     int num_releases = 0;
     try {
-        auto doc = Json::requireDocument(*response);
+        auto doc          = Json::requireDocument(*response);
         auto release_list = Json::requireArray(doc);
         for (auto release_json : release_list) {
             auto release_obj = Json::requireObject(release_json);
 
             GitHubRelease release = {};
-            release.id = Json::requireInteger(release_obj, "id");
-            release.name = release_obj["name"].toString();
-            release.tag_name = Json::requireString(release_obj, "tag_name");
-            release.created_at = QDateTime::fromString(Json::requireString(release_obj, "created_at"), Qt::ISODate);
-            release.published_at = QDateTime::fromString(release_obj["published_at"].toString(), Qt::ISODate);
-            release.draft = Json::requireBoolean(release_obj, "draft");
-            release.prerelease = Json::requireBoolean(release_obj, "prerelease");
-            release.body = release_obj["body"].toString();
-            release.version = Version(release.tag_name);
+            release.id            = Json::requireInteger(release_obj, "id");
+            release.name          = release_obj["name"].toString();
+            release.tag_name      = Json::requireString(release_obj, "tag_name");
+            release.created_at    = QDateTime::fromString(Json::requireString(release_obj, "created_at"), Qt::ISODate);
+            release.published_at  = QDateTime::fromString(release_obj["published_at"].toString(), Qt::ISODate);
+            release.draft         = Json::requireBoolean(release_obj, "draft");
+            release.prerelease    = Json::requireBoolean(release_obj, "prerelease");
+            release.body          = release_obj["body"].toString();
+            release.version       = Version(release.tag_name);
 
             auto release_assets_obj = Json::requireArray(release_obj, "assets");
             for (auto asset_json : release_assets_obj) {
-                auto asset_obj = Json::requireObject(asset_json);
-                GitHubReleaseAsset asset = {};
-                asset.id = Json::requireInteger(asset_obj, "id");
-                asset.name = Json::requireString(asset_obj, "name");
-                asset.label = asset_obj["label"].toString();
-                asset.content_type = Json::requireString(asset_obj, "content_type");
-                asset.size = Json::requireInteger(asset_obj, "size");
-                asset.created_at = QDateTime::fromString(Json::requireString(asset_obj, "created_at"), Qt::ISODate);
-                asset.updated_at = QDateTime::fromString(Json::requireString(asset_obj, "updated_at"), Qt::ISODate);
-                asset.browser_download_url = Json::requireString(asset_obj, "browser_download_url");
+                auto               asset_obj = Json::requireObject(asset_json);
+                GitHubReleaseAsset asset     = {};
+                asset.id                     = Json::requireInteger(asset_obj, "id");
+                asset.name                   = Json::requireString(asset_obj, "name");
+                asset.label                  = asset_obj["label"].toString();
+                asset.content_type           = Json::requireString(asset_obj, "content_type");
+                asset.size                   = Json::requireInteger(asset_obj, "size");
+                asset.created_at             = QDateTime::fromString(Json::requireString(asset_obj, "created_at"), Qt::ISODate);
+                asset.updated_at             = QDateTime::fromString(Json::requireString(asset_obj, "updated_at"), Qt::ISODate);
+                asset.browser_download_url   = Json::requireString(asset_obj, "browser_download_url");
                 release.assets.append(asset);
             }
             m_releases.append(release);

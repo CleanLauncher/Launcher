@@ -18,28 +18,29 @@
 
 #pragma once
 
-#include <QDialog>
 #include "ui/pages/BasePageProvider.h"
+#include <QDialog>
 
 class MinecraftInstance;
 class PageContainer;
 class PackProfile;
 class QDialogButtonBox;
 
-class InstallLoaderDialog final : public QDialog, protected BasePageProvider {
+class InstallLoaderDialog final : public QDialog, protected BasePageProvider
+{
     Q_OBJECT
 
-   public:
+public:
     explicit InstallLoaderDialog(PackProfile* instance, const QString& uid = QString(), QWidget* parent = nullptr);
 
     QList<BasePage*> getPages() override;
-    QString dialogTitle() override;
+    QString          dialogTitle() override;
 
     void validate(BasePage* page);
     void done(int result) override;
 
-   private:
-    PackProfile* profile;
-    PageContainer* container;
+private:
+    PackProfile*      profile;
+    PageContainer*    container;
     QDialogButtonBox* buttons;
 };

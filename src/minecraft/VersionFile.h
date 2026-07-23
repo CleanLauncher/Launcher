@@ -42,13 +42,13 @@
 #include <QString>
 #include <QStringList>
 
-#include <meta/JsonFormat.h>
-#include <memory>
 #include "Agent.h"
 #include "Library.h"
 #include "ProblemProvider.h"
 #include "java/JavaMetadata.h"
 #include "minecraft/Rule.h"
+#include <memory>
+#include <meta/JsonFormat.h>
 
 class PackProfile;
 class VersionFile;
@@ -57,14 +57,15 @@ struct MojangDownloadInfo;
 struct MojangAssetIndexInfo;
 
 using VersionFilePtr = std::shared_ptr<VersionFile>;
-class VersionFile : public ProblemContainer {
+class VersionFile : public ProblemContainer
+{
     friend class MojangVersionFormat;
     friend class OneSixVersionFormat;
 
-   public:
+public:
     void applyTo(LaunchProfile* profile, const RuntimeContext& runtimeContext);
 
-   public:
+public:
     int order = 0;
 
     QString name;
@@ -123,7 +124,7 @@ class VersionFile : public ProblemContainer {
 
     QList<Java::MetadataPtr> runtimes;
 
-   public:
+public:
     QMap<QString, std::shared_ptr<MojangDownloadInfo>> mojangDownloads;
 
     std::shared_ptr<MojangAssetIndexInfo> mojangAssetIndex;

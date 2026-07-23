@@ -36,29 +36,36 @@
 
 #pragma once
 
+#include "RuntimeContext.h"
 #include <QJsonObject>
 #include <QList>
 #include <QString>
-#include "RuntimeContext.h"
 
 class Library;
 
-class Rule {
-   public:
-    enum Action { Allow, Disallow, Defer };
+class Rule
+{
+public:
+    enum Action
+    {
+        Allow,
+        Disallow,
+        Defer
+    };
 
     static Rule fromJson(const QJsonObject& json);
     QJsonObject toJson();
 
     Action apply(const RuntimeContext& runtimeContext);
 
-   private:
-    struct OS {
+private:
+    struct OS
+    {
         QString name;
 
         QString version;
     };
 
-    Action m_action = Defer;
+    Action            m_action = Defer;
     std::optional<OS> m_os;
 };

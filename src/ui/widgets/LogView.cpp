@@ -115,9 +115,9 @@ void LogView::rowsAboutToBeInserted(const QModelIndex& parent, int first, int la
     Q_UNUSED(parent)
     Q_UNUSED(first)
     Q_UNUSED(last)
-    QScrollBar* bar = verticalScrollBar();
-    int max_bar = bar->maximum();
-    int val_bar = bar->value();
+    QScrollBar* bar     = verticalScrollBar();
+    int         max_bar = bar->maximum();
+    int         val_bar = bar->value();
     if (m_scroll) {
         m_scroll = (max_bar - val_bar) <= 1;
     } else {
@@ -128,15 +128,15 @@ void LogView::rowsAboutToBeInserted(const QModelIndex& parent, int first, int la
 void LogView::rowsInserted(const QModelIndex& parent, int first, int last)
 {
     QTextDocument document;
-    QTextCursor cursor(&document);
+    QTextCursor   cursor(&document);
 
     cursor.movePosition(QTextCursor::End);
     cursor.beginEditBlock();
     for (int i = first; i <= last; i++) {
-        auto idx = m_model->index(i, 0, parent);
-        auto text = m_model->data(idx, Qt::DisplayRole).toString();
+        auto            idx  = m_model->index(i, 0, parent);
+        auto            text = m_model->data(idx, Qt::DisplayRole).toString();
         QTextCharFormat format(*m_defaultFormat);
-        auto font = m_model->data(idx, Qt::FontRole);
+        auto            font = m_model->data(idx, Qt::FontRole);
         if (font.isValid()) {
             format.setFont(font.value<QFont>());
         }
@@ -154,7 +154,7 @@ void LogView::rowsInserted(const QModelIndex& parent, int first, int last)
     cursor.endEditBlock();
 
     QTextDocumentFragment fragment(&document);
-    QTextCursor workCursor = textCursor();
+    QTextCursor           workCursor = textCursor();
     workCursor.movePosition(QTextCursor::End);
     workCursor.insertFragment(fragment);
 

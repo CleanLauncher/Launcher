@@ -3,9 +3,9 @@
 #include "JavaWizardPage.h"
 #include "LanguageWizardPage.h"
 
+#include "translations/TranslationsModel.h"
 #include <Application.h>
 #include <FileSystem.h>
-#include "translations/TranslationsModel.h"
 
 #include <BuildConfig.h>
 #include <QAbstractButton>
@@ -55,7 +55,7 @@ void SetupWizard::pageChanged(int id)
         return;
     }
     if (basePagePtr->wantsRefreshButton()) {
-        setButtonLayout({ QWizard::CustomButton1, QWizard::Stretch, QWizard::BackButton, QWizard::NextButton, QWizard::FinishButton });
+        setButtonLayout({QWizard::CustomButton1, QWizard::Stretch, QWizard::BackButton, QWizard::NextButton, QWizard::FinishButton});
         auto customButton = button(QWizard::CustomButton1);
         connect(customButton, &QAbstractButton::clicked, [this]() {
             auto basePagePtr = getCurrentBasePage();
@@ -64,7 +64,7 @@ void SetupWizard::pageChanged(int id)
             }
         });
     } else {
-        setButtonLayout({ QWizard::Stretch, QWizard::BackButton, QWizard::NextButton, QWizard::FinishButton });
+        setButtonLayout({QWizard::Stretch, QWizard::BackButton, QWizard::NextButton, QWizard::FinishButton});
     }
 }
 

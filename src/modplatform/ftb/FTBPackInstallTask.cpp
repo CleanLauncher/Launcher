@@ -51,7 +51,8 @@
 #include "BuildConfig.h"
 #include "ui/dialogs/BlockedModsDialog.h"
 
-namespace FTB {
+namespace FTB
+{
 
 PackInstallTask::PackInstallTask(Modpack pack, QString version, QWidget* parent)
     : m_pack(std::move(pack)), m_versionName(std::move(version)), m_parent(parent)
@@ -77,8 +78,8 @@ void PackInstallTask::executeTask()
     setStatus(tr("Getting the manifest..."));
     setAbortable(false);
 
-    auto version_it = std::find_if(m_pack.versions.constBegin(), m_pack.versions.constEnd(),
-                                   [this](const FTB::VersionInfo& a) { return a.name == m_versionName; });
+    auto version_it = std::find_if(
+        m_pack.versions.constBegin(), m_pack.versions.constEnd(), [this](const FTB::VersionInfo& a) { return a.name == m_versionName; });
 
     if (version_it == m_pack.versions.constEnd()) {
         emitFailed(tr("Failed to find pack version %1").arg(m_versionName));
@@ -111,7 +112,7 @@ void PackInstallTask::onManifestDownloadSucceeded(QByteArray* responsePtr)
     m_net_job.reset();
 
     QJsonParseError parse_error{};
-    QJsonDocument doc = QJsonDocument::fromJson(response, &parse_error);
+    QJsonDocument   doc = QJsonDocument::fromJson(response, &parse_error);
     if (parse_error.error != QJsonParseError::NoError) {
         qWarning() << "Error while parsing JSON response from FTB at " << parse_error.offset << " reason: " << parse_error.errorString();
         qWarning() << response;
@@ -150,7 +151,7 @@ void PackInstallTask::resolveMods()
 
             Flame::File flameFile;
             flameFile.projectId = file.curseforge.project_id;
-            flameFile.fileId = file.curseforge.file_id;
+            flameFile.fileId    = file.curseforge.file_id;
 
             manifest.files.insert(flameFile.fileId, flameFile);
             m_fileIds.append(flameFile.fileId);
@@ -181,16 +182,16 @@ void PackInstallTask::onResolveModsSucceeded()
         if (file_id < 0)
             continue;
 
-        Flame::File resultsFile = results.files[file_id];
-        VersionFile& localFile = m_version.files[index];
+        Flame::File  resultsFile = results.files[file_id];
+        VersionFile& localFile   = m_version.files[index];
 
         if (resultsFile.version.downloadUrl.isEmpty()) {
             BlockedMod blocked_mod;
-            blocked_mod.name = resultsFile.version.fileName;
-            blocked_mod.websiteUrl = QString("%1/download/%2").arg(resultsFile.pack.websiteUrl, QString::number(resultsFile.fileId));
-            blocked_mod.hash = resultsFile.version.hash;
-            blocked_mod.matched = false;
-            blocked_mod.localPath = "";
+            blocked_mod.name         = resultsFile.version.fileName;
+            blocked_mod.websiteUrl   = QString("%1/download/%2").arg(resultsFile.pack.websiteUrl, QString::number(resultsFile.fileId));
+            blocked_mod.hash         = resultsFile.version.hash;
+            blocked_mod.matched      = false;
+            blocked_mod.localPath    = "";
             blocked_mod.targetFolder = resultsFile.targetFolder;
 
             m_blockedMods.append(blocked_mod);
@@ -206,7 +207,8 @@ void PackInstallTask::onResolveModsSucceeded()
     if (anyBlocked) {
         qDebug() << "Blocked files found, displaying file list";
 
-        BlockedModsDialog message_dialog(m_parent, tr("Blocked files found"),
+        BlockedModsDialog message_dialog(m_parent,
+                                         tr("Blocked files found"),
                                          tr("The following files are not available for download in third party launchers.<br/>"
                                             "You will need to manually download them and add them to the instance."),
                                          m_blockedMods);
@@ -233,10 +235,10 @@ void PackInstallTask::createInstance()
     QCoreApplication::processEvents();
 
     auto instanceConfigPath = FS::PathCombine(m_stagingPath, "instance.cfg");
-    auto instanceSettings = std::make_unique<INISettingsObject>(instanceConfigPath);
+    auto instanceSettings   = std::make_unique<INISettingsObject>(instanceConfigPath);
 
     MinecraftInstance instance(m_globalSettings, std::move(instanceSettings), m_stagingPath);
-    auto components = instance.getPackProfile();
+    auto              components = instance.getPackProfile();
     components->buildingFromScratch();
 
     for (auto target : m_version.targets) {
@@ -357,7 +359,7 @@ void PackInstallTask::copyBlockedMods()
 {
     setStatus(tr("Copying Blocked Mods..."));
     setAbortable(false);
-    int i = 0;
+    int i     = 0;
     int total = m_blockedMods.length();
     setProgress(i, total);
     for (const auto& mod : m_blockedMods) {

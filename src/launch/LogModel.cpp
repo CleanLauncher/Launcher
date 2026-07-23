@@ -18,7 +18,7 @@ QVariant LogModel::data(const QModelIndex& index, int role) const
     if (index.row() < 0 || index.row() >= m_numLines)
         return QVariant();
 
-    auto row = index.row();
+    auto row     = index.row();
     auto realRow = (row + m_firstLine) % m_maxLines;
     if (role == Qt::DisplayRole || role == Qt::EditRole) {
         return m_content[realRow].line;
@@ -47,12 +47,12 @@ void LogModel::append(MessageLevel level, QString line)
         endRemoveRows();
     } else if (m_numLines == m_maxLines - 1 && m_stopOnOverflow) {
         level = MessageLevel::Fatal;
-        line = m_overflowMessage;
+        line  = m_overflowMessage;
     }
     beginInsertRows(QModelIndex(), m_numLines, m_numLines);
     m_numLines++;
     m_content[lineNum].level = level;
-    m_content[lineNum].line = line;
+    m_content[lineNum].line  = line;
     endInsertRows();
 }
 
@@ -70,7 +70,7 @@ void LogModel::clear()
 {
     beginResetModel();
     m_firstLine = 0;
-    m_numLines = 0;
+    m_numLines  = 0;
     endResetModel();
 }
 
@@ -116,7 +116,7 @@ void LogModel::setMaxLines(int maxLines)
         endRemoveRows();
     }
     m_firstLine = 0;
-    m_maxLines = maxLines;
+    m_maxLines  = maxLines;
 }
 
 int LogModel::getMaxLines()

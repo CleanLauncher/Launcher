@@ -43,8 +43,9 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-class INIFile : public QMap<QString, QVariant> {
-   public:
+class INIFile : public QMap<QString, QVariant>
+{
+public:
     explicit INIFile();
 
     bool loadFile(QString fileName);
@@ -52,5 +53,5 @@ class INIFile : public QMap<QString, QVariant> {
     bool saveFile(QString fileName);
 
     QVariant get(QString key, QVariant def) const;
-    void set(QString key, QVariant val);
+    void     set(QString key, QVariant val);
 };

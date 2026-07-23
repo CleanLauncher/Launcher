@@ -36,16 +36,16 @@
 
 #include "LanguagePage.h"
 
-#include <QVBoxLayout>
 #include "Application.h"
 #include "settings/SettingsObject.h"
 #include "ui/widgets/LanguageSelectionWidget.h"
+#include <QVBoxLayout>
 
 LanguagePage::LanguagePage(QWidget* parent) : QWidget(parent)
 {
     setObjectName(QStringLiteral("languagePage"));
     auto layout = new QVBoxLayout(this);
-    mainWidget = new LanguageSelectionWidget(this);
+    mainWidget  = new LanguageSelectionWidget(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(mainWidget);
     retranslate();
@@ -61,8 +61,8 @@ bool LanguagePage::apply()
 
 void LanguagePage::applySettings()
 {
-    auto settings = APPLICATION->settings();
-    QString key = mainWidget->getSelectedLanguageKey();
+    auto    settings = APPLICATION->settings();
+    QString key      = mainWidget->getSelectedLanguageKey();
     settings->set("Language", key);
 }
 

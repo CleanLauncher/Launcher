@@ -19,20 +19,23 @@
 #include <QLineEdit>
 #include <QSortFilterProxyModel>
 
-namespace Ui {
+namespace Ui
+{
 class IconPickerDialog;
 }
 
-class IconPickerDialog : public QDialog {
+class IconPickerDialog : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     explicit IconPickerDialog(QWidget* parent = 0);
     ~IconPickerDialog();
-    int execWithSelection(QString selection);
+    int     execWithSelection(QString selection);
     QString selectedIconKey;
 
-    enum IconPickerCategory {
+    enum IconPickerCategory
+    {
         Any,
         Modern,
         Legacy,
@@ -41,16 +44,16 @@ class IconPickerDialog : public QDialog {
     };
     Q_ENUM(IconPickerCategory)
 
-   protected:
+protected:
     virtual bool eventFilter(QObject*, QEvent*);
 
-   private:
-    Ui::IconPickerDialog* ui;
-    QPushButton* buttonRemove;
-    QLineEdit* searchBar;
+private:
+    Ui::IconPickerDialog*  ui;
+    QPushButton*           buttonRemove;
+    QLineEdit*             searchBar;
     QSortFilterProxyModel* proxyModel;
 
-   private slots:
+private slots:
     void selectionChanged(QItemSelection, QItemSelection);
     void activated(QModelIndex);
     void delayed_scroll(QModelIndex);

@@ -3,23 +3,26 @@
 #include <QDialog>
 #include <QTreeWidgetItem>
 
-namespace Ui {
+namespace Ui
+{
 class ReviewMessageBox;
 }
 
-class ReviewMessageBox : public QDialog {
+class ReviewMessageBox : public QDialog
+{
     Q_OBJECT
 
-   public:
+public:
     static auto create(QWidget* parent, QString&& title, QString&& icon = "") -> ReviewMessageBox*;
 
-    using ResourceInformation = struct res_info {
-        QString name;
-        QString filename;
-        QString provider;
+    using ResourceInformation = struct res_info
+    {
+        QString     name;
+        QString     filename;
+        QString     provider;
         QStringList required_by;
-        QString version_type;
-        bool enabled = true;
+        QString     version_type;
+        bool        enabled = true;
     };
 
     void appendResource(ResourceInformation&& info);
@@ -29,14 +32,14 @@ class ReviewMessageBox : public QDialog {
 
     ~ReviewMessageBox() override;
 
-   protected slots:
+protected slots:
     void on_toggleDepsButton_clicked();
 
-   protected:
+protected:
     ReviewMessageBox(QWidget* parent, const QString& title, const QString& icon);
 
     Ui::ReviewMessageBox* ui;
 
     QList<QTreeWidgetItem*> m_deps;
-    bool m_deps_checked = true;
+    bool                    m_deps_checked = true;
 };

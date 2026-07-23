@@ -8,38 +8,40 @@
 
 #include <optional>
 
-namespace LegacyFTB {
+namespace LegacyFTB
+{
 
-class PackInstallTask : public InstanceTask {
+class PackInstallTask : public InstanceTask
+{
     Q_OBJECT
 
-   public:
+public:
     explicit PackInstallTask(QNetworkAccessManager* network, const Modpack& pack, QString version);
     virtual ~PackInstallTask() {}
 
     bool canAbort() const override { return true; }
     bool abort() override;
 
-   protected:
+protected:
     virtual void executeTask() override;
 
-   private:
+private:
     void downloadPack();
     void unzip();
     void install();
 
-   private slots:
+private slots:
 
     void onUnzipFinished();
     void onUnzipCanceled();
 
-   private:
-    QNetworkAccessManager* m_network;
-    bool abortable = false;
-    QFuture<std::optional<QStringList>> m_extractFuture;
+private:
+    QNetworkAccessManager*                     m_network;
+    bool                                       abortable = false;
+    QFuture<std::optional<QStringList>>        m_extractFuture;
     QFutureWatcher<std::optional<QStringList>> m_extractFutureWatcher;
-    NetJob::Ptr netJobContainer;
-    QString archivePath;
+    NetJob::Ptr                                netJobContainer;
+    QString                                    archivePath;
 
     Modpack m_pack;
     QString m_version;

@@ -39,7 +39,8 @@
 
 #include "net/Logging.h"
 
-namespace Net {
+namespace Net
+{
 
 Task::State FileSink::init(QNetworkRequest& request)
 {
@@ -101,10 +102,10 @@ Task::State FileSink::abort()
 
 Task::State FileSink::finalize(QNetworkReply& reply)
 {
-    bool gotFile = false;
+    bool     gotFile     = false;
     QVariant statusCodeV = reply.attribute(QNetworkRequest::HttpStatusCodeAttribute);
-    bool validStatus = false;
-    int statusCode = statusCodeV.toInt(&validStatus);
+    bool     validStatus = false;
+    int      statusCode  = statusCodeV.toInt(&validStatus);
     if (validStatus) {
         gotFile = statusCode == 200 || statusCode == 203;
     }

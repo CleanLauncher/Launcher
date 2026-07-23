@@ -7,10 +7,10 @@
 #include "Application.h"
 #include "InstanceList.h"
 
-#include <InstanceList.h>
 #include "modplatform/ResourceType.h"
 #include "ui/instanceview/InstanceDelegate.h"
 #include "ui/instanceview/InstanceProxyModel.h"
+#include <InstanceList.h>
 
 ImportResourceDialog::ImportResourceDialog(QString file_path, ModPlatform::ResourceType type, QWidget* parent)
     : QDialog(parent), ui(new Ui::ImportResourceDialog), m_resource_type(type), m_file_path(file_path)

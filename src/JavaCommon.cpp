@@ -68,10 +68,9 @@ bool JavaCommon::checkJVMArgs(QString jvmargs, QWidget* parent)
 void JavaCommon::javaWasOk(QWidget* parent, const JavaChecker::Result& result)
 {
     QString text;
-    text += QObject::tr(
-                "Java test succeeded!<br />Platform reported: %1<br />Java version "
-                "reported: %2<br />Java vendor "
-                "reported: %3<br />")
+    text += QObject::tr("Java test succeeded!<br />Platform reported: %1<br />Java version "
+                        "reported: %2<br />Java vendor "
+                        "reported: %3<br />")
                 .arg(result.realPlatform, result.javaVersion.toString(), result.javaVendor);
     if (result.errorLog.size()) {
         auto htmlError = result.errorLog;
@@ -83,7 +82,7 @@ void JavaCommon::javaWasOk(QWidget* parent, const JavaChecker::Result& result)
 
 void JavaCommon::javaArgsWereBad(QWidget* parent, const JavaChecker::Result& result)
 {
-    auto htmlError = result.errorLog;
+    auto    htmlError = result.errorLog;
     QString text;
     htmlError.replace('\n', "<br />");
     text += QObject::tr("The specified Java binary didn't work with the arguments you provided:<br />");
@@ -94,9 +93,8 @@ void JavaCommon::javaArgsWereBad(QWidget* parent, const JavaChecker::Result& res
 void JavaCommon::javaBinaryWasBad(QWidget* parent, const JavaChecker::Result& result)
 {
     QString text;
-    text += QObject::tr(
-        "The specified Java binary didn't work.<br />You should press 'Detect', "
-        "or set the path to the Java executable.<br />");
+    text += QObject::tr("The specified Java binary didn't work.<br />You should press 'Detect', "
+                        "or set the path to the Java executable.<br />");
     CustomMessageBox::selectable(parent, QObject::tr("Java test failure"), text, QMessageBox::Warning)->show();
 }
 

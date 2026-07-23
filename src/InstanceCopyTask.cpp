@@ -1,22 +1,22 @@
 #include "InstanceCopyTask.h"
-#include <QDebug>
-#include <QtConcurrentRun>
-#include <memory>
 #include "FileSystem.h"
 #include "Filter.h"
 #include "NullInstance.h"
 #include "settings/INISettingsObject.h"
 #include "tasks/Task.h"
+#include <QDebug>
+#include <QtConcurrentRun>
+#include <memory>
 
 InstanceCopyTask::InstanceCopyTask(BaseInstance* origInstance, const InstanceCopyPrefs& prefs)
 {
-    m_origInstance = origInstance;
-    m_keepPlaytime = prefs.isKeepPlaytimeEnabled();
-    m_useLinks = prefs.isUseSymLinksEnabled();
+    m_origInstance    = origInstance;
+    m_keepPlaytime    = prefs.isKeepPlaytimeEnabled();
+    m_useLinks        = prefs.isUseSymLinksEnabled();
     m_linkRecursively = prefs.isLinkRecursivelyEnabled();
-    m_useHardLinks = prefs.isLinkRecursivelyEnabled() && prefs.isUseHardLinksEnabled();
-    m_copySaves = prefs.isLinkRecursivelyEnabled() && prefs.isDontLinkSavesEnabled() && prefs.isCopySavesEnabled();
-    m_useClone = prefs.isUseCloneEnabled();
+    m_useHardLinks    = prefs.isLinkRecursivelyEnabled() && prefs.isUseHardLinksEnabled();
+    m_copySaves       = prefs.isLinkRecursivelyEnabled() && prefs.isDontLinkSavesEnabled() && prefs.isCopySavesEnabled();
+    m_useClone        = prefs.isUseCloneEnabled();
 
     QString filters = prefs.getSelectedFiltersAsRegex();
     if (m_useLinks || m_useHardLinks) {
@@ -44,8 +44,8 @@ void InstanceCopyTask::executeTask()
 
             folderClone(true);
             setProgress(0, folderClone.totalCloned());
-            connect(&folderClone, &FS::clone::fileCloned,
-                    [this](QString src, QString dst) { setProgress(m_progress + 1, m_progressTotal); });
+            connect(
+                &folderClone, &FS::clone::fileCloned, [this](QString src, QString dst) { setProgress(m_progress + 1, m_progressTotal); });
             return folderClone();
         }
         if (m_useLinks || m_useHardLinks) {
@@ -67,14 +67,15 @@ void InstanceCopyTask::executeTask()
                 connect(savesCopy.get(), &FS::copy::fileCopied, [this](QString src) { setProgress(m_progress + 1, m_progressTotal); });
             }
             FS::create_link folderLink(m_origInstance->instanceRoot(), m_stagingPath);
-            int depth = m_linkRecursively ? -1 : 0;
+            int             depth = m_linkRecursively ? -1 : 0;
 
             folderLink.linkRecursively(true).setMaxDepth(depth).useHardLinks(m_useHardLinks).matcher(m_matcher);
 
             folderLink(true);
             setProgress(0, m_progressTotal + folderLink.totalToLink());
-            connect(&folderLink, &FS::create_link::fileLinked,
-                    [this](QString src, QString dst) { setProgress(m_progress + 1, m_progressTotal); });
+            connect(&folderLink, &FS::create_link::fileLinked, [this](QString src, QString dst) {
+                setProgress(m_progress + 1, m_progressTotal);
+            });
             bool there_were_errors = false;
 
             if (!folderLink()) {
@@ -86,7 +87,7 @@ void InstanceCopyTask::executeTask()
                     qDebug() << "attempting to run with privelage";
 
                     QEventLoop loop;
-                    bool got_priv_results = false;
+                    bool       got_priv_results = false;
 
                     connect(&folderLink, &FS::create_link::finishedPrivileged, this, [&got_priv_results, &loop](bool gotResults) {
                         if (!gotResults) {

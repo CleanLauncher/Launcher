@@ -47,23 +47,26 @@
 #include <QTimer>
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class ModrinthPage;
 }
 
-namespace Modrinth {
+namespace Modrinth
+{
 class ModpackListModel;
 }
 
-class ModrinthPage : public QWidget, public ModpackProviderBasePage {
+class ModrinthPage : public QWidget, public ModpackProviderBasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ModrinthPage(NewInstanceDialog* dialog, QWidget* parent = nullptr);
     ~ModrinthPage() override;
 
     QString displayName() const override { return tr("Modrinth"); }
-    QIcon icon() const override { return QIcon::fromTheme("modrinth"); }
+    QIcon   icon() const override { return QIcon::fromTheme("modrinth"); }
     QString id() const override { return "modrinth"; }
     QString helpPage() const override { return "Modrinth-platform"; }
 
@@ -71,7 +74,7 @@ class ModrinthPage : public QWidget, public ModpackProviderBasePage {
     inline QString metaEntryBase() const { return "ModrinthModpacks"; };
 
     ModPlatform::IndexedPack::Ptr getCurrent() { return m_current; }
-    void suggestCurrent();
+    void                          suggestCurrent();
 
     void updateUI();
 
@@ -83,28 +86,28 @@ class ModrinthPage : public QWidget, public ModpackProviderBasePage {
 
     virtual QString getSerachTerm() const override;
 
-   private slots:
+private slots:
     void onSelectionChanged(QModelIndex first, QModelIndex second);
     void onVersionSelectionChanged(int index);
     void triggerSearch();
     void createFilterWidget();
 
-   private:
-    Ui::ModrinthPage* m_ui;
-    NewInstanceDialog* m_dialog;
+private:
+    Ui::ModrinthPage*           m_ui;
+    NewInstanceDialog*          m_dialog;
     Modrinth::ModpackListModel* m_model;
 
     ModPlatform::IndexedPack::Ptr m_current;
-    QString m_selectedVersion;
+    QString                       m_selectedVersion;
 
     ProgressWidget m_fetch_progress;
 
     QTimer m_search_timer;
 
     std::unique_ptr<ModFilterWidget> m_filterWidget;
-    Task::Ptr m_categoriesTask;
+    Task::Ptr                        m_categoriesTask;
 
     ModrinthAPI m_api;
-    Task::Ptr m_job;
-    Task::Ptr m_job2;
+    Task::Ptr   m_job;
+    Task::Ptr   m_job2;
 };

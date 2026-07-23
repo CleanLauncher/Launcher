@@ -42,10 +42,10 @@
 AtlUserInteractionSupportImpl::AtlUserInteractionSupportImpl(QWidget* parent) : m_parent(parent) {}
 
 std::optional<QList<QString>> AtlUserInteractionSupportImpl::chooseOptionalMods(const ATLauncher::PackVersion& version,
-                                                                                QList<ATLauncher::VersionMod> mods)
+                                                                                QList<ATLauncher::VersionMod>  mods)
 {
     AtlOptionalModDialog optionalModDialog(m_parent, version, mods);
-    auto result = optionalModDialog.exec();
+    auto                 result = optionalModDialog.exec();
     if (result == QDialog::Rejected) {
         return {};
     }
@@ -65,7 +65,7 @@ QString AtlUserInteractionSupportImpl::chooseVersion(Meta::VersionList::Ptr vlis
 
     for (int i = 0; i < vlist->versions().size(); i++) {
         auto version = vlist->versions().at(i);
-        auto reqs = version->requiredSet();
+        auto reqs    = version->requiredSet();
 
         if (minecraftVersion != nullptr) {
             auto iter = std::find_if(reqs.begin(), reqs.end(), [](const Meta::Require& req) { return req.uid == "net.minecraft"; });

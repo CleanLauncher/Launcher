@@ -29,9 +29,10 @@
 
 class Version;
 
-class DataPack : public Resource {
+class DataPack : public Resource
+{
     Q_OBJECT
-   public:
+public:
     DataPack(QObject* parent = nullptr) : Resource(parent) {}
     DataPack(QFileInfo file_info) : Resource(file_info) {}
 
@@ -49,25 +50,26 @@ class DataPack : public Resource {
 
     bool valid() const override;
 
-    [[nodiscard]] int compare(const Resource& other, SortType type) const override;
+    [[nodiscard]] int  compare(const Resource& other, SortType type) const override;
     [[nodiscard]] bool applyFilter(QRegularExpression filter) const override;
 
     QString packFormatStr() const;
 
-   protected:
+protected:
     virtual QMap<std::pair<int, int>, std::pair<Version, Version>> mappings() const;
 
-   protected:
+protected:
     mutable QMutex m_data_lock;
 
-    int m_pack_format = 0;
+    int                 m_pack_format = 0;
     std::pair<int, int> m_min_format;
     std::pair<int, int> m_max_format;
 
     QString m_description;
 
-    struct {
+    struct
+    {
         QPixmapCache::Key key;
-        bool was_ever_used = false;
+        bool              was_ever_used = false;
     } mutable m_pack_image_cache_key;
 };

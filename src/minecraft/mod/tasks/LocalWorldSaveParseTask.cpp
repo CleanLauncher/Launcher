@@ -29,18 +29,19 @@
 #include <QFileInfo>
 #include <tuple>
 
-namespace WorldSaveUtils {
+namespace WorldSaveUtils
+{
 
 bool process(WorldSave& pack, ProcessingLevel level)
 {
     switch (pack.type()) {
-        case ResourceType::FOLDER:
-            return WorldSaveUtils::processFolder(pack, level);
-        case ResourceType::ZIPFILE:
-            return WorldSaveUtils::processZIP(pack, level);
-        default:
-            qWarning() << "Invalid type for world save parse task!";
-            return false;
+    case ResourceType::FOLDER:
+        return WorldSaveUtils::processFolder(pack, level);
+    case ResourceType::ZIPFILE:
+        return WorldSaveUtils::processZIP(pack, level);
+    default:
+        qWarning() << "Invalid type for world save parse task!";
+        return false;
     }
 }
 
@@ -152,7 +153,7 @@ bool processZIP(WorldSave& save, ProcessingLevel level)
 
 bool validate(QFileInfo file)
 {
-    WorldSave sp{ file };
+    WorldSave sp{file};
     return WorldSaveUtils::process(sp, ProcessingLevel::BasicInfoOnly) && sp.valid();
 }
 

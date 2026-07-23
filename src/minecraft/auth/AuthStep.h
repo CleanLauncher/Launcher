@@ -5,7 +5,8 @@
 #include "QObjectPtr.h"
 #include "minecraft/auth/AccountData.h"
 
-enum class AccountTaskState {
+enum class AccountTaskState
+{
     STATE_CREATED,
     STATE_WORKING,
     STATE_SUCCEEDED,
@@ -21,10 +22,11 @@ enum class AccountTaskState {
 
 };
 
-class AuthStep : public QObject {
+class AuthStep : public QObject
+{
     Q_OBJECT
 
-   public:
+public:
     using Ptr = shared_qobject_ptr<AuthStep>;
 
     explicit AuthStep(AccountData* data) : QObject(nullptr), m_data(data) {};
@@ -32,13 +34,13 @@ class AuthStep : public QObject {
 
     virtual QString describe() = 0;
 
-   public slots:
+public slots:
     virtual void perform() = 0;
     virtual void abort() {}
 
-   signals:
+signals:
     void finished(AccountTaskState resultingState, QString message);
 
-   protected:
+protected:
     AccountData* m_data;
 };

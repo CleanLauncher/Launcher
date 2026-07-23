@@ -51,14 +51,9 @@
 #include <QUrl>
 
 OtherLogsPage::OtherLogsPage(QString id, QString displayName, QString helpPage, BaseInstance* instance, QWidget* parent)
-    : QWidget(parent)
-    , m_id(id)
-    , m_displayName(displayName)
-    , m_helpPage(helpPage)
-    , ui(new Ui::OtherLogsPage)
-    , m_instance(instance)
-    , m_basePath(instance ? instance->gameRoot() : APPLICATION->dataRoot())
-    , m_logSearchPaths(instance ? instance->getLogFileSearchPaths() : QStringList{ "logs" })
+    : QWidget(parent), m_id(id), m_displayName(displayName), m_helpPage(helpPage), ui(new Ui::OtherLogsPage), m_instance(instance),
+      m_basePath(instance ? instance->gameRoot() : APPLICATION->dataRoot()),
+      m_logSearchPaths(instance ? instance->getLogFileSearchPaths() : QStringList{"logs"})
 {
     ui->setupUi(this);
 
@@ -71,9 +66,9 @@ OtherLogsPage::OtherLogsPage(QString id, QString displayName, QString helpPage, 
     }
 
     {
-        QString fontFamily = APPLICATION->settings()->get("ConsoleFont").toString();
-        bool conversionOk = false;
-        int fontSize = APPLICATION->settings()->get("ConsoleFontSize").toInt(&conversionOk);
+        QString fontFamily   = APPLICATION->settings()->get("ConsoleFont").toString();
+        bool    conversionOk = false;
+        int     fontSize     = APPLICATION->settings()->get("ConsoleFontSize").toInt(&conversionOk);
         if (!conversionOk) {
             fontSize = 11;
         }
@@ -312,9 +307,9 @@ void OtherLogsPage::reload()
         m_model->clear();
         if (file.fileName().endsWith(".gz")) {
             QString line;
-            auto error = GZip::readGzFileByBlocks(&file, [&line, handleLine](const QByteArray& d) {
-                auto block = d;
-                int newlineIndex = block.indexOf('\n');
+            auto    error = GZip::readGzFileByBlocks(&file, [&line, handleLine](const QByteArray& d) {
+                auto block        = d;
+                int  newlineIndex = block.indexOf('\n');
                 while (newlineIndex != -1) {
                     line += QString::fromUtf8(block).left(newlineIndex);
                     block.remove(0, newlineIndex + 1);
@@ -335,8 +330,7 @@ void OtherLogsPage::reload()
                 handleLine(line);
             }
         } else {
-            while (!file.atEnd() && !handleLine(QString::fromUtf8(file.readLine()))) {
-            }
+            while (!file.atEnd() && !handleLine(QString::fromUtf8(file.readLine()))) {}
         }
 
         if (m_instance) {
@@ -381,12 +375,14 @@ void OtherLogsPage::on_btnDelete_clicked()
         setControlsEnabled(false);
         return;
     }
-    if (QMessageBox::question(this, tr("Confirm Deletion"),
+    if (QMessageBox::question(this,
+                              tr("Confirm Deletion"),
                               tr("You are about to delete \"%1\".\n"
                                  "This may be permanent and it will be gone from the logs folder.\n\n"
                                  "Are you sure?")
                                   .arg(m_currentFile),
-                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No) {
+                              QMessageBox::Yes,
+                              QMessageBox::No) == QMessageBox::No) {
         return;
     }
     QFile file(FS::PathCombine(m_basePath, m_currentFile));
@@ -426,7 +422,7 @@ void OtherLogsPage::on_btnClean_clicked()
     QStringList failed;
     for (auto item : toDelete) {
         QString absolutePath = FS::PathCombine(m_basePath, item);
-        QFile file(absolutePath);
+        QFile   file(absolutePath);
         qDebug() << "Deleting log" << absolutePath;
         if (FS::trash(file.fileName())) {
             continue;
@@ -505,7 +501,7 @@ QStringList OtherLogsPage::getPaths()
     for (QString searchPath : m_logSearchPaths) {
         QDir searchDir(searchPath);
 
-        QStringList filters{ "*.log", "*.log.gz" };
+        QStringList filters{"*.log", "*.log.gz"};
 
         if (searchPath != m_basePath)
             filters.append("*.txt");
@@ -522,7 +518,7 @@ QStringList OtherLogsPage::getPaths()
 void OtherLogsPage::on_findButton_clicked()
 {
     auto modifiers = QApplication::keyboardModifiers();
-    bool reverse = modifiers & Qt::ShiftModifier;
+    bool reverse   = modifiers & Qt::ShiftModifier;
     ui->text->findNext(ui->searchBar->text(), reverse);
 }
 

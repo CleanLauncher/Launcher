@@ -44,7 +44,8 @@
 
 #include "settings/Setting.h"
 
-namespace Ui {
+namespace Ui
+{
 class ServersPage;
 }
 
@@ -52,10 +53,11 @@ struct Server;
 class ServersModel;
 class MinecraftInstance;
 
-class ServersPage : public QMainWindow, public BasePage {
+class ServersPage : public QMainWindow, public BasePage
+{
     Q_OBJECT
 
-   public:
+public:
     explicit ServersPage(BaseInstance* inst, QWidget* parent = 0);
     virtual ~ServersPage();
 
@@ -63,20 +65,20 @@ class ServersPage : public QMainWindow, public BasePage {
     void closedImpl() override;
 
     virtual QString displayName() const override { return tr("Servers"); }
-    virtual QIcon icon() const override { return QIcon::fromTheme("server"); }
+    virtual QIcon   icon() const override { return QIcon::fromTheme("server"); }
     virtual QString id() const override { return "servers"; }
     virtual QString helpPage() const override { return "Servers-management"; }
-    void retranslate() override;
+    void            retranslate() override;
 
-   protected:
+protected:
     QMenu* createPopupMenu() override;
 
-   private:
+private:
     void updateState();
     void scheduleSave();
     bool saveIsScheduled() const;
 
-   private slots:
+private slots:
     void currentChanged(const QModelIndex& current, const QModelIndex& previous);
     void rowsRemoved(const QModelIndex& parent, int first, int last);
 
@@ -95,12 +97,12 @@ class ServersPage : public QMainWindow, public BasePage {
 
     void ShowContextMenu(const QPoint& pos);
 
-   private:
-    int currentServer = -1;
-    bool m_locked = true;
-    Ui::ServersPage* ui = nullptr;
-    ServersModel* m_model = nullptr;
-    BaseInstance* m_inst = nullptr;
+private:
+    int              currentServer = -1;
+    bool             m_locked      = true;
+    Ui::ServersPage* ui            = nullptr;
+    ServersModel*    m_model       = nullptr;
+    BaseInstance*    m_inst        = nullptr;
 
     std::shared_ptr<Setting> m_wide_bar_setting = nullptr;
 };

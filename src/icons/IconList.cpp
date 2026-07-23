@@ -35,6 +35,7 @@
  */
 
 #include "IconList.h"
+#include "icons/IconUtils.h"
 #include <FileSystem.h>
 #include <QDebug>
 #include <QFileSystemWatcher>
@@ -43,7 +44,6 @@
 #include <QPixmap>
 #include <QSet>
 #include <QUrl>
-#include "icons/IconUtils.h"
 
 #define MAX_SIZE 1024
 
@@ -106,10 +106,10 @@ bool IconList::addPathRecursively(const QString& path)
 QStringList IconList::getIconFilePaths() const
 {
     QStringList iconFiles{};
-    QStringList directories{ m_dir.absolutePath() };
+    QStringList directories{m_dir.absolutePath()};
     while (!directories.isEmpty()) {
         QString first = directories.takeFirst();
-        QDir dir(first);
+        QDir    dir(first);
         for (QFileInfo& fileInfo : dir.entryInfoList(QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name)) {
             if (fileInfo.isDir())
                 directories.push_back(fileInfo.absoluteFilePath());
@@ -126,7 +126,7 @@ QString formatName(const QDir& iconsDir, const QFileInfo& iconFile)
         return iconFile.completeBaseName();
 
     constexpr auto delimiter = " » ";
-    QString relativePathWithoutExtension =
+    QString        relativePathWithoutExtension =
         iconsDir.relativeFilePath(iconFile.dir().path()) + QDir::separator() + iconFile.completeBaseName();
     return relativePathWithoutExtension.replace(QDir::separator(), delimiter);
 }
@@ -150,9 +150,9 @@ void IconList::directoryChanged(const QString& path)
     if (!m_dir.exists() && !FS::ensureFolderPathExists(m_dir.absolutePath()))
         return;
     m_dir.refresh();
-    const QStringList newFileNamesList = getIconFilePaths();
-    const QSet<QString> newSet = toStringSet(newFileNamesList);
-    QSet<QString> currentSet;
+    const QStringList   newFileNamesList = getIconFilePaths();
+    const QSet<QString> newSet           = toStringSet(newFileNamesList);
+    QSet<QString>       currentSet;
     for (const MMCIcon& it : m_icons) {
         if (!it.has(IconType::FileBased))
             continue;
@@ -160,13 +160,13 @@ void IconList::directoryChanged(const QString& path)
         currentSet.insert(icon.absoluteFilePath());
     }
     QSet<QString> toRemove = currentSet - newSet;
-    QSet<QString> toAdd = newSet - currentSet;
+    QSet<QString> toAdd    = newSet - currentSet;
 
     for (const QString& removedPath : toRemove) {
         qDebug() << "Removing icon" << removedPath;
         QFileInfo removedFile(removedPath);
-        QString relativePath = m_dir.relativeFilePath(removedFile.absoluteFilePath());
-        QString key = QFileInfo(relativePath).completeBaseName();
+        QString   relativePath = m_dir.relativeFilePath(removedFile.absoluteFilePath());
+        QString   key          = QFileInfo(relativePath).completeBaseName();
 
         int idx = getIconIndex(key);
         if (idx == -1)
@@ -188,9 +188,9 @@ void IconList::directoryChanged(const QString& path)
         qDebug() << "Adding icon" << addedPath;
 
         QFileInfo addfile(addedPath);
-        QString relativePath = m_dir.relativeFilePath(addfile.absoluteFilePath());
-        QString key = QFileInfo(relativePath).completeBaseName();
-        QString name = formatName(m_dir, addfile);
+        QString   relativePath = m_dir.relativeFilePath(addfile.absoluteFilePath());
+        QString   key          = QFileInfo(relativePath).completeBaseName();
+        QString   name         = formatName(m_dir, addfile);
 
         if (addIcon(key, name, addfile.filePath(), IconType::FileBased)) {
             m_watcher->addPath(addedPath);
@@ -208,7 +208,7 @@ void IconList::fileChanged(const QString& path)
     if (!checkfile.exists())
         return;
     QString key = m_dir.relativeFilePath(checkfile.absoluteFilePath());
-    int idx = getIconIndex(key);
+    int     idx = getIconIndex(key);
     if (idx == -1)
         return;
     QIcon icon;
@@ -264,10 +264,10 @@ Qt::DropActions IconList::supportedDropActions() const
     return Qt::CopyAction;
 }
 
-bool IconList::dropMimeData(const QMimeData* data,
-                            Qt::DropAction action,
-                            [[maybe_unused]] int row,
-                            [[maybe_unused]] int column,
+bool IconList::dropMimeData(const QMimeData*                    data,
+                            Qt::DropAction                      action,
+                            [[maybe_unused]] int                row,
+                            [[maybe_unused]] int                column,
                             [[maybe_unused]] const QModelIndex& parent)
 {
     if (action == Qt::IgnoreAction)
@@ -277,7 +277,7 @@ bool IconList::dropMimeData(const QMimeData* data,
         return false;
 
     if (data->hasUrls()) {
-        auto urls = data->urls();
+        auto        urls = data->urls();
         QStringList iconFiles;
         for (const auto& url : urls) {
             if (!url.isLocalFile())
@@ -307,14 +307,14 @@ QVariant IconList::data(const QModelIndex& index, int role) const
         return {};
 
     switch (role) {
-        case Qt::DecorationRole:
-            return m_icons[row].icon();
-        case Qt::DisplayRole:
-            return m_icons[row].name();
-        case Qt::UserRole:
-            return m_icons[row].m_key;
-        default:
-            return {};
+    case Qt::DecorationRole:
+        return m_icons[row].icon();
+    case Qt::DisplayRole:
+        return m_icons[row].name();
+    case Qt::UserRole:
+        return m_icons[row].m_key;
+    default:
+        return {};
     }
 }
 
@@ -380,7 +380,7 @@ bool IconList::addThemeIcon(const QString& key)
     {
         MMCIcon mmc_icon;
         mmc_icon.m_name = key;
-        mmc_icon.m_key = key;
+        mmc_icon.m_key  = key;
         mmc_icon.replace(Builtin, key);
         m_icons.push_back(mmc_icon);
         m_nameIndex[key] = m_icons.size() - 1;
@@ -413,7 +413,7 @@ bool IconList::addIcon(const QString& key, const QString& name, const QString& p
     {
         MMCIcon mmc_icon;
         mmc_icon.m_name = name;
-        mmc_icon.m_key = key;
+        mmc_icon.m_key  = key;
         mmc_icon.replace(type, icon, path);
         m_icons.push_back(mmc_icon);
         m_nameIndex[key] = m_icons.size() - 1;
@@ -424,7 +424,7 @@ bool IconList::addIcon(const QString& key, const QString& name, const QString& p
 
 void IconList::saveIcon(const QString& key, const QString& path, const char* format) const
 {
-    auto icon = getIcon(key);
+    auto icon   = getIcon(key);
     auto pixmap = icon.pixmap(128, 128);
     pixmap.save(path, format);
 }

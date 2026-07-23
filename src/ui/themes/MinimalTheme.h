@@ -2,8 +2,9 @@
 
 #include "ITheme.h"
 
-class MinimalTheme : public ITheme {
-   public:
+class MinimalTheme : public ITheme
+{
+public:
     virtual ~MinimalTheme() {}
 
     QString qtTheme() override;

@@ -8,22 +8,25 @@
 #include "ui/pages/modplatform/DataPackModel.h"
 #include "ui/pages/modplatform/ResourcePage.h"
 
-namespace Ui {
+namespace Ui
+{
 class ResourcePage;
 }
 
-namespace ResourceDownload {
+namespace ResourceDownload
+{
 
 class DataPackDownloadDialog;
 
-class DataPackResourcePage : public ResourcePage {
+class DataPackResourcePage : public ResourcePage
+{
     Q_OBJECT
 
-   public:
+public:
     template <typename T>
     static T* create(DataPackDownloadDialog* dialog, BaseInstance& instance)
     {
-        auto page = new T(dialog, instance);
+        auto page  = new T(dialog, instance);
         auto model = static_cast<DataPackResourceModel*>(page->getModel());
 
         connect(model, &ResourceModel::versionListUpdated, page, &ResourcePage::versionListUpdated);
@@ -41,10 +44,10 @@ class DataPackResourcePage : public ResourcePage {
 
     QMap<QString, QString> urlHandlers() const override;
 
-   protected:
+protected:
     DataPackResourcePage(DataPackDownloadDialog* dialog, BaseInstance& instance);
 
-   protected slots:
+protected slots:
     void triggerSearch() override;
 };
 

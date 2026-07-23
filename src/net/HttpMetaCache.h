@@ -42,13 +42,14 @@
 
 class HttpMetaCache;
 
-class MetaEntry {
+class MetaEntry
+{
     friend class HttpMetaCache;
 
-   protected:
+protected:
     MetaEntry() = default;
 
-   public:
+public:
     auto isStale() -> bool { return m_stale; }
     void setStale(bool stale) { m_stale = stale; }
 
@@ -75,28 +76,29 @@ class MetaEntry {
 
     bool isExpired(qint64 offset) { return !m_is_eternal && (m_current_age >= m_max_age - offset); }
 
-   protected:
+protected:
     QString m_baseId;
     QString m_basePath;
     QString m_relativePath;
     QString m_md5sum;
     QString m_etag;
 
-    qint64 m_local_changed_timestamp = 0;
+    qint64  m_local_changed_timestamp = 0;
     QString m_remote_changed_timestamp;
 
     qint64 m_current_age = 0;
-    qint64 m_max_age = 0;
-    bool m_is_eternal = false;
+    qint64 m_max_age     = 0;
+    bool   m_is_eternal  = false;
 
     bool m_stale = true;
 };
 
 using MetaEntryPtr = std::shared_ptr<MetaEntry>;
 
-class HttpMetaCache : public QObject {
+class HttpMetaCache : public QObject
+{
     Q_OBJECT
-   public:
+public:
     HttpMetaCache(QString path = QString());
     ~HttpMetaCache() override;
 
@@ -118,18 +120,19 @@ class HttpMetaCache : public QObject {
 
     auto getBasePath(QString base) -> QString;
 
-   public slots:
+public slots:
     void SaveNow();
 
-   private:
+private:
     auto staleEntry(QString base, QString resource_path) -> MetaEntryPtr;
 
-    struct EntryMap {
-        QString base_path;
+    struct EntryMap
+    {
+        QString                     base_path;
         QMap<QString, MetaEntryPtr> entry_list;
     };
 
     QMap<QString, EntryMap> m_entries;
-    QString m_index_file;
-    QTimer saveBatchingTimer;
+    QString                 m_index_file;
+    QTimer                  saveBatchingTimer;
 };

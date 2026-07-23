@@ -23,10 +23,10 @@ HintOverrideProxyStyle::HintOverrideProxyStyle(QStyle* style) : QProxyStyle(styl
     setObjectName(baseStyle()->objectName());
 }
 
-int HintOverrideProxyStyle::styleHint(QStyle::StyleHint hint,
+int HintOverrideProxyStyle::styleHint(QStyle::StyleHint   hint,
                                       const QStyleOption* option,
-                                      const QWidget* widget,
-                                      QStyleHintReturn* returnData) const
+                                      const QWidget*      widget,
+                                      QStyleHintReturn*   returnData) const
 {
     if (hint == QStyle::SH_ItemView_ActivateItemOnSingleClick)
         return 0;

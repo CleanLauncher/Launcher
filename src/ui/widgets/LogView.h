@@ -4,22 +4,23 @@
 
 class QAbstractItemModel;
 
-class LogView : public QPlainTextEdit {
+class LogView : public QPlainTextEdit
+{
     Q_OBJECT
-   public:
+public:
     explicit LogView(QWidget* parent = nullptr);
     virtual ~LogView();
 
-    virtual void setModel(QAbstractItemModel* model);
+    virtual void        setModel(QAbstractItemModel* model);
     QAbstractItemModel* model() const;
 
-   public slots:
+public slots:
     void setWordWrap(bool wrapping);
     void setColorLines(bool colorLines);
     void findNext(const QString& what, bool reverse);
     void scrollToBottom();
 
-   protected slots:
+protected slots:
     void repopulate();
 
     void rowsInserted(const QModelIndex& parent, int first, int last);
@@ -28,10 +29,10 @@ class LogView : public QPlainTextEdit {
     void rowsRemoved(const QModelIndex& parent, int first, int last);
     void modelDestroyed(QObject* model);
 
-   protected:
-    QAbstractItemModel* m_model = nullptr;
-    QTextCharFormat* m_defaultFormat = nullptr;
-    bool m_scroll = false;
-    bool m_scrolling = false;
-    bool m_colorLines = true;
+protected:
+    QAbstractItemModel* m_model         = nullptr;
+    QTextCharFormat*    m_defaultFormat = nullptr;
+    bool                m_scroll        = false;
+    bool                m_scrolling     = false;
+    bool                m_colorLines    = true;
 };

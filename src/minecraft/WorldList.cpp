@@ -51,7 +51,7 @@ WorldList::WorldList(const QString& dir, BaseInstance* instance) : QAbstractList
     FS::ensureFolderPathExists(m_dir.absolutePath());
     m_dir.setFilter(QDir::Readable | QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs);
     m_dir.setSorting(QDir::Name | QDir::IgnoreCase | QDir::LocaleAware);
-    m_watcher = new QFileSystemWatcher(this);
+    m_watcher    = new QFileSystemWatcher(this);
     m_isWatching = false;
     connect(m_watcher, &QFileSystemWatcher::directoryChanged, this, &WorldList::directoryChanged);
 }
@@ -158,7 +158,7 @@ bool WorldList::resetIcon(int row)
     World& m = m_worlds[row];
     if (m.resetIcon()) {
         QModelIndex modelIndex = index(row, NameColumn);
-        emit dataChanged(modelIndex, modelIndex, { WorldList::IconFileRole });
+        emit        dataChanged(modelIndex, modelIndex, {WorldList::IconFileRole});
         return true;
     }
     return false;
@@ -174,7 +174,7 @@ QVariant WorldList::data(const QModelIndex& index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    int row = index.row();
+    int row    = index.row();
     int column = index.column();
 
     if (row < 0 || row >= m_worlds.size())
@@ -184,114 +184,114 @@ QVariant WorldList::data(const QModelIndex& index, int role) const
 
     auto& world = m_worlds[row];
     switch (role) {
-        case Qt::DisplayRole:
-            switch (column) {
-                case NameColumn:
-                    return world.name();
-
-                case GameModeColumn:
-                    return world.gameType().toTranslatedString();
-
-                case LastPlayedColumn:
-                    return world.lastPlayed();
-
-                case SizeColumn:
-                    return locale.formattedDataSize(world.bytes());
-
-                case InfoColumn:
-                    if (world.isSymLinkUnder(instDirPath())) {
-                        return tr("This world is symbolically linked from elsewhere.");
-                    }
-                    if (world.isMoreThanOneHardLink()) {
-                        return tr("\nThis world is hard linked elsewhere.");
-                    }
-                    return "";
-                default:
-                    return QVariant();
-            }
-
-        case Qt::UserRole:
-            if (column == SizeColumn)
-                return QVariant::fromValue<qlonglong>(world.bytes());
-            return data(index, Qt::DisplayRole);
-
-        case Qt::ToolTipRole: {
-            if (column == InfoColumn) {
-                if (world.isSymLinkUnder(instDirPath())) {
-                    return tr("Warning: This world is symbolically linked from elsewhere. Editing it will also change the original."
-                              "\nCanonical Path: %1")
-                        .arg(world.canonicalFilePath());
-                }
-                if (world.isMoreThanOneHardLink()) {
-                    return tr("Warning: This world is hard linked elsewhere. Editing it will also change the original.");
-                }
-            }
-            return world.folderName();
-        }
-        case ObjectRole: {
-            return QVariant::fromValue<void*>((void*)&world);
-        }
-        case FolderRole: {
-            return QDir::toNativeSeparators(dir().absoluteFilePath(world.folderName()));
-        }
-        case SeedRole: {
-            return QVariant::fromValue<qlonglong>(world.seed());
-        }
-        case NameRole: {
+    case Qt::DisplayRole:
+        switch (column) {
+        case NameColumn:
             return world.name();
-        }
-        case LastPlayedRole: {
+
+        case GameModeColumn:
+            return world.gameType().toTranslatedString();
+
+        case LastPlayedColumn:
             return world.lastPlayed();
-        }
-        case SizeRole: {
-            return QVariant::fromValue<qlonglong>(world.bytes());
-        }
-        case IconFileRole: {
-            return world.iconFile();
-        }
+
+        case SizeColumn:
+            return locale.formattedDataSize(world.bytes());
+
+        case InfoColumn:
+            if (world.isSymLinkUnder(instDirPath())) {
+                return tr("This world is symbolically linked from elsewhere.");
+            }
+            if (world.isMoreThanOneHardLink()) {
+                return tr("\nThis world is hard linked elsewhere.");
+            }
+            return "";
         default:
             return QVariant();
+        }
+
+    case Qt::UserRole:
+        if (column == SizeColumn)
+            return QVariant::fromValue<qlonglong>(world.bytes());
+        return data(index, Qt::DisplayRole);
+
+    case Qt::ToolTipRole: {
+        if (column == InfoColumn) {
+            if (world.isSymLinkUnder(instDirPath())) {
+                return tr("Warning: This world is symbolically linked from elsewhere. Editing it will also change the original."
+                          "\nCanonical Path: %1")
+                    .arg(world.canonicalFilePath());
+            }
+            if (world.isMoreThanOneHardLink()) {
+                return tr("Warning: This world is hard linked elsewhere. Editing it will also change the original.");
+            }
+        }
+        return world.folderName();
+    }
+    case ObjectRole: {
+        return QVariant::fromValue<void*>((void*)&world);
+    }
+    case FolderRole: {
+        return QDir::toNativeSeparators(dir().absoluteFilePath(world.folderName()));
+    }
+    case SeedRole: {
+        return QVariant::fromValue<qlonglong>(world.seed());
+    }
+    case NameRole: {
+        return world.name();
+    }
+    case LastPlayedRole: {
+        return world.lastPlayed();
+    }
+    case SizeRole: {
+        return QVariant::fromValue<qlonglong>(world.bytes());
+    }
+    case IconFileRole: {
+        return world.iconFile();
+    }
+    default:
+        return QVariant();
     }
 }
 
 QVariant WorldList::headerData(int section, [[maybe_unused]] Qt::Orientation orientation, int role) const
 {
     switch (role) {
-        case Qt::DisplayRole:
-            switch (section) {
-                case NameColumn:
-                    return tr("Name");
-                case GameModeColumn:
-                    return tr("Game Mode");
-                case LastPlayedColumn:
-                    return tr("Last Played");
-                case SizeColumn:
+    case Qt::DisplayRole:
+        switch (section) {
+        case NameColumn:
+            return tr("Name");
+        case GameModeColumn:
+            return tr("Game Mode");
+        case LastPlayedColumn:
+            return tr("Last Played");
+        case SizeColumn:
 
-                    return tr("Size");
-                case InfoColumn:
+            return tr("Size");
+        case InfoColumn:
 
-                    return tr("Info");
-                default:
-                    return QVariant();
-            }
-
-        case Qt::ToolTipRole:
-            switch (section) {
-                case NameColumn:
-                    return tr("The name of the world.");
-                case GameModeColumn:
-                    return tr("Game mode of the world.");
-                case LastPlayedColumn:
-                    return tr("Date and time the world was last played.");
-                case SizeColumn:
-                    return tr("Size of the world on disk.");
-                case InfoColumn:
-                    return tr("Information and warnings about the world.");
-                default:
-                    return QVariant();
-            }
+            return tr("Info");
         default:
             return QVariant();
+        }
+
+    case Qt::ToolTipRole:
+        switch (section) {
+        case NameColumn:
+            return tr("The name of the world.");
+        case GameModeColumn:
+            return tr("Game mode of the world.");
+        case LastPlayedColumn:
+            return tr("Date and time the world was last played.");
+        case SizeColumn:
+            return tr("Size of the world on disk.");
+        case InfoColumn:
+            return tr("Information and warnings about the world.");
+        default:
+            return QVariant();
+        }
+    default:
+        return QVariant();
     }
 }
 
@@ -358,10 +358,10 @@ void WorldList::installWorld(QFileInfo filename)
     w.install(m_dir.absolutePath());
 }
 
-bool WorldList::dropMimeData(const QMimeData* data,
-                             Qt::DropAction action,
-                             [[maybe_unused]] int row,
-                             [[maybe_unused]] int column,
+bool WorldList::dropMimeData(const QMimeData*                    data,
+                             Qt::DropAction                      action,
+                             [[maybe_unused]] int                row,
+                             [[maybe_unused]] int                column,
                              [[maybe_unused]] const QModelIndex& parent)
 {
     if (action == Qt::IgnoreAction)
@@ -399,7 +399,7 @@ int64_t calculateWorldSize(const QFileInfo& file)
         return file.size();
     } else if (file.isDir()) {
         QDirIterator it(file.absoluteFilePath(), QDir::Files, QDirIterator::Subdirectories);
-        int64_t total = 0;
+        int64_t      total = 0;
         while (it.hasNext()) {
             it.next();
             total += it.fileInfo().size();
@@ -413,7 +413,7 @@ void WorldList::loadWorldsAsync()
 {
     for (int i = 0; i < m_worlds.size(); ++i) {
         auto file = m_worlds.at(i).container();
-        int row = i;
+        int  row  = i;
         QThreadPool::globalInstance()->start([this, file, row]() mutable {
             auto size = calculateWorldSize(file);
 
@@ -424,7 +424,7 @@ void WorldList::loadWorldsAsync()
                         m_worlds[row].setSize(size);
 
                         QModelIndex modelIndex = index(row, SizeColumn);
-                        emit dataChanged(modelIndex, modelIndex, { SizeRole });
+                        emit        dataChanged(modelIndex, modelIndex, {SizeRole});
                     }
                 },
                 Qt::QueuedConnection);

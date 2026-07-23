@@ -5,7 +5,8 @@
 
 using Filter = std::function<bool(const QString&)>;
 
-namespace Filters {
+namespace Filters
+{
 inline Filter inverse(Filter filter)
 {
     return [filter = std::move(filter)](const QString& src) { return !filter(src); };
