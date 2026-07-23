@@ -4,7 +4,6 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-
 macro_rules! ffi_null_check {
     ($($ptr:expr),+ $(,)?) => {
         if $($ptr.is_null())||+ {
@@ -73,8 +72,6 @@ macro_rules! ffi_string_vec_to_raw {
         raw_ptr
     }};
 }
-
-
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
 pub extern "C" fn gzip_unzip(
@@ -114,8 +111,6 @@ pub extern "C" fn launcher_free_buffer(raw_ptr: *mut u8, length: usize) {
         }
     }
 }
-
-
 /// Convert markdown to HTML. Returns null on error. Caller must free with `launcher_free_string`.
 #[no_mangle]
 pub extern "C" fn markdown_to_html(markdown_ptr: *const c_char) -> *mut c_char {
@@ -136,8 +131,6 @@ pub extern "C" fn launcher_free_string(raw_ptr: *mut c_char) {
         }
     }
 }
-
-
 /// Natural compare of two strings. Returns `-1`, `0`, or `1`.
 #[no_mangle]
 pub extern "C" fn launcher_natural_compare(
@@ -174,8 +167,6 @@ pub extern "C" fn launcher_human_readable_file_size(
         string_utils::human_readable_file_size(raw_byte_count, use_si_units, decimal_points);
     ffi_cstring_to_raw!(formatted_size)
 }
-
-
 /// Validate JSON data. Returns `true` when the payload parses.
 #[no_mangle]
 pub extern "C" fn json_validate(data_ptr: *const u8, data_len: usize) -> bool {
@@ -195,8 +186,6 @@ pub extern "C" fn json_is_binary(data_ptr: *const u8, data_len: usize) -> bool {
     let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
     json::is_binary_json(input_bytes)
 }
-
-
 /// Read file contents. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
 pub extern "C" fn launcher_fs_read(path_ptr: *const c_char, output_length: *mut usize) -> *mut u8 {
@@ -241,8 +230,6 @@ pub extern "C" fn launcher_fs_remove_invalid_filename_chars(
         filesystem::remove_invalid_filename_chars(input_text, replace_with as u8 as char);
     ffi_cstring_to_raw!(sanitized)
 }
-
-
 /// Compute SHA-256 hash of input bytes. Returns hex string. Caller must free with `launcher_free_string`.
 #[no_mangle]
 pub extern "C" fn launcher_hash_sha256(data_ptr: *const u8, data_len: usize) -> *mut c_char {
@@ -290,8 +277,6 @@ pub extern "C" fn launcher_verify_sha256(
     let expected = ffi_cstr_to_str_false!(expected_ptr);
     hashing::verify_sha256(input_bytes, expected)
 }
-
-
 /// List all entry names in a ZIP archive. Returns null on error. Caller must free with launcher_free_string_list.
 #[no_mangle]
 pub extern "C" fn launcher_zip_entry_names(
@@ -387,8 +372,6 @@ pub extern "C" fn launcher_zip_entry_exists(
     let entry_name = ffi_cstr_to_str_false!(entry_name_ptr);
     archive::zip_entry_exists(archive_path, entry_name).unwrap_or(false)
 }
-
-
 /// List entries in a TAR.GZ archive. Returns null on error. Caller must free with launcher_free_string_list.
 #[no_mangle]
 pub extern "C" fn launcher_tar_entry_names(
