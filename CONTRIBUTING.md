@@ -64,4 +64,4 @@ All contributions must be signed off. Add `-s` to your `git commit` call, or man
 Signed-off-by: Author name <Author email>
 ```
 
-By signing off, you agree to the Developer Certificate of Origin (DCO) - see the full text in the original PrismLauncher contributing guide.
+By signing off, you agree to the Developer Certificate of Origin (DCO): see the full text in the original PrismLauncher contributing guide.
