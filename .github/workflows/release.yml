@@ -149,6 +149,7 @@ jobs:
         run: |
           RELEASE_DIR="release-files"
           VERSION="${{ env.VERSION }}"
+          CHANGELOG_FILE="Launcher-source/.changelog/${VERSION}.md"
           ASSETS=""
 
           for f in "$RELEASE_DIR"/*; do
@@ -164,8 +165,21 @@ jobs:
             gh release delete "$VERSION" --repo "${{ github.repository }}" --yes
           fi
 
+          NOTES=""
+          if [ -f "$CHANGELOG_FILE" ]; then
+            NOTES=$(cat "$CHANGELOG_FILE")
+            echo "Using changelog from $CHANGELOG_FILE"
+          else
+            NOTES=$(gh release view "$VERSION" --repo "${{ github.repository }}" --json body --jq '.body' 2>/dev/null || echo "")
+            if [ -z "$NOTES" ]; then
+              NOTES="## What's Changed
+
+See the [changelog](https://github.com/${{ github.repository }}/blob/master/.changelog/${VERSION}.md) for details."
+            fi
+          fi
+
           gh release create "$VERSION" \
             --repo "${{ github.repository }}" \
             --title "Launcher $VERSION" \
-            --generate-notes \
+            --notes "$NOTES" \
             $ASSETS
