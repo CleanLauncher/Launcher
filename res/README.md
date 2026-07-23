@@ -2,12 +2,12 @@
 
 This directory contains program metadata and branding information for Launcher, including:
 
-- **Application name and logo** - Branding assets such as SVG icons, PNG icons, and macOS `.icns` files
-- **Desktop integration** - `.desktop` file for Linux desktop environments, metainfo XML for AppStream/software centers
-- **Windows resources** - `.rc` resource file, `.manifest` for Windows compatibility, and `.ico` icon
-- **macOS resources** - `.qrc` Qt resource file, `.icns` icon bundle
-- **Man page** - `launcher.6.scd` scdoc source for the man page
-- **Build configuration** - `CMakeLists.txt` that configures and copies these files into the build directory
+- **Application name and logo**: Branding assets such as SVG icons, PNG icons, and macOS `.icns` files
+- **Desktop integration**: `.desktop` file for Linux desktop environments, metainfo XML for AppStream/software centers
+- **Windows resources**: `.rc` resource file, `.manifest` for Windows compatibility, and `.ico` icon
+- **macOS resources**: `.qrc` Qt resource file, `.icns` icon bundle
+- **Man page**: `launcher.6.scd` scdoc source for the man page
+- **Build configuration**: `CMakeLists.txt` that configures and copies these files into the build directory
 
 ## Files
 
