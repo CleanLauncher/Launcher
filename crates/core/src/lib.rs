@@ -4,9 +4,6 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::slice;
 
-// ============================================================================
-// FFI helper macros
-// ============================================================================
 
 macro_rules! ffi_null_check {
     ($($ptr:expr),+ $(,)?) => {
@@ -77,9 +74,6 @@ macro_rules! ffi_string_vec_to_raw {
     }};
 }
 
-// ============================================================================
-// GZip
-// ============================================================================
 
 /// GZip decompression. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
@@ -121,9 +115,6 @@ pub extern "C" fn launcher_free_buffer(raw_ptr: *mut u8, length: usize) {
     }
 }
 
-// ============================================================================
-// Markdown
-// ============================================================================
 
 /// Convert markdown to HTML. Returns null on error. Caller must free with `launcher_free_string`.
 #[no_mangle]
@@ -146,9 +137,6 @@ pub extern "C" fn launcher_free_string(raw_ptr: *mut c_char) {
     }
 }
 
-// ============================================================================
-// String utilities
-// ============================================================================
 
 /// Natural compare of two strings. Returns `-1`, `0`, or `1`.
 #[no_mangle]
@@ -187,9 +175,6 @@ pub extern "C" fn launcher_human_readable_file_size(
     ffi_cstring_to_raw!(formatted_size)
 }
 
-// ============================================================================
-// JSON
-// ============================================================================
 
 /// Validate JSON data. Returns `true` when the payload parses.
 #[no_mangle]
@@ -211,9 +196,6 @@ pub extern "C" fn json_is_binary(data_ptr: *const u8, data_len: usize) -> bool {
     json::is_binary_json(input_bytes)
 }
 
-// ============================================================================
-// Filesystem
-// ============================================================================
 
 /// Read file contents. Returns null on error. Caller must free with `launcher_free_buffer`.
 #[no_mangle]
@@ -260,9 +242,6 @@ pub extern "C" fn launcher_fs_remove_invalid_filename_chars(
     ffi_cstring_to_raw!(sanitized)
 }
 
-// ============================================================================
-// Hashing
-// ============================================================================
 
 /// Compute SHA-256 hash of input bytes. Returns hex string. Caller must free with `launcher_free_string`.
 #[no_mangle]
@@ -312,9 +291,6 @@ pub extern "C" fn launcher_verify_sha256(
     hashing::verify_sha256(input_bytes, expected)
 }
 
-// ============================================================================
-// Archive: ZIP
-// ============================================================================
 
 /// List all entry names in a ZIP archive. Returns null on error. Caller must free with launcher_free_string_list.
 #[no_mangle]
@@ -412,9 +388,6 @@ pub extern "C" fn launcher_zip_entry_exists(
     archive::zip_entry_exists(archive_path, entry_name).unwrap_or(false)
 }
 
-// ============================================================================
-// Archive: TAR.GZ
-// ============================================================================
 
 /// List entries in a TAR.GZ archive. Returns null on error. Caller must free with launcher_free_string_list.
 #[no_mangle]
