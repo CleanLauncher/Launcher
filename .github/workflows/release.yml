@@ -150,22 +150,34 @@ jobs:
           cd "${{ github.workspace }}"
           tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION.tar.gz" Launcher-source
 
-          # Nix and metadata
+          # Metadata archive (nix, flatpak, snap, resources)
+          METADATA_TEMP_DIR=$(mktemp -d)
           if [ -f "Launcher-source/nix/launcher.nix" ]; then
-            cp Launcher-source/nix/launcher.nix "$RELEASE_OUTPUT_DIRECTORY/"
+            mkdir -p "$METADATA_TEMP_DIR/nix"
+            cp Launcher-source/nix/launcher.nix "$METADATA_TEMP_DIR/nix/"
           fi
           if [ -d "Launcher-source/nix" ]; then
-            tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION-nix-config.tar.gz" -C Launcher-source nix/
+            mkdir -p "$METADATA_TEMP_DIR/nix"
+            cp -r Launcher-source/nix/* "$METADATA_TEMP_DIR/nix/" 2>/dev/null || true
           fi
           if [ -d "Launcher-source/res" ]; then
-            tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION-res.tar.gz" -C Launcher-source res/
+            mkdir -p "$METADATA_TEMP_DIR/res"
+            cp -r Launcher-source/res/* "$METADATA_TEMP_DIR/res/" 2>/dev/null || true
           fi
           if [ -f "Launcher-source/flatpak/com.cleanlauncher.Launcher.yml" ]; then
-            cp Launcher-source/flatpak/com.cleanlauncher.Launcher.yml "$RELEASE_OUTPUT_DIRECTORY/"
+            mkdir -p "$METADATA_TEMP_DIR/flatpak"
+            cp Launcher-source/flatpak/com.cleanlauncher.Launcher.yml "$METADATA_TEMP_DIR/flatpak/"
           fi
           if [ -f "Launcher-source/snap/snapcraft.yaml" ]; then
-            cp Launcher-source/snap/snapcraft.yaml "$RELEASE_OUTPUT_DIRECTORY/"
+            mkdir -p "$METADATA_TEMP_DIR/snap"
+            cp Launcher-source/snap/snapcraft.yaml "$METADATA_TEMP_DIR/snap/"
           fi
+          if [ -f "Launcher-source/.changelog/$RELEASE_VERSION.md" ]; then
+            mkdir -p "$METADATA_TEMP_DIR/changelog"
+            cp Launcher-source/.changelog/$RELEASE_VERSION.md "$METADATA_TEMP_DIR/changelog/"
+          fi
+          tar -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION-metadata.tar.gz" -C "$METADATA_TEMP_DIR" .
+          rm -rf "$METADATA_TEMP_DIR"
 
           # Windows MSIX bundles
           find artifacts/ -name "*.msixbundle" -exec sh -c '
