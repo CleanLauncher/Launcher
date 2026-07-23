@@ -80,7 +80,7 @@ jobs:
           COUNT=0
           while IFS= read -r hash; do
             [ -z "$hash" ] && continue
-            PARENTS=$(git cat-file -p "$hash" | grep -c '^parent ' || true)
+            PARENTS=$(git cat-file -p "$hash" | grep -c '^parent ')
             if [ "$PARENTS" -gt 1 ]; then
               continue
             fi
@@ -90,7 +90,7 @@ jobs:
             fi
             COUNT=$((COUNT + 1))
             BODY=$(git log -1 --format='%B' "$hash")
-            LINE_COUNT=$(echo "$BODY" | grep -c '^' || true)
+            LINE_COUNT=$(echo "$BODY" | grep -c '^')
             if [ "$LINE_COUNT" -ne 3 ]; then
               echo "::error file=.git commit=$hash::Commit message must be exactly one line + blank line + Signed-off-by (got $LINE_COUNT lines)"
               git log -1 --format='  %h %s' "$hash"
@@ -120,7 +120,7 @@ jobs:
         run: |
           FAILED=0
           while IFS= read -r file; do
-            MATCHES=$(perl -ne 'print "$.: $_" if /[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/' "$file" 2>/dev/null || true)
+            MATCHES=$(perl -ne 'print "$.: $_" if /[\x{1F300}-\x{1F9FF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}]/' "$file" 2>/dev/null)
             if [ -n "$MATCHES" ]; then
               echo "::error file=$file::Emoji found"
               echo "$MATCHES" | head -3
@@ -151,6 +151,60 @@ jobs:
           codespell --skip='./libraries,./build,./.git,./.mimocode,./crates/target,./docs,*.lock,*.json,*.nix,*.ui,./tests/testdata,./src/resources,./cmake,./scripts,./res' \
             --ignore-words .codespell-ignore-words \
             --quiet-level=2
+
+  semantic-variables:
+    name: Semantic variables
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Check for non-semantic variable names in shell scripts
+        run: |
+          FAILED=0
+          NONSEMANTIC_VARIABLES="(^|[^a-zA-Z0-9_])(data|result|buf|s|tmp|temp|str|val|x|y|z|i|j|k|n|e|r|t|d|dir|dirname|f|fn|ret|err|msg|cmd|args|opts|param|list|arr|item|elem|node|parent|child|sibling|next|prev|head|tail|src|dst|input|output|path|name|type|kind|id|key|value|index|count|size|len|length|width|height|depth|min|max|sum|avg|mean|total|count|num|flag|debug|verbose|quiet|silent|force|dry|help|version|usage)([^a-zA-Z0-9_]|$)"
+          while IFS= read -r file; do
+            if grep -nE "$NONSEMANTIC_VARIABLES" "$file" 2>/dev/null; then
+              while IFS=: read -r line_number line_content; do
+                if echo "$line_content" | grep -qvE '^\s*#' && echo "$line_content" | grep -qE "$NONSEMANTIC_VARIABLES"; then
+                  echo "::error file=$file,line=$line_number::Non-semantic variable name found: $line_content"
+                  FAILED=1
+                fi
+              done < <(grep -nE "$NONSEMANTIC_VARIABLES" "$file" 2>/dev/null)
+            fi
+          done < <(find . -name "*.sh" -o -name "*.yml" -o -name "*.yaml" | grep -v '.git/' | grep -v 'build/' | grep -v '.mimocode/' | grep -v 'libraries/' | grep -v 'crates/')
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "Variable names must be semantic (AGENTS.md rule)."
+            echo "Examples: compressed_data, output_buffer, file_size_human"
+            echo "Forbidden: data, result, buf, s, tmp, dir, dirname, f, etc."
+            exit 1
+          fi
+          echo "All variable names are semantic."
+
+      - name: Check for non-semantic function names in shell scripts
+        run: |
+          FAILED=0
+          NONSEMANTIC_FUNCTIONS="^function (run|get|set|process|handle|check|do|make|create|delete|remove|add|update|modify|change|test|verify|validate|init|setup|teardown|cleanup|start|stop|pause|resume|enable|disable|open|close|read|write|send|receive|fetch|load|save|parse|encode|decode|convert|transform|format|print|log|debug|warn|error|info|fatal|trace|assert|expect|should|must|can|may|will|shall) "
+          while IFS= read -r file; do
+            if grep -nE "$NONSEMANTIC_FUNCTIONS" "$file" 2>/dev/null; then
+              while IFS=: read -r line_number line_content; do
+                if echo "$line_content" | grep -qE "$NONSEMANTIC_FUNCTIONS"; then
+                  echo "::error file=$file,line=$line_number::Non-semantic function name found: $line_content"
+                  FAILED=1
+                fi
+              done < <(grep -nE "$NONSEMANTIC_FUNCTIONS" "$file" 2>/dev/null)
+            fi
+          done < <(find . -name "*.sh" | grep -v '.git/' | grep -v 'build/' | grep -v '.mimocode/' | grep -v 'libraries/' | grep -v 'crates/')
+          if [ "$FAILED" -eq 1 ]; then
+            echo ""
+            echo "Function names must be semantic (AGENTS.md rule)."
+            echo "Use descriptive names like: process_file_content, validate_user_input"
+            exit 1
+          fi
+          echo "All function names are semantic."
 
   yaml-lint:
     name: YAML lint

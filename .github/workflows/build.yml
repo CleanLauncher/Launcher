@@ -133,16 +133,16 @@ jobs:
         if: ${{ matrix.msystem == '' }}
         shell: bash
         run: |
-          BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1 || true)
+          BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1)
           if [ -z "$BINARY" ]; then
             echo "::warning::Binary not found, skipping smoke test"
             exit 0
           fi
           echo "Testing binary: $BINARY"
           if command -v timeout &>/dev/null; then
-            timeout 10 "$BINARY" --version 2>&1 || true
+            timeout 10 "$BINARY" --version 2>&1
           else
-            "$BINARY" --version 2>&1 || true
+            "$BINARY" --version 2>&1
           fi
           echo "Smoke test passed: binary executes"
 
@@ -150,13 +150,13 @@ jobs:
         if: ${{ matrix.msystem != '' }}
         shell: msys2 {0}
         run: |
-          BINARY=$(find build -name 'launcher.exe' -type f 2>/dev/null | head -1 || true)
+          BINARY=$(find build -name 'launcher.exe' -type f 2>/dev/null | head -1)
           if [ -z "$BINARY" ]; then
             echo "::warning::Binary not found, skipping smoke test"
             exit 0
           fi
           echo "Testing binary: $BINARY"
-          timeout 10 "$BINARY" --version 2>&1 || true
+          timeout 10 "$BINARY" --version 2>&1
           echo "Smoke test passed: binary executes"
 
       - name: Get short version

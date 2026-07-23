@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clamav clamav-daemon
-          sudo systemctl stop clamav-freshclam || true
+          sudo systemctl stop clamav-freshclam
           sudo freshclam
 
 

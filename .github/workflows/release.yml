@@ -82,102 +82,129 @@ jobs:
       - name: Grab version
         run: |
           tag_name=$(echo ${{ github.ref }} | grep -oE "[^/]+$")
-          echo "VERSION=$tag_name" >> $GITHUB_ENV
+          echo "RELEASE_VERSION=$tag_name" >> $GITHUB_ENV
 
       - name: Collect all release files
         run: |
-          RELEASE_DIR="release-files"
-          mkdir -p "$RELEASE_DIR"
-          VERSION="${{ env.VERSION }}"
+          RELEASE_OUTPUT_DIRECTORY="release-files"
+          mkdir -p "$RELEASE_OUTPUT_DIRECTORY"
+          RELEASE_VERSION="${{ env.RELEASE_VERSION }}"
 
           echo "Collecting artifacts from: artifacts/"
           find artifacts/ -type f 2>/dev/null | head -50
 
           # Linux AppImage (x86_64 and aarch64)
-          find artifacts/ -name "*.AppImage" -not -name "*.zsync" -exec cp {} "$RELEASE_DIR/" \;
-          find artifacts/ -name "*.AppImage.zsync" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.AppImage" -not -name "*.zsync" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
+          find artifacts/ -name "*.AppImage.zsync" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
 
           # Linux Portable tarballs
-          find artifacts/ -name "*.tar.gz" -path "*/Portable*" -exec sh -c 'cp "$1" "'"$RELEASE_DIR"'/Launcher-Linux-Portable-'"$VERSION"'.tar.gz"' _ {} \; 2>/dev/null || true
+          find artifacts/ -name "*.tar.gz" -path "*/Portable*" -exec sh -c 'cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Linux-Portable-'"$RELEASE_VERSION"'.tar.gz"' _ {} \;
 
           # .deb packages
-          find artifacts/ -name "*.deb" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.deb" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
 
           # .rpm packages
-          find artifacts/ -name "*.rpm" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.rpm" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
 
           # Snap
-          find artifacts/ -name "*.snap" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.snap" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
 
           # Flatpak
-          find artifacts/ -name "*.flatpak" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.flatpak" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \;
 
-          # macOS
-          find artifacts/ -name "*.dmg" -exec cp {} "$RELEASE_DIR/" \;
-          find artifacts/ -name "*.zip" -path "*/macOS*" -exec sh -c 'cp "$1" "'"$RELEASE_DIR"'/Launcher-macOS-'"$VERSION"'.zip"' _ {} \; 2>/dev/null || true
+          # macOS DMG
+          find artifacts/ -name "*.dmg" -exec sh -c '
+            cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-macOS-'"$RELEASE_VERSION"'.dmg"' _ {} \;
 
-          # Windows installers
+          # macOS ZIP
+          find artifacts/ -name "*.zip" -path "*/macOS*" -exec sh -c '
+            cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-macOS-'"$RELEASE_VERSION"'.zip"' _ {} \;
+
+          # Windows NSIS Installer
           find artifacts/ -name "Launcher-Setup.exe" -exec sh -c '
-            dir=$(dirname "$1")
-            dirname=$(basename "$dir")
-            if echo "$dirname" | grep -q "MinGW-w64"; then
-              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-MinGW-w64-Setup-'"$VERSION"'.exe"
-            elif echo "$dirname" | grep -q "arm64"; then
-              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-MinGW-arm64-Setup-'"$VERSION"'.exe"
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-Setup-'"$RELEASE_VERSION"'.exe"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-Setup-'"$RELEASE_VERSION"'.exe"
             else
-              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-Setup-'"$VERSION"'.exe"
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-Setup-'"$RELEASE_VERSION"'.exe"
+            fi
+          ' _ {} \;
+
+          # Windows Portable ZIP
+          find artifacts/ -name "Launcher-portable.zip" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-Portable-'"$RELEASE_VERSION"'.zip"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-Portable-'"$RELEASE_VERSION"'.zip"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-Portable-'"$RELEASE_VERSION"'.zip"
             fi
           ' _ {} \;
 
           # Source tarball
           cd "${{ github.workspace }}"
-          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION.tar.gz" Launcher-source
+          tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION.tar.gz" Launcher-source
 
           # Nix and metadata
-          cp Launcher-source/nix/launcher.nix "$RELEASE_DIR/" 2>/dev/null || true
-          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION-nix-config.tar.gz" -C Launcher-source nix/ 2>/dev/null || true
-          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION-res.tar.gz" -C Launcher-source res/ 2>/dev/null || true
-          cp Launcher-source/flatpak/com.cleanlauncher.Launcher.yml "$RELEASE_DIR/" 2>/dev/null || true
-          cp Launcher-source/snap/snapcraft.yaml "$RELEASE_DIR/" 2>/dev/null || true
+          if [ -f "Launcher-source/nix/launcher.nix" ]; then
+            cp Launcher-source/nix/launcher.nix "$RELEASE_OUTPUT_DIRECTORY/"
+          fi
+          if [ -d "Launcher-source/nix" ]; then
+            tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION-nix-config.tar.gz" -C Launcher-source nix/
+          fi
+          if [ -d "Launcher-source/res" ]; then
+            tar --exclude='.git' -czf "$RELEASE_OUTPUT_DIRECTORY/Launcher-$RELEASE_VERSION-res.tar.gz" -C Launcher-source res/
+          fi
+          if [ -f "Launcher-source/flatpak/com.cleanlauncher.Launcher.yml" ]; then
+            cp Launcher-source/flatpak/com.cleanlauncher.Launcher.yml "$RELEASE_OUTPUT_DIRECTORY/"
+          fi
+          if [ -f "Launcher-source/snap/snapcraft.yaml" ]; then
+            cp Launcher-source/snap/snapcraft.yaml "$RELEASE_OUTPUT_DIRECTORY/"
+          fi
 
           echo "Final release files:"
-          ls -la "$RELEASE_DIR/"
+          ls -la "$RELEASE_OUTPUT_DIRECTORY/"
 
       - name: Create release
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_DIR="release-files"
-          VERSION="${{ env.VERSION }}"
-          CHANGELOG_FILE="Launcher-source/.changelog/${VERSION}.md"
-          ASSETS=""
+          RELEASE_OUTPUT_DIRECTORY="release-files"
+          RELEASE_VERSION="${{ env.RELEASE_VERSION }}"
+          CHANGELOG_FILE_PATH="Launcher-source/.changelog/${RELEASE_VERSION}.md"
+          RELEASE_ASSETS=""
 
-          for f in "$RELEASE_DIR"/*; do
-            test -f "$f" && ASSETS="$ASSETS $f"
+          for release_file in "$RELEASE_OUTPUT_DIRECTORY"/*; do
+            test -f "$release_file" && RELEASE_ASSETS="$RELEASE_ASSETS $release_file"
           done
 
-          if [ -z "$ASSETS" ]; then
+          if [ -z "$RELEASE_ASSETS" ]; then
             echo "::warning::No release assets found, creating release without binaries"
           fi
 
-          if gh release view "$VERSION" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            echo "Release $VERSION already exists, deleting to recreate."
-            gh release delete "$VERSION" --repo "${{ github.repository }}" --yes
+          if gh release view "$RELEASE_VERSION" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "Release $RELEASE_VERSION already exists, deleting to recreate."
+            gh release delete "$RELEASE_VERSION" --repo "${{ github.repository }}" --yes
           fi
 
-          NOTES=""
-          if [ -f "$CHANGELOG_FILE" ]; then
-            NOTES=$(cat "$CHANGELOG_FILE")
-            echo "Using changelog from $CHANGELOG_FILE"
+          RELEASE_NOTES=""
+          if [ -f "$CHANGELOG_FILE_PATH" ]; then
+            RELEASE_NOTES=$(sed '1{/^# /d}' "$CHANGELOG_FILE_PATH")
+            echo "Using changelog from $CHANGELOG_FILE_PATH"
           else
-            NOTES=$(gh release view "$VERSION" --repo "${{ github.repository }}" --json body --jq '.body' 2>/dev/null || echo "")
-            if [ -z "$NOTES" ]; then
-              NOTES="See the changelog for details: https://github.com/${{ github.repository }}/blob/master/.changelog/${VERSION}.md"
+            RELEASE_NOTES=$(gh release view "$RELEASE_VERSION" --repo "${{ github.repository }}" --json body --jq '.body' 2>/dev/null || echo "")
+            if [ -z "$RELEASE_NOTES" ]; then
+              RELEASE_NOTES="See the changelog for details: https://github.com/${{ github.repository }}/blob/master/.changelog/${RELEASE_VERSION}.md"
             fi
           fi
 
-          gh release create "$VERSION" \
+          gh release create "$RELEASE_VERSION" \
             --repo "${{ github.repository }}" \
-            --title "Launcher $VERSION" \
-            --notes "$NOTES" \
-            $ASSETS
+            --title "Launcher $RELEASE_VERSION" \
+            --notes "$RELEASE_NOTES" \
+            $RELEASE_ASSETS

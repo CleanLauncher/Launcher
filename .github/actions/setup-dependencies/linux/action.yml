@@ -28,9 +28,9 @@ runs:
             X64)   APPIMAGE_ARCH="x86_64" ;;
             ARM64) APPIMAGE_ARCH="aarch64" ;;
             *)
-              dpkg_arch="$(dpkg --print-architecture 2>/dev/null || true)"
+              dpkg_arch="$(dpkg --print-architecture 2>/dev/null)"
               if [ -z "$dpkg_arch" ]; then
-                dpkg_arch="$(uname -m 2>/dev/null || arch 2>/dev/null || true)"
+                dpkg_arch="$(uname -m 2>/dev/null || arch 2>/dev/null)"
               fi
               dpkg_arch="$(echo "$dpkg_arch" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
               case "$dpkg_arch" in
@@ -41,7 +41,7 @@ runs:
               ;;
           esac
         else
-          dpkg_arch="$(dpkg --print-architecture 2>/dev/null || uname -m 2>/dev/null || arch 2>/dev/null || true)"
+          dpkg_arch="$(dpkg --print-architecture 2>/dev/null || uname -m 2>/dev/null || arch 2>/dev/null)"
           dpkg_arch="$(echo "$dpkg_arch" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
           case "$dpkg_arch" in
             "amd64"|"x86_64")  APPIMAGE_ARCH="x86_64" ;;

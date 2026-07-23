@@ -157,9 +157,9 @@ RUN cmake --preset linux \
 RUN cmake --build --preset linux --config Debug -j$(nproc)
 
 # Smoke test
-RUN BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1 || true) \
+RUN BINARY=$(find build -name 'launcher' -type f -executable 2>/dev/null | head -1) \
   && if [ -n "$BINARY" ]; then \
-    QT_QPA_PLATFORM=offscreen "$BINARY" --version 2>&1 || true; \
+    QT_QPA_PLATFORM=offscreen "$BINARY" --version 2>&1; \
   fi
 
 # Install for packaging

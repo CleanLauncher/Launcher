@@ -50,8 +50,8 @@ jobs:
         run: |
           cmake --preset "$CMAKE_PRESET" \
             -DCMAKE_BUILD_TYPE=Debug \
-            -DCMAKE_C_FLAGS="-g -O0" \
-            -DCMAKE_CXX_FLAGS="-g -O0"
+            -DCMAKE_C_FLAGS="-g -O0 -fno-omit-frame-pointer" \
+            -DCMAKE_CXX_FLAGS="-g -O0 -fno-omit-frame-pointer"
 
       - name: Build
         run: |
@@ -62,11 +62,26 @@ jobs:
           valgrind --tool=memcheck \
             --leak-check=full \
             --show-leak-kinds=all \
+            --errors-for-leak-kinds=all \
             --track-origins=yes \
             --error-exitcode=1 \
             --xml=yes \
             --xml-file=valgrind-report.xml \
-            ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE" --output-on-failure || true
+            --keep-stacktraces=alloc-and-free \
+            --num-callers=50 \
+            --track-fds=yes \
+            --trace-children=yes \
+            --fair-sched=yes \
+            --child-silent-after-fork=no \
+            --time-unit=instructions \
+            --max-stackframe=1048576 \
+            --main-stacksize=8388608 \
+            --redo-last-malloc=no \
+            --show-reachable=yes \
+            --show-mismatched-frees=yes \
+            --inline-alloc=yes \
+            --auto=yes \
+            ctest --preset "$CMAKE_PRESET" --build-config "$BUILD_TYPE" --output-on-failure
 
           # Print human-readable summary
           if [ -f valgrind-report.xml ]; then

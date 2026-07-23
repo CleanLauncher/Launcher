@@ -159,6 +159,17 @@ runs:
         cd "${{ github.workspace }}/${{ env.INSTALL_DIR }}"
         makensis -NOCD "${{ github.workspace }}/${{ env.BUILD_DIR }}/res/win_install.nsi"
 
+    - name: Package (portable zip)
+      shell: pwsh
+      env:
+        BUILD_DIR: build
+        INSTALL_PORTABLE_DIR: install-portable
+      run: |
+        $portableDir = "${{ github.workspace }}\${{ env.INSTALL_PORTABLE_DIR }}"
+        if (Test-Path "$portableDir") {
+          Compress-Archive -Path "$portableDir\*" -DestinationPath "Launcher-portable.zip" -Force
+        }
+
     - name: Sign installer
       shell: pwsh
       run: |
@@ -182,3 +193,9 @@ runs:
       with:
         name: Launcher-${{ inputs.artifact-name }}-Setup-${{ inputs.version }}-${{ inputs.build-type }}
         path: Launcher-Setup.exe
+
+    - name: Upload portable zip
+      uses: actions/upload-artifact@v7
+      with:
+        name: Launcher-${{ inputs.artifact-name }}-Portable-${{ inputs.version }}-${{ inputs.build-type }}
+        path: Launcher-portable.zip

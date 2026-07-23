@@ -36,7 +36,7 @@ runs:
     - name: Setup build variables
       shell: bash
       run: |
-        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU 2>/dev/null || true)"
+        dpkg_arch="$(dpkg-architecture -q DEB_HOST_ARCH_CPU 2>/dev/null)"
         if [ -z "$dpkg_arch" ]; then
           dpkg_arch="$(uname -m)"
         fi
@@ -48,7 +48,7 @@ runs:
         echo "APPIMAGE_ARCH=$APPIMAGE_ARCH" >> "$GITHUB_ENV"
         echo "DEB_ARCH=$DEB_ARCH" >> "$GITHUB_ENV"
         echo "RPM_ARCH=$RPM_ARCH" >> "$GITHUB_ENV"
-        echo "DEB_HOST_MULTIARCH=$(dpkg-architecture -q DEB_HOST_MULTIARCH 2>/dev/null || true)" >> "$GITHUB_ENV"
+        echo "DEB_HOST_MULTIARCH=$(dpkg-architecture -q DEB_HOST_MULTIARCH 2>/dev/null)" >> "$GITHUB_ENV"
 
     - name: Package AppImage
       shell: bash
@@ -96,20 +96,20 @@ runs:
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libbz2*.so* \
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libz*.so* \
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libstdc++.so* \
-          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so* || true
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so*
 
         # Bundle Qt platform plugins explicitly
         for plugin_dir in "$QT_PLUGIN_PATH"/platforms "$QT_PLUGIN_PATH"/platformthemes "$QT_PLUGIN_PATH"/styles "$QT_PLUGIN_PATH"/imageformats "$QT_PLUGIN_PATH"/iconengines "$QT_PLUGIN_PATH"/tls; do
           if [ -d "$plugin_dir" ]; then
             mkdir -p "$INSTALL_APPIMAGE_DIR/$(basename "$plugin_dir")"
-            cp -a "$plugin_dir"/* "$INSTALL_APPIMAGE_DIR/$(basename "$plugin_dir")/" 2>/dev/null || true
+            cp -a "$plugin_dir"/* "$INSTALL_APPIMAGE_DIR/$(basename "$plugin_dir")/" 2>/dev/null
           fi
         done
 
         # Bundle fonts if available
         if [ -d "/usr/share/fonts" ]; then
           mkdir -p "$INSTALL_APPIMAGE_DIR/fonts"
-          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_APPIMAGE_DIR/fonts/" 2>/dev/null || true
+          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_APPIMAGE_DIR/fonts/" 2>/dev/null
         fi
 
         cp ~/bin/AppImageUpdate.AppImage "$INSTALL_APPIMAGE_DIR"/bin/
@@ -162,8 +162,8 @@ runs:
         printf ' Clean and maintained Minecraft launcher.\n' >> "$INSTALL_DEB_DIR/DEBIAN/control"
 
         printf '#!/bin/bash\n' > "$INSTALL_DEB_DIR/DEBIAN/postinst"
-        printf 'update-desktop-database /usr/share/applications 2>/dev/null || true\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
-        printf 'update-mime-database /usr/share/mime 2>/dev/null || true\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
+        printf 'update-desktop-database /usr/share/applications 2>/dev/null\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
+        printf 'update-mime-database /usr/share/mime 2>/dev/null\n' >> "$INSTALL_DEB_DIR/DEBIAN/postinst"
         chmod 755 "$INSTALL_DEB_DIR/DEBIAN/postinst"
 
         dpkg-deb --root-owner-group --build "$INSTALL_DEB_DIR" "$DEB_PKG"
@@ -201,7 +201,7 @@ runs:
         printf '/opt/launcher/*\n' >> "$RPM_SPEC"
         printf '\n' >> "$RPM_SPEC"
         printf '%%post\n' >> "$RPM_SPEC"
-        printf 'update-desktop-database /usr/share/applications 2>/dev/null || true\n' >> "$RPM_SPEC"
+        printf 'update-desktop-database /usr/share/applications 2>/dev/null\n' >> "$RPM_SPEC"
 
         rpmbuild -bb "$RPM_SPEC" --define "_topdir /tmp/rpmbuild" \
           --define "version $RPM_VERSION" \
@@ -249,20 +249,20 @@ runs:
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libbz2*.so* \
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libz*.so* \
           /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libstdc++.so* \
-          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so* || true
+          /usr/lib/"$APPIMAGE_ARCH"-linux-gnu/libgcc_s.so*
 
         # Bundle Qt platform plugins explicitly
         for plugin_dir in "$QT_PLUGIN_PATH"/platforms "$QT_PLUGIN_PATH"/platformthemes "$QT_PLUGIN_PATH"/styles "$QT_PLUGIN_PATH"/imageformats "$QT_PLUGIN_PATH"/iconengines "$QT_PLUGIN_PATH"/tls; do
           if [ -d "$plugin_dir" ]; then
             mkdir -p "$INSTALL_PORTABLE_DIR/$(basename "$plugin_dir")"
-            cp -a "$plugin_dir"/* "$INSTALL_PORTABLE_DIR/$(basename "$plugin_dir")/" 2>/dev/null || true
+            cp -a "$plugin_dir"/* "$INSTALL_PORTABLE_DIR/$(basename "$plugin_dir")/" 2>/dev/null
           fi
         done
 
         # Bundle fonts if available
         if [ -d "/usr/share/fonts" ]; then
           mkdir -p "$INSTALL_PORTABLE_DIR/fonts"
-          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_PORTABLE_DIR/fonts/" 2>/dev/null || true
+          cp -a /usr/share/fonts/truetype/dejavu "$INSTALL_PORTABLE_DIR/fonts/" 2>/dev/null
         fi
 
         find "$INSTALL_PORTABLE_DIR" -name '*gamemode*' -exec rm {} +

@@ -63,7 +63,7 @@ jobs:
             echo "$match" >> "$GITHUB_STEP_SUMMARY"
             FOUND=$((FOUND + 1))
           done < <(grep -rn 'TODO\|FIXME\|HACK\|XXX\|WORKAROUND' \
-            src/ --include='*.cpp' --include='*.h' --include='*.hpp' 2>/dev/null || true)
+            src/ --include='*.cpp' --include='*.h' --include='*.hpp' 2>/dev/null)
           echo "Found **$FOUND** items." >> "$GITHUB_STEP_SUMMARY"
           echo "Found $FOUND TODO/FIXME/HACK comments."
 

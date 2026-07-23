@@ -166,7 +166,7 @@ jobs:
           BLOCKING_ISSUES: ${{ steps.blocking_data.outputs.current_blocking }}
         run: |
           while read -r pr ; do
-            gh -R ${{ github.repository }} issue edit --add-label 'status: blocking' "$pr" || true
+            gh -R ${{ github.repository }} issue edit --add-label 'status: blocking' "$pr"
           done < <(jq -c '.[]' <<< "$BLOCKING_ISSUES")
 
       - name: Apply Blocking PR Status Check
