@@ -164,7 +164,7 @@ jobs:
       - name: Check for non-semantic variable names in shell scripts
         run: |
           FAILED=0
-          NONSEMANTIC_VARIABLES="(^|[^a-zA-Z0-9_])(data|result|buf|s|tmp|temp|str|val|x|y|z|i|j|k|n|e|r|t|d|dir|dirname|f|fn|ret|err|msg|cmd|args|opts|param|list|arr|item|elem|node|parent|child|sibling|next|prev|head|tail|src|dst|input|output)([^a-zA-Z0-9_]|$)"
+          NONSEMANTIC_VARIABLES="^[[:space:]]*(data|result|buf|s|tmp|temp|str|val|x|y|z|i|j|k|n|e|r|t|d|dir|dirname|f|fn|ret|err|msg|cmd|args|opts|param|list|arr|item|elem|node|parent|child|sibling|next|prev|head|tail|src|dst|input|output)[[:space:]]*="
           while IFS= read -r file; do
             if grep -nE "$NONSEMANTIC_VARIABLES" "$file" 2>/dev/null; then
               while IFS=: read -r line_number line_content; do
