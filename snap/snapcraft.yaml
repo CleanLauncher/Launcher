@@ -1,6 +1,6 @@
 name: cleanlauncher
 base: core24
-version: '111.0.x'
+version: '111.0.3'
 summary: CleanLauncher
 description: |
   CleanLauncher is a C++/Rust launcher application.

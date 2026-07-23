@@ -30,7 +30,7 @@ jobs:
       - name: Build Snap
         run: |
           sudo snapcraft --destructive-mode
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: snap
           path: "*.snap"
@@ -51,7 +51,7 @@ jobs:
         run: |
           flatpak-builder --user --disable-rofiles-fuse --install-deps-from=flathub --force-clean build-dir flatpak/com.cleanlauncher.Launcher.yml
           flatpak build-bundle build-dir Launcher.flatpak com.cleanlauncher.Launcher
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: flatpak
           path: Launcher.flatpak
@@ -74,118 +74,98 @@ jobs:
           git config --global user.name "Alessio Attilio"
           git config --global user.email "attilio.alessio@protonmail.com"
 
-      - name: Download artifacts
+      - name: Download all artifacts
         uses: actions/download-artifact@v8
+        with:
+          path: artifacts
 
       - name: Grab version
         run: |
           tag_name=$(echo ${{ github.ref }} | grep -oE "[^/]+$")
           echo "VERSION=$tag_name" >> $GITHUB_ENV
 
-      - name: Package artifacts
+      - name: Collect all release files
         run: |
-          mv ${{ github.workspace }}/Launcher-source Launcher-${{ env.VERSION }}
+          RELEASE_DIR="release-files"
+          mkdir -p "$RELEASE_DIR"
+          VERSION="${{ env.VERSION }}"
 
-          # Linux
-          mv Launcher-Linux-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz 2>/dev/null || true
-          mv Launcher-Linux-aarch64-Qt6-Portable*/Launcher-portable.tar.gz Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz 2>/dev/null || true
-          mv Launcher-*.AppImage/Launcher-*-x86_64.AppImage Launcher-Linux-x86_64.AppImage 2>/dev/null || true
-          mv Launcher-*.AppImage.zsync/Launcher-*-x86_64.AppImage.zsync Launcher-Linux-x86_64.AppImage.zsync 2>/dev/null || true
-          mv Launcher-*.AppImage/Launcher-*-aarch64.AppImage Launcher-Linux-aarch64.AppImage 2>/dev/null || true
-          mv Launcher-*.AppImage.zsync/Launcher-*-aarch64.AppImage.zsync Launcher-Linux-aarch64.AppImage.zsync 2>/dev/null || true
+          echo "Collecting artifacts from: artifacts/"
+          find artifacts/ -type f 2>/dev/null | head -50
 
-          # .deb and .rpm
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.deb"
-          done < <(find . -name '*.deb' -type f 2>/dev/null)
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.rpm"
-          done < <(find . -name '*.rpm' -type f 2>/dev/null)
+          # Linux AppImage (x86_64 and aarch64)
+          find artifacts/ -name "*.AppImage" -not -name "*.zsync" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.AppImage.zsync" -exec cp {} "$RELEASE_DIR/" \;
 
-          # .nix script
-          cp Launcher-${{ env.VERSION }}/nix/launcher.nix launcher.nix 2>/dev/null || true
+          # Linux Portable tarballs
+          find artifacts/ -name "*.tar.gz" -path "*/Portable*" -exec sh -c 'cp "$1" "'"$RELEASE_DIR"'/Launcher-Linux-Portable-'"$VERSION"'.tar.gz"' _ {} \; 2>/dev/null || true
 
-          # Flatpak
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.flatpak"
-          done < <(find . -name '*.flatpak' -type f 2>/dev/null)
+          # .deb packages
+          find artifacts/ -name "*.deb" -exec cp {} "$RELEASE_DIR/" \;
+
+          # .rpm packages
+          find artifacts/ -name "*.rpm" -exec cp {} "$RELEASE_DIR/" \;
 
           # Snap
-          while IFS= read -r f; do
-            cp "$f" "Launcher-${{ env.VERSION }}.snap"
-          done < <(find . -name '*.snap' -type f 2>/dev/null)
+          find artifacts/ -name "*.snap" -exec cp {} "$RELEASE_DIR/" \;
+
+          # Flatpak
+          find artifacts/ -name "*.flatpak" -exec cp {} "$RELEASE_DIR/" \;
 
           # macOS
-          mv Launcher-macOS*/Launcher.zip Launcher-macOS-${{ env.VERSION }}.zip 2>/dev/null || true
-          mv Launcher-macOS*/Launcher.dmg Launcher-macOS-${{ env.VERSION }}.dmg 2>/dev/null || true
+          find artifacts/ -name "*.dmg" -exec cp {} "$RELEASE_DIR/" \;
+          find artifacts/ -name "*.zip" -path "*/macOS*" -exec sh -c 'cp "$1" "'"$RELEASE_DIR"'/Launcher-macOS-'"$VERSION"'.zip"' _ {} \; 2>/dev/null || true
 
-          # Windows
-          for d in Launcher-Windows-MinGW-w64*; do
-            cd "${d}" || continue
-            test -f Launcher-*.exe && mv Launcher-*.exe ../Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
-            cd ..
-          done
-
-          for d in Launcher-Windows-MinGW-arm64*; do
-            cd "${d}" || continue
-            test -f Launcher-*.exe && mv Launcher-*.exe ../Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe 2>/dev/null || true
-            cd ..
-          done
+          # Windows installers
+          find artifacts/ -name "Launcher-Setup.exe" -exec sh -c '
+            dir=$(dirname "$1")
+            dirname=$(basename "$dir")
+            if echo "$dirname" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-MinGW-w64-Setup-'"$VERSION"'.exe"
+            elif echo "$dirname" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-MinGW-arm64-Setup-'"$VERSION"'.exe"
+            else
+              cp "$1" "'"$RELEASE_DIR"'/Launcher-Windows-Setup-'"$VERSION"'.exe"
+            fi
+          ' _ {} \;
 
           # Source tarball
-          tar --exclude='.git' -czf Launcher-${{ env.VERSION }}.tar.gz Launcher-${{ env.VERSION }}
+          cd "${{ github.workspace }}"
+          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION.tar.gz" Launcher-source
 
-          # Metadata folders and manifests
-          cd "Launcher-${{ env.VERSION }}"
-          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-nix-config.tar.gz nix/
-          tar --exclude='.git' -czf ../Launcher-${{ env.VERSION }}-res.tar.gz res/
-          cp flatpak/com.cleanlauncher.Launcher.yml ../com.cleanlauncher.Launcher.yml 2>/dev/null || true
-          cp snap/snapcraft.yaml ../snapcraft.yaml 2>/dev/null || true
-          cd ..
+          # Nix and metadata
+          cp Launcher-source/nix/launcher.nix "$RELEASE_DIR/" 2>/dev/null || true
+          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION-nix-config.tar.gz" -C Launcher-source nix/ 2>/dev/null || true
+          tar --exclude='.git' -czf "$RELEASE_DIR/Launcher-$VERSION-res.tar.gz" -C Launcher-source res/ 2>/dev/null || true
+          cp Launcher-source/flatpak/com.cleanlauncher.Launcher.yml "$RELEASE_DIR/" 2>/dev/null || true
+          cp Launcher-source/snap/snapcraft.yaml "$RELEASE_DIR/" 2>/dev/null || true
+
+          echo "Final release files:"
+          ls -la "$RELEASE_DIR/"
 
       - name: Create release
-        id: create_release
         env:
           GH_TOKEN: ${{ secrets.RELEASE_PAT || secrets.GITHUB_TOKEN }}
         run: |
+          RELEASE_DIR="release-files"
+          VERSION="${{ env.VERSION }}"
           ASSETS=""
-          for f in \
-            "Launcher-Linux-x86_64.AppImage" \
-            "Launcher-Linux-x86_64.AppImage.zsync" \
-            "Launcher-Linux-aarch64.AppImage" \
-            "Launcher-Linux-aarch64.AppImage.zsync" \
-            "Launcher-Linux-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
-            "Launcher-Linux-aarch64-Qt6-Portable-${{ env.VERSION }}.tar.gz" \
-            "Launcher-${{ env.VERSION }}.deb" \
-            "Launcher-${{ env.VERSION }}.rpm" \
-            "launcher.nix" \
-            "Launcher-${{ env.VERSION }}.flatpak" \
-            "Launcher-${{ env.VERSION }}.snap" \
-            "com.cleanlauncher.Launcher.yml" \
-            "snapcraft.yaml" \
-            "Launcher-Windows-MinGW-w64-Setup-${{ env.VERSION }}.exe" \
-            "Launcher-Windows-MinGW-arm64-Setup-${{ env.VERSION }}.exe" \
-            "Launcher-macOS-${{ env.VERSION }}.zip" \
-            "Launcher-macOS-${{ env.VERSION }}.dmg" \
-            "Launcher-${{ env.VERSION }}.tar.gz" \
-            "Launcher-${{ env.VERSION }}-nix-config.tar.gz" \
-            "Launcher-${{ env.VERSION }}-res.tar.gz"
-          do
+
+          for f in "$RELEASE_DIR"/*; do
             test -f "$f" && ASSETS="$ASSETS $f"
           done
 
-          # Top-level dotfiles
-          for f in .*; do
-            test -f "$f" && ASSETS="$ASSETS $f"
-          done
-
-          if gh release view "${{ github.ref_name }}" --repo "${{ github.repository }}" >/dev/null 2>&1; then
-            echo "Release ${{ github.ref_name }} already exists, deleting to recreate."
-            gh release delete "${{ github.ref_name }}" --repo "${{ github.repository }}" --yes
+          if [ -z "$ASSETS" ]; then
+            echo "::warning::No release assets found, creating release without binaries"
           fi
 
-          gh release create "${{ github.ref_name }}" \
+          if gh release view "$VERSION" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            echo "Release $VERSION already exists, deleting to recreate."
+            gh release delete "$VERSION" --repo "${{ github.repository }}" --yes
+          fi
+
+          gh release create "$VERSION" \
             --repo "${{ github.repository }}" \
-            --title "Launcher ${{ env.VERSION }}" \
+            --title "Launcher $VERSION" \
             --generate-notes \
             $ASSETS
