@@ -172,9 +172,7 @@ jobs:
           else
             NOTES=$(gh release view "$VERSION" --repo "${{ github.repository }}" --json body --jq '.body' 2>/dev/null || echo "")
             if [ -z "$NOTES" ]; then
-              NOTES="## What's Changed
-
-See the [changelog](https://github.com/${{ github.repository }}/blob/master/.changelog/${VERSION}.md) for details."
+              NOTES="See the changelog for details: https://github.com/${{ github.repository }}/blob/master/.changelog/${VERSION}.md"
             fi
           fi
 
