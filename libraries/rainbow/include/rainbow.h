@@ -1,4 +1,4 @@
-/* This was part of the KDE project - see KGuiAddons
+/* This was part of the KDE project: see KGuiAddons
  * Copyright (C) 2007 Matthew Woehlke <mw_triad@users.sourceforge.net>
  * Copyright (C) 2007 Olaf Schmidt <ojschmidt@kde.org>
  * Copyright (C) 2007 Thomas Zander <zander@kde.org>

@@ -167,8 +167,100 @@ jobs:
             cp Launcher-source/snap/snapcraft.yaml "$RELEASE_OUTPUT_DIRECTORY/"
           fi
 
+          # Windows MSIX bundles
+          find artifacts/ -name "*.msixbundle" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-'"$RELEASE_VERSION"'.msixbundle"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-'"$RELEASE_VERSION"'.msixbundle"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-'"$RELEASE_VERSION"'.msixbundle"
+            fi
+          ' _ {} \; 2>/dev/null || true
+
+          # Windows MSIX packages
+          find artifacts/ -name "*.msix" -not -name "*.msixbundle" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-'"$RELEASE_VERSION"'.msix"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-'"$RELEASE_VERSION"'.msix"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-'"$RELEASE_VERSION"'.msix"
+            fi
+          ' _ {} \; 2>/dev/null || true
+
+          # Windows APPX bundles
+          find artifacts/ -name "*.appxbundle" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-'"$RELEASE_VERSION"'.appxbundle"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-'"$RELEASE_VERSION"'.appxbundle"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-'"$RELEASE_VERSION"'.appxbundle"
+            fi
+          ' _ {} \; 2>/dev/null || true
+
+          # Windows APPX packages
+          find artifacts/ -name "*.appx" -not -name "*.appxbundle" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-'"$RELEASE_VERSION"'.appx"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-'"$RELEASE_VERSION"'.appx"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-'"$RELEASE_VERSION"'.appx"
+            fi
+          ' _ {} \; 2>/dev/null || true
+
+          # Windows MSI installers
+          find artifacts/ -name "*.msi" -exec sh -c '
+            file_directory=$(dirname "$1")
+            directory_name=$(basename "$file_directory")
+            if echo "$directory_name" | grep -q "MinGW-w64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-w64-'"$RELEASE_VERSION"'.msi"
+            elif echo "$directory_name" | grep -q "arm64"; then
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-MinGW-arm64-'"$RELEASE_VERSION"'.msi"
+            else
+              cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Windows-'"$RELEASE_VERSION"'.msi"
+            fi
+          ' _ {} \; 2>/dev/null || true
+
+          # Linux .pkg.tar.zst (Arch Linux)
+          find artifacts/ -name "*.pkg.tar.zst" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \; 2>/dev/null || true
+
+          # Linux .pkg.tar.xz (Arch Linux)
+          find artifacts/ -name "*.pkg.tar.xz" -exec cp {} "$RELEASE_OUTPUT_DIRECTORY/" \; 2>/dev/null || true
+
+          # Linux portable tar.xz
+          find artifacts/ -name "*.tar.xz" -path "*/Portable*" -exec sh -c '
+            cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Linux-Portable-'"$RELEASE_VERSION"'.tar.xz"' _ {} \; 2>/dev/null || true
+
+          # Linux portable tar.bz2
+          find artifacts/ -name "*.tar.bz2" -path "*/Portable*" -exec sh -c '
+            cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Linux-Portable-'"$RELEASE_VERSION"'.tar.bz2"' _ {} \; 2>/dev/null || true
+
+          # Linux portable tar.zst
+          find artifacts/ -name "*.tar.zst" -path "*/Portable*" -exec sh -c '
+            cp "$1" "'"$RELEASE_OUTPUT_DIRECTORY"'/Launcher-Linux-Portable-'"$RELEASE_VERSION"'.tar.zst"' _ {} \; 2>/dev/null || true
+
+          # Generate checksums for all release files
+          cd "$RELEASE_OUTPUT_DIRECTORY"
+          for release_checksum_file in *; do
+            if [ -f "$release_checksum_file" ]; then
+              sha256sum "$release_checksum_file" >> "Launcher-$RELEASE_VERSION-SHA256.txt"
+            fi
+          done
+
           echo "Final release files:"
           ls -la "$RELEASE_OUTPUT_DIRECTORY/"
+          echo "Total files: $(find "$RELEASE_OUTPUT_DIRECTORY" -type f | wc -l)"
 
       - name: Create release
         env:
