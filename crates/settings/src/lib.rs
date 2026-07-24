@@ -209,7 +209,6 @@ fn unescape_ini_value(value: &str) -> String {
                 Some('n') => result.push('\n'),
                 Some('t') => result.push('\t'),
                 Some('#') => result.push('#'),
-                Some('\\') => result.push('\\'),
                 Some(other) => {
                     result.push('\\');
                     result.push(other);
