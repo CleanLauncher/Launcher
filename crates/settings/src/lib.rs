@@ -301,7 +301,7 @@ mod tests {
     fn test_parse_ini_escaping() {
         let content = "path=C:\\Users\\test\nmulti=line1\\nline2\n";
         let map = parse_ini(content);
-        assert_eq!(map.get("path").unwrap(), "C:\\Users\\test");
+        assert_eq!(map.get("path").unwrap(), r"C:\Users\test");
         assert_eq!(map.get("multi").unwrap(), "line1\nline2");
     }
 
