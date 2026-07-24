@@ -17,4 +17,5 @@ hashing = { path = "../hashing" }
 http_client = { path = "../http_client" }
 json = { path = "../json" }
 markdown = { path = "../markdown" }
+settings = { path = "../settings" }
 string_utils = { path = "../string_utils" }

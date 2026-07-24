@@ -126,6 +126,61 @@ bool launcher_http_get_file_resume(const char* url, const char* path, uint64_t e
 // Returns null on error. Caller must free with launcher_free_buffer.
 uint8_t* launcher_http_post_json(const char* url, const uint8_t* body, size_t body_len, uint16_t* out_status, size_t* out_len);
 
+// --- Settings ---
+
+// Opaque handle to a settings store.
+typedef struct SettingsStore SettingsStore;
+
+// Create a new settings store for the given file path.
+// Returns null on error. Caller must free with launcher_settings_free.
+SettingsStore* launcher_settings_new(const char* path);
+
+// Free a settings store.
+void launcher_settings_free(SettingsStore* ptr);
+
+// Load settings from the file. Returns true on success.
+bool launcher_settings_load(SettingsStore* ptr);
+
+// Save settings to the file. Returns true on success.
+bool launcher_settings_save(SettingsStore* ptr);
+
+// Get a string value. Returns null if key is missing and no default is set.
+// Caller must free with launcher_free_string.
+char* launcher_settings_get_string(const SettingsStore* ptr, const char* key);
+
+// Get an integer value. Returns 0 if key is missing.
+int64_t launcher_settings_get_int(const SettingsStore* ptr, const char* key);
+
+// Get a boolean value. Returns false if key is missing.
+bool launcher_settings_get_bool(const SettingsStore* ptr, const char* key);
+
+// Set a string value.
+void launcher_settings_set_string(SettingsStore* ptr, const char* key, const char* value);
+
+// Set an integer value.
+void launcher_settings_set_int(SettingsStore* ptr, const char* key, int64_t value);
+
+// Set a boolean value.
+void launcher_settings_set_bool(SettingsStore* ptr, const char* key, bool value);
+
+// Reset a setting to its default (removes the key from storage).
+void launcher_settings_reset(SettingsStore* ptr, const char* key);
+
+// Check if a key exists in the store.
+bool launcher_settings_contains(const SettingsStore* ptr, const char* key);
+
+// Register a default value for a key.
+void launcher_settings_register_default(SettingsStore* ptr, const char* key, const char* value);
+
+// Register an alias: when alias is used, it resolves to canonical.
+void launcher_settings_register_alias(SettingsStore* ptr, const char* alias, const char* canonical);
+
+// Check if the store has unsaved changes.
+bool launcher_settings_is_dirty(const SettingsStore* ptr);
+
+// Get all keys. Caller must free with launcher_free_string_list.
+char** launcher_settings_keys(const SettingsStore* ptr, size_t* out_count);
+
 #ifdef __cplusplus
 }
 #endif
