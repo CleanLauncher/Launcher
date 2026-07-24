@@ -511,7 +511,10 @@ pub extern "C" fn launcher_settings_get_int(ptr: *const settings::SettingsStore,
         return 0;
     }
     let store = unsafe { &*ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
+    let key = match unsafe { CStr::from_ptr(key_ptr) }.to_str() {
+        Ok(text) => text,
+        Err(_) => return 0,
+    };
     store.get_int(key)
 }
 
@@ -524,7 +527,7 @@ pub extern "C" fn launcher_settings_get_bool(ptr: *const settings::SettingsStore
         return false;
     }
     let store = unsafe { &*ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
+    let key = ffi_cstr_to_str_false!(key_ptr);
     store.get_bool(key)
 }
 
