@@ -159,7 +159,7 @@ pub struct ModDonation {
     pub url: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct ModLinks {
     #[serde(default)]
     pub website_url: String,

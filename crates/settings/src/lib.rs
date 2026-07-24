@@ -390,7 +390,7 @@ mod tests {
         {
             let mut store = SettingsStore::new(path);
             store.save().unwrap();
-            assert!(!path.exists());
+            assert!(!Path::new(path).exists());
         }
         let _ = fs::remove_file(path);
     }

@@ -225,7 +225,7 @@ fn is_client_error(error: &CoreError) -> bool {
     if let CoreError::Http(msg) = error {
         if let Some(code_str) = msg.strip_prefix("HTTP ") {
             if let Ok(code) = code_str.parse::<u16>() {
-                return code >= 400 && code < 500 && code != 429;
+                return (400..500).contains(&code) && code != 429;
             }
         }
     }
