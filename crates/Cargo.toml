@@ -9,6 +9,7 @@ members = [
     "http_client",
     "json",
     "markdown",
+    "mod_metadata",
     "settings",
     "string_utils",
     "core"
