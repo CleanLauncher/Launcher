@@ -97,6 +97,35 @@ char** launcher_tar_entry_names(const char* archive_path, size_t* out_count);
 // Caller must free result names with launcher_free_string_list.
 char** launcher_tar_extract_dir(const char* archive_path, const char* target_dir, size_t* out_count);
 
+// --- HTTP Client ---
+
+// Set the global HTTP user agent string.
+void launcher_http_set_user_agent(const char* agent);
+
+// Set the global HTTP request timeout in milliseconds.
+void launcher_http_set_timeout(uint64_t timeout_ms);
+
+// Set a custom HTTP header for all subsequent requests.
+void launcher_http_set_header(const char* name, const char* value);
+
+// Perform an HTTP GET request. Returns response body.
+// out_status receives the HTTP status code.
+// Returns null on error. Caller must free with launcher_free_buffer.
+uint8_t* launcher_http_get(const char* url, uint16_t* out_status, size_t* out_len);
+
+// Download a URL to a file. Returns true on success.
+// out_status receives the HTTP status code.
+bool launcher_http_get_file(const char* url, const char* path, uint16_t* out_status);
+
+// Download a URL to a file with resume support. Pass the existing file size to resume from.
+// Returns true on success. out_status receives the HTTP status code.
+bool launcher_http_get_file_resume(const char* url, const char* path, uint64_t existing_bytes, uint32_t max_retries, uint16_t* out_status);
+
+// Perform an HTTP POST request with a JSON body. Returns response body.
+// out_status receives the HTTP status code.
+// Returns null on error. Caller must free with launcher_free_buffer.
+uint8_t* launcher_http_post_json(const char* url, const uint8_t* body, size_t body_len, uint16_t* out_status, size_t* out_len);
+
 #ifdef __cplusplus
 }
 #endif

@@ -6,6 +6,7 @@ members = [
     "filesystem",
     "gzip",
     "hashing",
+    "http_client",
     "json",
     "markdown",
     "string_utils",

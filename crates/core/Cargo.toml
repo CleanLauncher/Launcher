@@ -14,6 +14,7 @@ archive = { path = "../archive" }
 filesystem = { path = "../filesystem" }
 gzip = { path = "../gzip" }
 hashing = { path = "../hashing" }
+http_client = { path = "../http_client" }
 json = { path = "../json" }
 markdown = { path = "../markdown" }
 string_utils = { path = "../string_utils" }

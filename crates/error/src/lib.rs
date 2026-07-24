@@ -34,6 +34,12 @@ pub enum CoreError {
 
     #[error("Configuration error: {0}")]
     Config(String),
+
+    #[error("HTTP error: {0}")]
+    Http(String),
+
+    #[error("HTTP timeout after {0}ms")]
+    HttpTimeout(u64),
 }
 
 pub type Result<T> = std::result::Result<T, CoreError>;
