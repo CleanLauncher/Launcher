@@ -323,7 +323,7 @@ mod tests {
         store.register_default("name", "DefaultName");
         assert_eq!(store.get_string("name"), "DefaultName");
         assert_eq!(store.get_int("missing"), 0);
-        assert_eq!(store.get_bool("missing"), false);
+        assert!(!store.get_bool("missing"));
     }
 
     #[test]
@@ -334,7 +334,7 @@ mod tests {
         store.set_bool("flag", true);
         assert_eq!(store.get_string("name"), "Hello");
         assert_eq!(store.get_int("count"), 42);
-        assert_eq!(store.get_bool("flag"), true);
+        assert!(store.get_bool("flag"));
         assert!(store.is_dirty());
     }
 
