@@ -1,14 +1,13 @@
-use std::collections::HashMap;
-
 use error::{CoreError, Result};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModSide {
     Required,
     Optional,
     Unsupported,
+    #[default]
     Unknown,
 }
 
@@ -23,12 +22,13 @@ impl ModSide {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModVersionType {
     Release,
     Beta,
     Alpha,
+    #[default]
     Unknown,
 }
 
