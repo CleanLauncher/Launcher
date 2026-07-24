@@ -504,7 +504,9 @@ pub extern "C" fn launcher_settings_get_string(ptr: *const settings::SettingsSto
 
 #[no_mangle]
 pub extern "C" fn launcher_settings_get_int(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> i64 {
-    ffi_null_check!(key_ptr);
+    if key_ptr.is_null() {
+        return 0;
+    }
     if ptr.is_null() {
         return 0;
     }
@@ -515,7 +517,9 @@ pub extern "C" fn launcher_settings_get_int(ptr: *const settings::SettingsStore,
 
 #[no_mangle]
 pub extern "C" fn launcher_settings_get_bool(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> bool {
-    ffi_null_check!(key_ptr);
+    if key_ptr.is_null() {
+        return false;
+    }
     if ptr.is_null() {
         return false;
     }
