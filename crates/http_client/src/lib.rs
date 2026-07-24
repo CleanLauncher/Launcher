@@ -265,9 +265,7 @@ mod tests {
 
     #[test]
     fn test_is_client_error_non_http() {
-        assert!(!is_client_error(&CoreError::Io(std::io::Error::other(
-            "test"
-        ))));
+        assert!(!is_client_error(&CoreError::Io(std::io::Error::other("test"))));
     }
 
     #[test]
