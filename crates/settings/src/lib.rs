@@ -55,7 +55,7 @@ impl SettingsStore {
         self.aliases.insert(alias.to_string(), canonical.to_string());
     }
 
-    fn resolve_key(&self, key: &str) -> &str {
+    fn resolve_key<'a>(&'a self, key: &'a str) -> &'a str {
         self.aliases.get(key).map(|s| s.as_str()).unwrap_or(key)
     }
 
