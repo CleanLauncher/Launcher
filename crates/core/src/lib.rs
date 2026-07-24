@@ -38,6 +38,15 @@ macro_rules! ffi_cstr_to_str_false {
     };
 }
 
+macro_rules! ffi_cstr_to_str_void {
+    ($ptr:expr) => {
+        match unsafe { CStr::from_ptr($ptr) }.to_str() {
+            Ok(text) => text,
+            Err(_) => return,
+        }
+    };
+}
+
 macro_rules! ffi_buffer_to_box {
     ($data:expr, $output_length:expr) => {{
         let mut boxed_buffer = $data.into_boxed_slice();
@@ -349,7 +358,7 @@ pub extern "C" fn launcher_http_set_user_agent(agent_ptr: *const c_char) {
     if agent_ptr.is_null() {
         return;
     }
-    let agent = ffi_cstr_to_str!(agent_ptr);
+    let agent = ffi_cstr_to_str_void!(agent_ptr);
     http_client::set_user_agent(agent);
 }
 
@@ -363,8 +372,8 @@ pub extern "C" fn launcher_http_set_header(name_ptr: *const c_char, value_ptr: *
     if name_ptr.is_null() || value_ptr.is_null() {
         return;
     }
-    let name = ffi_cstr_to_str!(name_ptr);
-    let value = ffi_cstr_to_str!(value_ptr);
+    let name = ffi_cstr_to_str_void!(name_ptr);
+    let value = ffi_cstr_to_str_void!(value_ptr);
     http_client::set_header(name, value);
 }
 
@@ -521,8 +530,8 @@ pub extern "C" fn launcher_settings_set_string(ptr: *mut settings::SettingsStore
         return;
     }
     let store = unsafe { &mut *ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
-    let value = ffi_cstr_to_str!(value_ptr);
+    let key = ffi_cstr_to_str_void!(key_ptr);
+    let value = ffi_cstr_to_str_void!(value_ptr);
     store.set_string(key, value);
 }
 
@@ -532,7 +541,7 @@ pub extern "C" fn launcher_settings_set_int(ptr: *mut settings::SettingsStore, k
         return;
     }
     let store = unsafe { &mut *ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
+    let key = ffi_cstr_to_str_void!(key_ptr);
     store.set_int(key, value);
 }
 
@@ -542,7 +551,7 @@ pub extern "C" fn launcher_settings_set_bool(ptr: *mut settings::SettingsStore, 
         return;
     }
     let store = unsafe { &mut *ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
+    let key = ffi_cstr_to_str_void!(key_ptr);
     store.set_bool(key, value);
 }
 
@@ -552,7 +561,7 @@ pub extern "C" fn launcher_settings_reset(ptr: *mut settings::SettingsStore, key
         return;
     }
     let store = unsafe { &mut *ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
+    let key = ffi_cstr_to_str_void!(key_ptr);
     store.reset(key);
 }
 
@@ -573,8 +582,8 @@ pub extern "C" fn launcher_settings_register_default(ptr: *mut settings::Setting
         return;
     }
     let store = unsafe { &mut *ptr };
-    let key = ffi_cstr_to_str!(key_ptr);
-    let value = ffi_cstr_to_str!(value_ptr);
+    let key = ffi_cstr_to_str_void!(key_ptr);
+    let value = ffi_cstr_to_str_void!(value_ptr);
     store.register_default(key, value);
 }
 
@@ -588,8 +597,8 @@ pub extern "C" fn launcher_settings_register_alias(
         return;
     }
     let store = unsafe { &mut *ptr };
-    let alias = ffi_cstr_to_str!(alias_ptr);
-    let canonical = ffi_cstr_to_str!(canonical_ptr);
+    let alias = ffi_cstr_to_str_void!(alias_ptr);
+    let canonical = ffi_cstr_to_str_void!(canonical_ptr);
     store.register_alias(alias, canonical);
 }
 
