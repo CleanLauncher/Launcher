@@ -74,11 +74,7 @@ macro_rules! ffi_string_vec_to_raw {
 }
 
 #[no_mangle]
-pub extern "C" fn gzip_unzip(
-    compressed_ptr: *const u8,
-    compressed_len: usize,
-    output_length: *mut usize,
-) -> *mut u8 {
+pub extern "C" fn gzip_unzip(compressed_ptr: *const u8, compressed_len: usize, output_length: *mut usize) -> *mut u8 {
     ffi_null_check!(compressed_ptr, output_length);
     let input_bytes = unsafe { slice::from_raw_parts(compressed_ptr, compressed_len) };
     match gzip::unzip(input_bytes) {
@@ -88,11 +84,7 @@ pub extern "C" fn gzip_unzip(
 }
 
 #[no_mangle]
-pub extern "C" fn gzip_zip(
-    uncompressed_ptr: *const u8,
-    uncompressed_len: usize,
-    output_length: *mut usize,
-) -> *mut u8 {
+pub extern "C" fn gzip_zip(uncompressed_ptr: *const u8, uncompressed_len: usize, output_length: *mut usize) -> *mut u8 {
     ffi_null_check!(uncompressed_ptr, output_length);
     let input_bytes = unsafe { slice::from_raw_parts(uncompressed_ptr, uncompressed_len) };
     match gzip::zip(input_bytes) {
@@ -130,11 +122,7 @@ pub extern "C" fn launcher_free_string(raw_ptr: *mut c_char) {
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_natural_compare(
-    left_ptr: *const c_char,
-    right_ptr: *const c_char,
-    case_insensitive: bool,
-) -> i32 {
+pub extern "C" fn launcher_natural_compare(left_ptr: *const c_char, right_ptr: *const c_char, case_insensitive: bool) -> i32 {
     if left_ptr.is_null() || right_ptr.is_null() {
         return 0;
     }
@@ -154,13 +142,8 @@ pub extern "C" fn launcher_natural_compare(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_human_readable_file_size(
-    raw_byte_count: f64,
-    use_si_units: bool,
-    decimal_points: usize,
-) -> *mut c_char {
-    let formatted_size =
-        string_utils::human_readable_file_size(raw_byte_count, use_si_units, decimal_points);
+pub extern "C" fn launcher_human_readable_file_size(raw_byte_count: f64, use_si_units: bool, decimal_points: usize) -> *mut c_char {
+    let formatted_size = string_utils::human_readable_file_size(raw_byte_count, use_si_units, decimal_points);
     ffi_cstring_to_raw!(formatted_size)
 }
 
@@ -193,11 +176,7 @@ pub extern "C" fn launcher_fs_read(path_ptr: *const c_char, output_length: *mut 
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_fs_write(
-    path_ptr: *const c_char,
-    data_ptr: *const u8,
-    data_len: usize,
-) -> bool {
+pub extern "C" fn launcher_fs_write(path_ptr: *const c_char, data_ptr: *const u8, data_len: usize) -> bool {
     ffi_false_check!(path_ptr, data_ptr);
     let path_text = ffi_cstr_to_str_false!(path_ptr);
     let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
@@ -212,14 +191,10 @@ pub extern "C" fn launcher_fs_delete_path(path_ptr: *const c_char) -> bool {
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_fs_remove_invalid_filename_chars(
-    input_ptr: *const c_char,
-    replace_with: c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_fs_remove_invalid_filename_chars(input_ptr: *const c_char, replace_with: c_char) -> *mut c_char {
     ffi_null_check!(input_ptr);
     let input_text = ffi_cstr_to_str!(input_ptr);
-    let sanitized =
-        filesystem::remove_invalid_filename_chars(input_text, replace_with as u8 as char);
+    let sanitized = filesystem::remove_invalid_filename_chars(input_text, replace_with as u8 as char);
     ffi_cstring_to_raw!(sanitized)
 }
 
@@ -255,11 +230,7 @@ pub extern "C" fn launcher_hash_sha256_file(path_ptr: *const c_char) -> *mut c_c
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_verify_sha256(
-    data_ptr: *const u8,
-    data_len: usize,
-    expected_ptr: *const c_char,
-) -> bool {
+pub extern "C" fn launcher_verify_sha256(data_ptr: *const u8, data_len: usize, expected_ptr: *const c_char) -> bool {
     ffi_false_check!(data_ptr, expected_ptr);
     let input_bytes = unsafe { slice::from_raw_parts(data_ptr, data_len) };
     let expected = ffi_cstr_to_str_false!(expected_ptr);
@@ -267,10 +238,7 @@ pub extern "C" fn launcher_verify_sha256(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_zip_entry_names(
-    archive_path_ptr: *const c_char,
-    out_count: *mut usize,
-) -> *mut *mut c_char {
+pub extern "C" fn launcher_zip_entry_names(archive_path_ptr: *const c_char, out_count: *mut usize) -> *mut *mut c_char {
     ffi_null_check!(archive_path_ptr, out_count);
     let archive_path = ffi_cstr_to_str!(archive_path_ptr);
     match archive::zip_entry_names(archive_path) {
@@ -296,11 +264,7 @@ pub extern "C" fn launcher_free_string_list(ptr: *mut *mut c_char, count: usize)
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_zip_read_entry(
-    archive_path_ptr: *const c_char,
-    entry_name_ptr: *const c_char,
-    out_len: *mut usize,
-) -> *mut u8 {
+pub extern "C" fn launcher_zip_read_entry(archive_path_ptr: *const c_char, entry_name_ptr: *const c_char, out_len: *mut usize) -> *mut u8 {
     ffi_null_check!(archive_path_ptr, entry_name_ptr, out_len);
     let archive_path = ffi_cstr_to_str!(archive_path_ptr);
     let entry_name = ffi_cstr_to_str!(entry_name_ptr);
@@ -345,10 +309,7 @@ pub extern "C" fn launcher_zip_extract_dir(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_zip_entry_exists(
-    archive_path_ptr: *const c_char,
-    entry_name_ptr: *const c_char,
-) -> bool {
+pub extern "C" fn launcher_zip_entry_exists(archive_path_ptr: *const c_char, entry_name_ptr: *const c_char) -> bool {
     ffi_false_check!(archive_path_ptr, entry_name_ptr);
     let archive_path = ffi_cstr_to_str_false!(archive_path_ptr);
     let entry_name = ffi_cstr_to_str_false!(entry_name_ptr);
@@ -356,10 +317,7 @@ pub extern "C" fn launcher_zip_entry_exists(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_tar_entry_names(
-    archive_path_ptr: *const c_char,
-    out_count: *mut usize,
-) -> *mut *mut c_char {
+pub extern "C" fn launcher_tar_entry_names(archive_path_ptr: *const c_char, out_count: *mut usize) -> *mut *mut c_char {
     ffi_null_check!(archive_path_ptr, out_count);
     let archive_path = ffi_cstr_to_str!(archive_path_ptr);
     match archive::tar_list_entries(archive_path) {
@@ -411,11 +369,7 @@ pub extern "C" fn launcher_http_set_header(name_ptr: *const c_char, value_ptr: *
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_http_get(
-    url_ptr: *const c_char,
-    out_status: *mut u16,
-    out_len: *mut usize,
-) -> *mut u8 {
+pub extern "C" fn launcher_http_get(url_ptr: *const c_char, out_status: *mut u16, out_len: *mut usize) -> *mut u8 {
     ffi_null_check!(url_ptr, out_status, out_len);
     let url = ffi_cstr_to_str!(url_ptr);
     match http_client::get(url) {
@@ -430,11 +384,7 @@ pub extern "C" fn launcher_http_get(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_http_get_file(
-    url_ptr: *const c_char,
-    path_ptr: *const c_char,
-    out_status: *mut u16,
-) -> bool {
+pub extern "C" fn launcher_http_get_file(url_ptr: *const c_char, path_ptr: *const c_char, out_status: *mut u16) -> bool {
     ffi_false_check!(url_ptr, path_ptr);
     let url = ffi_cstr_to_str_false!(url_ptr);
     let path = ffi_cstr_to_str_false!(path_ptr);
@@ -529,10 +479,7 @@ pub extern "C" fn launcher_settings_save(ptr: *mut settings::SettingsStore) -> b
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_get_string(
-    ptr: *const settings::SettingsStore,
-    key_ptr: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_settings_get_string(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> *mut c_char {
     ffi_null_check!(key_ptr);
     if ptr.is_null() {
         return std::ptr::null_mut();
@@ -547,10 +494,7 @@ pub extern "C" fn launcher_settings_get_string(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_get_int(
-    ptr: *const settings::SettingsStore,
-    key_ptr: *const c_char,
-) -> i64 {
+pub extern "C" fn launcher_settings_get_int(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> i64 {
     ffi_null_check!(key_ptr);
     if ptr.is_null() {
         return 0;
@@ -561,10 +505,7 @@ pub extern "C" fn launcher_settings_get_int(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_get_bool(
-    ptr: *const settings::SettingsStore,
-    key_ptr: *const c_char,
-) -> bool {
+pub extern "C" fn launcher_settings_get_bool(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> bool {
     ffi_null_check!(key_ptr);
     if ptr.is_null() {
         return false;
@@ -575,11 +516,7 @@ pub extern "C" fn launcher_settings_get_bool(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_set_string(
-    ptr: *mut settings::SettingsStore,
-    key_ptr: *const c_char,
-    value_ptr: *const c_char,
-) {
+pub extern "C" fn launcher_settings_set_string(ptr: *mut settings::SettingsStore, key_ptr: *const c_char, value_ptr: *const c_char) {
     if ptr.is_null() || key_ptr.is_null() || value_ptr.is_null() {
         return;
     }
@@ -590,11 +527,7 @@ pub extern "C" fn launcher_settings_set_string(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_set_int(
-    ptr: *mut settings::SettingsStore,
-    key_ptr: *const c_char,
-    value: i64,
-) {
+pub extern "C" fn launcher_settings_set_int(ptr: *mut settings::SettingsStore, key_ptr: *const c_char, value: i64) {
     if ptr.is_null() || key_ptr.is_null() {
         return;
     }
@@ -604,11 +537,7 @@ pub extern "C" fn launcher_settings_set_int(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_set_bool(
-    ptr: *mut settings::SettingsStore,
-    key_ptr: *const c_char,
-    value: bool,
-) {
+pub extern "C" fn launcher_settings_set_bool(ptr: *mut settings::SettingsStore, key_ptr: *const c_char, value: bool) {
     if ptr.is_null() || key_ptr.is_null() {
         return;
     }
@@ -618,10 +547,7 @@ pub extern "C" fn launcher_settings_set_bool(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_reset(
-    ptr: *mut settings::SettingsStore,
-    key_ptr: *const c_char,
-) {
+pub extern "C" fn launcher_settings_reset(ptr: *mut settings::SettingsStore, key_ptr: *const c_char) {
     if ptr.is_null() || key_ptr.is_null() {
         return;
     }
@@ -631,10 +557,7 @@ pub extern "C" fn launcher_settings_reset(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_contains(
-    ptr: *const settings::SettingsStore,
-    key_ptr: *const c_char,
-) -> bool {
+pub extern "C" fn launcher_settings_contains(ptr: *const settings::SettingsStore, key_ptr: *const c_char) -> bool {
     ffi_false_check!(key_ptr);
     if ptr.is_null() {
         return false;
@@ -645,11 +568,7 @@ pub extern "C" fn launcher_settings_contains(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_register_default(
-    ptr: *mut settings::SettingsStore,
-    key_ptr: *const c_char,
-    value_ptr: *const c_char,
-) {
+pub extern "C" fn launcher_settings_register_default(ptr: *mut settings::SettingsStore, key_ptr: *const c_char, value_ptr: *const c_char) {
     if ptr.is_null() || key_ptr.is_null() || value_ptr.is_null() {
         return;
     }
@@ -684,10 +603,7 @@ pub extern "C" fn launcher_settings_is_dirty(ptr: *const settings::SettingsStore
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_settings_keys(
-    ptr: *const settings::SettingsStore,
-    out_count: *mut usize,
-) -> *mut *mut c_char {
+pub extern "C" fn launcher_settings_keys(ptr: *const settings::SettingsStore, out_count: *mut usize) -> *mut *mut c_char {
     ffi_null_check!(out_count);
     if ptr.is_null() {
         unsafe {
@@ -701,9 +617,7 @@ pub extern "C" fn launcher_settings_keys(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_parse_modrinth_project(
-    json_ptr: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_parse_modrinth_project(json_ptr: *const c_char) -> *mut c_char {
     ffi_null_check!(json_ptr);
     let json = ffi_cstr_to_str!(json_ptr);
     match mod_metadata::parse_modrinth_project(json) {
@@ -716,9 +630,7 @@ pub extern "C" fn launcher_parse_modrinth_project(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_parse_modrinth_version(
-    json_ptr: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_parse_modrinth_version(json_ptr: *const c_char) -> *mut c_char {
     ffi_null_check!(json_ptr);
     let json = ffi_cstr_to_str!(json_ptr);
     match mod_metadata::parse_modrinth_version(json) {
@@ -731,9 +643,7 @@ pub extern "C" fn launcher_parse_modrinth_version(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_parse_curseforge_project(
-    json_ptr: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_parse_curseforge_project(json_ptr: *const c_char) -> *mut c_char {
     ffi_null_check!(json_ptr);
     let json = ffi_cstr_to_str!(json_ptr);
     match mod_metadata::parse_curseforge_project(json) {
@@ -746,9 +656,7 @@ pub extern "C" fn launcher_parse_curseforge_project(
 }
 
 #[no_mangle]
-pub extern "C" fn launcher_parse_curseforge_version(
-    json_ptr: *const c_char,
-) -> *mut c_char {
+pub extern "C" fn launcher_parse_curseforge_version(json_ptr: *const c_char) -> *mut c_char {
     ffi_null_check!(json_ptr);
     let json = ffi_cstr_to_str!(json_ptr);
     match mod_metadata::parse_curseforge_version(json) {

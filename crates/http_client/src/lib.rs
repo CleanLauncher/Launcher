@@ -35,10 +35,7 @@ fn build_client() -> Result<Client> {
         headers.insert(USER_AGENT, val);
     }
     for (key, value) in &state.extra_headers {
-        if let (Ok(name), Ok(val)) = (
-            HeaderName::from_bytes(key.as_bytes()),
-            HeaderValue::from_str(value),
-        ) {
+        if let (Ok(name), Ok(val)) = (HeaderName::from_bytes(key.as_bytes()), HeaderValue::from_str(value)) {
             headers.insert(name, val);
         }
     }
@@ -93,20 +90,12 @@ pub fn download_to_file(url: &str, path: &str) -> Result<HttpDownloadResult> {
     download_to_file_with_resume(url, path, 0, None)
 }
 
-pub fn download_to_file_with_resume(
-    url: &str,
-    path: &str,
-    existing_bytes: u64,
-    max_retries: Option<u32>,
-) -> Result<HttpDownloadResult> {
+pub fn download_to_file_with_resume(url: &str, path: &str, existing_bytes: u64, max_retries: Option<u32>) -> Result<HttpDownloadResult> {
     let max_retries = max_retries.unwrap_or(DEFAULT_MAX_RETRIES);
     let mut last_error: Option<CoreError> = None;
     let mut extra_headers = HashMap::new();
     if existing_bytes > 0 {
-        extra_headers.insert(
-            "Range".to_string(),
-            format!("bytes={}-", existing_bytes),
-        );
+        extra_headers.insert("Range".to_string(), format!("bytes={}-", existing_bytes));
     }
     let mut attempts = 0;
     while attempts <= max_retries {
@@ -128,19 +117,11 @@ pub fn download_to_file_with_resume(
     Err(last_error.unwrap_or_else(|| CoreError::Http("max retries exceeded".to_string())))
 }
 
-fn execute_download(
-    url: &str,
-    path: &str,
-    existing_bytes: u64,
-    extra_headers: &HashMap<String, String>,
-) -> Result<HttpDownloadResult> {
+fn execute_download(url: &str, path: &str, existing_bytes: u64, extra_headers: &HashMap<String, String>) -> Result<HttpDownloadResult> {
     let client = build_client()?;
     let mut request = client.get(url);
     for (key, value) in extra_headers {
-        if let (Ok(name), Ok(val)) = (
-            HeaderName::from_bytes(key.as_bytes()),
-            HeaderValue::from_str(value),
-        ) {
+        if let (Ok(name), Ok(val)) = (HeaderName::from_bytes(key.as_bytes()), HeaderValue::from_str(value)) {
             request = request.header(name, val);
         }
     }
@@ -153,8 +134,7 @@ fn execute_download(
         } else if existing_bytes > 0 && status == 200 {
             OpenOptions::new().write(true).truncate(true).open(path)
         } else {
-            fs::create_dir_all(Path::new(path).parent().unwrap_or(Path::new(".")))
-                .map_err(CoreError::Io)?;
+            fs::create_dir_all(Path::new(path).parent().unwrap_or(Path::new("."))).map_err(CoreError::Io)?;
             OpenOptions::new().create(true).write(true).truncate(true).open(path)
         };
         let mut file = open_result.map_err(CoreError::Io)?;
@@ -170,10 +150,7 @@ fn execute_download(
             bytes_written += bytes_read as u64;
         }
         file.flush().map_err(CoreError::Io)?;
-        Ok(HttpDownloadResult {
-            status,
-            bytes_written,
-        })
+        Ok(HttpDownloadResult { status, bytes_written })
     } else {
         Err(CoreError::Http(format!("HTTP {}", status)))
     }
@@ -207,11 +184,7 @@ fn request_with_retry(
     Err(last_error.unwrap_or_else(|| CoreError::Http("max retries exceeded".to_string())))
 }
 
-fn execute_request(
-    url: &str,
-    method: Option<&str>,
-    extra_headers: Option<&HashMap<String, String>>,
-) -> Result<HttpResponse> {
+fn execute_request(url: &str, method: Option<&str>, extra_headers: Option<&HashMap<String, String>>) -> Result<HttpResponse> {
     let client = build_client()?;
     let mut request = match method {
         Some("POST") | Some("post") => client.post(url),
@@ -221,10 +194,7 @@ fn execute_request(
     };
     if let Some(headers) = extra_headers {
         for (key, value) in headers {
-            if let (Ok(name), Ok(val)) = (
-                HeaderName::from_bytes(key.as_bytes()),
-                HeaderValue::from_str(value),
-            ) {
+            if let (Ok(name), Ok(val)) = (HeaderName::from_bytes(key.as_bytes()), HeaderValue::from_str(value)) {
                 request = request.header(name, val);
             }
         }
@@ -237,16 +207,10 @@ fn execute_request(
 
 pub fn post_json(url: &str, body: &[u8], extra_headers: Option<HashMap<String, String>>) -> Result<HttpResponse> {
     let client = build_client()?;
-    let mut request = client
-        .post(url)
-        .header("Content-Type", "application/json")
-        .body(body.to_vec());
+    let mut request = client.post(url).header("Content-Type", "application/json").body(body.to_vec());
     if let Some(headers) = extra_headers {
         for (key, value) in &headers {
-            if let (Ok(name), Ok(val)) = (
-                HeaderName::from_bytes(key.as_bytes()),
-                HeaderValue::from_str(value),
-            ) {
+            if let (Ok(name), Ok(val)) = (HeaderName::from_bytes(key.as_bytes()), HeaderValue::from_str(value)) {
                 request = request.header(name, val);
             }
         }

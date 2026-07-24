@@ -67,11 +67,7 @@ pub fn zip_extract_file(archive_path: &str, entry_name: &str, target_path: &str)
     Ok(())
 }
 
-pub fn zip_extract_dir(
-    archive_path: &str,
-    subdir_prefix: &str,
-    target_dir: &str,
-) -> Result<Vec<String>> {
+pub fn zip_extract_dir(archive_path: &str, subdir_prefix: &str, target_dir: &str) -> Result<Vec<String>> {
     let file_handle = fs::File::open(archive_path)?;
     let mut zip_archive = ZipArchive::new(file_handle)?;
 
@@ -145,11 +141,7 @@ pub fn zip_create_from_entries(archive_path: &str, entries: &[(String, Vec<u8>)]
     Ok(())
 }
 
-pub fn zip_merge_archives(
-    source_paths: &[&str],
-    target_path: &str,
-    exclude_set: &HashSet<String>,
-) -> Result<()> {
+pub fn zip_merge_archives(source_paths: &[&str], target_path: &str, exclude_set: &HashSet<String>) -> Result<()> {
     let output_file = fs::File::create(target_path)?;
     let mut zip_writer = ZipWriter::new(output_file);
     let write_options = SimpleFileOptions::default()
@@ -245,10 +237,7 @@ pub fn tar_extract_dir(archive_path: &str, target_dir: &str) -> Result<Vec<Strin
 
 fn validate_path_safety(entry_name: &str) -> Result<()> {
     let normalized_path = entry_name.replace('\\', "/");
-    let path_components: Vec<&str> = normalized_path
-        .split('/')
-        .filter(|s| !s.is_empty())
-        .collect();
+    let path_components: Vec<&str> = normalized_path.split('/').filter(|s| !s.is_empty()).collect();
 
     let mut depth_counter: i32 = 0;
     for component in &path_components {
@@ -272,8 +261,7 @@ mod tests {
     fn create_test_zip(entries: &[(&str, &[u8])]) -> Vec<u8> {
         let output_buffer = Vec::new();
         let mut zip_writer = ZipWriter::new(Cursor::new(output_buffer));
-        let options =
-            SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
+        let options = SimpleFileOptions::default().compression_method(zip::CompressionMethod::Deflated);
 
         for (name, data) in entries {
             if name.ends_with('/') {
@@ -288,11 +276,7 @@ mod tests {
 
     #[test]
     fn zip_list_and_read() {
-        let zip_data = create_test_zip(&[
-            ("hello.txt", b"hello world"),
-            ("dir/", b""),
-            ("dir/nested.txt", b"nested content"),
-        ]);
+        let zip_data = create_test_zip(&[("hello.txt", b"hello world"), ("dir/", b""), ("dir/nested.txt", b"nested content")]);
         let temp_dir = std::env::temp_dir().join("core_archive_test");
         fs::create_dir_all(&temp_dir).unwrap();
         let archive_path = temp_dir.join("test.zip");
@@ -322,12 +306,7 @@ mod tests {
         fs::write(&archive_path, &zip_data).unwrap();
 
         let target = temp_dir.join("output.txt");
-        zip_extract_file(
-            archive_path.to_str().unwrap(),
-            "extract_me.txt",
-            target.to_str().unwrap(),
-        )
-        .unwrap();
+        zip_extract_file(archive_path.to_str().unwrap(), "extract_me.txt", target.to_str().unwrap()).unwrap();
 
         let extracted = fs::read(&target).unwrap();
         assert_eq!(extracted, b"extract this");
@@ -349,12 +328,7 @@ mod tests {
         fs::write(&archive_path, &zip_data).unwrap();
 
         let target_dir = temp_dir.join("extracted");
-        let extracted = zip_extract_dir(
-            archive_path.to_str().unwrap(),
-            "subdir/",
-            target_dir.to_str().unwrap(),
-        )
-        .unwrap();
+        let extracted = zip_extract_dir(archive_path.to_str().unwrap(), "subdir/", target_dir.to_str().unwrap()).unwrap();
 
         assert_eq!(extracted.len(), 2);
         let a_content = fs::read(target_dir.join("a.txt")).unwrap();
@@ -380,8 +354,7 @@ mod tests {
         let read_back = zip_read_entry(archive_path.to_str().unwrap(), "file1.txt").unwrap();
         assert_eq!(read_back, b"data1");
 
-        let read_back3 =
-            zip_read_entry(archive_path.to_str().unwrap(), "nested/file3.txt").unwrap();
+        let read_back3 = zip_read_entry(archive_path.to_str().unwrap(), "nested/file3.txt").unwrap();
         assert_eq!(read_back3, b"data3");
 
         fs::remove_dir_all(&temp_dir).unwrap();

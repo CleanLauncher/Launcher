@@ -25,21 +25,14 @@ pub fn write_string(path: impl AsRef<Path>, content_text: &str) -> Result<()> {
 
 pub fn append(path: impl AsRef<Path>, content_bytes: &[u8]) -> Result<()> {
     use std::io::Write;
-    let mut file = fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(path)?;
+    let mut file = fs::OpenOptions::new().create(true).append(true).open(path)?;
     file.write_all(content_bytes)?;
     Ok(())
 }
 
 pub fn append_safe(path: impl AsRef<Path>, content_bytes: &[u8]) -> Result<()> {
     use std::io::Write;
-    let mut file = fs::OpenOptions::new()
-        .create(true)
-        .append(true)
-        .truncate(false)
-        .open(path)?;
+    let mut file = fs::OpenOptions::new().create(true).append(true).truncate(false).open(path)?;
     file.write_all(content_bytes)?;
     Ok(())
 }
@@ -96,16 +89,7 @@ pub fn remove_invalid_filename_chars(input_string: &str, replace_with: char) -> 
     input_string
         .chars()
         .map(|c| {
-            if c == '<'
-                || c == '>'
-                || c == ':'
-                || c == '"'
-                || c == '/'
-                || c == '\\'
-                || c == '|'
-                || c == '?'
-                || c == '*'
-            {
+            if c == '<' || c == '>' || c == ':' || c == '"' || c == '/' || c == '\\' || c == '|' || c == '?' || c == '*' {
                 replace_with
             } else {
                 c

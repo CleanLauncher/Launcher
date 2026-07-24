@@ -48,13 +48,11 @@ impl SettingsStore {
     }
 
     pub fn register_default(&mut self, key: &str, default_value: &str) {
-        self.defaults
-            .insert(key.to_string(), default_value.to_string());
+        self.defaults.insert(key.to_string(), default_value.to_string());
     }
 
     pub fn register_alias(&mut self, alias: &str, canonical: &str) {
-        self.aliases
-            .insert(alias.to_string(), canonical.to_string());
+        self.aliases.insert(alias.to_string(), canonical.to_string());
     }
 
     fn resolve_key(&self, key: &str) -> &str {
@@ -72,10 +70,7 @@ impl SettingsStore {
 
     pub fn get_int(&self, key: &str) -> i64 {
         let canonical = self.resolve_key(key);
-        let raw = self
-            .values
-            .get(canonical)
-            .or_else(|| self.defaults.get(canonical));
+        let raw = self.values.get(canonical).or_else(|| self.defaults.get(canonical));
         match raw {
             Some(v) => v.parse().unwrap_or(0),
             None => 0,
@@ -84,10 +79,7 @@ impl SettingsStore {
 
     pub fn get_bool(&self, key: &str) -> bool {
         let canonical = self.resolve_key(key);
-        let raw = self
-            .values
-            .get(canonical)
-            .or_else(|| self.defaults.get(canonical));
+        let raw = self.values.get(canonical).or_else(|| self.defaults.get(canonical));
         match raw {
             Some(v) => matches!(v.as_str(), "true" | "1" | "yes"),
             None => false,
@@ -96,10 +88,7 @@ impl SettingsStore {
 
     pub fn get_double(&self, key: &str) -> f64 {
         let canonical = self.resolve_key(key);
-        let raw = self
-            .values
-            .get(canonical)
-            .or_else(|| self.defaults.get(canonical));
+        let raw = self.values.get(canonical).or_else(|| self.defaults.get(canonical));
         match raw {
             Some(v) => v.parse().unwrap_or(0.0),
             None => 0.0,
@@ -108,35 +97,31 @@ impl SettingsStore {
 
     pub fn set_string(&mut self, key: &str, value: &str) {
         let canonical = self.resolve_key(key);
-        self.values
-            .insert(canonical.to_string(), value.to_string());
+        self.values.insert(canonical.to_string(), value.to_string());
         self.dirty = true;
     }
 
     pub fn set_int(&mut self, key: &str, value: i64) {
         let canonical = self.resolve_key(key);
-        self.values
-            .insert(canonical.to_string(), value.to_string());
+        self.values.insert(canonical.to_string(), value.to_string());
         self.dirty = true;
     }
 
     pub fn set_bool(&mut self, key: &str, value: bool) {
         let canonical = self.resolve_key(key);
-        self.values
-            .insert(canonical.to_string(), value.to_string());
+        self.values.insert(canonical.to_string(), value.to_string());
         self.dirty = true;
     }
 
     pub fn set_double(&mut self, key: &str, value: f64) {
         let canonical = self.resolve_key(key);
-        self.values
-            .insert(canonical.to_string(), format!("{value}"));
+        self.values.insert(canonical.to_string(), format!("{value}"));
         self.dirty = true;
     }
 
     pub fn reset(&mut self, key: &str) {
-        let canonical = self.resolve_key(key);
-        self.values.remove(canonical);
+        let canonical = self.resolve_key(key).to_string();
+        self.values.remove(&canonical);
         self.dirty = true;
     }
 
@@ -150,8 +135,7 @@ impl SettingsStore {
         if let Some(v) = self.values.get(&canonical) {
             return v.clone();
         }
-        self.values
-            .insert(canonical, default_value.to_string());
+        self.values.insert(canonical, default_value.to_string());
         self.dirty = true;
         default_value.to_string()
     }
@@ -161,8 +145,7 @@ impl SettingsStore {
         if let Some(v) = self.values.get(&canonical) {
             return v.parse().unwrap_or(default_value);
         }
-        self.values
-            .insert(canonical, default_value.to_string());
+        self.values.insert(canonical, default_value.to_string());
         self.dirty = true;
         default_value
     }
@@ -172,8 +155,7 @@ impl SettingsStore {
         if let Some(v) = self.values.get(&canonical) {
             return matches!(v.as_str(), "true" | "1" | "yes");
         }
-        self.values
-            .insert(canonical, default_value.to_string());
+        self.values.insert(canonical, default_value.to_string());
         self.dirty = true;
         default_value
     }

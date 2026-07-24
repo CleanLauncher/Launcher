@@ -1,10 +1,6 @@
 use regex::Regex;
 
-pub fn natural_compare(
-    left_string: &str,
-    right_string: &str,
-    case_insensitive: bool,
-) -> std::cmp::Ordering {
+pub fn natural_compare(left_string: &str, right_string: &str, case_insensitive: bool) -> std::cmp::Ordering {
     let mut left_chars = left_string.chars().peekable();
     let mut right_chars = right_string.chars().peekable();
 
@@ -84,44 +80,25 @@ pub fn natural_compare(
     }
 }
 
-pub fn human_readable_file_size(
-    raw_byte_count: f64,
-    use_si_units: bool,
-    decimal_points: usize,
-) -> String {
+pub fn human_readable_file_size(raw_byte_count: f64, use_si_units: bool, decimal_points: usize) -> String {
     let kibibyte_units = ["B", "KiB", "MiB", "GiB", "TiB"];
     let si_units = ["B", "KB", "MB", "GB", "TB"];
-    let selected_units = if use_si_units {
-        &si_units
-    } else {
-        &kibibyte_units
-    };
+    let selected_units = if use_si_units { &si_units } else { &kibibyte_units };
     let unit_scale = if use_si_units { 1000.0 } else { 1024.0 };
 
     let mut scaled_value = raw_byte_count;
     let mut unit_index = 0;
     let rounding_factor = 10f64.powi(decimal_points as i32);
 
-    while unit_index < selected_units.len() - 1
-        && (scaled_value * rounding_factor).round() / rounding_factor >= unit_scale
-    {
+    while unit_index < selected_units.len() - 1 && (scaled_value * rounding_factor).round() / rounding_factor >= unit_scale {
         scaled_value /= unit_scale;
         unit_index += 1;
     }
 
-    format!(
-        "{:.width$} {}",
-        scaled_value,
-        selected_units[unit_index],
-        width = decimal_points
-    )
+    format!("{:.width$} {}", scaled_value, selected_units[unit_index], width = decimal_points)
 }
 
-pub fn truncate_url_human_friendly(
-    url_input: &str,
-    max_length: usize,
-    _hard_limit: bool,
-) -> String {
+pub fn truncate_url_human_friendly(url_input: &str, max_length: usize, _hard_limit: bool) -> String {
     if url_input.len() <= max_length {
         return url_input.to_string();
     }
@@ -134,11 +111,7 @@ pub fn get_random_alpha_numeric() -> String {
     uuid::Uuid::new_v4().to_string().replace('-', "")
 }
 
-pub fn split_first(
-    input_string: &str,
-    separator: &str,
-    case_insensitive: bool,
-) -> (String, String) {
+pub fn split_first(input_string: &str, separator: &str, case_insensitive: bool) -> (String, String) {
     let match_index = if case_insensitive {
         input_string.to_lowercase().find(&separator.to_lowercase())
     } else {
@@ -155,11 +128,7 @@ pub fn split_first(
     }
 }
 
-pub fn split_first_char(
-    input_string: &str,
-    separator: char,
-    case_insensitive: bool,
-) -> (String, String) {
+pub fn split_first_char(input_string: &str, separator: char, case_insensitive: bool) -> (String, String) {
     let match_index = if case_insensitive {
         input_string
             .to_lowercase()
@@ -218,14 +187,8 @@ mod tests {
 
     #[test]
     fn natural_compare_test() {
-        assert_eq!(
-            natural_compare("file2", "file10", false),
-            std::cmp::Ordering::Less
-        );
-        assert_eq!(
-            natural_compare("file10", "file2", false),
-            std::cmp::Ordering::Greater
-        );
+        assert_eq!(natural_compare("file2", "file10", false), std::cmp::Ordering::Less);
+        assert_eq!(natural_compare("file10", "file2", false), std::cmp::Ordering::Greater);
     }
 
     #[test]
@@ -238,13 +201,7 @@ mod tests {
 
     #[test]
     fn split_first_test() {
-        assert_eq!(
-            split_first("key=value", "=", false),
-            ("key".to_string(), "value".to_string())
-        );
-        assert_eq!(
-            split_first("no-separator", "=", false),
-            ("no-separator".to_string(), String::new())
-        );
+        assert_eq!(split_first("key=value", "=", false), ("key".to_string(), "value".to_string()));
+        assert_eq!(split_first("no-separator", "=", false), ("no-separator".to_string(), String::new()));
     }
 }

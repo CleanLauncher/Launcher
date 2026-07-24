@@ -97,19 +97,13 @@ mod tests {
     #[test]
     fn sha256_empty() {
         let result = sha256(b"");
-        assert_eq!(
-            result,
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        );
+        assert_eq!(result, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
     }
 
     #[test]
     fn sha256_hello_world() {
         let result = sha256(b"hello world");
-        assert_eq!(
-            result,
-            "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
-        );
+        assert_eq!(result, "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9");
     }
 
     #[test]
@@ -161,10 +155,7 @@ mod tests {
         let empty: &[u8] = b"";
         let mut cursor = std::io::Cursor::new(empty);
         let result = sha256_reader(&mut cursor).unwrap();
-        assert_eq!(
-            result,
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-        );
+        assert_eq!(result, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
     }
 
     #[test]
@@ -172,9 +163,6 @@ mod tests {
         let data = b"hello world";
         let mut cursor = std::io::Cursor::new(data);
         let result = sha256_reader(&mut cursor).unwrap();
-        assert_eq!(
-            result,
-            "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
-        );
+        assert_eq!(result, "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9");
     }
 }

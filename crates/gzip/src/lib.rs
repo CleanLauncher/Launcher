@@ -49,10 +49,7 @@ pub fn deflate_raw(raw_input: &[u8]) -> Result<Vec<u8>> {
     Ok(result)
 }
 
-pub fn read_gz_by_blocks<Reader, BlockHandler>(
-    reader: &mut Reader,
-    mut block_handler: BlockHandler,
-) -> Result<()>
+pub fn read_gz_by_blocks<Reader, BlockHandler>(reader: &mut Reader, mut block_handler: BlockHandler) -> Result<()>
 where
     Reader: Read,
     BlockHandler: FnMut(&[u8]) -> bool,

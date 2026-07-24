@@ -20,27 +20,17 @@ pub fn to_string_pretty(value: &Value) -> Result<String> {
 
 pub fn is_binary_json(input_bytes: &[u8]) -> bool {
     // Binary JSON format starts with 0x00 0xBF 0x00 0xBF
-    input_bytes.len() >= 4
-        && input_bytes[0] == 0x00
-        && input_bytes[1] == 0xBF
-        && input_bytes[2] == 0x00
-        && input_bytes[3] == 0xBF
+    input_bytes.len() >= 4 && input_bytes[0] == 0x00 && input_bytes[1] == 0xBF && input_bytes[2] == 0x00 && input_bytes[3] == 0xBF
 }
 
 pub fn require_document(input_bytes: &[u8], what: &str) -> Result<Value> {
     if is_binary_json(input_bytes) {
-        return Err(CoreError::InvalidData(format!(
-            "{}: Invalid JSON. Binary JSON unsupported",
-            what
-        )));
+        return Err(CoreError::InvalidData(format!("{}: Invalid JSON. Binary JSON unsupported", what)));
     }
     parse(input_bytes)
 }
 
-pub fn require_object<'a>(
-    value: &'a Value,
-    what: &str,
-) -> Result<&'a serde_json::Map<String, Value>> {
+pub fn require_object<'a>(value: &'a Value, what: &str) -> Result<&'a serde_json::Map<String, Value>> {
     value
         .as_object()
         .ok_or_else(|| CoreError::InvalidData(format!("{} is not an object", what)))
@@ -73,10 +63,7 @@ pub fn require_f64(value: &Value, what: &str) -> Result<f64> {
 pub fn require_i64(value: &Value, what: &str) -> Result<i64> {
     let num = require_f64(value, what)?;
     if num.fract() != 0.0 {
-        return Err(CoreError::InvalidData(format!(
-            "{} is not an integer",
-            what
-        )));
+        return Err(CoreError::InvalidData(format!("{} is not an integer", what)));
     }
     Ok(num as i64)
 }
@@ -97,9 +84,7 @@ pub fn from_hex_string(hex: &str) -> Result<Vec<u8>> {
     (0..hex.len())
         .step_by(2)
         .map(|i| {
-            u8::from_str_radix(&hex[i..i + 2], 16).map_err(|_| {
-                CoreError::InvalidData(format!("Invalid hex string at position {}", i))
-            })
+            u8::from_str_radix(&hex[i..i + 2], 16).map_err(|_| CoreError::InvalidData(format!("Invalid hex string at position {}", i)))
         })
         .collect()
 }

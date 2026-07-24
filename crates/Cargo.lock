@@ -203,6 +203,9 @@ dependencies = [
  "http_client",
  "json",
  "markdown",
+ "mod_metadata",
+ "serde_json",
+ "settings",
  "string_utils",
 ]
 
@@ -923,6 +926,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "mod_metadata"
+version = "0.1.0"
+dependencies = [
+ "error",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "num-conv"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1337,6 +1349,13 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
+]
+
+[[package]]
+name = "settings"
+version = "0.1.0"
+dependencies = [
+ "error",
 ]
 
 [[package]]
